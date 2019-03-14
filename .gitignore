@@ -34,3 +34,7 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+advanced.cues
+edica.cues
+song.desc
+weaponized.ogg
