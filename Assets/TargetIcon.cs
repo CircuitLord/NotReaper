@@ -20,7 +20,7 @@ public class TargetIcon : MonoBehaviour {
 
     public void SetHandType(TargetHandType handType)
     {
-        foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>())
+        foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true))
         {
             switch (handType)
             {

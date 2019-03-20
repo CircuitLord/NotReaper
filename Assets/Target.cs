@@ -26,7 +26,7 @@ public class Target : MonoBehaviour
         else
         {
             var x = Mathf.RoundToInt(gridTarget.transform.position.x + 5.5f);
-            var y = Mathf.RoundToInt(gridTarget.transform.position.y + 4);
+            var y = Mathf.RoundToInt(gridTarget.transform.position.y + 3);
             pitch = x + 12 * y;
             offsetX = gridTarget.transform.position.x + 5.5f - x;
             offsetY = gridTarget.transform.position.y + 4 - y;
