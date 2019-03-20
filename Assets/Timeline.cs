@@ -85,7 +85,7 @@ public class Timeline : MonoBehaviour {
         else
         {
             x = (cue.pitch % 12) + (float) cue.gridOffset.x - 5.5f;
-            y = cue.pitch / 12 + (float)cue.gridOffset.y - 4f;
+            y = cue.pitch / 12 + (float)cue.gridOffset.y - 3f;
         }
 
         AddTarget(x, y, (cue.tick - offset) / 480f , cue.tickLength / 480f, cue.velocity, cue.handType, cue.behavior);
@@ -93,7 +93,7 @@ public class Timeline : MonoBehaviour {
 
     public void AddTarget(float x, float y)
     {
-        AddTarget(x, y, TimeToBeat(time), 1, 20, selectedHandType, selectedBehaviour);
+        AddTarget(x, y, BeatTime(), 1, 20, selectedHandType, selectedBehaviour);
     }
 
     public void AddTarget(float x, float y, float beatTime, float beatLength = 1, int velocity = 20, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard)
@@ -228,6 +228,7 @@ public class Timeline : MonoBehaviour {
     {
         bpm = newBpm;
         songDesc.tempo = newBpm;
+        SetScale(scale);
     }
 
 
@@ -249,7 +250,7 @@ public class Timeline : MonoBehaviour {
         timelineNotes.transform.localPosition = Vector3.left * (t * bpm / 60 - offset / 480f) / (scale / 20f);
         spectrogram.localPosition = Vector3.left * (t * bpm / 60) / (scale / 20f);
 
-        gridNotes.transform.localPosition = Vector3.back * (t * bpm / 60 + offset / 480f);
+        gridNotes.transform.localPosition = Vector3.back * (t * bpm / 60 - offset / 480f);
     }
 
     public void SetScale(int newScale)
@@ -298,27 +299,25 @@ public class Timeline : MonoBehaviour {
                 {
                     SetScale(scale + 1);
                 }
-            } else
-            {
-                if (Input.mouseScrollDelta.y > 0.1f)
-                {
-                    time += BeatToTime(4f / beatSnap);
-                    time = SnapTime(time);
-                    aud.time = time;
-                    previewAud.time = time;
-                    if (paused) previewAud.Play();
-                }
-                else if (Input.mouseScrollDelta.y < -0.1f)
-                {
-                    time -= BeatToTime(4f / beatSnap); 
-                    time = SnapTime(time);
-                    if (time < 0) time = 0;
-                    aud.time = time;
-                    previewAud.time = time;
-                    if (paused) previewAud.Play();
-                }
             }
-            
+        }
+        if(!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
+        if (Input.mouseScrollDelta.y > 0.1f)
+        {
+            time += BeatsToDuration(4f / beatSnap);
+            time = SnapTime(time);
+            aud.time = time;
+            previewAud.time = time;
+            if (paused) previewAud.Play();
+        }
+        else if (Input.mouseScrollDelta.y < -0.1f)
+        {
+            time -= BeatsToDuration(4f / beatSnap);
+            time = SnapTime(time);
+            if (time < 0) time = 0;
+            aud.time = time;
+            previewAud.time = time;
+            if (paused) previewAud.Play();
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -355,14 +354,14 @@ public class Timeline : MonoBehaviour {
         hover = false;
     }
 
-    public float TimeToBeat(float t)
+    public float DurationToBeats(float t)
     {
-        return t * bpm / 60 - offset/480f;
+        return t * bpm / 60;
     }
-    
-    public float BeatToTime(float beat)
+
+    public float BeatsToDuration(float beat)
     {
-        return (beat + offset/480f) * 60 / bpm;
+        return beat * 60 / bpm;
     }
     
     public float Snap(float beat)
@@ -370,8 +369,13 @@ public class Timeline : MonoBehaviour {
         return Mathf.Round(beat * beatSnap/4f) * 4f / beatSnap;
     }
 
+    public float BeatTime()
+    {
+        return DurationToBeats(time) - offset / 480f;
+    }
+
     public float SnapTime(float t)
     {
-        return BeatToTime(Snap(TimeToBeat(t)));
+        return BeatsToDuration(Snap(DurationToBeats(t) - offset/480f)+offset/480f);
     }
 }
