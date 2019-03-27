@@ -1106,7 +1106,7 @@ GameObject:
   - component: {fileID: 176916393}
   - component: {fileID: 176916392}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Ticker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

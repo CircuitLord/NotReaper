@@ -29,7 +29,7 @@ public class Target : MonoBehaviour
             var y = Mathf.RoundToInt(gridTarget.transform.position.y + 3);
             pitch = x + 12 * y;
             offsetX = gridTarget.transform.position.x + 5.5f - x;
-            offsetY = gridTarget.transform.position.y + 4 - y;
+            offsetY = gridTarget.transform.position.y + 3 - y;
         }
         Cue cue = new Cue()
         {

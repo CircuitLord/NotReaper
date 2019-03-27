@@ -15,13 +15,10 @@ public class Ticker : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("ping");
         if (layermask == (layermask | (1 << other.gameObject.layer)))
         {
-            Debug.Log(other.transform.position.z);
             if (other.transform.position.z > -1)
             { 
-                Debug.Log("pong");
                 aud.time = 0;
                 aud.Play();
             }
