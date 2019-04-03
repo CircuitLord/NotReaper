@@ -12,11 +12,14 @@ public class TargetIcon : MonoBehaviour {
     public GameObject chainStart;
     public GameObject chain;
     public GameObject melee;
+    public GameObject line;
 
     public Color leftColor;
     public Color rightColor;
     public Color eitherColor;
     public Color noneColor;
+
+    public float sustainDirection = 0.6f;
 
     public void SetHandType(TargetHandType handType)
     {
@@ -36,6 +39,52 @@ public class TargetIcon : MonoBehaviour {
                 default:
                     r.material.SetColor("_Tint", noneColor);
                     break;
+            }
+        }
+        foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true))
+        {
+            switch (handType)
+            {
+                case TargetHandType.Left:
+                    l.startColor = leftColor;
+                    l.endColor = leftColor;
+                    sustainDirection = 0.6f;
+                    break;
+                case TargetHandType.Right:
+                    l.startColor = rightColor;
+                    l.endColor = rightColor;
+                    sustainDirection = -0.6f;
+                    break;
+                case TargetHandType.Either:
+                    l.startColor = eitherColor;
+                    l.endColor = eitherColor;
+                    sustainDirection = 0.6f;
+                    break;
+                default:
+                    l.startColor = noneColor;
+                    l.endColor = noneColor;
+                    sustainDirection = 0.6f;
+                    break;
+            }
+        }
+
+    }
+
+    public void SetSustainLength(float beatLength)
+    {
+        foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true))
+        {
+            if (beatLength > 1)
+            {
+                l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
+                l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
+                l.SetPosition(2, new Vector3((beatLength / 2.8f), sustainDirection, 0.0f));
+            }
+            else
+            {
+                l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
+                l.SetPosition(1, new Vector3(0.0f, 0.0f, 0.0f));
+                l.SetPosition(2, new Vector3(0.0f, 0.0f, 0.0f));
             }
         }
     }

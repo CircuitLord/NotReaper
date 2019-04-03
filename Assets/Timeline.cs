@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.IO;
 using UnityEngine.Networking;
+using TMPro;
 using UnityEngine.UI;
 
 public class Timeline : MonoBehaviour {
@@ -17,11 +18,15 @@ public class Timeline : MonoBehaviour {
     [SerializeField] private AudioSource aud;
     [SerializeField] private AudioSource previewAud;
     [SerializeField] private Transform spectrogram;
+    [SerializeField] private TextMeshPro curMinutes;
+    [SerializeField] private TextMeshPro curSeconds;
+    [SerializeField] private TextMeshPro curTick;
 
     public Color leftColor;
     public Color rightColor;
     public Color bothColor;
     public Color neitherColor;
+
 
     List<GridTarget> notes;
     SongDesc songDesc;
@@ -38,9 +43,18 @@ public class Timeline : MonoBehaviour {
     private float targetScale = 1f;
     private float scaleOffset = 0;
     private float bpm = 60;
-    private int offset = 150;
+    private int offset = 0;
+    // .Desc menu
+    private string songid = "";
+    private string songtitle = "";
+    private string songartist = "";
+    private string songendevent = "";
+    private float songpreroll = 0.0f;
+    private string songauthor = "";
+
     private TargetHandType selectedHandType = TargetHandType.Right;
     private TargetBehavior selectedBehaviour = TargetBehavior.Standard;
+    private TargetVelocity selectedVelocity = TargetVelocity.Standard;
 
     private float timelineMaterialOffset;
 
@@ -88,15 +102,15 @@ public class Timeline : MonoBehaviour {
             y = cue.pitch / 12 + (float)cue.gridOffset.y - 3f;
         }
 
-        AddTarget(x, y, (cue.tick - offset) / 480f , cue.tickLength / 480f, cue.velocity, cue.handType, cue.behavior);
+        AddTarget(x, y, (cue.tick - offset) / 480f , cue.tickLength / 120f, cue.velocity, cue.handType, cue.behavior);
     }
 
     public void AddTarget(float x, float y)
     {
-        AddTarget(x, y, BeatTime(), 1, 20, selectedHandType, selectedBehaviour);
+        AddTarget(x, y, BeatTime(), 1, selectedVelocity, selectedHandType, selectedBehaviour);
     }
 
-    public void AddTarget(float x, float y, float beatTime, float beatLength = 1, int velocity = 20, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard)
+    public void AddTarget(float x, float y, float beatTime, float beatLength = 1, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard)
     {
         // Add to timeline
         var timelineClone = Instantiate(timelineNotePrefab, timelineNotes);
@@ -147,6 +161,7 @@ public class Timeline : MonoBehaviour {
 
         json = JsonUtility.ToJson(songDesc, true);
         File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "song.desc"), json);
+
     }
 
     public void Import()
@@ -157,7 +172,13 @@ public class Timeline : MonoBehaviour {
             string json = File.ReadAllText(descFiles[0]);
             songDesc = JsonUtility.FromJson<SongDesc>(json);
             SetOffset(songDesc.offset);
-            
+            SetSongID(songDesc.songID);
+            SetSongTitle(songDesc.title);
+            SetSongArtist(songDesc.artist);
+            SetSongEndEvent(songDesc.songEndEvent.Replace("event:/song_end/song_end_", string.Empty));
+            SetSongPreRoll(songDesc.prerollSeconds);
+            SetSongAuthor(songDesc.author);
+
         } else
         {
             songDesc = new SongDesc();
@@ -200,7 +221,7 @@ public class Timeline : MonoBehaviour {
 
                 SetBPM(songDesc.tempo);
                 SetScale(20);
-                Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap);
+                Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 
                 spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
             }
@@ -210,6 +231,11 @@ public class Timeline : MonoBehaviour {
     public void SetBehavior(TargetBehavior behavior)
     {
         selectedBehaviour = behavior;
+    }
+
+    public void SetVelocity(TargetVelocity velocity)
+    {
+        selectedVelocity = velocity;
     }
 
     public void SetPlaybackSpeed(float speed)
@@ -241,6 +267,43 @@ public class Timeline : MonoBehaviour {
     public void SetSnap(int newSnap)
     {
         beatSnap = newSnap;
+    }
+
+    // .desc menu
+    public void SetSongID(string newSongID)
+    {
+        songid = newSongID;
+        songDesc.songID = newSongID;
+    }
+
+    public void SetSongTitle(string newSongTitle)
+    {
+        songtitle = newSongTitle;
+        songDesc.title = newSongTitle;
+    }
+
+    public void SetSongArtist(string newSongArtist)
+    {
+        songartist = newSongArtist;
+        songDesc.artist = newSongArtist;
+    }
+
+    public void SetSongEndEvent(string newSongEndEvent)
+    {
+        songendevent = newSongEndEvent;
+        songDesc.songEndEvent = string.Concat("event:/song_end/song_end_", newSongEndEvent.ToUpper());
+    }
+
+    public void SetSongPreRoll(float newSongPreRoll)
+    {
+        songpreroll = newSongPreRoll;
+        songDesc.prerollSeconds = newSongPreRoll;
+    }
+
+    public void SetSongAuthor(string newSongAuthor)
+    {
+        songauthor = newSongAuthor;
+        songDesc.author = newSongAuthor;
     }
 
     public void SetBeatTime(float t)
@@ -285,7 +348,8 @@ public class Timeline : MonoBehaviour {
 
     public void Update()
     {
-        if(!paused)time += Time.deltaTime * playbackSpeed;
+
+        if (!paused)time += Time.deltaTime * playbackSpeed;
 
         if (hover)
         {
@@ -341,6 +405,9 @@ public class Timeline : MonoBehaviour {
         {
             previewAud.Pause();
         }
+
+        SetCurrentTime ();
+        SetCurrentTick();
     }
     
 
@@ -378,4 +445,21 @@ public class Timeline : MonoBehaviour {
     {
         return BeatsToDuration(Snap(DurationToBeats(t) - offset/480f)+offset/480f);
     }
+
+    private void SetCurrentTime()
+    {
+        string minutes = Mathf.Floor((int)time / 60).ToString("00");
+        string seconds = ((int)time % 60).ToString("00");
+
+        curMinutes.text = minutes;
+        curSeconds.text = seconds;
+    }
+
+    private void SetCurrentTick()
+    {
+        string currentTick = Mathf.Floor((int)BeatTime() * 480f).ToString();
+
+        curTick.text = currentTick;
+    }
+
 }
