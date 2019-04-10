@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class NoteGrid : MonoBehaviour {
 
@@ -24,6 +25,9 @@ public class NoteGrid : MonoBehaviour {
     {
         if (hover)
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
             var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePos = SnapToGrid(mousePos);
             var ghostPos = ghost.position;
@@ -33,12 +37,18 @@ public class NoteGrid : MonoBehaviour {
 
             if (Input.GetMouseButtonDown(0))
             {
+                if (EventSystem.current.IsPointerOverGameObject())
+                    return;
+
                 timeline.AddTarget(mousePos.x, mousePos.y);
             }
         }
 
         if (Input.GetMouseButtonDown(1))
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
             timeline.DeleteTarget(NoteUnderMouse());
         }
 

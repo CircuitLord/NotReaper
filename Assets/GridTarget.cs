@@ -3,5 +3,5 @@
     public TargetHandType handType;
     public TargetBehavior behavior;
     public float beatLength = 1;
-    public int velocity = 20;
+    public TargetVelocity velocity;
 }
