@@ -17164,8 +17164,8 @@ GameObject:
   - component: {fileID: 2103585222}
   - component: {fileID: 2103585221}
   - component: {fileID: 2103585220}
-  - component: {fileID: 2103585223}
   - component: {fileID: 2103585224}
+  - component: {fileID: 2103585223}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -17231,7 +17231,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2103585219}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56ddc7cc694734f46be5ae8c989cb483, type: 3}
+  m_Script: {fileID: 11500000, guid: 6c3a018ab3426784bbf3da191b30d168, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   question: {fileID: 1337527835}
@@ -17249,7 +17249,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2103585219}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67d579aa5ac60ed47a70545d60c6b28b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e87d764d1117b94888d2990684610ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   timeline: {fileID: 224780582}
