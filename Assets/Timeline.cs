@@ -174,6 +174,29 @@ public class Timeline : MonoBehaviour
         time = 0;
     }
 
+    public void Import()
+    {
+        DeleteTargets();
+
+        //load cues from temp
+            var cueFiles = StandaloneFileBrowser.OpenFilePanel("Import .cues", Application.persistentDataPath, "cues", false);
+            if (cueFiles.Length > 0)
+            {
+                string json = File.ReadAllText(cueFiles[0]);
+                json = json.Replace("cues", "Items");
+                Cue[] cues = JsonHelper.FromJson<Cue>(json);
+                foreach (Cue cue in cues)
+                {
+                    AddTarget(cue);
+                }
+            }
+            else
+            {
+                Debug.Log("cues not found");
+            }
+
+    }
+
     public void Save()
     {
         Cue[] cues = new Cue[notes.Count];
