@@ -4,14 +4,20 @@ using UnityEngine;
 using System;
 using System.Linq;
 using System.IO;
+using System.IO.Compression;
 using UnityEngine.Networking;
 using TMPro;
 using UnityEngine.UI;
+using UnityEditor;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using SFB;
 
-public class Timeline : MonoBehaviour {
-
+public class Timeline : MonoBehaviour
+{    
+    public LoadModalInstance loadmodal;
     public float playbackSpeed = 1f;
-    
+
     [SerializeField] private Renderer timelineBG;
     [SerializeField] private Transform timelineNotes;
     [SerializeField] private Transform gridNotes;
@@ -29,13 +35,14 @@ public class Timeline : MonoBehaviour {
 
 
     List<GridTarget> notes;
+    List<TimelineTarget> notesTimeline;
     SongDesc songDesc;
 
     public GridTarget gridNotePrefab;
     public TimelineTarget timelineNotePrefab;
 
     public float previewDuration = 0.1f;
-    
+
     public float time { get; private set; }
 
     private int beatSnap = 4;
@@ -61,12 +68,14 @@ public class Timeline : MonoBehaviour {
     private bool hover = false;
     private bool paused = true;
 
-    
-    private void Awake()
+
+    private void Start()
     {
         notes = new List<GridTarget>();
+        notesTimeline = new List<TimelineTarget>();
 
-        Import();
+
+        loadmodal.LoadPanelStart();
     }
 
     public void AddTarget(Cue cue)
@@ -98,11 +107,11 @@ public class Timeline : MonoBehaviour {
         }
         else
         {
-            x = (cue.pitch % 12) + (float) cue.gridOffset.x - 5.5f;
+            x = (cue.pitch % 12) + (float)cue.gridOffset.x - 5.5f;
             y = cue.pitch / 12 + (float)cue.gridOffset.y - 3f;
         }
 
-        AddTarget(x, y, (cue.tick - offset) / 480f , cue.tickLength / 120f, cue.velocity, cue.handType, cue.behavior);
+        AddTarget(x, y, (cue.tick - offset) / 480f, cue.tickLength / 120f, cue.velocity, cue.handType, cue.behavior);
     }
 
     public void AddTarget(float x, float y)
@@ -129,12 +138,13 @@ public class Timeline : MonoBehaviour {
         gridClone.SetBehavior(behavior);
         gridClone.SetBeatLength(beatLength);
         gridClone.SetVelocity(velocity);
-        
+
         notes.Add(gridClone);
+        notesTimeline.Add(timelineClone);
 
         UpdateTrail();
     }
-    
+
     public void DeleteTarget(Target target)
     {
         if (target == null) return;
@@ -143,6 +153,61 @@ public class Timeline : MonoBehaviour {
         var g = target.gridTarget.gameObject;
         Destroy(tl);
         Destroy(g);
+    }
+
+    private void DeleteTargets()
+    {
+        foreach (GridTarget obj in notes)
+        {
+            Destroy(obj.gameObject);
+        }
+
+        foreach (TimelineTarget obj in notesTimeline)
+        {
+            Destroy(obj.gameObject);
+        }
+
+        var liner = gridNotes.gameObject.GetComponentInChildren<LineRenderer>();
+        liner.SetPositions(new Vector3[0]);
+        liner.positionCount = 0;
+
+        time = 0;
+    }
+
+    public void Save()
+    {
+        Cue[] cues = new Cue[notes.Count];
+        GridTarget[] orderedNotes = notes.OrderBy(v => v.transform.position.z).ToArray();
+        for (int i = 0; i < notes.Count; i++)
+        {
+            cues[i] = orderedNotes[i].ToCue(offset);
+        }
+
+        string json = JsonHelper.ToJson(cues, true);
+        json = json.Replace("Items", "cues");
+
+        string dirpath = Application.persistentDataPath;
+
+        File.WriteAllText(Path.Combine(dirpath, "edica.cues"), json);
+        FileInfo edicaFile = new FileInfo(Path.Combine(dirpath, "edica.cues"));
+
+        json = JsonUtility.ToJson(songDesc, true);
+        File.WriteAllText(Path.Combine(dirpath, "song.desc"), json);
+        FileInfo descFile = new FileInfo(Path.Combine(dirpath, "song.desc"));
+
+        string[] oggPath = Directory.GetFiles(dirpath + "\\temp\\", "*.ogg");
+        FileInfo oggFile = new FileInfo(oggPath[0]);
+
+
+        FileInfo[] files = new FileInfo[3];
+        files[0] = edicaFile;
+        files[1] = descFile;
+        files[2] = oggFile;
+
+        string path = StandaloneFileBrowser.SaveFilePanel("Audica Save", Application.persistentDataPath, "Edica Save", "edica");
+        //PlayerPrefs.SetString("previousSave", path);
+        Compress(files, path);
+
     }
 
     public void Export()
@@ -156,51 +221,209 @@ public class Timeline : MonoBehaviour {
 
         string json = JsonHelper.ToJson(cues, true);
         json = json.Replace("Items", "cues");
-        
-        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "edica.cues"), json);
+
+        string[] dirpatharr = StandaloneFileBrowser.OpenFolderPanel("Export Location","",false);
+        if(dirpatharr.Length > 0)
+        {        
+        string dirpath = dirpatharr[0];
+        File.WriteAllText(Path.Combine(dirpath, "edica.cues"), json);
+        FileInfo edicaFile = new FileInfo(Path.Combine(dirpath, "edica.cues"));
 
         json = JsonUtility.ToJson(songDesc, true);
-        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "song.desc"), json);
+        File.WriteAllText(Path.Combine(dirpath, "song.desc"), json);
+        FileInfo descFile = new FileInfo(Path.Combine(dirpath, "song.desc"));
+        }
 
     }
 
-    public void Import()
+
+    public static void Compress(FileInfo[] files, string destination)
     {
-        var descFiles = Directory.GetFiles(Environment.CurrentDirectory, "song.desc");
-        if (descFiles.Length > 0)
-        {
-            string json = File.ReadAllText(descFiles[0]);
-            songDesc = JsonUtility.FromJson<SongDesc>(json);
-            SetOffset(songDesc.offset);
-            SetSongID(songDesc.songID);
-            SetSongTitle(songDesc.title);
-            SetSongArtist(songDesc.artist);
-            SetSongEndEvent(songDesc.songEndEvent.Replace("event:/song_end/song_end_", string.Empty));
-            SetSongPreRoll(songDesc.prerollSeconds);
-            SetSongAuthor(songDesc.author);
+        string dirpath = Application.persistentDataPath;
 
-        } else
+        DirectorySecurity securityRules = new DirectorySecurity();
+        SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
+        securityRules.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.FullControl, AccessControlType.Allow));
+
+
+
+        if (!System.IO.Directory.Exists(dirpath + "\\TempSave\\"))
         {
-            songDesc = new SongDesc();
+            System.IO.Directory.CreateDirectory(dirpath + "\\TempSave\\", securityRules);
+
         }
 
-        var cueFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.cues");
-        if (cueFiles.Length > 0) {
-            string json = File.ReadAllText(cueFiles[0]);
-            json = json.Replace("cues", "Items");
-            Cue[] cues = JsonHelper.FromJson<Cue>(json);
-            foreach (Cue cue in cues)
+        foreach (FileInfo fileToCompress in files)
+        {
+            fileToCompress.CopyTo(dirpath + "\\TempSave\\" + fileToCompress.Name, true);
+        }
+
+        try
+        {
+            ZipFile.CreateFromDirectory(dirpath + "\\TempSave\\", destination);
+        }
+        catch (IOException e)
+        {
+            Debug.Log(e.Message + "....Deleting File");
+            FileInfo fileToReplace = new FileInfo(destination);
+            fileToReplace.Delete();
+            try
             {
-                AddTarget(cue);
+                ZipFile.CreateFromDirectory(dirpath + "\\TempSave\\", destination);
             }
-        }
+            catch (IOException e2)
+            {
+                Debug.Log(e2.Message + "....No More attempts");
+            }
 
-        var audioFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.ogg");
+        }
+        DirectoryInfo dir = new DirectoryInfo(dirpath + "\\TempSave\\");
+        dir.Delete(true);
+    }
+
+    public void NewFile()
+    {
+        DeleteTargets();
+
+        notes = new List<GridTarget>();
+        notesTimeline = new List<TimelineTarget>();
+
+        string dirpath = Application.persistentDataPath;
+
+        //create the new song desc
+        songDesc = new SongDesc();
+
+        //locate and copy ogg file to temp folder (used to save the project later)
+        var audioFiles = StandaloneFileBrowser.OpenFilePanel("Import .ogg file", System.Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "ogg",false);
         if (audioFiles.Length > 0)
         {
-            StartCoroutine(GetAudioClip(audioFiles[0]));
+            FileInfo oggFile = new FileInfo(audioFiles[0]);
+            if (!System.IO.Directory.Exists(dirpath + "\\temp\\"))
+            {
+                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\");
+            }
+            else
+            {
+                DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
+                direct.Delete(true);
+
+                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\");
+            }
+            oggFile.CopyTo(dirpath + "\\temp\\" + oggFile.Name, true);
+
+            //load ogg into audio clip
+            if (audioFiles.Length > 0)
+            {
+                StartCoroutine(GetAudioClip(audioFiles[0]));
+            }
+            else
+            {
+                Debug.Log("ogg not found");
+            }
+        }
+        else
+        {
+            Application.Quit();
         }
 
+    }
+
+    private void LoadFromFile(string edicaSave)
+    {
+        DeleteTargets();        
+        
+        if (edicaSave.Length > 0)
+        {
+            PlayerPrefs.SetString("previousSave",edicaSave);
+
+            //move zip to temp folder
+            string dirpath = Application.persistentDataPath;
+            if (!System.IO.Directory.Exists(dirpath + "\\temp\\"))
+            {
+                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\");
+            }
+            else
+            {
+                DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
+                direct.Delete(true);
+
+                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\");
+            }
+
+            //unzip save into temp
+            ZipFile.ExtractToDirectory(edicaSave, dirpath + "\\temp\\");
+
+
+            //load desc from temp
+            var descFiles = Directory.GetFiles(dirpath + "\\temp\\", "song.desc");
+            if (descFiles.Length > 0)
+            {
+                string json = File.ReadAllText(dirpath + "\\temp\\song.desc");
+                songDesc = JsonUtility.FromJson<SongDesc>(json);
+                SetOffset(songDesc.offset);
+                SetSongID(songDesc.songID);
+                SetSongTitle(songDesc.title);
+                SetSongArtist(songDesc.artist);
+                SetSongEndEvent(songDesc.songEndEvent.Replace("event:/song_end/song_end_", string.Empty));
+                SetSongPreRoll(songDesc.prerollSeconds);
+                SetSongAuthor(songDesc.author);
+
+            }
+            else
+            {
+                Debug.Log("desc not found");
+                songDesc = new SongDesc();
+            }
+
+            //load cues from temp
+            var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
+            if (cueFiles.Length > 0)
+            {
+                string json = File.ReadAllText(cueFiles[0]);
+                json = json.Replace("cues", "Items");
+                Cue[] cues = JsonHelper.FromJson<Cue>(json);
+                foreach (Cue cue in cues)
+                {
+                    AddTarget(cue);
+                }
+            }
+            else
+            {
+                Debug.Log("cues not found");
+                NewFile();
+            }
+
+
+            //load ogg into audio clip
+            var audioFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.ogg");
+            if (audioFiles.Length > 0)
+            {
+                StartCoroutine(GetAudioClip(audioFiles[0]));
+            }
+            else
+            {
+                Debug.Log("ogg not found");
+            }
+        }
+        else
+        {
+            NewFile();
+        }
+    }
+    public void LoadPrevious()
+    {
+        string edicaSave = PlayerPrefs.GetString("previousSave");;   
+        LoadFromFile(edicaSave);
+    }
+    
+    public void Load()
+    {
+        //open save
+        string[] edicaSave = StandaloneFileBrowser.OpenFilePanel("Edica save file", Application.persistentDataPath, "edica",false);
+        if(edicaSave.Length > 0)
+            LoadFromFile(edicaSave[0]);
+        else
+            NewFile();
     }
 
     IEnumerator GetAudioClip(string uri)
@@ -308,7 +531,7 @@ public class Timeline : MonoBehaviour {
 
     public void SetBeatTime(float t)
     {
-        timelineBG.material.SetTextureOffset("_MainTex", new Vector2 (((t * bpm/60 - offset/480f)/4f + scaleOffset), 1));
+        timelineBG.material.SetTextureOffset("_MainTex", new Vector2(((t * bpm / 60 - offset / 480f) / 4f + scaleOffset), 1));
 
         timelineNotes.transform.localPosition = Vector3.left * (t * bpm / 60 - offset / 480f) / (scale / 20f);
         spectrogram.localPosition = Vector3.left * (t * bpm / 60) / (scale / 20f);
@@ -318,13 +541,13 @@ public class Timeline : MonoBehaviour {
 
     public void SetScale(int newScale)
     {
-        timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale/4f, 1));
-        scaleOffset =  - newScale % 8 / 8f;
+        timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
+        scaleOffset = -newScale % 8 / 8f;
 
-        spectrogram.localScale = new Vector3(aud.clip.length / 2 * bpm / 60 / (newScale/20f), 1, 1);
+        spectrogram.localScale = new Vector3(aud.clip.length / 2 * bpm / 60 / (newScale / 20f), 1, 1);
 
-        timelineNotes.transform.localScale *= (float)scale/newScale;
-        targetScale *= (float)newScale/scale;
+        timelineNotes.transform.localScale *= (float)scale / newScale;
+        targetScale *= (float)newScale / scale;
         // fix scaling on all notes
         foreach (Transform note in timelineNotes.transform)
         {
@@ -349,7 +572,7 @@ public class Timeline : MonoBehaviour {
     public void Update()
     {
 
-        if (!paused)time += Time.deltaTime * playbackSpeed;
+        if (!paused) time += Time.deltaTime * playbackSpeed;
 
         if (hover)
         {
@@ -365,24 +588,24 @@ public class Timeline : MonoBehaviour {
                 }
             }
         }
-        if(!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
-        if (Input.mouseScrollDelta.y > 0.1f)
-        {
-            time += BeatsToDuration(4f / beatSnap);
-            time = SnapTime(time);
-            aud.time = time;
-            previewAud.time = time;
-            if (paused) previewAud.Play();
-        }
-        else if (Input.mouseScrollDelta.y < -0.1f)
-        {
-            time -= BeatsToDuration(4f / beatSnap);
-            time = SnapTime(time);
-            if (time < 0) time = 0;
-            aud.time = time;
-            previewAud.time = time;
-            if (paused) previewAud.Play();
-        }
+        if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
+            if (Input.mouseScrollDelta.y > 0.1f)
+            {
+                time += BeatsToDuration(4f / beatSnap);
+                time = SnapTime(time);
+                aud.time = time;
+                previewAud.time = time;
+                if (paused) previewAud.Play();
+            }
+            else if (Input.mouseScrollDelta.y < -0.1f)
+            {
+                time -= BeatsToDuration(4f / beatSnap);
+                time = SnapTime(time);
+                if (time < 0) time = 0;
+                aud.time = time;
+                previewAud.time = time;
+                if (paused) previewAud.Play();
+            }
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (paused)
@@ -395,7 +618,7 @@ public class Timeline : MonoBehaviour {
             {
                 aud.Pause();
                 paused = true;
-               // time = SnapTime(time);
+                // time = SnapTime(time);
                 if (time < 0) time = 0;
                 if (time > aud.clip.length) time = aud.clip.length;
             }
@@ -406,10 +629,10 @@ public class Timeline : MonoBehaviour {
             previewAud.Pause();
         }
 
-        SetCurrentTime ();
+        SetCurrentTime();
         SetCurrentTick();
     }
-    
+
 
     void OnMouseOver()
     {
@@ -430,10 +653,10 @@ public class Timeline : MonoBehaviour {
     {
         return beat * 60 / bpm;
     }
-    
+
     public float Snap(float beat)
     {
-        return Mathf.Round(beat * beatSnap/4f) * 4f / beatSnap;
+        return Mathf.Round(beat * beatSnap / 4f) * 4f / beatSnap;
     }
 
     public float BeatTime()
@@ -443,7 +666,7 @@ public class Timeline : MonoBehaviour {
 
     public float SnapTime(float t)
     {
-        return BeatsToDuration(Snap(DurationToBeats(t) - offset/480f)+offset/480f);
+        return BeatsToDuration(Snap(DurationToBeats(t) - offset / 480f) + offset / 480f);
     }
 
     private void SetCurrentTime()
