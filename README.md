@@ -13,9 +13,9 @@
 THE FOLLOWING IS ONLY FOR USERS WHO ARE COMING FROM OTHER EDITORS (or older versions of this editor)
 
 1. Create a folder
-2. Place you .cue .desc (if you have one) and .ogg files in said folder
+2. Place you `.cue` `.desc` (if you have one) and `.ogg` files in said folder
 3. Select the files and create a zip file containing only those 3 files (make sure they are not contained in a folder in the zip)
-4. Change the .zip file extension to .edica
+4. Change the `.zip` file extension to `.edica`
 5. In edica when prompted select "Load .edica file" and navigate to the file you created
 
 
