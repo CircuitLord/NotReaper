@@ -1580,6 +1580,8 @@ GameObject:
   - component: {fileID: 224780584}
   - component: {fileID: 224780585}
   - component: {fileID: 224780586}
+  - component: {fileID: 224780588}
+  - component: {fileID: 224780587}
   m_Layer: 0
   m_Name: Timeline
   m_TagString: Untagged
@@ -1599,7 +1601,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e769d6862748d144eb65683184b51a05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadmodal: {fileID: 2103585224}
+  loadmodal: {fileID: 224780588}
   playbackSpeed: 1
   timelineBG: {fileID: 276713672}
   timelineNotes: {fileID: 1395177109}
@@ -1844,6 +1846,37 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &224780587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224780581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fa4915724e8cf54b8682507af3c5ef7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  question: {fileID: 1337527835}
+  Button1: {fileID: 1132862714}
+  Button2: {fileID: 380542040}
+  Button3: {fileID: 539330480}
+  Button4: {fileID: 2111764651}
+  modalPanelObject: {fileID: 1643640776}
+--- !u!114 &224780588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224780581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b75796ae62ffda41bd32a317f636813, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeline: {fileID: 224780582}
 --- !u!1 &242585230
 GameObject:
   m_ObjectHideFlags: 0
@@ -17164,8 +17197,6 @@ GameObject:
   - component: {fileID: 2103585222}
   - component: {fileID: 2103585221}
   - component: {fileID: 2103585220}
-  - component: {fileID: 2103585224}
-  - component: {fileID: 2103585223}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -17222,37 +17253,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2103585223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2103585219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c3a018ab3426784bbf3da191b30d168, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  question: {fileID: 1337527835}
-  Button1: {fileID: 1132862714}
-  Button2: {fileID: 380542040}
-  Button3: {fileID: 539330480}
-  Button4: {fileID: 2111764651}
-  modalPanelObject: {fileID: 1643640776}
---- !u!114 &2103585224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2103585219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e87d764d1117b94888d2990684610ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeline: {fileID: 224780582}
 --- !u!1 &2104353030
 GameObject:
   m_ObjectHideFlags: 0
