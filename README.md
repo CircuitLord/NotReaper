@@ -1,6 +1,7 @@
 # AudicaEditor
 
 ## How to use
+* If you want to change the resolution of the application hold the shift key while launching Edica
 * Convert your music to OGG-VORBIS `.ogg` before use
 * Export will always save results to edica.cues - be careful not to overwrite your previous work
 * Save will give you a .audica file. This file can be used to save progress on your map without exporting it.
