@@ -16,6 +16,7 @@ using SFB;
 public class Timeline : MonoBehaviour
 {    
     public LoadModalInstance loadmodal;
+    public DifficultySelection DifficultySelection_s;
     public float playbackSpeed = 1f;
 
     [SerializeField] private Renderer timelineBG;
@@ -67,6 +68,10 @@ public class Timeline : MonoBehaviour
 
     private bool hover = false;
     private bool paused = true;
+    public bool projectStarted = false;
+
+    private DirectorySecurity securityRules = new DirectorySecurity();
+    private SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
 
 
     private void Start()
@@ -74,8 +79,16 @@ public class Timeline : MonoBehaviour
         notes = new List<GridTarget>();
         notesTimeline = new List<TimelineTarget>();
 
+        securityRules.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.FullControl, AccessControlType.Allow));
+
 
         loadmodal.LoadPanelStart();
+    }
+
+    void OnApplicationQuit()
+    {
+        DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath + "\\temp\\");
+        dir.Delete(true);
     }
 
     public void AddTarget(Cue cue)
@@ -159,19 +172,48 @@ public class Timeline : MonoBehaviour
     {
         foreach (GridTarget obj in notes)
         {
-            Destroy(obj.gameObject);
+            if(obj)
+                Destroy(obj.gameObject);
         }
 
         foreach (TimelineTarget obj in notesTimeline)
         {
-            Destroy(obj.gameObject);
+            if(obj)
+                Destroy(obj.gameObject);
         }
+
+        notes = new List<GridTarget>();
+        notesTimeline = new List<TimelineTarget>();
 
         var liner = gridNotes.gameObject.GetComponentInChildren<LineRenderer>();
         liner.SetPositions(new Vector3[0]);
         liner.positionCount = 0;
 
         time = 0;
+    }
+
+    public void ChangeDifficulty()
+    {
+        string dirpath = Application.persistentDataPath;
+
+        string[] cuePath = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
+        if (cuePath.Length > 0)
+        {
+            DeleteTargets();
+
+            //load cues from temp
+            string json = File.ReadAllText(cuePath[0]);
+            json = json.Replace("cues", "Items");
+            Cue[] cues = JsonHelper.FromJson<Cue>(json);
+            foreach (Cue cue in cues)
+            {
+                AddTarget(cue);
+            }
+        }
+        else
+        {
+            DeleteTargets();
+        }
     }
 
     public void Import()
@@ -198,7 +240,7 @@ public class Timeline : MonoBehaviour
     }
 
     public void Save()
-    {
+    {      
         Cue[] cues = new Cue[notes.Count];
         GridTarget[] orderedNotes = notes.OrderBy(v => v.transform.position.z).ToArray();
         for (int i = 0; i < notes.Count; i++)
@@ -211,29 +253,77 @@ public class Timeline : MonoBehaviour
 
         string dirpath = Application.persistentDataPath;
 
-        File.WriteAllText(Path.Combine(dirpath, "edica.cues"), json);
-        FileInfo edicaFile = new FileInfo(Path.Combine(dirpath, "edica.cues"));
+        if(notes.Count>0)
+            File.WriteAllText(Path.Combine(dirpath  + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
+
 
         json = JsonUtility.ToJson(songDesc, true);
-        File.WriteAllText(Path.Combine(dirpath, "song.desc"), json);
-        FileInfo descFile = new FileInfo(Path.Combine(dirpath, "song.desc"));
+        File.WriteAllText(Path.Combine(dirpath  + "\\temp\\", "song.desc"), json);
+        FileInfo descFile = new FileInfo(Path.Combine(dirpath  + "\\temp\\", "song.desc"));
 
         string[] oggPath = Directory.GetFiles(dirpath + "\\temp\\", "*.ogg");
         FileInfo oggFile = new FileInfo(oggPath[0]);
 
 
-        FileInfo[] files = new FileInfo[3];
-        files[0] = edicaFile;
-        files[1] = descFile;
-        files[2] = oggFile;
+        List<FileInfo> files = new List<FileInfo>();
+        files.Add(descFile);
+        files.Add(oggFile);
+
+        //push all .cues files to list
+        var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
+        if (cueFiles.Length > 0)
+        {
+            foreach(var cue in cueFiles)
+            {
+                FileInfo file = new FileInfo(cue);
+                files.Add(file);
+            }
+        }
 
         string path = StandaloneFileBrowser.SaveFilePanel("Audica Save", Application.persistentDataPath, "Edica Save", "edica");
         //PlayerPrefs.SetString("previousSave", path);
-        Compress(files, path);
+        if(path.Length > 0)
+            Compress(files, path);
 
     }
 
     public void Export()
+    {
+
+        string[] dirpatharr = StandaloneFileBrowser.OpenFolderPanel("Export Location", "", false);
+        if (dirpatharr.Length > 0)
+        {
+            //push all .cues files to list
+            List<FileInfo> files = new List<FileInfo>();
+            string dirpath = Application.persistentDataPath;
+
+
+            var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
+            if (cueFiles.Length > 0)
+            {
+                foreach (var cue in cueFiles)
+                {
+                    FileInfo file = new FileInfo(cue);
+                    files.Add(file);
+                }
+            }
+
+
+            //export desc    
+            string json = JsonUtility.ToJson(songDesc, true);
+            File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
+            FileInfo descfile = new FileInfo(dirpath + "\\temp\\song.desc");
+            files.Add(descfile);
+
+            //compress files and send to location
+            Compress(files,dirpatharr[0]+"temp.zip");
+            ZipFile.ExtractToDirectory(dirpatharr[0] + "temp.zip", dirpatharr[0]);
+
+        }
+
+    }
+
+    public void ExportCueToTemp()
     {
         Cue[] cues = new Cue[notes.Count];
         GridTarget[] orderedNotes = notes.OrderBy(v => v.transform.position.z).ToArray();
@@ -245,30 +335,16 @@ public class Timeline : MonoBehaviour
         string json = JsonHelper.ToJson(cues, true);
         json = json.Replace("Items", "cues");
 
-        string[] dirpatharr = StandaloneFileBrowser.OpenFolderPanel("Export Location","",false);
-        if(dirpatharr.Length > 0)
-        {        
-        string dirpath = dirpatharr[0];
-        File.WriteAllText(Path.Combine(dirpath, "edica.cues"), json);
-        FileInfo edicaFile = new FileInfo(Path.Combine(dirpath, "edica.cues"));
+        string dirpath = Application.persistentDataPath;
 
-        json = JsonUtility.ToJson(songDesc, true);
-        File.WriteAllText(Path.Combine(dirpath, "song.desc"), json);
-        FileInfo descFile = new FileInfo(Path.Combine(dirpath, "song.desc"));
-        }
-
+        if(notes.Count>0)
+            File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
     }
 
 
-    public static void Compress(FileInfo[] files, string destination)
+    public void Compress(List<FileInfo> files, string destination)
     {
         string dirpath = Application.persistentDataPath;
-
-        DirectorySecurity securityRules = new DirectorySecurity();
-        SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
-        securityRules.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.FullControl, AccessControlType.Allow));
-
-
 
         if (!System.IO.Directory.Exists(dirpath + "\\TempSave\\"))
         {
@@ -323,14 +399,14 @@ public class Timeline : MonoBehaviour
             FileInfo oggFile = new FileInfo(audioFiles[0]);
             if (!System.IO.Directory.Exists(dirpath + "\\temp\\"))
             {
-                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\");
+                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\",securityRules);
             }
             else
             {
                 DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
                 direct.Delete(true);
 
-                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\");
+                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\",securityRules);
             }
             oggFile.CopyTo(dirpath + "\\temp\\" + oggFile.Name, true);
 
@@ -351,7 +427,7 @@ public class Timeline : MonoBehaviour
 
     }
 
-    private void LoadFromFile(string edicaSave)
+    public void LoadFromFile(string edicaSave)
     {
         DeleteTargets();        
         
@@ -363,14 +439,14 @@ public class Timeline : MonoBehaviour
             string dirpath = Application.persistentDataPath;
             if (!System.IO.Directory.Exists(dirpath + "\\temp\\"))
             {
-                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\");
+                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\",securityRules);
             }
             else
             {
                 DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
                 direct.Delete(true);
 
-                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\");
+                System.IO.Directory.CreateDirectory(dirpath + "\\temp\\",securityRules);
             }
 
             //unzip save into temp
@@ -399,16 +475,65 @@ public class Timeline : MonoBehaviour
             }
 
             //load cues from temp
-            var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
+            //var cueFile = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
+            var cueFiles = Directory.GetFiles(dirpath + "\\temp\\","*.cues");
             if (cueFiles.Length > 0)
             {
-                string json = File.ReadAllText(cueFiles[0]);
-                json = json.Replace("cues", "Items");
-                Cue[] cues = JsonHelper.FromJson<Cue>(json);
-                foreach (Cue cue in cues)
+                //figure out if it has difficulties (new edica file)
+                bool isDifficultyNamed = false;
+                string difficulty = "";
+                foreach(var file in cueFiles)
                 {
-                    AddTarget(cue);
+                    if(file.Contains("expert.cues"))
+                    {
+                        isDifficultyNamed = true;
+                        difficulty = "expert";
+                    }
+                    else if(file.Contains("advanced.cues"))
+                    {
+                        isDifficultyNamed = true;
+                        difficulty = "advanced";                    
+                    }
+                    else if(file.Contains("moderate.cues"))
+                    {
+                        isDifficultyNamed = true;
+                        difficulty = "moderate";                  
+                    }
+                    else if(file.Contains("beginner.cues"))
+                    {
+                        isDifficultyNamed = true;
+                        difficulty = "beginner";
+                    }
                 }
+
+                if (isDifficultyNamed)
+                {
+                    DifficultySelection_s.Value = difficulty;
+                    DifficultySelection_s.selection.value = (int)DifficultySelection.Options.Parse(typeof(DifficultySelection.Options), difficulty);
+
+                    //load .cues
+                    var cueFile = Directory.GetFiles(dirpath + "\\temp\\", difficulty + ".cues");
+                    string json = File.ReadAllText(cueFile[0]);
+                    json = json.Replace("cues", "Items");
+                    Cue[] cues = JsonHelper.FromJson<Cue>(json);
+                    foreach (Cue cue in cues)
+                    {
+                        AddTarget(cue);
+                    }
+                }
+
+                else //old edica format. Shove it into expert
+                {
+                    string json = File.ReadAllText(cueFiles[0]);
+                    json = json.Replace("cues", "Items");
+                    Cue[] cues = JsonHelper.FromJson<Cue>(json);
+                    foreach (Cue cue in cues)
+                    {
+                        AddTarget(cue);
+                    }
+                }
+                
+                
             }
             else
             {

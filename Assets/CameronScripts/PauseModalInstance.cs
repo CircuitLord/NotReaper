@@ -4,7 +4,7 @@ using UnityEngine.Events;
 using System.Collections;
 
 //  This script will be updated in Part 2 of this 2 part series.
-public class LoadModalInstance : MonoBehaviour
+public class PauseModalInstance : MonoBehaviour
 {
     private Modal modalPanel;
     private UnityAction Action1;
@@ -14,7 +14,13 @@ public class LoadModalInstance : MonoBehaviour
 
     public Timeline timeline;
 
-
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape) && timeline.projectStarted)
+        {
+            LoadPanelStart();
+        }
+    }
     void Awake()
     {
         modalPanel = Modal.Instance();
@@ -28,7 +34,7 @@ public class LoadModalInstance : MonoBehaviour
     //  Send to the Modal Panel to set up the Buttons and Functions to call
     public void LoadPanelStart()
     {
-        modalPanel.Choice("What Would you like to do?", Function1, Function2, Function3, Function4, "New edica project","Load edica save", PlayerPrefs.HasKey("previousSave") ? "Load \"" + PlayerPrefs.GetString("previousSave") + "\"" : "No recent files","Quit edica",true,true,true,true);
+        modalPanel.Choice("What Would you like to do?", Function1, Function2, Function3, Function4, "New edica project","Load edica save", PlayerPrefs.HasKey("previousSave") ? "Load \"" + PlayerPrefs.GetString("previousSave") + "\"" : "No recent files","Resume",true,true,true,true);
     }
 
     
@@ -37,14 +43,12 @@ public class LoadModalInstance : MonoBehaviour
     void Function1()
     {
         timeline.NewFile();
-        timeline.projectStarted = true;
     }
 
     //load
     void Function2()
     {
         timeline.Load();
-        timeline.projectStarted = true;
     }
 
     //load previous
@@ -54,13 +58,11 @@ public class LoadModalInstance : MonoBehaviour
             timeline.LoadPrevious();
         else
             timeline.NewFile();
-
-        timeline.projectStarted = true;
     }
 
-    //quit
+    //resume
     void Function4()
     {
-        Application.Quit();
+
     }
 }
