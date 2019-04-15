@@ -129,7 +129,7 @@ public class Timeline : MonoBehaviour
             y = cue.pitch / 12 + (float)cue.gridOffset.y - 3f;
         }
 
-        AddTarget(x, y, (cue.tick - offset) / 480f, cue.tickLength, cue.velocity, cue.handType, cue.behavior);
+        AddTarget(x, y, (cue.tick - offset) / 480f, cue.tickLength/480, cue.velocity, cue.handType, cue.behavior);
     }
 
     public void AddTarget(float x, float y)
