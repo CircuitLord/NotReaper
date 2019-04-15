@@ -59,7 +59,7 @@ public class HexGrid : MonoBehaviour {
         {
             for (int x = 0; x < columns; x++)
             {
-                float r = radius + magnitude * Mathf.PerlinNoise(timeline.time * speed + x * scale, y * scale);
+                float r = radius + magnitude * Mathf.PerlinNoise(Timeline.time * speed + x * scale, y * scale);
                 var pos = OnCircle(center, r, x * anglePerObject + oddRowOffset * (y % 2));
                 var rot = Quaternion.FromToRotation(Vector3.forward, pos - center);
                 try

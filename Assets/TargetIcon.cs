@@ -74,11 +74,11 @@ public class TargetIcon : MonoBehaviour {
     {
         foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true))
         {
-            if (beatLength > 1)
+            if (beatLength >= 1)
             {
                 l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                 l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
-                l.SetPosition(2, new Vector3((beatLength / 2.8f), sustainDirection, 0.0f));
+                l.SetPosition(2, new Vector3(beatLength / 0.7f, sustainDirection, 0.0f));
             }
             else
             {

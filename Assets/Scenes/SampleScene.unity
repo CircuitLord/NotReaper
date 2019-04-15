@@ -774,7 +774,7 @@ Transform:
   m_GameObject: {fileID: 125751206}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -2.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 7
@@ -1362,7 +1362,7 @@ Transform:
   m_GameObject: {fileID: 172367999}
   m_LocalRotation: {x: -0, y: -0, z: -0.70710576, w: 0.70710784}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 11, z: 1}
+  m_LocalScale: {x: 0.02, y: 11, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 0
@@ -2345,7 +2345,7 @@ Transform:
   m_GameObject: {fileID: 255888032}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 8
@@ -3007,7 +3007,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!114 &286530361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3248,7 +3248,7 @@ Transform:
   m_GameObject: {fileID: 309146069}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 4.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 14
@@ -3423,7 +3423,7 @@ Transform:
   m_GameObject: {fileID: 329440572}
   m_LocalRotation: {x: -0, y: -0, z: -0.70710576, w: 0.70710784}
   m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 0.01, y: 11, z: 1}
+  m_LocalScale: {x: 0.02, y: 11, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 2
@@ -4131,7 +4131,7 @@ Transform:
   m_GameObject: {fileID: 404882060}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 1.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 11
@@ -4542,7 +4542,7 @@ Transform:
   m_GameObject: {fileID: 407553651}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 9
@@ -7525,7 +7525,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 0
+  m_IsOn: 1
 --- !u!114 &785812970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8118,7 +8118,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0000076293945}
+  m_AnchoredPosition: {x: 0, y: -0.000009536743}
   m_SizeDelta: {x: 0, y: 28}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &831814624
@@ -8665,7 +8665,7 @@ Transform:
   m_GameObject: {fileID: 933912790}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -3.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 6
@@ -8960,7 +8960,7 @@ Transform:
   m_GameObject: {fileID: 953711226}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 3.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 13
@@ -12487,10 +12487,10 @@ RectTransform:
   m_Father: {fileID: 1666857134}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 211.69997, y: -196.84998}
-  m_SizeDelta: {x: -683.4, y: -415.3}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -188.30003, y: 28.150024}
+  m_SizeDelta: {x: 116.599976, y: 34.700012}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1388447403
 MonoBehaviour:
@@ -13344,8 +13344,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1036320257}
   m_HandleRect: {fileID: 1036320256}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.81333345
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -13419,7 +13419,7 @@ Transform:
   m_GameObject: {fileID: 1527349912}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 12
@@ -14759,7 +14759,7 @@ Transform:
   m_GameObject: {fileID: 1651670880}
   m_LocalRotation: {x: -0, y: -0, z: -0.70710576, w: 0.70710784}
   m_LocalPosition: {x: 0, y: -2, z: 0}
-  m_LocalScale: {x: 0.01, y: 11, z: 1}
+  m_LocalScale: {x: 0.02, y: 11, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 4
@@ -14857,7 +14857,7 @@ Transform:
   m_GameObject: {fileID: 1664777156}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 10
@@ -16476,7 +16476,7 @@ Transform:
   m_GameObject: {fileID: 1821526718}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -4.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 6, z: 1}
+  m_LocalScale: {x: 0.02, y: 6, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 5
@@ -17750,7 +17750,7 @@ Transform:
   m_GameObject: {fileID: 1956084303}
   m_LocalRotation: {x: -0, y: -0, z: -0.70710576, w: 0.70710784}
   m_LocalPosition: {x: 0, y: 2, z: 0}
-  m_LocalScale: {x: 0.01, y: 11, z: 1}
+  m_LocalScale: {x: 0.02, y: 11, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 1
@@ -17922,7 +17922,7 @@ Transform:
   m_GameObject: {fileID: 1974466632}
   m_LocalRotation: {x: -0, y: -0, z: -0.70710576, w: 0.70710784}
   m_LocalPosition: {x: 0, y: -1, z: 0}
-  m_LocalScale: {x: 0.01, y: 11, z: 1}
+  m_LocalScale: {x: 0.02, y: 11, z: 1}
   m_Children: []
   m_Father: {fileID: 753493857}
   m_RootOrder: 3

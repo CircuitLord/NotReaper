@@ -34,7 +34,7 @@ public class Target : MonoBehaviour
         Cue cue = new Cue()
         {
             tick = Mathf.RoundToInt(gridTarget.transform.localPosition.z * 480f) + offset,
-            tickLength = Mathf.RoundToInt(gridTarget.beatLength * 120f),
+            tickLength = Mathf.RoundToInt(gridTarget.beatLength * 480f),
             pitch = pitch,
             velocity = gridTarget.velocity,
             gridOffset = new Cue.GridOffset { x = (float)Math.Round(offsetX, 2), y = (float)Math.Round(offsetY,2) },
@@ -61,7 +61,9 @@ public class Target : MonoBehaviour
     internal void SetBeatLength(float beatLength)
     {
         gridTarget.beatLength = beatLength;
-        timelineTarget.icon.SetSustainLength(beatLength);
+
+        if(gridTarget.behavior == TargetBehavior.Hold)
+            timelineTarget.icon.SetSustainLength(beatLength);
     }
 
     public void SetVelocity(TargetVelocity velocity)
