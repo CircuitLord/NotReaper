@@ -28,7 +28,7 @@ public class LoadModalInstance : MonoBehaviour
     //  Send to the Modal Panel to set up the Buttons and Functions to call
     public void LoadPanelStart()
     {
-        modalPanel.Choice("What Would you like to do?", Function1, Function2, Function3, Function4, "New edica project","Load edica save", PlayerPrefs.HasKey("previousSave") ? "Load \"" + PlayerPrefs.GetString("previousSave") + "\"" : "No recent files","Quit edica",true,true,true,true);
+        modalPanel.Choice("What would you like to do?", Function1, Function2, Function3, Function4, "New edica project","Load edica save", PlayerPrefs.HasKey("previousSave") ? "Load \"" + PlayerPrefs.GetString("previousSave") + "\"" : "No recent files","Quit edica",true,true,true,true);
     }
 
     

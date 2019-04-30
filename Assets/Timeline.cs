@@ -15,6 +15,9 @@ using SFB;
 
 public class Timeline : MonoBehaviour
 {
+    
+    public OptionsMenu.DropdownToVelocity CurrentSound;
+    public static Timeline TimelineStatic;
     public LoadModalInstance loadmodal;
     public DifficultySelection DifficultySelection_s;
     public float playbackSpeed = 1f;
@@ -38,7 +41,7 @@ public class Timeline : MonoBehaviour
 
 
     List<GridTarget> notes;
-    public static GridTarget[] orderedNotes;
+    public static List<GridTarget> orderedNotes;
     List<TimelineTarget> notesTimeline;
     SongDesc songDesc;
 
@@ -80,12 +83,14 @@ public class Timeline : MonoBehaviour
     private void Start()
     {
         notes = new List<GridTarget>();
+        orderedNotes = new List<GridTarget>();
         notesTimeline = new List<TimelineTarget>();
 
         securityRules.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.FullControl, AccessControlType.Allow));
 
         gridNotesStatic = gridNotes;
         timelineNotesStatic = timelineNotes;
+        TimelineStatic = this;
 
         loadmodal.LoadPanelStart();
     }
@@ -129,15 +134,19 @@ public class Timeline : MonoBehaviour
             y = cue.pitch / 12 + (float)cue.gridOffset.y - 3f;
         }
 
-        AddTarget(x, y, (cue.tick - offset) / 480f, cue.tickLength/480, cue.velocity, cue.handType, cue.behavior);
+        if (cue.tickLength / 480 >= 1)
+            AddTarget(x, y, (cue.tick - offset) / 480f, cue.tickLength, cue.velocity, cue.handType, cue.behavior,false);
+        else
+            AddTarget(x, y, (cue.tick - offset) / 480f, 1, cue.velocity, cue.handType, cue.behavior, false);
+
     }
 
     public void AddTarget(float x, float y)
     {
-        AddTarget(x, y, BeatTime(), 1, selectedVelocity, selectedHandType, selectedBehaviour);
+        AddTarget(x, y, BeatTime(), 1, TargetVelocity.Standard, selectedHandType, selectedBehaviour, true);
     }
 
-    public void AddTarget(float x, float y, float beatTime, float beatLength = 1, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard)
+    public void AddTarget(float x, float y, float beatTime, float beatLength = 1, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false)
     {
         // Add to timeline
         var timelineClone = Instantiate(timelineNotePrefab, timelineNotes);
@@ -152,28 +161,203 @@ public class Timeline : MonoBehaviour
         timelineClone.timelineTarget = timelineClone;
         gridClone.gridTarget = gridClone;
         timelineClone.gridTarget = gridClone;
+        
+        //set velocity
+        if(userAdded)
+        {
+        switch(CurrentSound)
+        {
+            case OptionsMenu.DropdownToVelocity.Standard:
+                gridClone.velocity = TargetVelocity.Standard;
+                break;
+
+            case OptionsMenu.DropdownToVelocity.Snare:
+                gridClone.velocity = TargetVelocity.Snare;
+                break;
+
+            case OptionsMenu.DropdownToVelocity.Percussion:
+                gridClone.velocity = TargetVelocity.Percussion;
+                break;
+
+            case OptionsMenu.DropdownToVelocity.ChainStart:
+                gridClone.velocity = TargetVelocity.ChainStart;
+                break;
+
+            case OptionsMenu.DropdownToVelocity.Chain:
+                gridClone.velocity = TargetVelocity.Chain;
+                break;
+
+            case OptionsMenu.DropdownToVelocity.Melee:
+                gridClone.velocity = TargetVelocity.Melee;
+                break;
+
+                default:
+                gridClone.velocity = velocity;
+                break;
+    
+        }
+        }
+        else
+        {
+            gridClone.SetVelocity(velocity);
+        }
+
+       
 
         gridClone.SetHandType(handType);
         gridClone.SetBehavior(behavior);
         gridClone.SetBeatLength(beatLength);
-        gridClone.SetVelocity(velocity);
 
         notes.Add(gridClone);
         notesTimeline.Add(timelineClone);
 
-        orderedNotes = notes.OrderBy(v => v.transform.position.z).ToArray();
+        orderedNotes = notes.OrderByDescending(v => v.transform.position.z).ToList();
 
         UpdateTrail();
+        UpdateChainConnectors();
+    }
+
+    private void UpdateChords()
+    {
+        if (orderedNotes.Count > 0)
+            foreach (var note in orderedNotes)
+            {
+                if (Mathf.Round(note.transform.position.z) == 0 && note.behavior != TargetBehavior.ChainStart && note.behavior != TargetBehavior.Chain && note.behavior != TargetBehavior.HoldEnd)
+                {
+                    LineRenderer lr = note.GetComponent<LineRenderer>();
+
+                    List<Material> mats = new List<Material>();
+                    lr.GetMaterials(mats);
+                    Color activeColor = (note.handType == TargetHandType.Left) ? leftColor : rightColor;
+                    mats[0].SetColor("_EmissionColor", new Color(activeColor.r, activeColor.g, activeColor.b, activeColor.a / 2));
+
+
+                    var positionList = new List<Vector3>();
+                    lr.SetPositions(positionList.ToArray());
+                    lr.positionCount = 0;
+
+
+                    foreach (var note2 in orderedNotes)
+                    {
+                        if (note.transform.position.z == note2.transform.position.z && note != note2)
+                        {
+                            var positionList2 = new List<Vector3>();
+
+                            var offset = (note.handType == TargetHandType.Left) ? 0.01f : -0.01f;
+                            positionList2.Add(note.transform.position + new Vector3(0, offset, 0));
+                            positionList2.Add(note2.transform.position + new Vector3(0, offset, 0));
+                            lr.positionCount = 2;
+
+                            positionList2.Remove(new Vector3(0, 0, 1));
+
+                            lr.SetPositions(positionList2.ToArray());
+
+                        }
+
+
+                    }
+
+                }
+                else
+                {
+                    LineRenderer lr = note.GetComponent<LineRenderer>();
+
+                    if (lr.positionCount != 0)
+                    {
+                        var positionList = new List<Vector3>();
+                        lr.SetPositions(positionList.ToArray());
+                        lr.positionCount = 0;
+                    }
+                }
+            }
+
+    }
+
+    private void UpdateChainConnectors()
+    {
+        orderedNotes.Reverse();
+
+        if (orderedNotes.Count > 0)
+            foreach (var note in orderedNotes)
+            {
+                if (note.behavior == TargetBehavior.ChainStart)
+                {
+                    LineRenderer lr = note.GetComponentsInChildren<LineRenderer>()[1];
+
+                    List<Material> mats = new List<Material>();
+                    lr.GetMaterials(mats);
+                    Color activeColor = note.handType == TargetHandType.Left ? leftColor : rightColor;
+                    mats[0].SetColor("_Color", activeColor);
+                    mats[0].SetColor("_EmissionColor", activeColor);
+
+
+                    //clear pos list
+                    lr.SetPositions(new Vector3[2]);
+                    lr.positionCount = 2;
+
+
+                    //set start pos
+                    lr.SetPosition(0, note.transform.position);
+                    lr.SetPosition(1, note.transform.position);
+
+                    //add links in chain
+                    List<GridTarget> chainLinks = new List<GridTarget>();
+                    foreach (var note2 in orderedNotes)
+                    {
+                        //if new start end old chain
+                        if ((note.handType == note2.handType) && (note2.transform.position.z > note.transform.position.z) && (note2.behavior == TargetBehavior.ChainStart) && (note2 != note))
+                            break;
+
+                        if ((note.handType == note2.handType) && note2.transform.position.z > note.transform.position.z && note2.behavior == TargetBehavior.Chain)
+                        {
+                            chainLinks.Add(note2);
+                        }
+
+                    }
+
+                    note.chainedNotes = chainLinks;
+
+                    //aply lines to chain links
+                    if (chainLinks.Count > 0)
+                    {
+                        var positionList = new List<Vector3>();
+                        positionList.Add(new Vector3(note.transform.position.x, note.transform.position.y, 0));
+                        foreach (var link in chainLinks)
+                        {
+                            //add new
+                            if (!positionList.Contains(link.transform.position))
+                            {
+                                positionList.Add(new Vector3(link.transform.position.x, link.transform.position.y, link.transform.position.z - note.transform.position.z));
+                            }
+                        }
+                        lr.positionCount = positionList.Count;
+                        positionList = positionList.OrderByDescending(v => v.z - note.transform.position.z).ToList();
+
+                        for (int i = 0; i < positionList.Count; ++i)
+                        {
+                            positionList[i] = new Vector3(positionList[i].x, positionList[i].y, 0);
+                        }
+
+                        var finalPositions = positionList.ToArray();
+                        lr.SetPositions(finalPositions);
+                    }
+                }
+            }
+        orderedNotes.Reverse();
+
     }
 
     public void DeleteTarget(Target target)
     {
         if (target == null) return;
         notes.Remove(target.gridTarget);
+        orderedNotes.Remove(target.gridTarget);
         var tl = target.timelineTarget.gameObject;
         var g = target.gridTarget.gameObject;
         Destroy(tl);
         Destroy(g);
+        UpdateChainConnectors();
+        UpdateChords();
     }
 
     private void DeleteTargets()
@@ -194,8 +378,11 @@ public class Timeline : MonoBehaviour
         notesTimeline = new List<TimelineTarget>();
 
         var liner = gridNotes.gameObject.GetComponentInChildren<LineRenderer>();
-        liner.SetPositions(new Vector3[0]);
-        liner.positionCount = 0;
+        if (liner)
+        {
+            liner.SetPositions(new Vector3[0]);
+            liner.positionCount = 0;
+        }
 
         time = 0;
     }
@@ -745,7 +932,7 @@ public class Timeline : MonoBehaviour
         scale = newScale;
     }
 
-    private void UpdateTrail()
+    public void UpdateTrail()
     {
         Vector3[] positions = new Vector3[gridNotes.childCount];
         for (int i = 0; i < gridNotes.transform.childCount; i++)
@@ -760,18 +947,37 @@ public class Timeline : MonoBehaviour
 
     public void Update()
     {
-        foreach (var note in notes)
-        {
-            if (note.behavior == TargetBehavior.Hold)
+        if (orderedNotes.Count > 0)
+            foreach (var note in orderedNotes)
             {
-                var length = Mathf.Ceil(float.Parse(note.GetComponentInChildren<HoldController>().length.text)) / 480;
-                if (note.gridTarget.beatLength != length)
+
+                if (note.behavior == TargetBehavior.ChainStart)
                 {
-                    note.gridTarget.SetBeatLength(length);
-                    Debug.Log(note.beatLength);
+                    if (note.chainedNotes.Count > 0)
+                    {
+                        if ((note.transform.position.z < 0 && 0 > note.chainedNotes.Last().transform.position.z) || (note.transform.position.z > 0 && 0 < note.chainedNotes.Last().transform.position.z))
+                        {
+                            note.GetComponentsInChildren<LineRenderer>()[1].enabled = false;
+                        }
+                        else
+                        {
+                            note.GetComponentsInChildren<LineRenderer>()[1].enabled = true;
+                        }
+                    }
+                }
+
+                if (note.behavior == TargetBehavior.Hold)
+                {
+                    var length = Mathf.Ceil(float.Parse(note.GetComponentInChildren<HoldController>().length.text)) / 480;
+                    if (note.gridTarget.beatLength != length)
+                    {
+                        note.gridTarget.SetBeatLength(length);
+                        Debug.Log(note.beatLength);
+                    }
                 }
             }
-        }
+
+        UpdateChords();
 
 
         if (!paused) time += Time.deltaTime * playbackSpeed;
@@ -830,6 +1036,8 @@ public class Timeline : MonoBehaviour
         {
             previewAud.Pause();
         }
+
+        previewAud.volume = aud.volume;
 
         SetCurrentTime();
         SetCurrentTick();

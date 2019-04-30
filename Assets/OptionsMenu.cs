@@ -13,6 +13,8 @@ public class OptionsMenu : MonoBehaviour {
     public Text snapText;
     public Text playSpeedText;
 
+    public Dropdown SoundDropdown;
+
     // .Desc inputs
     public InputField songID;
     public InputField songTitle;
@@ -40,6 +42,15 @@ public class OptionsMenu : MonoBehaviour {
         songEndEvent.text = songendevent;
         songPreRoll.text = songpreroll.ToString();
         songAuthor.text = songauthor;
+    }
+
+    public enum DropdownToVelocity
+    {
+        Standard = 0, Snare = 1, Percussion = 2,ChainStart = 3, Chain = 4, Melee = 5
+    }
+    public void SoundWasChanged(Dropdown dpd)
+    {
+        timeline.CurrentSound = (DropdownToVelocity)dpd.value;
     }
 
 
@@ -108,6 +119,7 @@ public class OptionsMenu : MonoBehaviour {
     {
         timeline.SetBehavior(TargetBehavior.Standard);
         timeline.SetVelocity(TargetVelocity.Standard);
+        SoundDropdown.value = (int)DropdownToVelocity.Standard;
         hover.SetBehavior(TargetBehavior.Standard);
         noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
     }
@@ -116,6 +128,7 @@ public class OptionsMenu : MonoBehaviour {
     {
         timeline.SetBehavior(TargetBehavior.Hold);
         timeline.SetVelocity(TargetVelocity.Hold);
+        SoundDropdown.value = (int)DropdownToVelocity.Standard;
         hover.SetBehavior(TargetBehavior.Hold);
         noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
     }
@@ -124,6 +137,7 @@ public class OptionsMenu : MonoBehaviour {
     {
         timeline.SetBehavior(TargetBehavior.Chain);
         timeline.SetVelocity(TargetVelocity.Chain);
+        SoundDropdown.value = (int)DropdownToVelocity.Chain;
         hover.SetBehavior(TargetBehavior.Chain);
         noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
     }
@@ -132,6 +146,7 @@ public class OptionsMenu : MonoBehaviour {
     {
         timeline.SetBehavior(TargetBehavior.ChainStart);
         timeline.SetVelocity(TargetVelocity.ChainStart);
+        SoundDropdown.value = (int)DropdownToVelocity.ChainStart;
         hover.SetBehavior(TargetBehavior.ChainStart);
         noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
     }
@@ -140,6 +155,7 @@ public class OptionsMenu : MonoBehaviour {
     {
         timeline.SetBehavior(TargetBehavior.Horizontal);
         timeline.SetVelocity(TargetVelocity.Horizontal);
+        SoundDropdown.value = (int)DropdownToVelocity.Standard;
         hover.SetBehavior(TargetBehavior.Horizontal);
         noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
     }
@@ -148,6 +164,7 @@ public class OptionsMenu : MonoBehaviour {
     {
         timeline.SetBehavior(TargetBehavior.Vertical);
         timeline.SetVelocity(TargetVelocity.Vertical);
+        SoundDropdown.value = (int)DropdownToVelocity.Standard;
         hover.SetBehavior(TargetBehavior.Vertical);
         noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
     }
@@ -156,6 +173,7 @@ public class OptionsMenu : MonoBehaviour {
     {
         timeline.SetBehavior(TargetBehavior.Melee);
         timeline.SetVelocity(TargetVelocity.Melee);
+        SoundDropdown.value = (int)DropdownToVelocity.Melee;
         hover.SetBehavior(TargetBehavior.Melee);
         noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Melee);
     }
