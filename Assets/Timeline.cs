@@ -211,7 +211,7 @@ public class Timeline : MonoBehaviour
         notes.Add(gridClone);
         notesTimeline.Add(timelineClone);
 
-        orderedNotes = notes.OrderByDescending(v => v.transform.position.z).ToList();
+        orderedNotes = notes.OrderBy(v => v.transform.position.z).ToList();
 
         UpdateTrail();
         UpdateChainConnectors();
@@ -275,8 +275,6 @@ public class Timeline : MonoBehaviour
 
     private void UpdateChainConnectors()
     {
-        orderedNotes.Reverse();
-
         if (orderedNotes.Count > 0)
             foreach (var note in orderedNotes)
             {
@@ -343,7 +341,6 @@ public class Timeline : MonoBehaviour
                     }
                 }
             }
-        orderedNotes.Reverse();
 
     }
 
