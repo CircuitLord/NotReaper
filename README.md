@@ -1,4 +1,4 @@
-# Edica version Cameron1.2
+# Edica version Cameron1.3
 
 ## How to use
 * If you want to change the resolution of the application hold the shift key while launching Edica
@@ -16,7 +16,7 @@
 5. Repeat steps 3&4 for all of your difficulties
 6. You can now edit the project as normal. When saving, the project will be saved in the `.edica` format automatically.
 
-## Upgrading projects from Edica version "Cameron1.1.1" to "Cameron1.2"
+## Upgrading projects from Edica version "Cameron1.1.1" to "Cameron1.3"
 1. Open Edica and load your `.edica` file
 2. When loaded it will automatically set you previous work to "expert" difficulty. If the save was meant for expert mode you can stop at this step.
 3. To change difficulties click "Export". This will create an expert.cues file at the specified location.
