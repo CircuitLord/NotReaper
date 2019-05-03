@@ -1,4 +1,4 @@
-# Edica version Cameron1.3
+# Edica version Cameron1.4
 
 ## How to use
 * If you want to change the resolution of the application hold the shift key while launching Edica
