@@ -65,6 +65,7 @@ public class Timeline : MonoBehaviour
     private string songendevent = "";
     private float songpreroll = 0.0f;
     private string songauthor = "";
+    private string mogg = "";
 
     private TargetHandType selectedHandType = TargetHandType.Right;
     private TargetBehavior selectedBehaviour = TargetBehavior.Standard;
@@ -146,7 +147,7 @@ public class Timeline : MonoBehaviour
         AddTarget(x, y, BeatTime(), 1, TargetVelocity.Standard, selectedHandType, selectedBehaviour, true);
     }
 
-    public void AddTarget(float x, float y, float beatTime, float beatLength = 1, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false)
+    public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false)
     {
         // Add to timeline
         var timelineClone = Instantiate(timelineNotePrefab, timelineNotes);
@@ -206,7 +207,12 @@ public class Timeline : MonoBehaviour
 
         gridClone.SetHandType(handType);
         gridClone.SetBehavior(behavior);
-        gridClone.SetBeatLength(beatLength);
+        
+        if(gridClone.behavior == TargetBehavior.Hold)
+            gridClone.SetBeatLength(beatLength);
+        else
+            gridClone.SetBeatLength(0.25f);
+
 
         notes.Add(gridClone);
         notesTimeline.Add(timelineClone);
@@ -222,7 +228,7 @@ public class Timeline : MonoBehaviour
         if (orderedNotes.Count > 0)
             foreach (var note in orderedNotes)
             {
-                if (Mathf.Round(note.transform.position.z) == 0 && note.behavior != TargetBehavior.ChainStart && note.behavior != TargetBehavior.Chain && note.behavior != TargetBehavior.HoldEnd)
+                if (note && (Mathf.Round(note.transform.position.z) == 0 && note.behavior != TargetBehavior.ChainStart && note.behavior != TargetBehavior.Chain && note.behavior != TargetBehavior.HoldEnd))
                 {
                     LineRenderer lr = note.GetComponent<LineRenderer>();
 
@@ -902,6 +908,18 @@ public class Timeline : MonoBehaviour
         songDesc.author = newSongAuthor;
     }
 
+    public void SetMogg(string newmogg)
+    {
+        if(!mogg.Contains(".mogg"))
+        {
+            newmogg += ".mogg";
+        }
+       
+        mogg = newmogg;
+        songDesc.moggSong = mogg;
+        
+    }
+
     public void SetBeatTime(float t)
     {
         timelineBG.material.SetTextureOffset("_MainTex", new Vector2(((t * bpm / 60 - offset / 480f) / 4f + scaleOffset), 1));
@@ -948,7 +966,7 @@ public class Timeline : MonoBehaviour
             foreach (var note in orderedNotes)
             {
 
-                if (note.behavior == TargetBehavior.ChainStart)
+                if (note.behavior == TargetBehavior.ChainStart && note)
                 {
                     if (note.chainedNotes.Count > 0)
                     {
@@ -963,7 +981,7 @@ public class Timeline : MonoBehaviour
                     }
                 }
 
-                if (note.behavior == TargetBehavior.Hold)
+                if (note.behavior == TargetBehavior.Hold && note)
                 {
                     var length = Mathf.Ceil(float.Parse(note.GetComponentInChildren<HoldController>().length.text)) / 480;
                     if (note.gridTarget.beatLength != length)

@@ -1,7 +1,7 @@
 ﻿public class SongDesc
 {
     public string songID;
-    public string moggSong;
+    public string moggSong = "song.moggsong";
     public string title;
     public string artist;
     public string midiFile = "song.mid";

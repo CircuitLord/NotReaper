@@ -22,6 +22,7 @@ public class OptionsMenu : MonoBehaviour {
     public InputField songEndEvent;
     public InputField songPreRoll;
     public InputField songAuthor;
+    public InputField Moggsong;
 
 
     public TargetIcon hover;
@@ -113,6 +114,12 @@ public class OptionsMenu : MonoBehaviour {
     {
         string newSongAuthor = songAuthor.text;
         timeline.SetSongAuthor(newSongAuthor);
+    }
+
+    public void MoggWasChanged()
+    {
+        string newMog = Moggsong.text;
+        timeline.SetMogg(newMog);
     }
 
     public void SelectStandard()

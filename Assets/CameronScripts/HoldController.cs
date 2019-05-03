@@ -20,7 +20,6 @@ public class HoldController : MonoBehaviour
     {
         parentTarget = gameObject.GetComponentsInParent<GridTarget>()[0];
         length.text = "" + parentTarget.beatLength * 480;
-        Debug.Log(length.text);
         
         endMarker = Instantiate(endMarkerPrefab,gameObject.transform.position + new Vector3(0,0,int.Parse(length.text)/480f),Quaternion.identity,Timeline.gridNotesStatic);
         
