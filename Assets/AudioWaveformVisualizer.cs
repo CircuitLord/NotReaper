@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AudioWaveformVisualizer : MonoBehaviour
 {
@@ -7,9 +8,13 @@ public class AudioWaveformVisualizer : MonoBehaviour
 
     public Color colour = Color.white;
     public AudioSource aud;
+
+    public GameObject WF;
     
     Texture2D texture;
     float[] samples;
+
+    private bool formenabled;
 
     public void Init()
     {
@@ -58,6 +63,20 @@ public class AudioWaveformVisualizer : MonoBehaviour
         tex.Apply();
 
         return tex;
+    }
+
+    public void settingsToggle(Toggle tog)
+    {
+        if(tog.isOn)
+        {
+            Init();
+            WF.SetActive(true);
+        }
+        else
+        {
+            GetComponent<Renderer>().material.mainTexture = null;
+            WF.SetActive(false);
+        }
     }
 
 }

@@ -37,6 +37,7 @@ public class HexGrid : MonoBehaviour {
             for (int x = 0; x < columns; x++)
             {
                 hexes[x,y] = Instantiate(prefab, transform);
+                hexes[x,y].gameObject.layer = LayerMask.NameToLayer("Ignore main light");
             }
         }
 

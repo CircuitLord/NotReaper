@@ -15,7 +15,7 @@ using SFB;
 
 public class Timeline : MonoBehaviour
 {
-    
+    public bool SustainParticles = true;
     public OptionsMenu.DropdownToVelocity CurrentSound;
     public static Timeline TimelineStatic;
     public LoadModalInstance loadmodal;
@@ -136,7 +136,7 @@ public class Timeline : MonoBehaviour
         }
 
         if (cue.tickLength / 480 >= 1)
-            AddTarget(x, y, (cue.tick - offset) / 480f, cue.tickLength, cue.velocity, cue.handType, cue.behavior,false);
+            AddTarget(x, y, (cue.tick - offset) / 480f, cue.tickLength, cue.velocity, cue.handType, cue.behavior, false);
         else
             AddTarget(x, y, (cue.tick - offset) / 480f, 1, cue.velocity, cue.handType, cue.behavior, false);
 
@@ -162,53 +162,53 @@ public class Timeline : MonoBehaviour
         timelineClone.timelineTarget = timelineClone;
         gridClone.gridTarget = gridClone;
         timelineClone.gridTarget = gridClone;
-        
+
         //set velocity
-        if(userAdded)
+        if (userAdded)
         {
-        switch(CurrentSound)
-        {
-            case OptionsMenu.DropdownToVelocity.Standard:
-                gridClone.velocity = TargetVelocity.Standard;
-                break;
+            switch (CurrentSound)
+            {
+                case OptionsMenu.DropdownToVelocity.Standard:
+                    gridClone.velocity = TargetVelocity.Standard;
+                    break;
 
-            case OptionsMenu.DropdownToVelocity.Snare:
-                gridClone.velocity = TargetVelocity.Snare;
-                break;
+                case OptionsMenu.DropdownToVelocity.Snare:
+                    gridClone.velocity = TargetVelocity.Snare;
+                    break;
 
-            case OptionsMenu.DropdownToVelocity.Percussion:
-                gridClone.velocity = TargetVelocity.Percussion;
-                break;
+                case OptionsMenu.DropdownToVelocity.Percussion:
+                    gridClone.velocity = TargetVelocity.Percussion;
+                    break;
 
-            case OptionsMenu.DropdownToVelocity.ChainStart:
-                gridClone.velocity = TargetVelocity.ChainStart;
-                break;
+                case OptionsMenu.DropdownToVelocity.ChainStart:
+                    gridClone.velocity = TargetVelocity.ChainStart;
+                    break;
 
-            case OptionsMenu.DropdownToVelocity.Chain:
-                gridClone.velocity = TargetVelocity.Chain;
-                break;
+                case OptionsMenu.DropdownToVelocity.Chain:
+                    gridClone.velocity = TargetVelocity.Chain;
+                    break;
 
-            case OptionsMenu.DropdownToVelocity.Melee:
-                gridClone.velocity = TargetVelocity.Melee;
-                break;
+                case OptionsMenu.DropdownToVelocity.Melee:
+                    gridClone.velocity = TargetVelocity.Melee;
+                    break;
 
                 default:
-                gridClone.velocity = velocity;
-                break;
-    
-        }
+                    gridClone.velocity = velocity;
+                    break;
+
+            }
         }
         else
         {
             gridClone.SetVelocity(velocity);
         }
 
-       
+
 
         gridClone.SetHandType(handType);
         gridClone.SetBehavior(behavior);
-        
-        if(gridClone.behavior == TargetBehavior.Hold)
+
+        if (gridClone.behavior == TargetBehavior.Hold)
             gridClone.SetBeatLength(beatLength);
         else
             gridClone.SetBeatLength(0.25f);
@@ -221,6 +221,44 @@ public class Timeline : MonoBehaviour
 
         UpdateTrail();
         UpdateChainConnectors();
+    }
+
+    private void UpdateSustains()
+    {
+        foreach (var note in orderedNotes)
+        {
+            if (note.behavior == TargetBehavior.Hold)
+            {
+                if ((note.transform.position.z < 0) && (note.transform.position.z + note.beatLength > 0))
+                {
+                    var particles = note.GetComponentInChildren<ParticleSystem>();
+                    if (!particles.isEmitting)
+                    {
+                        particles.Play();
+                        var main = particles.main;
+                        main.startColor = note.handType == TargetHandType.Left ? new Color(leftColor.r,leftColor.g,leftColor.b,1) : new Color(rightColor.r,rightColor.g,rightColor.b,1);
+                    }
+
+                    ParticleSystem.Particle[] parts = new ParticleSystem.Particle[particles.particleCount];
+                    particles.GetParticles(parts);
+                    
+                    for(int i = 0; i < particles.particleCount; ++i)
+                    {
+                        parts[i].position = new Vector3(parts[i].position.x, parts[i].position.y, 0);
+                    }
+
+                    particles.SetParticles(parts,particles.particleCount);
+                }
+                else
+                {
+                    var particles = note.GetComponentInChildren<ParticleSystem>();
+                    if (particles.isEmitting)
+                    {
+                        particles.Stop();
+                    }
+                }
+            }
+        }
     }
 
     private void UpdateChords()
@@ -365,7 +403,14 @@ public class Timeline : MonoBehaviour
 
     private void DeleteTargets()
     {
+        Debug.Log("del targs");
         foreach (GridTarget obj in notes)
+        {
+            if (obj)
+                Destroy(obj.gameObject);
+        }
+
+        foreach (GridTarget obj in orderedNotes)
         {
             if (obj)
                 Destroy(obj.gameObject);
@@ -378,6 +423,7 @@ public class Timeline : MonoBehaviour
         }
 
         notes = new List<GridTarget>();
+        orderedNotes = new List<GridTarget>();
         notesTimeline = new List<TimelineTarget>();
 
         var liner = gridNotes.gameObject.GetComponentInChildren<LineRenderer>();
@@ -392,6 +438,7 @@ public class Timeline : MonoBehaviour
 
     public void ChangeDifficulty()
     {
+        Debug.Log("ChangeDifficulty");
         string dirpath = Application.persistentDataPath;
 
         string[] cuePath = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
@@ -411,6 +458,11 @@ public class Timeline : MonoBehaviour
         else
         {
             DeleteTargets();
+        }
+
+        foreach (GridTarget obj in notes)
+        {
+            Debug.Log(obj);
         }
     }
 
@@ -742,7 +794,8 @@ public class Timeline : MonoBehaviour
                     DifficultySelection_s.Value = difficulty;
                     DifficultySelection_s.selection.value = (int)DifficultySelection.Options.Parse(typeof(DifficultySelection.Options), difficulty);
 
-                    //load .cues
+                    //load .cues (delete first because changing difficulty creates targets)
+                    DeleteTargets();
                     var cueFile = Directory.GetFiles(dirpath + "\\temp\\", difficulty + ".cues");
                     string json = File.ReadAllText(cueFile[0]);
                     json = json.Replace("cues", "Items");
@@ -910,14 +963,14 @@ public class Timeline : MonoBehaviour
 
     public void SetMogg(string newmogg)
     {
-        if(!mogg.Contains(".mogg"))
+        if (!mogg.Contains(".mogg"))
         {
             newmogg += ".mogg";
         }
-       
+
         mogg = newmogg;
         songDesc.moggSong = mogg;
-        
+
     }
 
     public void SetBeatTime(float t)
@@ -994,6 +1047,8 @@ public class Timeline : MonoBehaviour
 
         UpdateChords();
 
+        if(SustainParticles)
+            UpdateSustains();
 
         if (!paused) time += Time.deltaTime * playbackSpeed;
 
@@ -1110,4 +1165,23 @@ public class Timeline : MonoBehaviour
         curTick.text = currentTick;
     }
 
+    public void SustainParticlesToggle(Toggle tog)
+    {
+        SustainParticles = tog.isOn;
+
+        if (!SustainParticles)
+        {
+            foreach (var note in orderedNotes)
+            {
+                if (note.behavior == TargetBehavior.Hold)
+                {
+                    var particles = note.GetComponentInChildren<ParticleSystem>();
+                    if (particles.isEmitting)
+                    {
+                        particles.Stop();
+                    }
+                }
+            }
+        }
+    }
 }
