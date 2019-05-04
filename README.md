@@ -1,4 +1,4 @@
-# Edica version Cameron1.3
+# Edica version Cameron1.4
 
 ## How to use
 * If you want to change the resolution of the application hold the shift key while launching Edica
@@ -8,6 +8,10 @@
 
 *If you have already started charting a track*, your beat markers may not line up with the grid properly - find the correct offset value to match the timeline beat grid to the music, and add an entry to `song.desc` that reads `"offset": x` where x is the offset you found
 
+## Trello
+You can keep up to date with what is in the works for future versions here:
+https://trello.com/b/kNU0IBMX/edica
+
 ## Importing work from other editors:
 1. Open edica
 2. Click "New edica project" and select the `.ogg` file for the song
@@ -16,7 +20,7 @@
 5. Repeat steps 3&4 for all of your difficulties
 6. You can now edit the project as normal. When saving, the project will be saved in the `.edica` format automatically.
 
-## Upgrading projects from Edica version "Cameron1.1.1" to "Cameron1.3"
+## Upgrading projects from Edica version "Cameron1.1.1" to "Cameron1.4"
 1. Open Edica and load your `.edica` file
 2. When loaded it will automatically set you previous work to "expert" difficulty. If the save was meant for expert mode you can stop at this step.
 3. To change difficulties click "Export". This will create an expert.cues file at the specified location.
