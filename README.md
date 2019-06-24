@@ -1,4 +1,5 @@
-# Circuit's Edica Fork
+# NotReaper
+"It's not reaper."
 
 ## How to use
 Click buttons and stuff and cool stuff will happen.
