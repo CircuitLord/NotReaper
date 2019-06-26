@@ -85,7 +85,7 @@ namespace NotReaper.Zipping {
 
 			if (File.Exists($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggSustainSongLeft}")) {
 				audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggSustainSongLeft}");
-				sustainRightLoaded = true;
+				sustainLeftLoaded = true;
 			}
 
 			//If all the songs were already cached, skip this and go to the finish.
