@@ -1,0 +1,70 @@
+Modern UI Pack - v2.2.6
+
+Import TextMeshPro if you haven't already, otherwise you'll get errors!
+
+Do you have any questions or requests? Contact me via 
+E-mail: isa.steam@outlook.com
+Website: https://www.michsky.com
+Discord: https://discord.gg/VXpHyUt
+YouTube: https://www.youtube.com/c/michsky
+Steam: https://steamcommunity.com/id/geezjesus
+
+Special thanks to:
+Geno (Contributor)
+Filmos (Tester)
+Kabbouchi (Tester)
+Takashi Sakai (https://github.com/mob-sakai)
+Raphael Monnerat (https://github.com/Shinao)
+
+Change Log v2.2.5
+----------------------------------------
+• Added multi selectable dropdown
+• Fixed editor script errors
+• Fixed minor bugs
+----------------------------------------
+
+Change Log v2.2.1
+----------------------------------------
+• Improved editor script
+• Cleaned project files
+----------------------------------------
+
+Change Log v2.2.0
+----------------------------------------
+• Added Hamburger Menu
+• Added new Blur Shaders
+• Added new Animated Icons (2)
+• Improved Switch
+• Changed editor workflow
+• Fixed Dropdown focus
+• Fixed Radial Slider value issue
+----------------------------------------
+
+Change Log v2.1.0
+----------------------------------------
+• TextMeshPro fully integrated
+• Horizontal selector added
+• Range slider added
+----------------------------------------
+
+Change Log v2.0.1
+----------------------------------------
+• Infinite radial slider fixed
+• Shader warnings are fixed
+• Added namespace to the scripts
+----------------------------------------
+
+Change Log v2.0.0
+----------------------------------------
+• New demo scene
+• New switches
+• New buttons
+• New editor shortcuts
+• Added TextMesh Pro support
+• Added new sliders
+• Added gradient system
+• Added blur material
+• Added new icons
+• Added new animated icons
+• Dropdowns changed
+----------------------------------------
