@@ -1,9 +1,11 @@
 fileFormatVersion: 2
-guid: e5f355cd468689e48a1567903a90be1f
+guid: c5b66cda3b42fc247a24567b626f1f45
+timeCreated: 1481977459
+licenseType: Free
 MonoImporter:
-  externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - myKickassPrefab: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

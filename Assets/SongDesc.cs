@@ -1,5 +1,4 @@
-﻿public class SongDesc
-{
+﻿public class SongDescyay {
     public string songID;
     public string moggSong = "song.moggsong";
     public string title;

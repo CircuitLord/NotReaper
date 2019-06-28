@@ -1,20 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
-using System.Linq;
 using System.IO;
 using System.IO.Compression;
-using UnityEngine.Networking;
-using TMPro;
-using UnityEngine.UI;
-using UnityEditor;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using SFB;
+using TMPro;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 
-public class Timeline : MonoBehaviour
-{
+public class Timeline : MonoBehaviour {
     public bool SustainParticles = true;
     public OptionsMenu.DropdownToVelocity CurrentSound;
     public static Timeline TimelineStatic;
@@ -39,11 +38,10 @@ public class Timeline : MonoBehaviour
     public Color bothColor;
     public Color neitherColor;
 
-
     List<GridTarget> notes;
     public static List<GridTarget> orderedNotes;
     List<TimelineTarget> notesTimeline;
-    SongDesc songDesc;
+    SongDescyay songDesc;
 
     public GridTarget gridNotePrefab;
     public TimelineTarget timelineNotePrefab;
@@ -80,9 +78,7 @@ public class Timeline : MonoBehaviour
     private DirectorySecurity securityRules = new DirectorySecurity();
     private SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
 
-
-    private void Start()
-    {
+    private void Start() {
         notes = new List<GridTarget>();
         orderedNotes = new List<GridTarget>();
         notesTimeline = new List<TimelineTarget>();
@@ -93,7 +89,6 @@ public class Timeline : MonoBehaviour
         timelineNotesStatic = timelineNotes;
         TimelineStatic = this;
 
-
         //Modify the note colors
         leftColor = UserPrefsManager.leftColor;
         rightColor = UserPrefsManager.rightColor;
@@ -103,20 +98,16 @@ public class Timeline : MonoBehaviour
         loadmodal.LoadPanelStart();
     }
 
-    void OnApplicationQuit()
-    {
+    void OnApplicationQuit() {
         DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath + "\\temp\\");
         dir.Delete(true);
     }
 
-    public void AddTarget(Cue cue)
-    {
+    public void AddTarget(Cueyay cue) {
         float x = 0, y = 0;
 
-        if (cue.behavior == TargetBehavior.Melee)
-        {
-            switch (cue.pitch)
-            {
+        if (cue.behavior == TargetBehavior.Melee) {
+            switch (cue.pitch) {
                 case 98:
                     x = -2f;
                     y = -1;
@@ -135,11 +126,9 @@ public class Timeline : MonoBehaviour
                     break;
 
             }
-        }
-        else
-        {
-            x = (cue.pitch % 12) + (float)cue.gridOffset.x - 5.5f;
-            y = cue.pitch / 12 + (float)cue.gridOffset.y - 3f;
+        } else {
+            x = (cue.pitch % 12) + (float) cue.gridOffset.x - 5.5f;
+            y = cue.pitch / 12 + (float) cue.gridOffset.y - 3f;
         }
 
         if (cue.tickLength / 480 >= 1)
@@ -149,13 +138,11 @@ public class Timeline : MonoBehaviour
 
     }
 
-    public void AddTarget(float x, float y)
-    {
+    public void AddTarget(float x, float y) {
         AddTarget(x, y, BeatTime(), 1, TargetVelocity.Standard, selectedHandType, selectedBehaviour, true);
     }
 
-    public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false)
-    {
+    public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false) {
         // Add to timeline
         var timelineClone = Instantiate(timelineNotePrefab, timelineNotes);
         timelineClone.transform.localPosition = new Vector3(beatTime, 0, 0);
@@ -171,10 +158,8 @@ public class Timeline : MonoBehaviour
         timelineClone.gridTarget = gridClone;
 
         //set velocity
-        if (userAdded)
-        {
-            switch (CurrentSound)
-            {
+        if (userAdded) {
+            switch (CurrentSound) {
                 case OptionsMenu.DropdownToVelocity.Standard:
                     gridClone.velocity = TargetVelocity.Standard;
                     break;
@@ -204,13 +189,9 @@ public class Timeline : MonoBehaviour
                     break;
 
             }
-        }
-        else
-        {
+        } else {
             gridClone.SetVelocity(velocity);
         }
-
-
 
         gridClone.SetHandType(handType);
         gridClone.SetBehavior(behavior);
@@ -219,7 +200,6 @@ public class Timeline : MonoBehaviour
             gridClone.SetBeatLength(beatLength);
         else
             gridClone.SetBeatLength(0.25f);
-
 
         notes.Add(gridClone);
         notesTimeline.Add(timelineClone);
@@ -230,37 +210,28 @@ public class Timeline : MonoBehaviour
         UpdateChainConnectors();
     }
 
-    private void UpdateSustains()
-    {
-        foreach (var note in orderedNotes)
-        {
-            if (note.behavior == TargetBehavior.Hold)
-            {
-                if ((note.transform.position.z < 0) && (note.transform.position.z + note.beatLength > 0))
-                {
+    private void UpdateSustains() {
+        foreach (var note in orderedNotes) {
+            if (note.behavior == TargetBehavior.Hold) {
+                if ((note.transform.position.z < 0) && (note.transform.position.z + note.beatLength > 0)) {
                     var particles = note.GetComponentInChildren<ParticleSystem>();
-                    if (!particles.isEmitting)
-                    {
+                    if (!particles.isEmitting) {
                         particles.Play();
                         var main = particles.main;
-                        main.startColor = note.handType == TargetHandType.Left ? new Color(leftColor.r,leftColor.g,leftColor.b,1) : new Color(rightColor.r,rightColor.g,rightColor.b,1);
+                        main.startColor = note.handType == TargetHandType.Left ? new Color(leftColor.r, leftColor.g, leftColor.b, 1) : new Color(rightColor.r, rightColor.g, rightColor.b, 1);
                     }
 
                     ParticleSystem.Particle[] parts = new ParticleSystem.Particle[particles.particleCount];
                     particles.GetParticles(parts);
-                    
-                    for(int i = 0; i < particles.particleCount; ++i)
-                    {
+
+                    for (int i = 0; i < particles.particleCount; ++i) {
                         parts[i].position = new Vector3(parts[i].position.x, parts[i].position.y, 0);
                     }
 
-                    particles.SetParticles(parts,particles.particleCount);
-                }
-                else
-                {
+                    particles.SetParticles(parts, particles.particleCount);
+                } else {
                     var particles = note.GetComponentInChildren<ParticleSystem>();
-                    if (particles.isEmitting)
-                    {
+                    if (particles.isEmitting) {
                         particles.Stop();
                     }
                 }
@@ -268,13 +239,10 @@ public class Timeline : MonoBehaviour
         }
     }
 
-    private void UpdateChords()
-    {
+    private void UpdateChords() {
         if (orderedNotes.Count > 0)
-            foreach (var note in orderedNotes)
-            {
-                if (note && (Mathf.Round(note.transform.position.z) == 0 && note.behavior != TargetBehavior.ChainStart && note.behavior != TargetBehavior.Chain && note.behavior != TargetBehavior.HoldEnd))
-                {
+            foreach (var note in orderedNotes) {
+                if (note && (Mathf.Round(note.transform.position.z) == 0 && note.behavior != TargetBehavior.ChainStart && note.behavior != TargetBehavior.Chain && note.behavior != TargetBehavior.HoldEnd)) {
                     LineRenderer lr = note.GetComponent<LineRenderer>();
 
                     List<Material> mats = new List<Material>();
@@ -282,16 +250,12 @@ public class Timeline : MonoBehaviour
                     Color activeColor = (note.handType == TargetHandType.Left) ? leftColor : rightColor;
                     mats[0].SetColor("_EmissionColor", new Color(activeColor.r, activeColor.g, activeColor.b, activeColor.a / 2));
 
-
                     var positionList = new List<Vector3>();
                     lr.SetPositions(positionList.ToArray());
                     lr.positionCount = 0;
 
-
-                    foreach (var note2 in orderedNotes)
-                    {
-                        if (note.transform.position.z == note2.transform.position.z && note != note2)
-                        {
+                    foreach (var note2 in orderedNotes) {
+                        if (note.transform.position.z == note2.transform.position.z && note != note2) {
                             var positionList2 = new List<Vector3>();
 
                             var offset = (note.handType == TargetHandType.Left) ? 0.01f : -0.01f;
@@ -305,16 +269,12 @@ public class Timeline : MonoBehaviour
 
                         }
 
-
                     }
 
-                }
-                else
-                {
+                } else {
                     LineRenderer lr = note.GetComponent<LineRenderer>();
 
-                    if (lr.positionCount != 0)
-                    {
+                    if (lr.positionCount != 0) {
                         var positionList = new List<Vector3>();
                         lr.SetPositions(positionList.ToArray());
                         lr.positionCount = 0;
@@ -324,14 +284,11 @@ public class Timeline : MonoBehaviour
 
     }
 
-    private void UpdateChainConnectors()
-    {
+    private void UpdateChainConnectors() {
         if (orderedNotes.Count > 0)
-            foreach (var note in orderedNotes)
-            {
-                if (note.behavior == TargetBehavior.ChainStart)
-                {
-                    LineRenderer lr = note.GetComponentsInChildren<LineRenderer>()[1];
+            foreach (var note in orderedNotes) {
+                if (note.behavior == TargetBehavior.ChainStart) {
+                    LineRenderer lr = note.GetComponentsInChildren<LineRenderer>() [1];
 
                     List<Material> mats = new List<Material>();
                     lr.GetMaterials(mats);
@@ -339,11 +296,9 @@ public class Timeline : MonoBehaviour
                     mats[0].SetColor("_Color", activeColor);
                     mats[0].SetColor("_EmissionColor", activeColor);
 
-
                     //clear pos list
                     lr.SetPositions(new Vector3[2]);
                     lr.positionCount = 2;
-
 
                     //set start pos
                     lr.SetPosition(0, note.transform.position);
@@ -351,14 +306,12 @@ public class Timeline : MonoBehaviour
 
                     //add links in chain
                     List<GridTarget> chainLinks = new List<GridTarget>();
-                    foreach (var note2 in orderedNotes)
-                    {
+                    foreach (var note2 in orderedNotes) {
                         //if new start end old chain
                         if ((note.handType == note2.handType) && (note2.transform.position.z > note.transform.position.z) && (note2.behavior == TargetBehavior.ChainStart) && (note2 != note))
                             break;
 
-                        if ((note.handType == note2.handType) && note2.transform.position.z > note.transform.position.z && note2.behavior == TargetBehavior.Chain)
-                        {
+                        if ((note.handType == note2.handType) && note2.transform.position.z > note.transform.position.z && note2.behavior == TargetBehavior.Chain) {
                             chainLinks.Add(note2);
                         }
 
@@ -367,23 +320,19 @@ public class Timeline : MonoBehaviour
                     note.chainedNotes = chainLinks;
 
                     //aply lines to chain links
-                    if (chainLinks.Count > 0)
-                    {
+                    if (chainLinks.Count > 0) {
                         var positionList = new List<Vector3>();
                         positionList.Add(new Vector3(note.transform.position.x, note.transform.position.y, 0));
-                        foreach (var link in chainLinks)
-                        {
+                        foreach (var link in chainLinks) {
                             //add new
-                            if (!positionList.Contains(link.transform.position))
-                            {
+                            if (!positionList.Contains(link.transform.position)) {
                                 positionList.Add(new Vector3(link.transform.position.x, link.transform.position.y, link.transform.position.z - note.transform.position.z));
                             }
                         }
                         lr.positionCount = positionList.Count;
                         positionList = positionList.OrderByDescending(v => v.z - note.transform.position.z).ToList();
 
-                        for (int i = 0; i < positionList.Count; ++i)
-                        {
+                        for (int i = 0; i < positionList.Count; ++i) {
                             positionList[i] = new Vector3(positionList[i].x, positionList[i].y, 0);
                         }
 
@@ -395,8 +344,7 @@ public class Timeline : MonoBehaviour
 
     }
 
-    public void DeleteTarget(Target target)
-    {
+    public void DeleteTarget(Target target) {
         if (target == null) return;
         notes.Remove(target.gridTarget);
         orderedNotes.Remove(target.gridTarget);
@@ -408,23 +356,19 @@ public class Timeline : MonoBehaviour
         UpdateChords();
     }
 
-    private void DeleteTargets()
-    {
+    private void DeleteTargets() {
         Debug.Log("del targs");
-        foreach (GridTarget obj in notes)
-        {
+        foreach (GridTarget obj in notes) {
             if (obj)
                 Destroy(obj.gameObject);
         }
 
-        foreach (GridTarget obj in orderedNotes)
-        {
+        foreach (GridTarget obj in orderedNotes) {
             if (obj)
                 Destroy(obj.gameObject);
         }
 
-        foreach (TimelineTarget obj in notesTimeline)
-        {
+        foreach (TimelineTarget obj in notesTimeline) {
             if (obj)
                 Destroy(obj.gameObject);
         }
@@ -434,8 +378,7 @@ public class Timeline : MonoBehaviour
         notesTimeline = new List<TimelineTarget>();
 
         var liner = gridNotes.gameObject.GetComponentInChildren<LineRenderer>();
-        if (liner)
-        {
+        if (liner) {
             liner.SetPositions(new Vector3[0]);
             liner.positionCount = 0;
         }
@@ -443,64 +386,51 @@ public class Timeline : MonoBehaviour
         time = 0;
     }
 
-    public void ChangeDifficulty()
-    {
+    public void ChangeDifficulty() {
         Debug.Log("ChangeDifficulty");
         string dirpath = Application.persistentDataPath;
 
         string[] cuePath = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
-        if (cuePath.Length > 0)
-        {
+        if (cuePath.Length > 0) {
             DeleteTargets();
 
             //load cues from temp
             string json = File.ReadAllText(cuePath[0]);
             json = json.Replace("cues", "Items");
-            Cue[] cues = JsonHelper.FromJson<Cue>(json);
-            foreach (Cue cue in cues)
-            {
+            Cueyay[] cues = JsonHelper.FromJson<Cueyay>(json);
+            foreach (Cueyay cue in cues) {
                 AddTarget(cue);
             }
-        }
-        else
-        {
+        } else {
             DeleteTargets();
         }
 
-        foreach (GridTarget obj in notes)
-        {
+        foreach (GridTarget obj in notes) {
             Debug.Log(obj);
         }
     }
 
-    public void Import()
-    {
+    public void Import() {
         DeleteTargets();
 
         //load cues from temp
         var cueFiles = StandaloneFileBrowser.OpenFilePanel("Import .cues", Application.persistentDataPath, "cues", false);
-        if (cueFiles.Length > 0)
-        {
+        if (cueFiles.Length > 0) {
             string json = File.ReadAllText(cueFiles[0]);
             json = json.Replace("cues", "Items");
-            Cue[] cues = JsonHelper.FromJson<Cue>(json);
-            foreach (Cue cue in cues)
-            {
+            Cueyay[] cues = JsonHelper.FromJson<Cueyay>(json);
+            foreach (Cueyay cue in cues) {
                 AddTarget(cue);
             }
-        }
-        else
-        {
+        } else {
             Debug.Log("cues not found");
         }
 
     }
 
-    public void Save()
-    {
-        Cue[] cues = new Cue[notes.Count];
-        for (int i = 0; i < notes.Count; i++)
-        {
+    public void Save() {
+        Cueyay[] cues = new Cueyay[notes.Count];
+        for (int i = 0; i < notes.Count; i++) {
             cues[i] = orderedNotes[i].ToCue(offset);
         }
 
@@ -512,7 +442,6 @@ public class Timeline : MonoBehaviour
         if (notes.Count > 0)
             File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 
-
         json = JsonUtility.ToJson(songDesc, true);
         File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
         FileInfo descFile = new FileInfo(Path.Combine(dirpath + "\\temp\\", "song.desc"));
@@ -520,17 +449,14 @@ public class Timeline : MonoBehaviour
         string[] oggPath = Directory.GetFiles(dirpath + "\\temp\\", "*.ogg");
         FileInfo oggFile = new FileInfo(oggPath[0]);
 
-
         List<FileInfo> files = new List<FileInfo>();
         files.Add(descFile);
         files.Add(oggFile);
 
         //push all .cues files to list
         var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
-        if (cueFiles.Length > 0)
-        {
-            foreach (var cue in cueFiles)
-            {
+        if (cueFiles.Length > 0) {
+            foreach (var cue in cueFiles) {
                 FileInfo file = new FileInfo(cue);
                 files.Add(file);
             }
@@ -543,14 +469,11 @@ public class Timeline : MonoBehaviour
 
     }
 
-    public void Export()
-    {
+    public void Export() {
         string dirpath = Application.persistentDataPath;
 
-
-        Cue[] cues = new Cue[notes.Count];
-        for (int i = 0; i < notes.Count; i++)
-        {
+        Cueyay[] cues = new Cueyay[notes.Count];
+        for (int i = 0; i < notes.Count; i++) {
             cues[i] = orderedNotes[i].ToCue(offset);
         }
 
@@ -560,48 +483,35 @@ public class Timeline : MonoBehaviour
         if (notes.Count > 0)
             File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 
-
-
         string[] dirpatharr = StandaloneFileBrowser.OpenFolderPanel("Export Location", "", false);
-        if (dirpatharr.Length > 0)
-        {
+        if (dirpatharr.Length > 0) {
             //push all .cues files to list
             List<FileInfo> files = new List<FileInfo>();
 
-
             var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
-            if (cueFiles.Length > 0)
-            {
-                foreach (var cue in cueFiles)
-                {
+            if (cueFiles.Length > 0) {
+                foreach (var cue in cueFiles) {
                     FileInfo file = new FileInfo(cue);
                     files.Add(file);
                 }
             }
 
-
             //export desc    
             json = JsonUtility.ToJson(songDesc, true);
-            try
-            {
+            try {
                 File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
                 FileInfo descfile = new FileInfo(dirpath + "\\temp\\song.desc");
                 files.Add(descfile);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 Debug.Log(e.Data + "...DELETING");
 
                 FileInfo fileToReplace = new FileInfo(dirpath + "\\temp\\song.desc");
                 fileToReplace.Delete();
-                try
-                {
+                try {
                     File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
                     FileInfo descfile = new FileInfo(dirpath + "\\temp\\song.desc");
                     files.Add(descfile);
-                }
-                catch (IOException e2)
-                {
+                } catch (IOException e2) {
                     Debug.Log(e2.Message + "....No More attempts");
                 }
             }
@@ -614,11 +524,9 @@ public class Timeline : MonoBehaviour
 
     }
 
-    public void ExportCueToTemp()
-    {
-        Cue[] cues = new Cue[notes.Count];
-        for (int i = 0; i < notes.Count; i++)
-        {
+    public void ExportCueToTemp() {
+        Cueyay[] cues = new Cueyay[notes.Count];
+        for (int i = 0; i < notes.Count; i++) {
             cues[i] = orderedNotes[i].ToCue(offset);
         }
 
@@ -631,37 +539,27 @@ public class Timeline : MonoBehaviour
             File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
     }
 
-
-    public void Compress(List<FileInfo> files, string destination)
-    {
+    public void Compress(List<FileInfo> files, string destination) {
         string dirpath = Application.persistentDataPath;
 
-        if (!System.IO.Directory.Exists(dirpath + "\\TempSave\\"))
-        {
+        if (!System.IO.Directory.Exists(dirpath + "\\TempSave\\")) {
             System.IO.Directory.CreateDirectory(dirpath + "\\TempSave\\", securityRules);
 
         }
 
-        foreach (FileInfo fileToCompress in files)
-        {
+        foreach (FileInfo fileToCompress in files) {
             fileToCompress.CopyTo(dirpath + "\\TempSave\\" + fileToCompress.Name, true);
         }
 
-        try
-        {
+        try {
             ZipFile.CreateFromDirectory(dirpath + "\\TempSave\\", destination);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             Debug.Log(e.Message + "....Deleting File");
             FileInfo fileToReplace = new FileInfo(destination);
             fileToReplace.Delete();
-            try
-            {
+            try {
                 ZipFile.CreateFromDirectory(dirpath + "\\TempSave\\", destination);
-            }
-            catch (IOException e2)
-            {
+            } catch (IOException e2) {
                 Debug.Log(e2.Message + "....No More attempts");
             }
 
@@ -670,8 +568,7 @@ public class Timeline : MonoBehaviour
         dir.Delete(true);
     }
 
-    public void NewFile()
-    {
+    public void NewFile() {
         DeleteTargets();
 
         notes = new List<GridTarget>();
@@ -680,19 +577,15 @@ public class Timeline : MonoBehaviour
         string dirpath = Application.persistentDataPath;
 
         //create the new song desc
-        songDesc = new SongDesc();
+        songDesc = new SongDescyay();
 
         //locate and copy ogg file to temp folder (used to save the project later)
         var audioFiles = StandaloneFileBrowser.OpenFilePanel("Import .ogg file", System.Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "ogg", false);
-        if (audioFiles.Length > 0)
-        {
+        if (audioFiles.Length > 0) {
             FileInfo oggFile = new FileInfo(audioFiles[0]);
-            if (!System.IO.Directory.Exists(dirpath + "\\temp\\"))
-            {
+            if (!System.IO.Directory.Exists(dirpath + "\\temp\\")) {
                 System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
-            }
-            else
-            {
+            } else {
                 DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
                 direct.Delete(true);
 
@@ -701,38 +594,28 @@ public class Timeline : MonoBehaviour
             oggFile.CopyTo(dirpath + "\\temp\\" + oggFile.Name, true);
 
             //load ogg into audio clip
-            if (audioFiles.Length > 0)
-            {
+            if (audioFiles.Length > 0) {
                 StartCoroutine(GetAudioClip(audioFiles[0]));
-            }
-            else
-            {
+            } else {
                 Debug.Log("ogg not found");
             }
-        }
-        else
-        {
+        } else {
             Application.Quit();
         }
 
     }
 
-    public void LoadFromFile(string edicaSave)
-    {
+    public void LoadFromFile(string edicaSave) {
         DeleteTargets();
 
-        if (edicaSave.Length > 0)
-        {
+        if (edicaSave.Length > 0) {
             PlayerPrefs.SetString("previousSave", edicaSave);
 
             //move zip to temp folder
             string dirpath = Application.persistentDataPath;
-            if (!System.IO.Directory.Exists(dirpath + "\\temp\\"))
-            {
+            if (!System.IO.Directory.Exists(dirpath + "\\temp\\")) {
                 System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
-            }
-            else
-            {
+            } else {
                 DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
                 direct.Delete(true);
 
@@ -742,13 +625,11 @@ public class Timeline : MonoBehaviour
             //unzip save into temp
             ZipFile.ExtractToDirectory(edicaSave, dirpath + "\\temp\\");
 
-
             //load desc from temp
             var descFiles = Directory.GetFiles(dirpath + "\\temp\\", "song.desc");
-            if (descFiles.Length > 0)
-            {
+            if (descFiles.Length > 0) {
                 string json = File.ReadAllText(dirpath + "\\temp\\song.desc");
-                songDesc = JsonUtility.FromJson<SongDesc>(json);
+                songDesc = JsonUtility.FromJson<SongDescyay>(json);
                 SetOffset(songDesc.offset);
                 SetSongID(songDesc.songID);
                 SetSongTitle(songDesc.title);
@@ -757,106 +638,79 @@ public class Timeline : MonoBehaviour
                 SetSongPreRoll(songDesc.prerollSeconds);
                 SetSongAuthor(songDesc.author);
 
-            }
-            else
-            {
+            } else {
                 Debug.Log("desc not found");
-                songDesc = new SongDesc();
+                songDesc = new SongDescyay();
             }
 
             //load cues from temp
             //var cueFile = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
             var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
-            if (cueFiles.Length > 0)
-            {
+            if (cueFiles.Length > 0) {
                 //figure out if it has difficulties (new edica file)
                 bool isDifficultyNamed = false;
                 string difficulty = "";
-                foreach (var file in cueFiles)
-                {
-                    if (file.Contains("expert.cues"))
-                    {
+                foreach (var file in cueFiles) {
+                    if (file.Contains("expert.cues")) {
                         isDifficultyNamed = true;
                         difficulty = "expert";
-                    }
-                    else if (file.Contains("advanced.cues"))
-                    {
+                    } else if (file.Contains("advanced.cues")) {
                         isDifficultyNamed = true;
                         difficulty = "advanced";
-                    }
-                    else if (file.Contains("moderate.cues"))
-                    {
+                    } else if (file.Contains("moderate.cues")) {
                         isDifficultyNamed = true;
                         difficulty = "moderate";
-                    }
-                    else if (file.Contains("beginner.cues"))
-                    {
+                    } else if (file.Contains("beginner.cues")) {
                         isDifficultyNamed = true;
                         difficulty = "beginner";
                     }
                 }
 
-                if (isDifficultyNamed)
-                {
+                if (isDifficultyNamed) {
                     DifficultySelection_s.Value = difficulty;
-                    DifficultySelection_s.selection.value = (int)DifficultySelection.Options.Parse(typeof(DifficultySelection.Options), difficulty);
+                    DifficultySelection_s.selection.value = (int) DifficultySelection.Options.Parse(typeof(DifficultySelection.Options), difficulty);
 
                     //load .cues (delete first because changing difficulty creates targets)
                     DeleteTargets();
                     var cueFile = Directory.GetFiles(dirpath + "\\temp\\", difficulty + ".cues");
                     string json = File.ReadAllText(cueFile[0]);
                     json = json.Replace("cues", "Items");
-                    Cue[] cues = JsonHelper.FromJson<Cue>(json);
-                    foreach (Cue cue in cues)
-                    {
+                    Cueyay[] cues = JsonHelper.FromJson<Cueyay>(json);
+                    foreach (Cueyay cue in cues) {
                         AddTarget(cue);
                     }
-                }
-
-                else //old edica format. Shove it into expert
+                } else //old edica format. Shove it into expert
                 {
                     string json = File.ReadAllText(cueFiles[0]);
                     json = json.Replace("cues", "Items");
-                    Cue[] cues = JsonHelper.FromJson<Cue>(json);
-                    foreach (Cue cue in cues)
-                    {
+                    Cueyay[] cues = JsonHelper.FromJson<Cueyay>(json);
+                    foreach (Cueyay cue in cues) {
                         AddTarget(cue);
                     }
                 }
 
-
-            }
-            else
-            {
+            } else {
                 Debug.Log("cues not found");
                 NewFile();
             }
 
-
             //load ogg into audio clip
             var audioFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.ogg");
-            if (audioFiles.Length > 0)
-            {
+            if (audioFiles.Length > 0) {
                 StartCoroutine(GetAudioClip(audioFiles[0]));
-            }
-            else
-            {
+            } else {
                 Debug.Log("ogg not found");
             }
-        }
-        else
-        {
+        } else {
             NewFile();
         }
     }
-    public void LoadPrevious()
-    {
-        string edicaSave = PlayerPrefs.GetString("previousSave"); ;
+    public void LoadPrevious() {
+        string edicaSave = PlayerPrefs.GetString("previousSave");;
         LoadFromFile(edicaSave);
     }
 
-    public void Load()
-    {
+    public void Load() {
         //open save
         string[] edicaSave = StandaloneFileBrowser.OpenFilePanel("Edica save file", Application.persistentDataPath, "edica", false);
         if (edicaSave.Length > 0)
@@ -865,18 +719,13 @@ public class Timeline : MonoBehaviour
             NewFile();
     }
 
-    IEnumerator GetAudioClip(string uri)
-    {
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS))
-        {
+    IEnumerator GetAudioClip(string uri) {
+        using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
             yield return www.SendWebRequest();
 
-            if (www.isNetworkError)
-            {
+            if (www.isNetworkError) {
                 Debug.Log(www.error);
-            }
-            else
-            {
+            } else {
                 AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
                 aud.clip = myClip;
                 previewAud.clip = myClip;
@@ -890,88 +739,72 @@ public class Timeline : MonoBehaviour
         }
     }
 
-    public void SetBehavior(TargetBehavior behavior)
-    {
+    public void SetBehavior(TargetBehavior behavior) {
         selectedBehaviour = behavior;
     }
 
-    public void SetVelocity(TargetVelocity velocity)
-    {
+    public void SetVelocity(TargetVelocity velocity) {
         selectedVelocity = velocity;
     }
 
-    public void SetPlaybackSpeed(float speed)
-    {
+    public void SetPlaybackSpeed(float speed) {
         playbackSpeed = speed;
         aud.pitch = speed;
         previewAud.pitch = speed;
     }
 
-    public void SetHandType(TargetHandType handType)
-    {
+    public void SetHandType(TargetHandType handType) {
         selectedHandType = handType;
     }
 
-    public void SetBPM(float newBpm)
-    {
+    public void SetBPM(float newBpm) {
         bpm = newBpm;
         songDesc.tempo = newBpm;
         SetScale(scale);
     }
 
-
-    public void SetOffset(int newOffset)
-    {
+    public void SetOffset(int newOffset) {
         offset = newOffset;
         songDesc.offset = newOffset;
     }
 
-    public void SetSnap(int newSnap)
-    {
+    public void SetSnap(int newSnap) {
         beatSnap = newSnap;
     }
 
     // .desc menu
-    public void SetSongID(string newSongID)
-    {
+    public void SetSongID(string newSongID) {
         songid = newSongID;
         songDesc.songID = newSongID;
     }
 
-    public void SetSongTitle(string newSongTitle)
-    {
+    public void SetSongTitle(string newSongTitle) {
         songtitle = newSongTitle;
         songDesc.title = newSongTitle;
     }
 
-    public void SetSongArtist(string newSongArtist)
-    {
+    public void SetSongArtist(string newSongArtist) {
         songartist = newSongArtist;
         songDesc.artist = newSongArtist;
     }
 
-    public void SetSongEndEvent(string newSongEndEvent)
-    {
+    public void SetSongEndEvent(string newSongEndEvent) {
         songendevent = newSongEndEvent;
         songDesc.songEndEvent = string.Concat("event:/song_end/song_end_", newSongEndEvent.ToUpper());
     }
 
-    public void SetSongPreRoll(float newSongPreRoll)
-    {
+    public void SetSongPreRoll(float newSongPreRoll) {
         songpreroll = newSongPreRoll;
         songDesc.prerollSeconds = newSongPreRoll;
     }
 
-    public void SetSongAuthor(string newSongAuthor)
-    {
+    public void SetSongAuthor(string newSongAuthor) {
         songauthor = newSongAuthor;
         songDesc.author = newSongAuthor;
     }
 
-    public void SetMogg(string newmogg)
-    {
-        if (!mogg.Contains(".mogg"))
-        {
+    public void SetMogg(string newmogg) {
+        if (!mogg.Contains(".mogg")) {
             newmogg += ".mogg";
         }
 
@@ -980,8 +813,7 @@ public class Timeline : MonoBehaviour
 
     }
 
-    public void SetBeatTime(float t)
-    {
+    public void SetBeatTime(float t) {
         timelineBG.material.SetTextureOffset("_MainTex", new Vector2(((t * bpm / 60 - offset / 480f) / 4f + scaleOffset), 1));
 
         timelineNotes.transform.localPosition = Vector3.left * (t * bpm / 60 - offset / 480f) / (scale / 20f);
@@ -990,28 +822,24 @@ public class Timeline : MonoBehaviour
         gridNotes.transform.localPosition = Vector3.back * (t * bpm / 60 - offset / 480f);
     }
 
-    public void SetScale(int newScale)
-    {
+    public void SetScale(int newScale) {
         timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
         scaleOffset = -newScale % 8 / 8f;
 
         spectrogram.localScale = new Vector3(aud.clip.length / 2 * bpm / 60 / (newScale / 20f), 1, 1);
 
-        timelineNotes.transform.localScale *= (float)scale / newScale;
-        targetScale *= (float)newScale / scale;
+        timelineNotes.transform.localScale *= (float) scale / newScale;
+        targetScale *= (float) newScale / scale;
         // fix scaling on all notes
-        foreach (Transform note in timelineNotes.transform)
-        {
+        foreach (Transform note in timelineNotes.transform) {
             note.localScale = targetScale * Vector3.one;
         }
         scale = newScale;
     }
 
-    public void UpdateTrail()
-    {
+    public void UpdateTrail() {
         Vector3[] positions = new Vector3[gridNotes.childCount];
-        for (int i = 0; i < gridNotes.transform.childCount; i++)
-        {
+        for (int i = 0; i < gridNotes.transform.childCount; i++) {
             positions[i] = gridNotes.GetChild(i).localPosition;
         }
         positions = positions.OrderBy(v => v.z).ToArray();
@@ -1020,32 +848,23 @@ public class Timeline : MonoBehaviour
         liner.SetPositions(positions);
     }
 
-    public void Update()
-    {
+    public void Update() {
         if (orderedNotes.Count > 0)
-            foreach (var note in orderedNotes)
-            {
+            foreach (var note in orderedNotes) {
 
-                if (note.behavior == TargetBehavior.ChainStart && note)
-                {
-                    if (note.chainedNotes.Count > 0)
-                    {
-                        if ((note.transform.position.z < 0 && 0 > note.chainedNotes.Last().transform.position.z) || (note.transform.position.z > 0 && 0 < note.chainedNotes.Last().transform.position.z))
-                        {
-                            note.GetComponentsInChildren<LineRenderer>()[1].enabled = false;
-                        }
-                        else
-                        {
-                            note.GetComponentsInChildren<LineRenderer>()[1].enabled = true;
+                if (note.behavior == TargetBehavior.ChainStart && note) {
+                    if (note.chainedNotes.Count > 0) {
+                        if ((note.transform.position.z < 0 && 0 > note.chainedNotes.Last().transform.position.z) || (note.transform.position.z > 0 && 0 < note.chainedNotes.Last().transform.position.z)) {
+                            note.GetComponentsInChildren<LineRenderer>() [1].enabled = false;
+                        } else {
+                            note.GetComponentsInChildren<LineRenderer>() [1].enabled = true;
                         }
                     }
                 }
 
-                if (note.behavior == TargetBehavior.Hold && note)
-                {
+                if (note.behavior == TargetBehavior.Hold && note) {
                     var length = Mathf.Ceil(float.Parse(note.GetComponentInChildren<HoldController>().length.text)) / 480;
-                    if (note.gridTarget.beatLength != length)
-                    {
+                    if (note.gridTarget.beatLength != length) {
                         note.gridTarget.SetBeatLength(length);
                         Debug.Log(note.beatLength);
                     }
@@ -1054,57 +873,46 @@ public class Timeline : MonoBehaviour
 
         UpdateChords();
 
-        if(SustainParticles)
+        if (SustainParticles)
             UpdateSustains();
 
         if (!paused) time += Time.deltaTime * playbackSpeed;
 
-        if (hover)
-        {
-            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-            {
-                if (Input.mouseScrollDelta.y > 0.1f)
-                {
+        if (hover) {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
+                if (Input.mouseScrollDelta.y > 0.1f) {
                     SetScale(scale - 1);
-                }
-                else if (Input.mouseScrollDelta.y < -0.1f)
-                {
+                } else if (Input.mouseScrollDelta.y < -0.1f) {
                     SetScale(scale + 1);
                 }
             }
         }
         if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
 
-        //Fixed the timeline scroll direction.
+            //Fixed the timeline scroll direction.
 
-            if (Input.mouseScrollDelta.y < -0.1f)
-            {
+            if (Input.mouseScrollDelta.y < -0.1f) {
                 time += BeatsToDuration(4f / beatSnap);
                 time = SnapTime(time);
                 aud.time = time;
                 previewAud.time = time;
                 if (paused) previewAud.Play();
             }
-            else if (Input.mouseScrollDelta.y > 0.1f)
-            {
-                time -= BeatsToDuration(4f / beatSnap);
-                time = SnapTime(time);
-                if (time < 0) time = 0;
-                aud.time = time;
-                previewAud.time = time;
-                if (paused) previewAud.Play();
-            }
+        else if (Input.mouseScrollDelta.y > 0.1f) {
+            time -= BeatsToDuration(4f / beatSnap);
+            time = SnapTime(time);
+            if (time < 0) time = 0;
+            aud.time = time;
+            previewAud.time = time;
+            if (paused) previewAud.Play();
+        }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (paused)
-            {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            if (paused) {
                 aud.Play();
                 previewAud.Pause();
                 paused = false;
-            }
-            else
-            {
+            } else {
                 aud.Pause();
                 paused = true;
 
@@ -1116,8 +924,7 @@ public class Timeline : MonoBehaviour
             }
         }
         SetBeatTime(time);
-        if (previewAud.time > time + previewDuration)
-        {
+        if (previewAud.time > time + previewDuration) {
             previewAud.Pause();
         }
 
@@ -1127,71 +934,56 @@ public class Timeline : MonoBehaviour
         SetCurrentTick();
     }
 
-
-    void OnMouseOver()
-    {
+    void OnMouseOver() {
         hover = true;
     }
 
-    void OnMouseExit()
-    {
+    void OnMouseExit() {
         hover = false;
     }
 
-    public static float DurationToBeats(float t)
-    {
+    public static float DurationToBeats(float t) {
         return t * bpm / 60;
     }
 
-    public float BeatsToDuration(float beat)
-    {
+    public float BeatsToDuration(float beat) {
         return beat * 60 / bpm;
     }
 
-    public float Snap(float beat)
-    {
+    public float Snap(float beat) {
         return Mathf.Round(beat * beatSnap / 4f) * 4f / beatSnap;
     }
 
-    public static float BeatTime()
-    {
+    public static float BeatTime() {
         return DurationToBeats(time) - offset / 480f;
     }
 
-    public float SnapTime(float t)
-    {
+    public float SnapTime(float t) {
         return BeatsToDuration(Snap(DurationToBeats(t) - offset / 480f) + offset / 480f);
     }
 
-    private void SetCurrentTime()
-    {
-        string minutes = Mathf.Floor((int)time / 60).ToString("00");
-        string seconds = ((int)time % 60).ToString("00");
+    private void SetCurrentTime() {
+        string minutes = Mathf.Floor((int) time / 60).ToString("00");
+        string seconds = ((int) time % 60).ToString("00");
 
         curMinutes.text = minutes;
         curSeconds.text = seconds;
     }
 
-    private void SetCurrentTick()
-    {
-        string currentTick = Mathf.Floor((int)BeatTime() * 480f).ToString();
+    private void SetCurrentTick() {
+        string currentTick = Mathf.Floor((int) BeatTime() * 480f).ToString();
 
         curTick.text = currentTick;
     }
 
-    public void SustainParticlesToggle(Toggle tog)
-    {
+    public void SustainParticlesToggle(Toggle tog) {
         SustainParticles = tog.isOn;
 
-        if (!SustainParticles)
-        {
-            foreach (var note in orderedNotes)
-            {
-                if (note.behavior == TargetBehavior.Hold)
-                {
+        if (!SustainParticles) {
+            foreach (var note in orderedNotes) {
+                if (note.behavior == TargetBehavior.Hold) {
                     var particles = note.GetComponentInChildren<ParticleSystem>();
-                    if (particles.isEmitting)
-                    {
+                    if (particles.isEmitting) {
                         particles.Stop();
                     }
                 }

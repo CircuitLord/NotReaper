@@ -5,9 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NotReaper.Zipping {
+namespace NotReaper.IO {
 	public static class MoggSongParser {
-
 
 		static string METADATA_START = "0xd000";
 
@@ -37,7 +36,6 @@ namespace NotReaper.Zipping {
 		}
 		*/
 
-
 		//This will parse in the DTA file as a single text string.
 		//raw_string is the text of the DTA file.
 		//tree at first should be an empty list that you can access later
@@ -46,9 +44,8 @@ namespace NotReaper.Zipping {
 		public static List<string> parse_metadata(string raw_text) {
 			int i = 0;
 			string s = "";
-			bool read_active = false;
+			//bool read_active = false;
 			List<string> tree = new List<string>();
-
 
 			while (raw_text[i] != '(') {
 				i++;
@@ -90,15 +87,8 @@ namespace NotReaper.Zipping {
 					//var subtree 
 				}
 
-
-
-
-
-
 				i++;
 			}
-
-
 
 			return tree;
 
