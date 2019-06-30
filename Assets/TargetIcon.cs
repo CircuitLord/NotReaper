@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class TargetIcon : MonoBehaviour {
-    
+
     public GameObject standard;
     public GameObject hold;
     public GameObject horizontal;
@@ -14,7 +14,7 @@ public class TargetIcon : MonoBehaviour {
     public GameObject melee;
     public GameObject line;
 
-//1DA4E5
+    //1DA4E5
 
     public Color leftColor;
     public Color rightColor;
@@ -23,12 +23,9 @@ public class TargetIcon : MonoBehaviour {
 
     public float sustainDirection = 0.6f;
 
-    public void SetHandType(TargetHandType handType)
-    {
-        foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true))
-        {
-            switch (handType)
-            {
+    public void SetHandType(TargetHandType handType) {
+        foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true)) {
+            switch (handType) {
                 case TargetHandType.Left:
                     r.material.SetColor("_Tint", UserPrefsManager.leftColor);
                     break;
@@ -36,17 +33,15 @@ public class TargetIcon : MonoBehaviour {
                     r.material.SetColor("_Tint", UserPrefsManager.rightColor);
                     break;
                 case TargetHandType.Either:
-                    r.material.SetColor("_Tint", eitherColor);
+                    r.material.SetColor("_Tint", UserPrefsManager.bothColor);
                     break;
                 default:
-                    r.material.SetColor("_Tint", noneColor);
+                    r.material.SetColor("_Tint", UserPrefsManager.neitherColor);
                     break;
             }
         }
-        foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true))
-        {
-            switch (handType)
-            {
+        foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
+            switch (handType) {
                 case TargetHandType.Left:
                     l.startColor = UserPrefsManager.leftColor;
                     l.endColor = UserPrefsManager.leftColor;
@@ -72,18 +67,13 @@ public class TargetIcon : MonoBehaviour {
 
     }
 
-    public void SetSustainLength(float beatLength)
-    {
-        foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true))
-        {
-            if (beatLength >= 1)
-            {
+    public void SetSustainLength(float beatLength) {
+        foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
+            if (beatLength >= 1) {
                 l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                 l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
                 l.SetPosition(2, new Vector3(beatLength / 0.7f, sustainDirection, 0.0f));
-            }
-            else
-            {
+            } else {
                 l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                 l.SetPosition(1, new Vector3(0.0f, 0.0f, 0.0f));
                 l.SetPosition(2, new Vector3(0.0f, 0.0f, 0.0f));
@@ -91,8 +81,7 @@ public class TargetIcon : MonoBehaviour {
         }
     }
 
-    public void SetBehavior(TargetBehavior behavior)
-    {
+    public void SetBehavior(TargetBehavior behavior) {
         standard.SetActive(behavior == TargetBehavior.Standard);
         hold.SetActive(behavior == TargetBehavior.Hold);
         horizontal.SetActive(behavior == TargetBehavior.Horizontal);
