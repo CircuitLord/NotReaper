@@ -1,0 +1,2746 @@
+{
+    "cues": [
+        {
+            "tick": 7680, 
+            "tickLength": 120, 
+            "pitch": 28, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 8160, 
+            "tickLength": 120, 
+            "pitch": 42, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 8880, 
+            "tickLength": 120, 
+            "pitch": 55, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 9600, 
+            "tickLength": 120, 
+            "pitch": 44, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 10320, 
+            "tickLength": 120, 
+            "pitch": 44, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 11040, 
+            "tickLength": 120, 
+            "pitch": 55, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 11520, 
+            "tickLength": 120, 
+            "pitch": 28, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 12000, 
+            "tickLength": 120, 
+            "pitch": 38, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 12720, 
+            "tickLength": 120, 
+            "pitch": 49, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 13440, 
+            "tickLength": 120, 
+            "pitch": 36, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 14160, 
+            "tickLength": 120, 
+            "pitch": 36, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 14880, 
+            "tickLength": 120, 
+            "pitch": 49, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 15360, 
+            "tickLength": 120, 
+            "pitch": 64, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 15840, 
+            "tickLength": 120, 
+            "pitch": 55, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 16560, 
+            "tickLength": 120, 
+            "pitch": 42, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 17280, 
+            "tickLength": 120, 
+            "pitch": 31, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 18000, 
+            "tickLength": 120, 
+            "pitch": 31, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 18720, 
+            "tickLength": 120, 
+            "pitch": 42, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 19200, 
+            "tickLength": 120, 
+            "pitch": 64, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 19680, 
+            "tickLength": 120, 
+            "pitch": 49, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 20400, 
+            "tickLength": 120, 
+            "pitch": 36, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 21120, 
+            "tickLength": 120, 
+            "pitch": 25, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 22320, 
+            "tickLength": 120, 
+            "pitch": 100, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 0, 
+            "behavior": 6
+        }, 
+        {
+            "tick": 22560, 
+            "tickLength": 120, 
+            "pitch": 100, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 0, 
+            "behavior": 6
+        }, 
+        {
+            "tick": 23040, 
+            "tickLength": 120, 
+            "pitch": 40, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 23160, 
+            "tickLength": 120, 
+            "pitch": 41, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 23280, 
+            "tickLength": 120, 
+            "pitch": 42, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 23400, 
+            "tickLength": 120, 
+            "pitch": 43, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 23520, 
+            "tickLength": 120, 
+            "pitch": 45, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 23760, 
+            "tickLength": 120, 
+            "pitch": 19, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 24000, 
+            "tickLength": 120, 
+            "pitch": 56, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 24480, 
+            "tickLength": 120, 
+            "pitch": 19, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 24960, 
+            "tickLength": 120, 
+            "pitch": 45, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 25200, 
+            "tickLength": 120, 
+            "pitch": 45, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 25440, 
+            "tickLength": 120, 
+            "pitch": 19, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 25920, 
+            "tickLength": 120, 
+            "pitch": 56, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 26400, 
+            "tickLength": 120, 
+            "pitch": 19, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 26880, 
+            "tickLength": 100, 
+            "pitch": 43, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 27000, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.28125, 
+                "y": -0.71875
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 27120, 
+            "tickLength": 100, 
+            "pitch": 29, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.578125, 
+                "y": -0.421875
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 27240, 
+            "tickLength": 100, 
+            "pitch": 16, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.859375, 
+                "y": -0.140625
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 27360, 
+            "tickLength": 120, 
+            "pitch": 40, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 27600, 
+            "tickLength": 120, 
+            "pitch": 26, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 27840, 
+            "tickLength": 120, 
+            "pitch": 51, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 28320, 
+            "tickLength": 120, 
+            "pitch": 26, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 29040, 
+            "tickLength": 120, 
+            "pitch": 51, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 29280, 
+            "tickLength": 120, 
+            "pitch": 26, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 29760, 
+            "tickLength": 120, 
+            "pitch": 53, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 30240, 
+            "tickLength": 80, 
+            "pitch": 55, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 30400, 
+            "tickLength": 80, 
+            "pitch": 43, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 30560, 
+            "tickLength": 80, 
+            "pitch": 31, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 30720, 
+            "tickLength": 100, 
+            "pitch": 19, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 30840, 
+            "tickLength": 100, 
+            "pitch": 30, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.1875, 
+                "y": -0.203125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 30960, 
+            "tickLength": 100, 
+            "pitch": 41, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.390625, 
+                "y": -0.40625
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 31080, 
+            "tickLength": 100, 
+            "pitch": 52, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.578125, 
+                "y": -0.59375
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 31200, 
+            "tickLength": 120, 
+            "pitch": 52, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 31440, 
+            "tickLength": 120, 
+            "pitch": 62, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 31680, 
+            "tickLength": 120, 
+            "pitch": 64, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 32160, 
+            "tickLength": 120, 
+            "pitch": 62, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 32640, 
+            "tickLength": 120, 
+            "pitch": 39, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 32880, 
+            "tickLength": 120, 
+            "pitch": 39, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 33120, 
+            "tickLength": 120, 
+            "pitch": 62, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 33600, 
+            "tickLength": 120, 
+            "pitch": 64, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 33840, 
+            "tickLength": 720, 
+            "pitch": 62, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 38400, 
+            "tickLength": 80, 
+            "pitch": 100, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 0, 
+            "behavior": 6
+        }, 
+        {
+            "tick": 38400, 
+            "tickLength": 80, 
+            "pitch": 98, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 0, 
+            "behavior": 6
+        }, 
+        {
+            "tick": 40320, 
+            "tickLength": 80, 
+            "pitch": 101, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 0, 
+            "behavior": 6
+        }, 
+        {
+            "tick": 40320, 
+            "tickLength": 80, 
+            "pitch": 99, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 0, 
+            "behavior": 6
+        }, 
+        {
+            "tick": 83520, 
+            "tickLength": 120, 
+            "pitch": 100, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 0, 
+            "behavior": 6
+        }, 
+        {
+            "tick": 84000, 
+            "tickLength": 120, 
+            "pitch": 50, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 84480, 
+            "tickLength": 120, 
+            "pitch": 28, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 84960, 
+            "tickLength": 100, 
+            "pitch": 76, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 85080, 
+            "tickLength": 100, 
+            "pitch": 64, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.75, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 85200, 
+            "tickLength": 100, 
+            "pitch": 53, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.5, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 85320, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.25, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 85440, 
+            "tickLength": 120, 
+            "pitch": 31, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 85920, 
+            "tickLength": 100, 
+            "pitch": 81, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 86040, 
+            "tickLength": 100, 
+            "pitch": 68, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.25, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 86160, 
+            "tickLength": 100, 
+            "pitch": 55, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.515625, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 86280, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.78125, 
+                "y": -0.046875
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 86400, 
+            "tickLength": 120, 
+            "pitch": 30, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 86880, 
+            "tickLength": 100, 
+            "pitch": 79, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 87000, 
+            "tickLength": 100, 
+            "pitch": 66, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.25, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 87120, 
+            "tickLength": 100, 
+            "pitch": 53, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.515625, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 87240, 
+            "tickLength": 100, 
+            "pitch": 40, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.78125, 
+                "y": -0.046875
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 87360, 
+            "tickLength": 120, 
+            "pitch": 28, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 87840, 
+            "tickLength": 120, 
+            "pitch": 39, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 87840, 
+            "tickLength": 120, 
+            "pitch": 43, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 88320, 
+            "tickLength": 120, 
+            "pitch": 30, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 88800, 
+            "tickLength": 100, 
+            "pitch": 76, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 88920, 
+            "tickLength": 100, 
+            "pitch": 64, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.734375, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 89040, 
+            "tickLength": 100, 
+            "pitch": 53, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.46875, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 89160, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.203125, 
+                "y": -0.046875
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 89280, 
+            "tickLength": 120, 
+            "pitch": 31, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 89760, 
+            "tickLength": 100, 
+            "pitch": 81, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 89880, 
+            "tickLength": 100, 
+            "pitch": 68, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.25, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 90000, 
+            "tickLength": 100, 
+            "pitch": 55, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.515625, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 90120, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.78125, 
+                "y": -0.046875
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 90240, 
+            "tickLength": 120, 
+            "pitch": 30, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 90720, 
+            "tickLength": 100, 
+            "pitch": 78, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 90840, 
+            "tickLength": 100, 
+            "pitch": 66, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.734375, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 90960, 
+            "tickLength": 100, 
+            "pitch": 55, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.46875, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 91080, 
+            "tickLength": 100, 
+            "pitch": 44, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.203125, 
+                "y": -0.046875
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 91200, 
+            "tickLength": 120, 
+            "pitch": 33, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 91680, 
+            "tickLength": 120, 
+            "pitch": 42, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 91680, 
+            "tickLength": 120, 
+            "pitch": 46, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 92160, 
+            "tickLength": 120, 
+            "pitch": 32, 
+            "velocity": 96, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 92640, 
+            "tickLength": 120, 
+            "pitch": 101, 
+            "velocity": 3, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 0, 
+            "behavior": 6
+        }, 
+        {
+            "tick": 93120, 
+            "tickLength": 100, 
+            "pitch": 16, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 93120, 
+            "tickLength": 100, 
+            "pitch": 19, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 93600, 
+            "tickLength": 100, 
+            "pitch": 27, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.484375, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 93600, 
+            "tickLength": 100, 
+            "pitch": 31, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.5, 
+                "y": -0.015625
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 94080, 
+            "tickLength": 100, 
+            "pitch": 39, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": -0.015625, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 94080, 
+            "tickLength": 100, 
+            "pitch": 44, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.0, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 94560, 
+            "tickLength": 100, 
+            "pitch": 65, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 94800, 
+            "tickLength": 100, 
+            "pitch": 66, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0.078125, 
+                "y": -0.796875
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 95040, 
+            "tickLength": 100, 
+            "pitch": 41, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0.65625, 
+                "y": -0.0625
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 95280, 
+            "tickLength": 100, 
+            "pitch": 40, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.328125, 
+                "y": -0.046875
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 95520, 
+            "tickLength": 100, 
+            "pitch": 63, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0.921875, 
+                "y": -0.78125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 96000, 
+            "tickLength": 120, 
+            "pitch": 65, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 96960, 
+            "tickLength": 100, 
+            "pitch": 16, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 96960, 
+            "tickLength": 100, 
+            "pitch": 19, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 97440, 
+            "tickLength": 100, 
+            "pitch": 27, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.484375, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 97440, 
+            "tickLength": 100, 
+            "pitch": 31, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.5, 
+                "y": -0.015625
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 97920, 
+            "tickLength": 100, 
+            "pitch": 39, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": -0.015625, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 97920, 
+            "tickLength": 100, 
+            "pitch": 44, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.0, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 98640, 
+            "tickLength": 120, 
+            "pitch": 17, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 98640, 
+            "tickLength": 120, 
+            "pitch": 66, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 99360, 
+            "tickLength": 120, 
+            "pitch": 39, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 99360, 
+            "tickLength": 120, 
+            "pitch": 44, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 115200, 
+            "tickLength": 960, 
+            "pitch": 56, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 115200, 
+            "tickLength": 939, 
+            "pitch": 20, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 117120, 
+            "tickLength": 960, 
+            "pitch": 16, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 117120, 
+            "tickLength": 939, 
+            "pitch": 19, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 119040, 
+            "tickLength": 960, 
+            "pitch": 66, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 120000, 
+            "tickLength": 960, 
+            "pitch": 44, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 120960, 
+            "tickLength": 480, 
+            "pitch": 66, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 121440, 
+            "tickLength": 480, 
+            "pitch": 44, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 121920, 
+            "tickLength": 480, 
+            "pitch": 18, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 3
+        }, 
+        {
+            "tick": 122880, 
+            "tickLength": 100, 
+            "pitch": 68, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 123120, 
+            "tickLength": 100, 
+            "pitch": 68, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.828125, 
+                "y": -0.3125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 123360, 
+            "tickLength": 100, 
+            "pitch": 69, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.40625, 
+                "y": -0.984375
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 123600, 
+            "tickLength": 100, 
+            "pitch": 57, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.59375, 
+                "y": -0.84375
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 123840, 
+            "tickLength": 100, 
+            "pitch": 45, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0.359375, 
+                "y": -0.6875
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 124080, 
+            "tickLength": 100, 
+            "pitch": 32, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.734375, 
+                "y": -0.3125
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 124320, 
+            "tickLength": 100, 
+            "pitch": 31, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.90625, 
+                "y": -0.578125
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 124560, 
+            "tickLength": 100, 
+            "pitch": 31, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.03125, 
+                "y": -0.40625
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 124800, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.359375, 
+                "y": -0.84375
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 125040, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 125280, 
+            "tickLength": 100, 
+            "pitch": 53, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.515625, 
+                "y": -0.265625
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 125520, 
+            "tickLength": 100, 
+            "pitch": 64, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.75, 
+                "y": -0.828125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 125760, 
+            "tickLength": 100, 
+            "pitch": 63, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.859375, 
+                "y": -0.8125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 126240, 
+            "tickLength": 120, 
+            "pitch": 49, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 126720, 
+            "tickLength": 100, 
+            "pitch": 63, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 126960, 
+            "tickLength": 100, 
+            "pitch": 62, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.125, 
+                "y": -0.203125
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 127200, 
+            "tickLength": 100, 
+            "pitch": 61, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.453125, 
+                "y": -0.765625
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 127440, 
+            "tickLength": 100, 
+            "pitch": 49, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.140625, 
+                "y": -0.59375
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 127680, 
+            "tickLength": 100, 
+            "pitch": 37, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0.265625, 
+                "y": -0.46875
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 127920, 
+            "tickLength": 100, 
+            "pitch": 25, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.796875, 
+                "y": -0.1875
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 128160, 
+            "tickLength": 100, 
+            "pitch": 26, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.59375, 
+                "y": -0.5625
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 128400, 
+            "tickLength": 100, 
+            "pitch": 27, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.46875, 
+                "y": -0.5
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 128640, 
+            "tickLength": 100, 
+            "pitch": 28, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.21875, 
+                "y": -0.046875
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 128880, 
+            "tickLength": 100, 
+            "pitch": 41, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 129120, 
+            "tickLength": 120, 
+            "pitch": 54, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 129360, 
+            "tickLength": 120, 
+            "pitch": 55, 
+            "velocity": 96, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 129600, 
+            "tickLength": 120, 
+            "pitch": 44, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 130080, 
+            "tickLength": 120, 
+            "pitch": 58, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 161280, 
+            "tickLength": 120, 
+            "pitch": 28, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 161760, 
+            "tickLength": 100, 
+            "pitch": 76, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 161880, 
+            "tickLength": 100, 
+            "pitch": 64, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.75, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 162000, 
+            "tickLength": 100, 
+            "pitch": 53, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.5, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 162120, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.25, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 162240, 
+            "tickLength": 120, 
+            "pitch": 31, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 162720, 
+            "tickLength": 100, 
+            "pitch": 81, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 162840, 
+            "tickLength": 100, 
+            "pitch": 68, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.25, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 162960, 
+            "tickLength": 100, 
+            "pitch": 55, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.515625, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 163080, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.78125, 
+                "y": -0.046875
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 163200, 
+            "tickLength": 120, 
+            "pitch": 30, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 163680, 
+            "tickLength": 100, 
+            "pitch": 79, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 163800, 
+            "tickLength": 100, 
+            "pitch": 66, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.25, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 163920, 
+            "tickLength": 100, 
+            "pitch": 53, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.515625, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 164040, 
+            "tickLength": 100, 
+            "pitch": 40, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.78125, 
+                "y": -0.046875
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 164160, 
+            "tickLength": 120, 
+            "pitch": 28, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 164640, 
+            "tickLength": 120, 
+            "pitch": 39, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 164640, 
+            "tickLength": 120, 
+            "pitch": 43, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 165120, 
+            "tickLength": 120, 
+            "pitch": 30, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 165600, 
+            "tickLength": 100, 
+            "pitch": 76, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 165720, 
+            "tickLength": 100, 
+            "pitch": 64, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.734375, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 165840, 
+            "tickLength": 100, 
+            "pitch": 53, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.46875, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 165960, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.203125, 
+                "y": -0.046875
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 166080, 
+            "tickLength": 120, 
+            "pitch": 31, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 166560, 
+            "tickLength": 100, 
+            "pitch": 81, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 166680, 
+            "tickLength": 100, 
+            "pitch": 68, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.25, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 166800, 
+            "tickLength": 100, 
+            "pitch": 55, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.515625, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 166920, 
+            "tickLength": 100, 
+            "pitch": 42, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.78125, 
+                "y": -0.046875
+            }, 
+            "handType": 1, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 167040, 
+            "tickLength": 120, 
+            "pitch": 30, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 167520, 
+            "tickLength": 100, 
+            "pitch": 78, 
+            "velocity": 1, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 4
+        }, 
+        {
+            "tick": 167640, 
+            "tickLength": 100, 
+            "pitch": 66, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.734375, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 167760, 
+            "tickLength": 100, 
+            "pitch": 55, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.46875, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 167880, 
+            "tickLength": 100, 
+            "pitch": 44, 
+            "velocity": 2, 
+            "gridOffset": {
+                "x": 0.203125, 
+                "y": -0.046875
+            }, 
+            "handType": 2, 
+            "behavior": 5
+        }, 
+        {
+            "tick": 168000, 
+            "tickLength": 120, 
+            "pitch": 33, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 2
+        }, 
+        {
+            "tick": 168480, 
+            "tickLength": 120, 
+            "pitch": 42, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 168480, 
+            "tickLength": 120, 
+            "pitch": 46, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 1
+        }, 
+        {
+            "tick": 168960, 
+            "tickLength": 120, 
+            "pitch": 32, 
+            "velocity": 96, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 169920, 
+            "tickLength": 100, 
+            "pitch": 16, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 169920, 
+            "tickLength": 100, 
+            "pitch": 19, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 170400, 
+            "tickLength": 100, 
+            "pitch": 27, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.484375, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 170400, 
+            "tickLength": 100, 
+            "pitch": 31, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.5, 
+                "y": -0.015625
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 170880, 
+            "tickLength": 100, 
+            "pitch": 39, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": -0.015625, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 170880, 
+            "tickLength": 100, 
+            "pitch": 44, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.0, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 171360, 
+            "tickLength": 100, 
+            "pitch": 65, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 171600, 
+            "tickLength": 100, 
+            "pitch": 66, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0.078125, 
+                "y": -0.796875
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 171840, 
+            "tickLength": 100, 
+            "pitch": 41, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0.65625, 
+                "y": -0.0625
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 172080, 
+            "tickLength": 100, 
+            "pitch": 40, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0.328125, 
+                "y": -0.046875
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 172320, 
+            "tickLength": 100, 
+            "pitch": 63, 
+            "velocity": 127, 
+            "gridOffset": {
+                "x": 0.921875, 
+                "y": -0.78125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 172800, 
+            "tickLength": 120, 
+            "pitch": 65, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 173760, 
+            "tickLength": 100, 
+            "pitch": 16, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 173760, 
+            "tickLength": 100, 
+            "pitch": 19, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 174240, 
+            "tickLength": 100, 
+            "pitch": 27, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.484375, 
+                "y": -0.015625
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 174240, 
+            "tickLength": 100, 
+            "pitch": 31, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.5, 
+                "y": -0.015625
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 174720, 
+            "tickLength": 100, 
+            "pitch": 39, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": -0.015625, 
+                "y": -0.03125
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 174720, 
+            "tickLength": 100, 
+            "pitch": 44, 
+            "velocity": 60, 
+            "gridOffset": {
+                "x": 0.0, 
+                "y": -0.03125
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 175440, 
+            "tickLength": 120, 
+            "pitch": 17, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 175440, 
+            "tickLength": 120, 
+            "pitch": 66, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 176160, 
+            "tickLength": 120, 
+            "pitch": 39, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 2, 
+            "behavior": 0
+        }, 
+        {
+            "tick": 176160, 
+            "tickLength": 120, 
+            "pitch": 44, 
+            "velocity": 20, 
+            "gridOffset": {
+                "x": 0, 
+                "y": 0
+            }, 
+            "handType": 1, 
+            "behavior": 0
+        }
+    ], 
+    "repeaters": [
+        {
+            "velocity": 96, 
+            "tick": 84480, 
+            "handType": 2, 
+            "tickLength": 28800, 
+            "pitch": 107
+        }, 
+        {
+            "velocity": 20, 
+            "tick": 161280, 
+            "handType": 2, 
+            "tickLength": 30720, 
+            "pitch": 107
+        }, 
+        {
+            "velocity": 20, 
+            "tick": 84480, 
+            "handType": 1, 
+            "tickLength": 28800, 
+            "pitch": 107
+        }, 
+        {
+            "velocity": 20, 
+            "tick": 161280, 
+            "handType": 1, 
+            "tickLength": 30720, 
+            "pitch": 107
+        }
+    ]
+}

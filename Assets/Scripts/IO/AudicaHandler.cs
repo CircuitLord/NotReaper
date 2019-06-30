@@ -16,6 +16,13 @@ namespace NotReaper.IO {
 
 			ZipFile audicaZip = ZipFile.Read(path);
 
+			string appPath = Application.dataPath;
+			bool easy = false;
+			bool standard = false;
+			bool advanced = false;
+			bool expert = false;
+
+
 			//Figure out what files we need to extract by getting the song.desc.
 			foreach (ZipEntry entry in audicaZip.Entries) {
 				if (entry.FileName == "song.desc") {
@@ -26,13 +33,43 @@ namespace NotReaper.IO {
 					audicaFile.desc = JsonConvert.DeserializeObject<SongDesc>(tempDesc);
 
 					ms.Dispose();
-					break;
+					continue;
 				}
+
+				//Extract the cues files.
+				else if (entry.FileName == $"{CuesDifficulty.expert}.cues") {
+					entry.Extract($"{appPath}/.cache");
+
+				} else if (entry.FileName == $"{CuesDifficulty.advanced}.cues") {
+					entry.Extract($"{appPath}/.cache");
+
+				} else if (entry.FileName == $"{CuesDifficulty.standard}.cues") {
+					entry.Extract($"{appPath}/.cache");
+
+				} else if (entry.FileName == $"{CuesDifficulty.easy}.cues") {
+					entry.Extract($"{appPath}/.cache");
+				}
+
 			}
 
 			//Now we fill the audicaFile var with all the things it needs.
 			//Remember, all props in audicaFile.desc refer to either moggsong or the name of the mogg.
 			//Real clips are stored in main audicaFile object.
+
+
+			//Load the cues files.
+			if (expert) {
+				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.expert}.json"));
+			}
+			if (advanced) {
+				audicaFile.diffs.advanced = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.advanced}.json"));
+			}
+			if (standard) {
+				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.standard}.json"));
+			}
+			if (easy) {
+				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.easy}.json"));
+			}
 
 			MemoryStream temp = new MemoryStream();
 
@@ -67,18 +104,18 @@ namespace NotReaper.IO {
 			bool sustainRightLoaded = false;
 			bool sustainLeftLoaded = false;
 
-			if (File.Exists($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggMainSong}")) {
-				audicaFile.song = Resources.Load<AudioClip>($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggMainSong}");
+			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggMainSong}")) {
+				audicaFile.song = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggMainSong}");
 				mainSongLoaded = true;
 			}
 
-			if (File.Exists($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggSustainSongRight}")) {
-				audicaFile.song_sustain_r = Resources.Load<AudioClip>($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggSustainSongRight}");
+			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongRight}")) {
+				audicaFile.song_sustain_r = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongRight}");
 				sustainRightLoaded = true;
 			}
 
-			if (File.Exists($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggSustainSongLeft}")) {
-				audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggSustainSongLeft}");
+			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongLeft}")) {
+				audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongLeft}");
 				sustainLeftLoaded = true;
 			}
 
@@ -96,19 +133,19 @@ namespace NotReaper.IO {
 				if (!mainSongLoaded && entry.FileName == audicaFile.desc.moggMainSong) {
 					entry.Extract(tempMogg);
 					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedOggMainSong);
-					audicaFile.song = Resources.Load<AudioClip>($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggMainSong}");
+					audicaFile.song = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggMainSong}");
 					mainSongLoaded = true;
 
 				} else if (!sustainRightLoaded && entry.FileName == audicaFile.desc.moggSustainSongRight) {
 					entry.Extract(tempMogg);
 					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedOggSustainSongRight);
-					audicaFile.song_sustain_r = Resources.Load<AudioClip>($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggSustainSongRight}");
+					audicaFile.song_sustain_r = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongRight}");
 					sustainRightLoaded = true;
 
 				} else if (!sustainLeftLoaded && entry.FileName == audicaFile.desc.moggSustainSongLeft) {
 					entry.Extract(tempMogg);
 					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedOggSustainSongLeft);
-					audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/CACHE/{audicaFile.desc.cachedOggSustainSongLeft}");
+					audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongLeft}");
 					sustainLeftLoaded = true;
 
 				}
@@ -137,14 +174,14 @@ namespace NotReaper.IO {
 
 			byte[] dst = new byte[bytes.Length - start];
 			Array.Copy(bytes, start, dst, 0, dst.Length);
-			File.WriteAllBytes($"{Application.dataPath}/CACHE/{filename}", dst);
+			File.WriteAllBytes($"{Application.dataPath}/.cache/{filename}", dst);
 
 		}
 
 
 		public static void CheckCacheValid() {
-			if (!Directory.Exists($"{Application.dataPath}/CACHE")) {
-				Directory.CreateDirectory($"{Application.dataPath}/CACHE");
+			if (!Directory.Exists($"{Application.dataPath}/.cache")) {
+				Directory.CreateDirectory($"{Application.dataPath}/.cache");
 			}
 		}
 

@@ -24,6 +24,8 @@ namespace NotReaper.Models {
 
 		public string fusionSpatialized;
 
+		public string targetDrums;
+
 		public string sustainSongRight;
 		public string moggSustainSongRight;
 		public string cachedOggSustainSongRight {
@@ -51,23 +53,33 @@ namespace NotReaper.Models {
 		public string mapper;
 	}
 
-	public class CuesList {
-		public List<Cue> expert = null;
-		public List<Cue> advanced = null;
-		public List<Cue> standard = null;
-		public List<Cue> easy = null;
+	public class DiffsList {
+		public CueFile expert = new CueFile();
+		public CueFile advanced = new CueFile();
+		public CueFile standard = new CueFile();
+		public CueFile easy = new CueFile();
 
+	}
+	public class CueFile {
+		public List<Cue> cues = null;
 	}
 
 	public class AudicaFile {
 		public SongDesc desc;
 		public AudioClip song;
-		public CuesList cues = new CuesList();
+		public DiffsList diffs = new DiffsList();
 		public AudioClip song_extras;
 		public AudioClip song_sustain_l;
 		public AudioClip song_sustain_r;
 		public string filepath;
 
+	}
+
+	public static class CuesDifficulty {
+		public static string expert = "expert";
+		public static string advanced = "advanced";
+		public static string standard = "standard";
+		public static string easy = "easy";
 	}
 
 	public enum TargetHandType { Either = 0, Right = 1, Left = 2, None = 3 }

@@ -21,23 +21,23 @@ namespace NotReaper.IO {
 			AudicaHandler.CheckCacheValid();
 
 			//Write the cues files to disk so we can add them to the audica file.
-			if (audicaFile.cues.expert != null) {
-				File.WriteAllText($"{Application.dataPath}/CACHE/expert.cues", CuesToJson(audicaFile.cues.expert));
+			if (audicaFile.diffs.expert.cues != null) {
+				File.WriteAllText($"{Application.dataPath}/.cache/expert-new.cues", CuesToJson(audicaFile.diffs.expert));
 			}
-			if (audicaFile.cues.advanced != null) {
-				File.WriteAllText($"{Application.dataPath}/CACHE/advanced.cues", CuesToJson(audicaFile.cues.advanced));
+			if (audicaFile.diffs.advanced.cues != null) {
+				File.WriteAllText($"{Application.dataPath}/.cache/advanced-new.cues", CuesToJson(audicaFile.diffs.advanced));
 			}
-			if (audicaFile.cues.standard != null) {
-				File.WriteAllText($"{Application.dataPath}/CACHE/standard.cues", CuesToJson(audicaFile.cues.standard));
+			if (audicaFile.diffs.standard.cues != null) {
+				File.WriteAllText($"{Application.dataPath}/.cache/standard-new.cues", CuesToJson(audicaFile.diffs.standard));
 			}
-			if (audicaFile.cues.easy != null) {
-				File.WriteAllText($"{Application.dataPath}/CACHE/easy.cues", CuesToJson(audicaFile.cues.easy));
+			if (audicaFile.diffs.easy.cues != null) {
+				File.WriteAllText($"{Application.dataPath}/.cache/easy-new.cues", CuesToJson(audicaFile.diffs.easy));
 			}
 
 
 			//Cache the song desc.
-			File.WriteAllText($"{Application.dataPath}/CACHE/song.desc", JsonConvert.SerializeObject(audicaFile.desc));
-			print("Import and export finished.");
+			File.WriteAllText($"{Application.dataPath}/.cache/song.desc", JsonConvert.SerializeObject(audicaFile.desc));
+			Debug.Log("Import and export finished.");
 
 		}
 
@@ -46,11 +46,8 @@ namespace NotReaper.IO {
 			public List<Cue> cues;
 		}
 
-		public string CuesToJson(List<Cue> cues) {
-			TempCues tempCues = new TempCues();
-			tempCues.cues = cues;
-			return JsonConvert.SerializeObject(tempCues);
-
+		public string CuesToJson(CueFile cueFile) {
+			return JsonConvert.SerializeObject(cueFile);
 		}
 
 
