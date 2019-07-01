@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 
@@ -16,11 +14,14 @@ public class NoteGrid : MonoBehaviour {
     public GameObject standardGrid;
     public GameObject meleeGrid;
 
+    public Vector3 gridOffsetFromCenter;
+
     [SerializeField] private Timeline timeline;
 
 
     private void Awake() {
         SetSnappingMode(SnappingMode.Grid);
+        gridOffsetFromCenter = transform.position;
     }
 
     private void Update() {
@@ -100,20 +101,32 @@ public class NoteGrid : MonoBehaviour {
         standardGrid.SetActive(snapMode == SnappingMode.Grid);
     }
 
-    public static Vector3 snap(Vector3 pos, float xSnap, float ySnap) {
+    public Vector3 snap(Vector3 pos, float xSnap, float ySnap) {
+        //pos.x = pos.x + xSnap;
+        //pos.y = pos.y - ySnap;
         float x = pos.x;
         float y = pos.y + 0.45f;
         float z = pos.z;
-        x = Mathf.FloorToInt(x / xSnap) * xSnap;
+        x = Mathf.FloorToInt((x - gridOffsetFromCenter.x) / xSnap) * xSnap;
         x = x + 0.65f;
-        y = Mathf.FloorToInt(y / ySnap) * ySnap;
+        y = Mathf.FloorToInt((y - gridOffsetFromCenter.y) / ySnap) * ySnap;
         //y = y + 0.45f;
         //z = Mathf.FloorToInt(z / v) * v;
-        return new Vector3(x, y, z);
+        Vector3 yay = new Vector3(xSnap, ySnap, 0);
+
+        Vector3 finalPos = new Vector3(x, y, z);
+
+        //finalPos += gridOffsetFromCenter;
+
+        //finalPos.x -= xSnap;
+        //finalPos.y += ySnap;
+        finalPos.y += gridOffsetFromCenter.y;
+        finalPos.x += gridOffsetFromCenter.x;
+        return finalPos;
     }
 
 
-    public static Vector3 SnapToGrid(Vector3 pos) {
+    public Vector3 SnapToGrid(Vector3 pos) {
         switch (snapMode) {
             case SnappingMode.Grid:
                 //return new Vector3(Mathf.Round(pos.x + 0.5f) - 0.5f, Mathf.Round(pos.y), pos.z);

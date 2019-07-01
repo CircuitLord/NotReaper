@@ -65,6 +65,9 @@ public class Timeline : MonoBehaviour {
     private string songauthor = "";
     private string mogg = "";
 
+    private int seconds;
+    public bool songLoaded = false;
+
     private TargetHandType selectedHandType = TargetHandType.Right;
     private TargetBehavior selectedBehaviour = TargetBehavior.Standard;
     private TargetVelocity selectedVelocity = TargetVelocity.Standard;
@@ -422,6 +425,7 @@ public class Timeline : MonoBehaviour {
             foreach (Cueyay cue in cues) {
                 AddTarget(cue);
             }
+            songLoaded = true;
         } else {
             Debug.Log("cues not found");
         }
@@ -940,6 +944,14 @@ public class Timeline : MonoBehaviour {
 
     void OnMouseExit() {
         hover = false;
+    }
+
+    public float GetPercentagePlayed() {
+        if (aud.clip != null)
+            return (time / aud.clip.length);
+
+        else
+            return 0;
     }
 
     public static float DurationToBeats(float t) {
