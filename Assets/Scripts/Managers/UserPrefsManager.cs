@@ -10,14 +10,15 @@ public class UserPrefsManager : MonoBehaviour {
     public static Color bothColor { get; set; } = Color.gray;
     public static Color neitherColor { get; set; } = Color.magenta;
 
+    public static float mouseHoldForDrag { get; set; } = 15f;
 
 
-    public Image LImage;
-    public Image RImage;
+    //public Image LImage;
+    //public Image RImage;
 
     public void Start() {
-        LImage.color = leftColor;
-        RImage.color = rightColor;
+        //LImage.color = leftColor;
+        //RImage.color = rightColor;
     }
 
     public static void ChangeColors() {

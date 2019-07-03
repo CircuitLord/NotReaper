@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BottomTimeline : MonoBehaviour {
+namespace NotReaper {
 
-    [SerializeField] private Slider timelineBottom;
-    [SerializeField] private Timeline timeline;
 
-    // Start is called before the first frame update
-    void Start() {
+    public class BottomTimeline : MonoBehaviour {
 
-    }
+        [SerializeField] private Slider timelineBottom;
+        [SerializeField] private Timeline timeline;
 
-    // Update is called once per frame
-    void Update() {
-        //timelineBottom.value = timeline.GetPercentagePlayed();
+        // Start is called before the first frame update
+        void Start() {
+
+        }
+
+        // Update is called once per frame
+        void Update() {
+            //timelineBottom.value = timeline.GetPercentagePlayed();
+        }
     }
 }

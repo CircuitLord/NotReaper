@@ -44,7 +44,7 @@ public class SceneSwitcherWindow : EditorWindow {
                 var sceneName = Path.GetFileNameWithoutExtension(scene.path);
                 var pressed = GUILayout.Button(i + ": " + sceneName, new GUIStyle(GUI.skin.GetStyle("Button")) { alignment = TextAnchor.MiddleLeft });
                 if (pressed) {
-                    if (EditorApplication.SaveCurrentSceneIfUserWantsTo()) {
+                    if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) {
                         EditorSceneManager.OpenScene(scene.path);
                     }
                 }

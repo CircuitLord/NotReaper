@@ -6,6 +6,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using NotReaper.Models;
+using NotReaper.Targets;
 using SFB;
 using TMPro;
 using UnityEditor;
@@ -13,10 +15,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Timeline : MonoBehaviour {
+public class TimelineOld : MonoBehaviour {
     public bool SustainParticles = true;
     public OptionsMenu.DropdownToVelocity CurrentSound;
-    public static Timeline TimelineStatic;
+    public static TimelineOld TimelineStatic;
     public LoadModalInstance loadmodal;
     public DifficultySelection DifficultySelection_s;
     public float playbackSpeed = 1f;
@@ -106,7 +108,7 @@ public class Timeline : MonoBehaviour {
         dir.Delete(true);
     }
 
-    public void AddTarget(Cueyay cue) {
+    public void AddTarget(Cue cue) {
         float x = 0, y = 0;
 
         if (cue.behavior == TargetBehavior.Melee) {
@@ -400,8 +402,8 @@ public class Timeline : MonoBehaviour {
             //load cues from temp
             string json = File.ReadAllText(cuePath[0]);
             json = json.Replace("cues", "Items");
-            Cueyay[] cues = JsonHelper.FromJson<Cueyay>(json);
-            foreach (Cueyay cue in cues) {
+            Cue[] cues = new Cue[2]; //JsonUtility.FromJson<Cue>(json);
+            foreach (Cue cue in cues) {
                 AddTarget(cue);
             }
         } else {
@@ -421,8 +423,8 @@ public class Timeline : MonoBehaviour {
         if (cueFiles.Length > 0) {
             string json = File.ReadAllText(cueFiles[0]);
             json = json.Replace("cues", "Items");
-            Cueyay[] cues = JsonHelper.FromJson<Cueyay>(json);
-            foreach (Cueyay cue in cues) {
+            Cue[] cues = new Cue[2]; //JsonUtility.FromJson<Cue>(json);
+            foreach (Cue cue in cues) {
                 AddTarget(cue);
             }
             songLoaded = true;
@@ -433,12 +435,12 @@ public class Timeline : MonoBehaviour {
     }
 
     public void Save() {
-        Cueyay[] cues = new Cueyay[notes.Count];
+        Cue[] cues = new Cue[notes.Count];
         for (int i = 0; i < notes.Count; i++) {
-            cues[i] = orderedNotes[i].ToCue(offset);
+            //cues[i] = orderedNotes[i].ToCue(offset);
         }
 
-        string json = JsonHelper.ToJson(cues, true);
+        string json = JsonUtility.ToJson(cues, true);
         json = json.Replace("Items", "cues");
 
         string dirpath = Application.persistentDataPath;
@@ -476,12 +478,12 @@ public class Timeline : MonoBehaviour {
     public void Export() {
         string dirpath = Application.persistentDataPath;
 
-        Cueyay[] cues = new Cueyay[notes.Count];
+        Cue[] cues = new Cue[notes.Count];
         for (int i = 0; i < notes.Count; i++) {
-            cues[i] = orderedNotes[i].ToCue(offset);
+            //cues[i] = orderedNotes[i].ToCue(offset);
         }
 
-        string json = JsonHelper.ToJson(cues, true);
+        string json = JsonUtility.ToJson(cues, true);
         json = json.Replace("Items", "cues");
 
         if (notes.Count > 0)
@@ -529,12 +531,12 @@ public class Timeline : MonoBehaviour {
     }
 
     public void ExportCueToTemp() {
-        Cueyay[] cues = new Cueyay[notes.Count];
+        Cue[] cues = new Cue[notes.Count];
         for (int i = 0; i < notes.Count; i++) {
-            cues[i] = orderedNotes[i].ToCue(offset);
+            //cues[i] = orderedNotes[i].ToCue(offset);
         }
 
-        string json = JsonHelper.ToJson(cues, true);
+        string json = JsonUtility.ToJson(cues, true);
         json = json.Replace("Items", "cues");
 
         string dirpath = Application.persistentDataPath;
@@ -679,16 +681,16 @@ public class Timeline : MonoBehaviour {
                     var cueFile = Directory.GetFiles(dirpath + "\\temp\\", difficulty + ".cues");
                     string json = File.ReadAllText(cueFile[0]);
                     json = json.Replace("cues", "Items");
-                    Cueyay[] cues = JsonHelper.FromJson<Cueyay>(json);
-                    foreach (Cueyay cue in cues) {
+                    Cue[] cues = new Cue[2]; //JsonUtility.FromJson<Cue>(json);
+                    foreach (Cue cue in cues) {
                         AddTarget(cue);
                     }
                 } else //old edica format. Shove it into expert
                 {
                     string json = File.ReadAllText(cueFiles[0]);
                     json = json.Replace("cues", "Items");
-                    Cueyay[] cues = JsonHelper.FromJson<Cueyay>(json);
-                    foreach (Cueyay cue in cues) {
+                    Cue[] cues = new Cue[2]; // JsonUtility.FromJson<Cue>(json);
+                    foreach (Cue cue in cues) {
                         AddTarget(cue);
                     }
                 }
@@ -921,7 +923,7 @@ public class Timeline : MonoBehaviour {
                 paused = true;
 
                 //Uncommented
-                time = SnapTime(time);
+                //time = SnapTime(time);
                 if (time < 0) time = 0;
                 if (time > aud.clip.length) time = aud.clip.length;
 

@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using NotReaper.Models;
+using NotReaper.Targets;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Ticker : MonoBehaviour
-{
+public class Ticker : MonoBehaviour {
 
     public LayerMask layermask;
     AudioSource aud;
@@ -20,27 +21,21 @@ public class Ticker : MonoBehaviour
 
     private float volume;
 
-    private void Start()
-    {
+    private void Start() {
         aud = GetComponent<AudioSource>();
-        volume =  PlayerPrefs.GetFloat("TickVol");
+        volume = PlayerPrefs.GetFloat("TickVol");
         volumeSlider.value = volume;
     }
 
-    public void VolumeChange(Slider vol)
-    {
+    public void VolumeChange(Slider vol) {
         volume = vol.value;
         PlayerPrefs.SetFloat("TickVol", volume);
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (layermask == (layermask | (1 << other.gameObject.layer)))
-        {
-            if (other.transform.position.z > -1)
-            {
-                switch (other.GetComponentInChildren<GridTarget>().velocity)
-                {
+    private void OnTriggerEnter(Collider other) {
+        if (layermask == (layermask | (1 << other.gameObject.layer))) {
+            if (other.transform.position.z > -1) {
+                switch (other.GetComponentInChildren<GridTarget>().velocity) {
                     case TargetVelocity.Standard:
                         {
                             kick.time = 0;

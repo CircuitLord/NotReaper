@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using NotReaper.Grid;
+using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class OptionsMenu : MonoBehaviour {
 
-    public Timeline timeline;
+    public TimelineOld timeline;
 
     public InputField bpmField;
     public InputField offsetField;
@@ -26,11 +28,10 @@ public class OptionsMenu : MonoBehaviour {
 
 
     public TargetIcon hover;
-    public NoteGrid noteGrid;
+    public NoteGridSnap noteGrid;
 
 
-    public void Init(float bpm, int offset, int snap, string songid, string songtitle, string songartist, string songendevent, float songpreroll, string songauthor)
-    {
+    public void Init(float bpm, int offset, int snap, string songid, string songtitle, string songartist, string songendevent, float songpreroll, string songauthor) {
         snapText.text = "beat snap 1/" + snap;
         SelectStandard();
         SelectLeftHand();
@@ -46,166 +47,142 @@ public class OptionsMenu : MonoBehaviour {
         songAuthor.text = songauthor;
     }
 
-    public enum DropdownToVelocity
-    {
-        Standard = 0, Snare = 1, Percussion = 2,ChainStart = 3, Chain = 4, Melee = 5
+    public enum DropdownToVelocity {
+        Standard = 0, Snare = 1, Percussion = 2, ChainStart = 3, Chain = 4, Melee = 5
     }
-    public void SoundWasChanged(Dropdown dpd)
-    {
-        timeline.CurrentSound = (DropdownToVelocity)dpd.value;
+    public void SoundWasChanged(Dropdown dpd) {
+        timeline.CurrentSound = (DropdownToVelocity) dpd.value;
     }
 
 
-    public void BPMWasChanged()
-    {
+    public void BPMWasChanged() {
         float newBpm = float.Parse(bpmField.text);
         timeline.SetBPM(newBpm);
     }
-    
-    public void OffsetWasChanged()
-    {
+
+    public void OffsetWasChanged() {
         int newOffset = int.Parse(offsetField.text);
         timeline.SetOffset(newOffset);
     }
 
-    public void SnapWasChanged(float rawSnap)
-    {
+    public void SnapWasChanged(float rawSnap) {
         int snap = Mathf.RoundToInt(rawSnap);
         timeline.SetSnap(snap);
         snapText.text = "beat snap 1/" + snap;
     }
 
-    public void PlaybackWasChanged(float speed)
-    {
+    public void PlaybackWasChanged(float speed) {
         timeline.SetPlaybackSpeed(speed);
         playSpeedText.text = "Speed " + Mathf.FloorToInt(speed * 100) + "%";
     }
     // .Desc menu
-    public void SongIDWasChanged()
-    {
+    public void SongIDWasChanged() {
         string newSongID = songID.text;
         timeline.SetSongID(newSongID);
     }
 
-    public void SongTitleWasChanged()
-    {
+    public void SongTitleWasChanged() {
         string newSongTitle = songTitle.text;
         timeline.SetSongTitle(newSongTitle);
     }
 
-    public void SongArtistWasChanged()
-    {
+    public void SongArtistWasChanged() {
         string newSongArtist = songArtist.text;
         timeline.SetSongArtist(newSongArtist);
     }
 
-    public void SongEndEventWasChanged()
-    {
+    public void SongEndEventWasChanged() {
         string newSongEndEvent = songEndEvent.text;
         timeline.SetSongEndEvent(newSongEndEvent);
     }
 
-    public void SongPreRollWasChanged()
-    {
+    public void SongPreRollWasChanged() {
         float newSongPreRoll = float.Parse(songPreRoll.text);
         timeline.SetSongPreRoll(newSongPreRoll);
     }
 
-    public void SongAuthorWasChanged()
-    {
+    public void SongAuthorWasChanged() {
         string newSongAuthor = songAuthor.text;
         timeline.SetSongAuthor(newSongAuthor);
     }
 
-    public void MoggWasChanged()
-    {
+    public void MoggWasChanged() {
         string newMog = Moggsong.text;
         timeline.SetMogg(newMog);
     }
 
-    public void SelectStandard()
-    {
+    public void SelectStandard() {
         timeline.SetBehavior(TargetBehavior.Standard);
         timeline.SetVelocity(TargetVelocity.Standard);
-        SoundDropdown.value = (int)DropdownToVelocity.Standard;
-        hover.SetBehavior(TargetBehavior.Standard);
-        noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
+        SoundDropdown.value = (int) DropdownToVelocity.Standard;
+        //hover.SetBehavior(TargetBehavior.Standard);
+        //noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Grid);
     }
 
-    public void SelectHold()
-    {
+    public void SelectHold() {
         timeline.SetBehavior(TargetBehavior.Hold);
         timeline.SetVelocity(TargetVelocity.Hold);
-        SoundDropdown.value = (int)DropdownToVelocity.Standard;
+        SoundDropdown.value = (int) DropdownToVelocity.Standard;
         hover.SetBehavior(TargetBehavior.Hold);
-        noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
+        noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Grid);
     }
 
-    public void SelectChain()
-    {
+    public void SelectChain() {
         timeline.SetBehavior(TargetBehavior.Chain);
         timeline.SetVelocity(TargetVelocity.Chain);
-        SoundDropdown.value = (int)DropdownToVelocity.Chain;
+        SoundDropdown.value = (int) DropdownToVelocity.Chain;
         hover.SetBehavior(TargetBehavior.Chain);
-        noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
+        noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Grid);
     }
 
-    public void SelectChainStart()
-    {
+    public void SelectChainStart() {
         timeline.SetBehavior(TargetBehavior.ChainStart);
         timeline.SetVelocity(TargetVelocity.ChainStart);
-        SoundDropdown.value = (int)DropdownToVelocity.ChainStart;
+        SoundDropdown.value = (int) DropdownToVelocity.ChainStart;
         hover.SetBehavior(TargetBehavior.ChainStart);
-        noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
+        noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Grid);
     }
 
-    public void SelectHorizontal()
-    {
+    public void SelectHorizontal() {
         timeline.SetBehavior(TargetBehavior.Horizontal);
         timeline.SetVelocity(TargetVelocity.Horizontal);
-        SoundDropdown.value = (int)DropdownToVelocity.Standard;
+        SoundDropdown.value = (int) DropdownToVelocity.Standard;
         hover.SetBehavior(TargetBehavior.Horizontal);
-        noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
+        noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Grid);
     }
 
-    public void SelectVertical()
-    {
+    public void SelectVertical() {
         timeline.SetBehavior(TargetBehavior.Vertical);
         timeline.SetVelocity(TargetVelocity.Vertical);
-        SoundDropdown.value = (int)DropdownToVelocity.Standard;
+        SoundDropdown.value = (int) DropdownToVelocity.Standard;
         hover.SetBehavior(TargetBehavior.Vertical);
-        noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Grid);
+        noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Grid);
     }
 
-    public void SelectMelee()
-    {
+    public void SelectMelee() {
         timeline.SetBehavior(TargetBehavior.Melee);
         timeline.SetVelocity(TargetVelocity.Melee);
-        SoundDropdown.value = (int)DropdownToVelocity.Melee;
+        SoundDropdown.value = (int) DropdownToVelocity.Melee;
         hover.SetBehavior(TargetBehavior.Melee);
-        noteGrid.SetSnappingMode(NoteGrid.SnappingMode.Melee);
+        noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Melee);
     }
 
-    public void SelectLeftHand()
-    {
+    public void SelectLeftHand() {
         timeline.SetHandType(TargetHandType.Left);
-        hover.SetHandType(TargetHandType.Left);
+        //hover.SetHandType(TargetHandType.Left);
     }
 
-    public void SelectRightHand()
-    {
+    public void SelectRightHand() {
         timeline.SetHandType(TargetHandType.Right);
         hover.SetHandType(TargetHandType.Right);
     }
 
-    public void SelectEitherHand()
-    {
+    public void SelectEitherHand() {
         timeline.SetHandType(TargetHandType.Either);
         hover.SetHandType(TargetHandType.Either);
     }
 
-    public void SelectNoHand()
-    {
+    public void SelectNoHand() {
         timeline.SetHandType(TargetHandType.None);
         hover.SetHandType(TargetHandType.None);
     }

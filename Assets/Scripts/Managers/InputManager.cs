@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputManager : MonoBehaviour
-{
+public class InputManager : MonoBehaviour {
     //Used for singleton
     public static InputManager IM;
- 
+
     //Create Keycodes that will be associated with each of our commands.
     //These can be accessed by any other script in our game
-    public KeyCode selectStandard {get; set;}
-    public KeyCode selectHold {get; set;}
-    public KeyCode selectHorz {get; set;}
-    public KeyCode selectVert {get; set;}
-    public KeyCode selectChainStart {get; set;}
-    public KeyCode selectChainNode {get; set;}
-    public KeyCode selectMelee {get; set;}
+    public KeyCode selectStandard { get; set; }
+    public KeyCode selectHold { get; set; }
+    public KeyCode selectHorz { get; set; }
+    public KeyCode selectVert { get; set; }
+    public KeyCode selectChainStart { get; set; }
+    public KeyCode selectChainNode { get; set; }
+    public KeyCode selectMelee { get; set; }
     public KeyCode toggleColor { get; set; }
     public KeyCode selectSoundKick { get; set; }
     public KeyCode selectSoundSnare { get; set; }
@@ -23,19 +22,14 @@ public class InputManager : MonoBehaviour
     public KeyCode selectSoundChainStart { get; set; }
     public KeyCode selectSoundChainNode { get; set; }
     public KeyCode selectSoundMelee { get; set; }
- 
-    
- 
-    void Awake()
-    {
+
+
+    void Awake() {
         //Singleton pattern
-        if(IM == null)
-        {
+        if (IM == null) {
             DontDestroyOnLoad(gameObject);
             IM = this;
-        }
-        else if(IM != this)
-        {
+        } else if (IM != this) {
             Destroy(gameObject);
         }
         /*Assign each keycode when the game starts.
@@ -53,13 +47,13 @@ public class InputManager : MonoBehaviour
         selectMelee = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectChainNode", "Alpha7"));
 
         toggleColor = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("toggleColor", "S"));
-        
+
         selectSoundKick = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectSoundKick", "Q"));
         selectSoundSnare = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectSoundSnare", "W"));
         selectSoundPercussion = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectSoundPercussion", "E"));
         selectSoundChainStart = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectSoundChainStart", "R"));
         selectSoundChainNode = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectSoundChainNode", "T"));
         selectSoundMelee = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectSoundMelee", "Y"));
- 
+
     }
 }

@@ -1,22 +1,20 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Events;
-using System.Collections;
+using UnityEngine.UI;
 
 //  This script will be updated in Part 2 of this 2 part series.
-public class LoadModalInstance : MonoBehaviour
-{
+public class LoadModalInstance : MonoBehaviour {
     private Modal modalPanel;
     private UnityAction Action1;
     private UnityAction Action2;
     private UnityAction Action3;
     private UnityAction Action4;
 
-    public Timeline timeline;
+    public TimelineOld timeline;
 
 
-    void Awake()
-    {
+    void Awake() {
         modalPanel = Modal.Instance();
 
         Action1 = new UnityAction(Function1);
@@ -26,31 +24,26 @@ public class LoadModalInstance : MonoBehaviour
     }
 
     //  Send to the Modal Panel to set up the Buttons and Functions to call
-    public void LoadPanelStart()
-    {
-        modalPanel.Choice("What would you like to do?", Function1, Function2, Function3, Function4, "New edica project","Load edica save", PlayerPrefs.HasKey("previousSave") ? "Load \"" + PlayerPrefs.GetString("previousSave") + "\"" : "No recent files","Quit edica",true,true,true,true);
+    public void LoadPanelStart() {
+        modalPanel.Choice("What would you like to do?", Function1, Function2, Function3, Function4, "New edica project", "Load edica save", PlayerPrefs.HasKey("previousSave") ? "Load \"" + PlayerPrefs.GetString("previousSave") + "\"" : "No recent files", "Quit edica", true, true, true, true);
     }
 
-    
-    
+
     //new file
-    void Function1()
-    {
+    void Function1() {
         timeline.NewFile();
         timeline.projectStarted = true;
     }
 
     //load
-    void Function2()
-    {
+    void Function2() {
         timeline.Load();
         timeline.projectStarted = true;
     }
 
     //load previous
-    void Function3()
-    {
-        if(PlayerPrefs.HasKey("previousSave"))
+    void Function3() {
+        if (PlayerPrefs.HasKey("previousSave"))
             timeline.LoadPrevious();
         else
             timeline.NewFile();
@@ -59,8 +52,7 @@ public class LoadModalInstance : MonoBehaviour
     }
 
     //quit
-    void Function4()
-    {
+    void Function4() {
         Application.Quit();
     }
 }
