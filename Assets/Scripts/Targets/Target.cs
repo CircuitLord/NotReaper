@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Models;
@@ -6,35 +6,42 @@ using UnityEngine;
 
 namespace NotReaper.Targets {
 
+	//Stores references to a timelineTarget and it's corrosponding gridTarget
+	public class Target {
 
-    public class Target : MonoBehaviour {
-        public TimelineTarget timelineTarget;
-        public GridTarget gridTarget;
+		public TargetHandType handType;
+		public TargetBehavior behavior;
+		public float beatLength;
+		public TargetVelocity velocity;
 
-        public TargetIcon icon;
+		public List<Target> chainedNotes;
 
-        internal void SetHandType(TargetHandType handType) {
-            gridTarget.handType = handType;
-            gridTarget.icon.SetHandType(handType);
-            timelineTarget.icon.SetHandType(handType);
-        }
 
-        internal void SetBehavior(TargetBehavior behavior) {
-            gridTarget.behavior = behavior;
-            timelineTarget.icon.SetBehavior(behavior);
-            gridTarget.icon.SetBehavior(behavior);
-        }
+		public GridTarget gridTarget;
+		public TimelineTarget timelineTarget;
 
-        internal void SetBeatLength(float beatLength) {
-            gridTarget.beatLength = beatLength;
+		public void SetHandType(TargetHandType handType) {
+			this.handType = handType;
+			gridTarget.targetIcon.SetHandType(handType);
+			timelineTarget.targetIcon.SetHandType(handType);
+		}
 
-            if (gridTarget.behavior == TargetBehavior.Hold)
-                timelineTarget.icon.SetSustainLength(beatLength);
-        }
+		public void SetBehavior(TargetBehavior behavior) {
+			this.behavior = behavior;
+			gridTarget.targetIcon.SetBehavior(behavior);
+			//timelineTarget.icon.SetBehavior(behavior);
+		}
 
-        public void SetVelocity(TargetVelocity velocity) {
-            gridTarget.velocity = velocity;
-        }
+		public void SetBeatLength(float beatLength) {
+			this.beatLength = beatLength;
 
-    }
+			if (this.behavior == TargetBehavior.Hold) { }
+			//timelineTarget.icon.SetSustainLength(beatLength);
+		}
+
+		public void SetVelocity(TargetVelocity velocity) {
+			this.velocity = velocity;
+		}
+
+	}
 }

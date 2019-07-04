@@ -22,6 +22,8 @@ namespace NotReaper.IO {
 			bool advanced = false;
 			bool expert = false;
 
+			//Remove any existing cue files.
+			ClearCueCache();
 
 			//Figure out what files we need to extract by getting the song.desc.
 			foreach (ZipEntry entry in audicaZip.Entries) {
@@ -39,15 +41,19 @@ namespace NotReaper.IO {
 				//Extract the cues files.
 				else if (entry.FileName == $"{CuesDifficulty.expert}.cues") {
 					entry.Extract($"{appPath}/.cache");
+					expert = true;
 
 				} else if (entry.FileName == $"{CuesDifficulty.advanced}.cues") {
 					entry.Extract($"{appPath}/.cache");
+					advanced = true;
 
 				} else if (entry.FileName == $"{CuesDifficulty.standard}.cues") {
 					entry.Extract($"{appPath}/.cache");
+					standard = true;
 
 				} else if (entry.FileName == $"{CuesDifficulty.easy}.cues") {
 					entry.Extract($"{appPath}/.cache");
+					easy = true;
 				}
 
 			}
@@ -59,16 +65,16 @@ namespace NotReaper.IO {
 
 			//Load the cues files.
 			if (expert) {
-				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.expert}.json"));
+				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.expert}.cues"));
 			}
 			if (advanced) {
-				audicaFile.diffs.advanced = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.advanced}.json"));
+				audicaFile.diffs.advanced = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.advanced}.cues"));
 			}
 			if (standard) {
-				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.standard}.json"));
+				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.standard}.cues"));
 			}
 			if (easy) {
-				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.easy}.json"));
+				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.easy}.cues"));
 			}
 
 			MemoryStream temp = new MemoryStream();
@@ -183,6 +189,13 @@ namespace NotReaper.IO {
 			if (!Directory.Exists($"{Application.dataPath}/.cache")) {
 				Directory.CreateDirectory($"{Application.dataPath}/.cache");
 			}
+		}
+		//TODO: Make use varaibles for names
+		public static void ClearCueCache() {
+			File.Delete($"{Application.dataPath}/.cache/expert.cues");
+			File.Delete($"{Application.dataPath}/.cache/advanced.cues");
+			File.Delete($"{Application.dataPath}/.cache/standard.cues");
+			File.Delete($"{Application.dataPath}/.cache/easy.cues");
 		}
 
 		public void Update() {

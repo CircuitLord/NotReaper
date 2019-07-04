@@ -1925,17 +1925,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2232741643246090343}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b143a5b191e7a5242bb313b8a32d9745, type: 3}
+  m_Script: {fileID: 11500000, guid: c920b84e8b6bbc343bee9ce6dc371d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  xSize: 0
+  ySize: 0
   ghost: {fileID: 2228434985690136869}
   notesLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   standardGrid: {fileID: 2232741643362261226}
   meleeGrid: {fileID: 2232741642822887180}
-  gridOffsetFromCenter: {x: 0, y: 0, z: 0}
-  timeline: {fileID: 0}
 --- !u!1 &2232741643290466266
 GameObject:
   m_ObjectHideFlags: 0
@@ -2502,6 +2502,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1155046927378772, guid: 961cf48f92539cd41817b6d3620f32bc, type: 3}
+      propertyPath: m_Name
+      value: HoverTarget
+      objectReference: {fileID: 0}
     - target: {fileID: 114367277738804828, guid: 961cf48f92539cd41817b6d3620f32bc,
         type: 3}
       propertyPath: leftColor.r
@@ -2516,10 +2520,6 @@ PrefabInstance:
         type: 3}
       propertyPath: leftColor.b
       value: 0.14351824
-      objectReference: {fileID: 0}
-    - target: {fileID: 1155046927378772, guid: 961cf48f92539cd41817b6d3620f32bc, type: 3}
-      propertyPath: m_Name
-      value: HoverTarget
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 961cf48f92539cd41817b6d3620f32bc, type: 3}

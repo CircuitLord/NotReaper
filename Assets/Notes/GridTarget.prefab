@@ -635,7 +635,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1441519570726298}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3541b36de1b9d1e488287c4edb3d9ca5, type: 3}
+  m_Script: {fileID: 11500000, guid: 24f0cb2feb8dde140893a217ea68c92a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   standard: {fileID: 1426756711388502}
@@ -646,10 +646,6 @@ MonoBehaviour:
   chain: {fileID: 1536298474919048}
   melee: {fileID: 1666194017861286}
   line: {fileID: 0}
-  leftColor: {r: 0, g: 0.6039216, b: 0.9960785, a: 1}
-  rightColor: {r: 0.9339623, g: 0.6512868, b: 0.118948035, a: 1}
-  eitherColor: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 1}
-  noneColor: {r: 0.98749995, g: 0.75, b: 1, a: 1}
   sustainDirection: 0.6
 --- !u!1 &1476111345598028
 GameObject:
@@ -697,17 +693,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1476111345598028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29e9861d5834a5e46b8846b8b2649374, type: 3}
+  m_Script: {fileID: 11500000, guid: 24ff15be701e6084bbd2808c1db41730, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timelineTarget: {fileID: 0}
-  gridTarget: {fileID: 0}
-  icon: {fileID: 114865039013314168}
+  targetIcon: {fileID: 114865039013314168}
   handType: 0
   behavior: 0
   beatLength: 1
-  velocity: 20
-  chainedNotes: []
+  velocity: 0
 --- !u!135 &135168456597591856
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NotReaper.Grid;
 using NotReaper.IO;
 using NotReaper.Models;
 using NotReaper.Targets;
 using UnityEngine;
 
 namespace NotReaper {
-
 
     public class Timeline : MonoBehaviour {
 
@@ -19,9 +19,10 @@ namespace NotReaper {
         [SerializeField] private Transform gridTransformParent;
         private OptionsMenu.DropdownToVelocity selectedSound;
 
-        List<GridTarget> gridTargets;
-        List<TimelineTarget> timelineTargets;
-        public static List<GridTarget> orderedNotes;
+        //List<GridTarget> gridTargets;
+        //List<TimelineTarget> timelineTargets;
+        private List<Target> targets = new List<Target>();
+        public static List<Target> orderedTargets;
 
         public static AudicaFile audicaFile;
         public TargetBehavior selectedTargetBehavior;
@@ -34,8 +35,8 @@ namespace NotReaper {
         //The note colors.
         private Color leftColor;
         private Color rightColor;
-        public Color bothColor;
-        public Color neitherColor;
+        private Color bothColor;
+        private Color neitherColor;
 
 
         private void Start() {
@@ -43,8 +44,30 @@ namespace NotReaper {
             rightColor = UserPrefsManager.rightColor;
             bothColor = UserPrefsManager.bothColor;
             neitherColor = UserPrefsManager.leftColor;
+
+
+            //orderedNotes = new List<Target>();
+            //gridTargets = new List<GridTarget>();
+            //timelineTargets = new List<TimelineTarget>();
         }
 
+        private void Update() {
+
+            if (Input.GetKeyDown(KeyCode.P)) {
+                LoadAudicaFile(@"C:\Files\GameStuff\AUDICACustom\Testing\test.audica");
+            }
+
+        }
+
+        //When loading from cues, use this.
+        public void AddTarget(Cue cue) {
+            Vector2 pos = NotePosCalc.PitchToPos(cue);
+
+            if (cue.tickLength / 480 >= 1)
+                AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, cue.tickLength, cue.velocity, cue.handType, cue.behavior, false);
+            else
+                AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, 1, cue.velocity, cue.handType, cue.behavior, false);
+        }
 
         //When the user adds a target, use this one.
         public void AddTarget(float x, float y) {
@@ -54,72 +77,74 @@ namespace NotReaper {
         //For adding targets to the grid and timeline. Used by both the user adding them and the loading of Audica Files.
         public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false) {
 
+            Target target = new Target();
+
             // Add to timeline
-            TimelineTarget timelineClone = Instantiate(timelineNotePrefab, timelineTransformParent);
-            timelineClone.transform.localPosition = new Vector3(beatTime, 0, 0);
+            target.timelineTarget = Instantiate(timelineNotePrefab, timelineTransformParent);
+            target.timelineTarget.transform.localPosition = new Vector3(beatTime, 0, 0);
 
             // Add to grid
-            GridTarget gridClone = Instantiate(gridNotePrefab, gridTransformParent);
-            gridClone.GetComponentInChildren<HoldController>().length.text = "" + beatLength;
-            gridClone.transform.localPosition = new Vector3(x, y, beatTime);
+            target.gridTarget = Instantiate(gridNotePrefab, gridTransformParent);
+            target.gridTarget.GetComponentInChildren<HoldController>().length.text = "" + beatLength;
+            target.gridTarget.transform.localPosition = new Vector3(x, y, beatTime);
 
-            gridClone.timelineTarget = timelineClone;
-            timelineClone.timelineTarget = timelineClone;
-            gridClone.gridTarget = gridClone;
-            timelineClone.gridTarget = gridClone;
+            //gridClone.timelineTarget = timelineClone;
+            //timelineClone.timelineTarget = timelineClone;
+            //gridClone.gridTarget = gridClone;
+            //timelineClone.gridTarget = gridClone;
 
             //set velocity
             if (userAdded) {
                 switch (selectedSound) {
                     case OptionsMenu.DropdownToVelocity.Standard:
-                        gridClone.velocity = TargetVelocity.Standard;
+                        target.velocity = TargetVelocity.Standard;
                         break;
 
                     case OptionsMenu.DropdownToVelocity.Snare:
-                        gridClone.velocity = TargetVelocity.Snare;
+                        target.velocity = TargetVelocity.Snare;
                         break;
 
                     case OptionsMenu.DropdownToVelocity.Percussion:
-                        gridClone.velocity = TargetVelocity.Percussion;
+                        target.velocity = TargetVelocity.Percussion;
                         break;
 
                     case OptionsMenu.DropdownToVelocity.ChainStart:
-                        gridClone.velocity = TargetVelocity.ChainStart;
+                        target.velocity = TargetVelocity.ChainStart;
                         break;
 
                     case OptionsMenu.DropdownToVelocity.Chain:
-                        gridClone.velocity = TargetVelocity.Chain;
+                        target.velocity = TargetVelocity.Chain;
                         break;
 
                     case OptionsMenu.DropdownToVelocity.Melee:
-                        gridClone.velocity = TargetVelocity.Melee;
+                        target.velocity = TargetVelocity.Melee;
                         break;
 
                     default:
-                        gridClone.velocity = velocity;
+                        target.velocity = velocity;
                         break;
 
                 }
             } else {
-                gridClone.SetVelocity(velocity);
+                target.SetVelocity(velocity);
             }
 
-            gridClone.SetHandType(handType);
-            gridClone.SetBehavior(behavior);
+            target.SetHandType(handType);
+            target.SetBehavior(behavior);
 
-            if (gridClone.behavior == TargetBehavior.Hold)
-                gridClone.SetBeatLength(beatLength);
+            if (target.behavior == TargetBehavior.Hold)
+                target.SetBeatLength(beatLength);
             else
-                gridClone.SetBeatLength(0.25f);
+                target.SetBeatLength(0.25f);
 
-            gridTargets.Add(gridClone);
-            timelineTargets.Add(timelineClone);
+            targets.Add(target);
 
-            orderedNotes = gridTargets.OrderBy(v => v.transform.position.z).ToList();
+            orderedTargets = targets.OrderBy(v => v.gridTarget.transform.position.z).ToList();
 
             UpdateTrail();
 
             UpdateChainConnectors();
+
         }
 
         public void UpdateTrail() {
@@ -134,10 +159,11 @@ namespace NotReaper {
         }
 
         private void UpdateChainConnectors() {
-            if (orderedNotes.Count > 0)
-                foreach (var note in orderedNotes) {
+
+            if (orderedTargets.Count > 0)
+                foreach (var note in orderedTargets) {
                     if (note.behavior == TargetBehavior.ChainStart) {
-                        LineRenderer lr = note.GetComponentsInChildren<LineRenderer>() [1];
+                        LineRenderer lr = note.gridTarget.GetComponentsInChildren<LineRenderer>() [1];
 
                         List<Material> mats = new List<Material>();
                         lr.GetMaterials(mats);
@@ -150,17 +176,17 @@ namespace NotReaper {
                         lr.positionCount = 2;
 
                         //set start pos
-                        lr.SetPosition(0, note.transform.position);
-                        lr.SetPosition(1, note.transform.position);
+                        lr.SetPosition(0, note.gridTarget.transform.position);
+                        lr.SetPosition(1, note.gridTarget.transform.position);
 
                         //add links in chain
-                        List<GridTarget> chainLinks = new List<GridTarget>();
-                        foreach (var note2 in orderedNotes) {
+                        List<Target> chainLinks = new List<Target>();
+                        foreach (var note2 in orderedTargets) {
                             //if new start end old chain
-                            if ((note.handType == note2.handType) && (note2.transform.position.z > note.transform.position.z) && (note2.behavior == TargetBehavior.ChainStart) && (note2 != note))
+                            if ((note.handType == note2.handType) && (note2.gridTarget.transform.position.z > note.gridTarget.transform.position.z) && (note2.behavior == TargetBehavior.ChainStart) && (note2 != note))
                                 break;
 
-                            if ((note.handType == note2.handType) && note2.transform.position.z > note.transform.position.z && note2.behavior == TargetBehavior.Chain) {
+                            if ((note.handType == note2.handType) && note2.gridTarget.transform.position.z > note.gridTarget.transform.position.z && note2.behavior == TargetBehavior.Chain) {
                                 chainLinks.Add(note2);
                             }
 
@@ -171,15 +197,15 @@ namespace NotReaper {
                         //aply lines to chain links
                         if (chainLinks.Count > 0) {
                             var positionList = new List<Vector3>();
-                            positionList.Add(new Vector3(note.transform.position.x, note.transform.position.y, 0));
+                            positionList.Add(new Vector3(note.gridTarget.transform.position.x, note.gridTarget.transform.position.y, 0));
                             foreach (var link in chainLinks) {
                                 //add new
-                                if (!positionList.Contains(link.transform.position)) {
-                                    positionList.Add(new Vector3(link.transform.position.x, link.transform.position.y, link.transform.position.z - note.transform.position.z));
+                                if (!positionList.Contains(link.gridTarget.transform.position)) {
+                                    positionList.Add(new Vector3(link.gridTarget.transform.position.x, link.gridTarget.transform.position.y, link.gridTarget.transform.position.z - note.gridTarget.transform.position.z));
                                 }
                             }
                             lr.positionCount = positionList.Count;
-                            positionList = positionList.OrderByDescending(v => v.z - note.transform.position.z).ToList();
+                            positionList = positionList.OrderByDescending(v => v.z - note.gridTarget.transform.position.z).ToList();
 
                             for (int i = 0; i < positionList.Count; ++i) {
                                 positionList[i] = new Vector3(positionList[i].x, positionList[i].y, 0);
@@ -191,13 +217,22 @@ namespace NotReaper {
                     }
                 }
 
+
         }
 
 
         //Loads an audica file into the editor.
         private void LoadAudicaFile(string path) {
             audicaFile = AudicaHandler.LoadAudicaFile(path);
-            //TODO add all notes
+
+            //TODO: difficulty loading
+            print(audicaFile);
+
+            foreach (Cue cue in audicaFile.diffs.expert.cues) {
+                AddTarget(cue);
+            }
+
+
         }
 
 

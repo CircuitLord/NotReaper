@@ -82,7 +82,10 @@ namespace NotReaper.Grid {
             Debug.DrawRay(ray.origin, ray.direction);
             if (Physics.Raycast(ray, out hit, 2, notesLayer)) {
                 Transform objectHit = hit.transform;
-                Target target = objectHit.GetComponent<Target>().gridTarget;
+
+                //TODO: uncomment
+                //Target target = objectHit.GetComponent<Target>().gridTarget;
+                Target target = new Target();
 
                 return target;
             }

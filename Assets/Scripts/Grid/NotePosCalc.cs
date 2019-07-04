@@ -13,7 +13,8 @@ namespace NotReaper.Grid {
 
 
 		//Gets the cue status based on a grid target.
-		public static Cue ToCue(GridTarget gridTarget, int offset) {
+		//TODO: New grid target
+		public static Cue ToCue(Target target, int offset) {
 
 			int pitch = 0;
 			Vector2 tempPos = new Vector2();
@@ -21,10 +22,10 @@ namespace NotReaper.Grid {
 			float offsetX, offsetY = 0;
 
 			//If it's a melee note.
-			if (gridTarget.behavior == TargetBehavior.Melee) {
+			if (target.behavior == TargetBehavior.Melee) {
 				pitch = 98;
-				if (gridTarget.transform.position.x > 0) pitch += 1;
-				if (gridTarget.transform.position.y > 0) pitch += 2;
+				if (target.gridTarget.transform.position.x > 0) pitch += 1;
+				if (target.gridTarget.transform.position.y > 0) pitch += 2;
 
 				offsetX = 0;
 				offsetY = 0;
@@ -41,19 +42,19 @@ namespace NotReaper.Grid {
 
 				pitch = x + 12 * y;
 
-				offsetX = gridTarget.transform.position.x + 5.5f - x;
-				offsetY = gridTarget.transform.position.y + 3 - y;
+				offsetX = target.gridTarget.transform.position.x + 5.5f - x;
+				offsetY = target.gridTarget.transform.position.y + 3 - y;
 
 			}
 
 			Cue cue = new Cue() {
-				tick = Mathf.RoundToInt(gridTarget.transform.localPosition.z * 480f) + offset,
-					tickLength = Mathf.RoundToInt(gridTarget.beatLength * 480f),
+				tick = Mathf.RoundToInt(target.gridTarget.transform.localPosition.z * 480f) + offset,
+					tickLength = Mathf.RoundToInt(target.beatLength * 480f),
 					pitch = pitch,
-					velocity = gridTarget.velocity,
+					velocity = target.velocity,
 					gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 2), y = (float) Math.Round(offsetY, 2) },
-					handType = gridTarget.handType,
-					behavior = gridTarget.behavior
+					handType = target.handType,
+					behavior = target.behavior
 			};
 
 
@@ -90,11 +91,13 @@ namespace NotReaper.Grid {
 				}
 			} else {
 				x = (cue.pitch % 12) + (float) cue.gridOffset.x - 5.5f;
+				x = x * xSize;
 				y = cue.pitch / 12 + (float) cue.gridOffset.y - 3f;
+				y = y * ySize;
 			}
 
 
-			return new Vector2();
+			return new Vector2(x, y);
 		}
 
 

@@ -29,16 +29,18 @@ public class UserInput : MonoBehaviour {
             if (mouseButtonHeld == true) {
                 mouseButtonHeld = false;
                 //TODO: Move to notegrid code
-                var bounds = RectUtil.GetViewportBounds(Camera.main, mouseDragPosStart, Input.mousePosition);
+                var bounds = DragUtil.GetViewportBounds(Camera.main, mouseDragPosStart, Input.mousePosition);
 
-            };
+                //TODO: add the notes inside bounding box
+
+
+            }
         }
+
 
         //Drag square
         if (mouseChargeLevel > UserPrefsManager.mouseHoldForDrag) {
-
             mouseButtonHeld = true;
-
         }
 
 
@@ -105,9 +107,9 @@ public class UserInput : MonoBehaviour {
         //Draw the rectangle
         if (mouseButtonHeld) {
             // Create a rect from both mouse positions
-            var rect = RectUtil.GetScreenRect(mouseDragPosStart, Input.mousePosition);
-            RectUtil.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
-            RectUtil.DrawScreenRectBorder(rect, 2, new Color(0.8f, 0.8f, 0.95f));
+            var rect = DragUtil.GetScreenRect(mouseDragPosStart, Input.mousePosition);
+            DragUtil.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
+            DragUtil.DrawScreenRectBorder(rect, 2, new Color(0.8f, 0.8f, 0.95f));
         }
     }
 

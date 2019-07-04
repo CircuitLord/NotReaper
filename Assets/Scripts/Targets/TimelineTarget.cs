@@ -1,5 +1,12 @@
-﻿namespace NotReaper.Targets {
+using UnityEngine;
+
+namespace NotReaper.Targets {
 
 
-	public class TimelineTarget : Target { }
+	public class TimelineTarget : MonoBehaviour {
+
+
+		public TargetIcon targetIcon;
+
+	}
 }

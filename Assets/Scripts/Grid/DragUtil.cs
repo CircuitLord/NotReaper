@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace NotReaper.Grid {
 
-	public static class RectUtil {
+	public static class DragUtil {
 		static Texture2D _whiteTexture;
 		public static Texture2D WhiteTexture {
 			get {
@@ -39,13 +39,13 @@ namespace NotReaper.Grid {
 
 		public static void DrawScreenRectBorder(Rect rect, float thickness, Color color) {
 			// Top
-			RectUtil.DrawScreenRect(new Rect(rect.xMin, rect.yMin, rect.width, thickness), color);
+			DrawScreenRect(new Rect(rect.xMin, rect.yMin, rect.width, thickness), color);
 			// Left
-			RectUtil.DrawScreenRect(new Rect(rect.xMin, rect.yMin, thickness, rect.height), color);
+			DrawScreenRect(new Rect(rect.xMin, rect.yMin, thickness, rect.height), color);
 			// Right
-			RectUtil.DrawScreenRect(new Rect(rect.xMax - thickness, rect.yMin, thickness, rect.height), color);
+			DrawScreenRect(new Rect(rect.xMax - thickness, rect.yMin, thickness, rect.height), color);
 			// Bottom
-			RectUtil.DrawScreenRect(new Rect(rect.xMin, rect.yMax - thickness, rect.width, thickness), color);
+			DrawScreenRect(new Rect(rect.xMin, rect.yMax - thickness, rect.width, thickness), color);
 		}
 
 		public static Rect GetScreenRect(Vector3 screenPosition1, Vector3 screenPosition2) {

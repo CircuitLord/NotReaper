@@ -21,9 +21,9 @@ namespace NotReaper.Grid {
 		void OnGUI() {
 			if (isSelecting) {
 				// Create a rect from both mouse positions
-				var rect = RectUtil.GetScreenRect(mousePosition1, Input.mousePosition);
-				RectUtil.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
-				RectUtil.DrawScreenRectBorder(rect, 2, new Color(0.8f, 0.8f, 0.95f));
+				var rect = DragUtil.GetScreenRect(mousePosition1, Input.mousePosition);
+				DragUtil.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
+				DragUtil.DrawScreenRectBorder(rect, 2, new Color(0.8f, 0.8f, 0.95f));
 			}
 		}
 	}

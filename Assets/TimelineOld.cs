@@ -40,12 +40,12 @@ public class TimelineOld : MonoBehaviour {
     public Color bothColor;
     public Color neitherColor;
 
-    List<GridTarget> notes;
-    public static List<GridTarget> orderedNotes;
+    List<GridTargetOld> notes;
+    public static List<GridTargetOld> orderedNotes;
     List<TimelineTarget> notesTimeline;
     SongDescyay songDesc;
 
-    public GridTarget gridNotePrefab;
+    public GridTargetOld gridNotePrefab;
     public TimelineTarget timelineNotePrefab;
 
     public float previewDuration = 0.1f;
@@ -84,8 +84,8 @@ public class TimelineOld : MonoBehaviour {
     private SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
 
     private void Start() {
-        notes = new List<GridTarget>();
-        orderedNotes = new List<GridTarget>();
+        notes = new List<GridTargetOld>();
+        orderedNotes = new List<GridTargetOld>();
         notesTimeline = new List<TimelineTarget>();
 
         securityRules.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.FullControl, AccessControlType.Allow));
@@ -157,10 +157,10 @@ public class TimelineOld : MonoBehaviour {
         gridClone.GetComponentInChildren<HoldController>().length.text = "" + beatLength;
         gridClone.transform.localPosition = new Vector3(x, y, beatTime);
 
-        gridClone.timelineTarget = timelineClone;
-        timelineClone.timelineTarget = timelineClone;
-        gridClone.gridTarget = gridClone;
-        timelineClone.gridTarget = gridClone;
+        //gridClone.timelineTarget = timelineClone;
+        //timelineClone.timelineTarget = timelineClone;
+        //gridClone.gridTarget = gridClone;
+        //timelineClone.gridTarget = gridClone;
 
         //set velocity
         if (userAdded) {
@@ -310,7 +310,7 @@ public class TimelineOld : MonoBehaviour {
                     lr.SetPosition(1, note.transform.position);
 
                     //add links in chain
-                    List<GridTarget> chainLinks = new List<GridTarget>();
+                    List<GridTargetOld> chainLinks = new List<GridTargetOld>();
                     foreach (var note2 in orderedNotes) {
                         //if new start end old chain
                         if ((note.handType == note2.handType) && (note2.transform.position.z > note.transform.position.z) && (note2.behavior == TargetBehavior.ChainStart) && (note2 != note))
@@ -349,7 +349,7 @@ public class TimelineOld : MonoBehaviour {
 
     }
 
-    public void DeleteTarget(Target target) {
+    public void DeleteTarget(TargetOld target) {
         if (target == null) return;
         notes.Remove(target.gridTarget);
         orderedNotes.Remove(target.gridTarget);
@@ -363,12 +363,12 @@ public class TimelineOld : MonoBehaviour {
 
     private void DeleteTargets() {
         Debug.Log("del targs");
-        foreach (GridTarget obj in notes) {
+        foreach (GridTargetOld obj in notes) {
             if (obj)
                 Destroy(obj.gameObject);
         }
 
-        foreach (GridTarget obj in orderedNotes) {
+        foreach (GridTargetOld obj in orderedNotes) {
             if (obj)
                 Destroy(obj.gameObject);
         }
@@ -378,8 +378,8 @@ public class TimelineOld : MonoBehaviour {
                 Destroy(obj.gameObject);
         }
 
-        notes = new List<GridTarget>();
-        orderedNotes = new List<GridTarget>();
+        notes = new List<GridTargetOld>();
+        orderedNotes = new List<GridTargetOld>();
         notesTimeline = new List<TimelineTarget>();
 
         var liner = gridNotes.gameObject.GetComponentInChildren<LineRenderer>();
@@ -410,7 +410,7 @@ public class TimelineOld : MonoBehaviour {
             DeleteTargets();
         }
 
-        foreach (GridTarget obj in notes) {
+        foreach (GridTargetOld obj in notes) {
             Debug.Log(obj);
         }
     }
@@ -577,7 +577,7 @@ public class TimelineOld : MonoBehaviour {
     public void NewFile() {
         DeleteTargets();
 
-        notes = new List<GridTarget>();
+        notes = new List<GridTargetOld>();
         notesTimeline = new List<TimelineTarget>();
 
         string dirpath = Application.persistentDataPath;

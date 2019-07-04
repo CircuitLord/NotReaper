@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -60,6 +61,8 @@ namespace NotReaper.Models {
 		public CueFile easy = new CueFile();
 
 	}
+
+	[Serializable]
 	public class CueFile {
 		public List<Cue> cues = null;
 	}
@@ -88,6 +91,7 @@ namespace NotReaper.Models {
 	public enum TargetBehavior { Standard = 0, Vertical = 1, Horizontal = 2, Hold = 3, ChainStart = 4, Chain = 5, Melee = 6, HoldEnd = 7 }
 	public enum TargetVelocity { Standard = 20, Vertical = 20, Horizontal = 20, Hold = 20, Snare = 127, Percussion = 60, ChainStart = 1, Chain = 2, Melee = 3 }
 
+	[Serializable]
 	public class Cue {
 		public int tick;
 		public int tickLength;
@@ -97,6 +101,7 @@ namespace NotReaper.Models {
 		public TargetHandType handType = TargetHandType.Right;
 		public TargetBehavior behavior = TargetBehavior.Standard;
 
+		[Serializable]
 		public struct GridOffset {
 			public double x;
 			public double y;

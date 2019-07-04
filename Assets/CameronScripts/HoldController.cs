@@ -18,7 +18,8 @@ public class HoldController : MonoBehaviour {
 
     void Start() {
         parentTarget = gameObject.GetComponentsInParent<GridTarget>() [0];
-        length.text = "" + parentTarget.beatLength * 480;
+        //TODO: Fix beatlength parent
+        //length.text = "" + parentTarget.beatLength * 480;
 
         endMarker = Instantiate(endMarkerPrefab, gameObject.transform.position + new Vector3(0, 0, int.Parse(length.text) / 480f), Quaternion.identity, TimelineOld.gridNotesStatic);
 
@@ -35,8 +36,8 @@ public class HoldController : MonoBehaviour {
         if (endMarker && endMarkerTl) {
             endMarker.transform.position = new Vector3(endMarker.transform.position.x, endMarker.transform.position.y, gameObject.transform.position.z + int.Parse(length.text) / 480f);
             endMarkerTl.transform.localScale = new Vector3(.3f, .3f, .3f);
-
-            endMarkerTl.transform.position = new Vector3(parentTarget.transform.position.z + parentTarget.beatLength, endMarkerTl.transform.position.y, endMarkerTl.transform.position.z);
+            //TODO: Uncomment this
+            //endMarkerTl.transform.position = new Vector3(parentTarget.transform.position.z + parentTarget.beatLength, endMarkerTl.transform.position.y, endMarkerTl.transform.position.z);
 
 
             if (gameObject.transform.position.z == 0) {

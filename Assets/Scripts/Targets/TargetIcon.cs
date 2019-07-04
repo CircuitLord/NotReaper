@@ -17,10 +17,10 @@ public class TargetIcon : MonoBehaviour {
 
     //1DA4E5
 
-    public Color leftColor;
-    public Color rightColor;
-    public Color eitherColor;
-    public Color noneColor;
+    private Color leftColor;
+    private Color rightColor;
+    private Color eitherColor;
+    private Color noneColor;
 
     public float sustainDirection = 0.6f;
 
