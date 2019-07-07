@@ -33,8 +33,8 @@ namespace NotReaper.Grid {
 			} else {
 
 				//We have to divide by the new positions between the grid.
-				tempPos.x = target.transform.position.x; // / xSize;
-				tempPos.y = target.transform.position.y; // / ySize;
+				tempPos.x = target.transform.position.x / xSize;
+				tempPos.y = target.transform.position.y / ySize;
 
 				//Offset it to all be positive.
 				x = Mathf.RoundToInt(tempPos.x + 5.5f);
@@ -43,8 +43,11 @@ namespace NotReaper.Grid {
 
 				pitch = x + 12 * y;
 
-				offsetX = 0; //target.transform.position.x + 5.5f - x;
-				offsetY = 0; //target.transform.position.y + 3 - y;
+				offsetX = (x - (pitch % 12) + 5.5f) / xSize;
+				offsetY = (y - (pitch / 12) + 3f) / ySize;
+
+				//offsetX = 0; //target.transform.position.x + 5.5f - x;
+				//offsetY = 0; //target.transform.position.y + 3 - y;
 
 			}
 
@@ -92,7 +95,7 @@ namespace NotReaper.Grid {
 				}
 			} else {
 				x = (cue.pitch % 12) + (float) (cue.gridOffset.x * xSize) - 5.5f;
-				// x / xSize
+				// (x - (cue.pitch % 12) + 5.5f) / xSize = cue.gridOffset.x;
 				x = x * xSize;
 				y = cue.pitch / 12 + (float) (cue.gridOffset.y * ySize) - 3f;
 				y = y * ySize;
