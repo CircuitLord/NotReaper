@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using NotReaper;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -11,7 +12,7 @@ public class LoadModalInstance : MonoBehaviour {
     private UnityAction Action3;
     private UnityAction Action4;
 
-    public TimelineOld timeline;
+    public Timeline timeline;
 
 
     void Awake() {
@@ -25,30 +26,31 @@ public class LoadModalInstance : MonoBehaviour {
 
     //  Send to the Modal Panel to set up the Buttons and Functions to call
     public void LoadPanelStart() {
-        modalPanel.Choice("What would you like to do?", Function1, Function2, Function3, Function4, "New edica project", "Load edica save", PlayerPrefs.HasKey("previousSave") ? "Load \"" + PlayerPrefs.GetString("previousSave") + "\"" : "No recent files", "Quit edica", true, true, true, true);
+        modalPanel.Choice("NotReaper", Function1, Function2, Function3, Function4, "Load Audica File", "Don't click this", "Or this one", "I think this closes it", true, true, true, true);
+        //modalPanel.Choice("NotReaper", Function1)
     }
 
 
     //new file
     void Function1() {
-        timeline.NewFile();
+        timeline.LoadAudicaFile();
         timeline.projectStarted = true;
     }
 
     //load
     void Function2() {
-        timeline.Load();
-        timeline.projectStarted = true;
+        //timeline.Load();
+        //timeline.projectStarted = true;
     }
 
     //load previous
     void Function3() {
-        if (PlayerPrefs.HasKey("previousSave"))
-            timeline.LoadPrevious();
-        else
-            timeline.NewFile();
+        //if (PlayerPrefs.HasKey("previousSave"))
+        //    timeline.LoadPrevious();
+        //else
+        //   timeline.NewFile();
 
-        timeline.projectStarted = true;
+        //timeline.projectStarted = true;
     }
 
     //quit

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Text;
 using Ionic.Zip;
 using Newtonsoft.Json;
 using NotReaper.Models;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace NotReaper.IO {
 
@@ -22,6 +24,8 @@ namespace NotReaper.IO {
 			bool advanced = false;
 			bool expert = false;
 
+
+			CheckCacheValid();
 			//Remove any existing cue files.
 			ClearCueCache();
 
@@ -32,7 +36,24 @@ namespace NotReaper.IO {
 					entry.Extract(ms);
 					string tempDesc = Encoding.UTF8.GetString(ms.ToArray());
 
-					audicaFile.desc = JsonConvert.DeserializeObject<SongDesc>(tempDesc);
+					audicaFile.desc = JsonUtility.FromJson<SongDesc>(tempDesc);
+					audicaFile.safeDesc.songID = audicaFile.desc.songID;
+					audicaFile.safeDesc.moggSong = audicaFile.desc.moggSong;
+					audicaFile.safeDesc.title = audicaFile.desc.title;
+					audicaFile.safeDesc.artist = audicaFile.desc.artist;
+					audicaFile.safeDesc.midiFile = audicaFile.desc.midiFile;
+					audicaFile.safeDesc.fusionSpatialized = audicaFile.desc.fusionSpatialized;
+					audicaFile.safeDesc.fusionUnspatialized = audicaFile.desc.fusionUnspatialized;
+					audicaFile.safeDesc.sustainSongRight = audicaFile.desc.sustainSongRight;
+					audicaFile.safeDesc.sustainSongLeft = audicaFile.desc.sustainSongLeft;
+					audicaFile.safeDesc.fxSong = audicaFile.desc.fxSong;
+					audicaFile.safeDesc.tempo = audicaFile.desc.tempo;
+					audicaFile.safeDesc.songEndEvent = audicaFile.desc.songEndEvent;
+					audicaFile.safeDesc.prerollSeconds = audicaFile.desc.prerollSeconds;
+					audicaFile.safeDesc.useMidiForCues = audicaFile.desc.useMidiForCues;
+					audicaFile.safeDesc.hidden = audicaFile.desc.hidden;
+					audicaFile.safeDesc.offset = audicaFile.desc.offset;
+					audicaFile.safeDesc.mapper = audicaFile.desc.mapper;
 
 					ms.Dispose();
 					continue;
@@ -104,24 +125,29 @@ namespace NotReaper.IO {
 			//If not, cache them then load them.
 
 			//Ensure cache folder exists. If not, it skips over them and goes to caching.
-			CheckCacheValid();
+
 
 			bool mainSongLoaded = false;
 			bool sustainRightLoaded = false;
 			bool sustainLeftLoaded = false;
 
-			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggMainSong}")) {
-				audicaFile.song = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggMainSong}");
+			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg")) {
+				//audicaFile.song = (AudioClip) Resources.Load($"{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}", typeof(AudioClip));
+
+
+				//var clip1 = www.GetAudioClip(true, true);
+				//audicaFile.song = clip1;
+
 				mainSongLoaded = true;
 			}
 
-			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongRight}")) {
-				audicaFile.song_sustain_r = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongRight}");
+			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg")) {
+				//audicaFile.song_sustain_r = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}");
 				sustainRightLoaded = true;
 			}
 
-			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongLeft}")) {
-				audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongLeft}");
+			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg")) {
+				//audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}");
 				sustainLeftLoaded = true;
 			}
 
@@ -138,20 +164,20 @@ namespace NotReaper.IO {
 
 				if (!mainSongLoaded && entry.FileName == audicaFile.desc.moggMainSong) {
 					entry.Extract(tempMogg);
-					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedOggMainSong);
-					audicaFile.song = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggMainSong}");
+					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedMainSong);
+					audicaFile.song = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}");
 					mainSongLoaded = true;
 
 				} else if (!sustainRightLoaded && entry.FileName == audicaFile.desc.moggSustainSongRight) {
 					entry.Extract(tempMogg);
-					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedOggSustainSongRight);
-					audicaFile.song_sustain_r = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongRight}");
+					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedSustainSongRight);
+					audicaFile.song_sustain_r = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}");
 					sustainRightLoaded = true;
 
 				} else if (!sustainLeftLoaded && entry.FileName == audicaFile.desc.moggSustainSongLeft) {
 					entry.Extract(tempMogg);
-					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedOggSustainSongLeft);
-					audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedOggSustainSongLeft}");
+					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedSustainSongLeft);
+					audicaFile.song_sustain_l = Resources.Load<AudioClip>($"{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}");
 					sustainLeftLoaded = true;
 
 				}
@@ -163,6 +189,7 @@ namespace NotReaper.IO {
 			Finish:
 
 				audicaFile.filepath = path;
+			audicaZip.Dispose();
 
 			return audicaFile;
 		}
@@ -180,7 +207,7 @@ namespace NotReaper.IO {
 
 			byte[] dst = new byte[bytes.Length - start];
 			Array.Copy(bytes, start, dst, 0, dst.Length);
-			File.WriteAllBytes($"{Application.dataPath}/.cache/{filename}", dst);
+			File.WriteAllBytes($"{Application.dataPath}/.cache/{filename}.ogg", dst);
 
 		}
 
@@ -196,14 +223,6 @@ namespace NotReaper.IO {
 			File.Delete($"{Application.dataPath}/.cache/advanced.cues");
 			File.Delete($"{Application.dataPath}/.cache/standard.cues");
 			File.Delete($"{Application.dataPath}/.cache/easy.cues");
-		}
-
-		public void Update() {
-
-			if (Input.GetKeyDown(KeyCode.K)) {
-
-
-			}
 		}
 
 	}

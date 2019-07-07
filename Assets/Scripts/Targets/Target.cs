@@ -7,40 +7,35 @@ using UnityEngine;
 namespace NotReaper.Targets {
 
 	//Stores references to a timelineTarget and it's corrosponding gridTarget
-	public class Target {
-
-		public TargetHandType handType;
-		public TargetBehavior behavior;
-		public float beatLength;
-		public TargetVelocity velocity;
-
-		public List<Target> chainedNotes;
-
+	public class Target : MonoBehaviour {
 
 		public GridTarget gridTarget;
 		public TimelineTarget timelineTarget;
 
+		public TargetIcon icon;
+
 		public void SetHandType(TargetHandType handType) {
-			this.handType = handType;
-			gridTarget.targetIcon.SetHandType(handType);
-			timelineTarget.targetIcon.SetHandType(handType);
+			gridTarget.handType = handType;
+
+			gridTarget.icon.SetHandType(handType);
+			timelineTarget.icon.SetHandType(handType);
 		}
 
 		public void SetBehavior(TargetBehavior behavior) {
-			this.behavior = behavior;
-			gridTarget.targetIcon.SetBehavior(behavior);
-			//timelineTarget.icon.SetBehavior(behavior);
+			gridTarget.behavior = behavior;
+			gridTarget.icon.SetBehavior(behavior);
+			timelineTarget.icon.SetBehavior(behavior);
 		}
 
 		public void SetBeatLength(float beatLength) {
-			this.beatLength = beatLength;
+			gridTarget.beatLength = beatLength;
 
-			if (this.behavior == TargetBehavior.Hold) { }
-			//timelineTarget.icon.SetSustainLength(beatLength);
+			if (gridTarget.behavior == TargetBehavior.Hold)
+				timelineTarget.icon.SetSustainLength(beatLength);
 		}
 
 		public void SetVelocity(TargetVelocity velocity) {
-			this.velocity = velocity;
+			gridTarget.velocity = velocity;
 		}
 
 	}

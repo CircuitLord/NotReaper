@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using NotReaper;
 using NotReaper.Grid;
 using NotReaper.Models;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 
 public class OptionsMenu : MonoBehaviour {
 
-    public TimelineOld timeline;
+    public Timeline timeline;
 
     public InputField bpmField;
     public InputField offsetField;
@@ -106,17 +107,17 @@ public class OptionsMenu : MonoBehaviour {
         timeline.SetSongAuthor(newSongAuthor);
     }
 
-    public void MoggWasChanged() {
-        string newMog = Moggsong.text;
-        timeline.SetMogg(newMog);
-    }
+    // public void MoggWasChanged() {
+    //     string newMog = Moggsong.text;
+    //     timeline.SetMogg(newMog);
+    // }
 
     public void SelectStandard() {
         timeline.SetBehavior(TargetBehavior.Standard);
         timeline.SetVelocity(TargetVelocity.Standard);
         SoundDropdown.value = (int) DropdownToVelocity.Standard;
-        //hover.SetBehavior(TargetBehavior.Standard);
-        //noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Grid);
+        hover.SetBehavior(TargetBehavior.Standard);
+        noteGrid.SetSnappingMode(NoteGridSnap.SnappingMode.Grid);
     }
 
     public void SelectHold() {
@@ -169,7 +170,7 @@ public class OptionsMenu : MonoBehaviour {
 
     public void SelectLeftHand() {
         timeline.SetHandType(TargetHandType.Left);
-        //hover.SetHandType(TargetHandType.Left);
+        hover.SetHandType(TargetHandType.Left);
     }
 
     public void SelectRightHand() {

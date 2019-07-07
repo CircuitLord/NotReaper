@@ -696,11 +696,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24ff15be701e6084bbd2808c1db41730, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetIcon: {fileID: 114865039013314168}
+  gridTarget: {fileID: 0}
+  timelineTarget: {fileID: 0}
+  icon: {fileID: 114865039013314168}
   handType: 0
   behavior: 0
   beatLength: 1
   velocity: 0
+  chainedNotes: []
 --- !u!135 &135168456597591856
 SphereCollider:
   m_ObjectHideFlags: 0

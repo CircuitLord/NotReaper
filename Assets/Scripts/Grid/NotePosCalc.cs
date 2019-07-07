@@ -14,7 +14,7 @@ namespace NotReaper.Grid {
 
 		//Gets the cue status based on a grid target.
 		//TODO: New grid target
-		public static Cue ToCue(Target target, int offset) {
+		public static Cue ToCue(GridTarget target, int offset, bool includeGridOffset) {
 
 			int pitch = 0;
 			Vector2 tempPos = new Vector2();
@@ -24,8 +24,8 @@ namespace NotReaper.Grid {
 			//If it's a melee note.
 			if (target.behavior == TargetBehavior.Melee) {
 				pitch = 98;
-				if (target.gridTarget.transform.position.x > 0) pitch += 1;
-				if (target.gridTarget.transform.position.y > 0) pitch += 2;
+				if (target.transform.position.x > 0) pitch += 1;
+				if (target.transform.position.y > 0) pitch += 2;
 
 				offsetX = 0;
 				offsetY = 0;
@@ -33,22 +33,23 @@ namespace NotReaper.Grid {
 			} else {
 
 				//We have to divide by the new positions between the grid.
-				tempPos.x = tempPos.x / xSize;
-				tempPos.y = tempPos.y / ySize;
+				tempPos.x = target.transform.position.x; // / xSize;
+				tempPos.y = target.transform.position.y; // / ySize;
 
 				//Offset it to all be positive.
 				x = Mathf.RoundToInt(tempPos.x + 5.5f);
 				y = Mathf.RoundToInt(tempPos.y + 3);
 
+
 				pitch = x + 12 * y;
 
-				offsetX = target.gridTarget.transform.position.x + 5.5f - x;
-				offsetY = target.gridTarget.transform.position.y + 3 - y;
+				offsetX = 0; //target.transform.position.x + 5.5f - x;
+				offsetY = 0; //target.transform.position.y + 3 - y;
 
 			}
 
 			Cue cue = new Cue() {
-				tick = Mathf.RoundToInt(target.gridTarget.transform.localPosition.z * 480f) + offset,
+				tick = Mathf.RoundToInt(target.transform.localPosition.z * 480f) + offset,
 					tickLength = Mathf.RoundToInt(target.beatLength * 480f),
 					pitch = pitch,
 					velocity = target.velocity,
@@ -90,9 +91,10 @@ namespace NotReaper.Grid {
 
 				}
 			} else {
-				x = (cue.pitch % 12) + (float) cue.gridOffset.x - 5.5f;
+				x = (cue.pitch % 12) + (float) (cue.gridOffset.x * xSize) - 5.5f;
+				// x / xSize
 				x = x * xSize;
-				y = cue.pitch / 12 + (float) cue.gridOffset.y - 3f;
+				y = cue.pitch / 12 + (float) (cue.gridOffset.y * ySize) - 3f;
 				y = y * ySize;
 			}
 

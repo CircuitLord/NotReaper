@@ -23,6 +23,7 @@ namespace NotReaper.Grid {
         public LayerMask notesLayer;
         public GameObject standardGrid;
         public GameObject meleeGrid;
+        public Timeline timeline;
 
 
         private void Awake() {
@@ -46,7 +47,7 @@ namespace NotReaper.Grid {
                     if (EventSystem.current.IsPointerOverGameObject())
                         return;
 
-                    //timeline.AddTarget(mousePos.x, mousePos.y);
+                    timeline.AddTarget(ghost.position.x, ghost.position.y);
                 }
             }
 
@@ -54,7 +55,7 @@ namespace NotReaper.Grid {
                 if (EventSystem.current.IsPointerOverGameObject())
                     return;
 
-                //timeline.DeleteTarget(NoteUnderMouse());
+                timeline.DeleteTarget(NoteUnderMouse());
             }
 
             HandleKeybinds();
@@ -83,9 +84,8 @@ namespace NotReaper.Grid {
             if (Physics.Raycast(ray, out hit, 2, notesLayer)) {
                 Transform objectHit = hit.transform;
 
-                //TODO: uncomment
-                //Target target = objectHit.GetComponent<Target>().gridTarget;
-                Target target = new Target();
+                Target target = objectHit.GetComponent<Target>().gridTarget;
+
 
                 return target;
             }

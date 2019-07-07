@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using NotReaper;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 public class DifficultySelection : MonoBehaviour {
     public Dropdown selection;
 
-    public TimelineOld timeline;
+    public Timeline timeline;
 
     public Sprite checkmark;
 

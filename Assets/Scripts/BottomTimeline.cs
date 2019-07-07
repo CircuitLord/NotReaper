@@ -17,8 +17,8 @@ namespace NotReaper {
         }
 
         // Update is called once per frame
-        void Update() {
-            //timelineBottom.value = timeline.GetPercentagePlayed();
-        }
+        //void Update() {
+        //timelineBottom.value = timeline.GetPercentagePlayed();
+        //}
     }
 }

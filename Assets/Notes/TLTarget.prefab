@@ -399,7 +399,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74d00b0eb8c561448e96b0f428c3917, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetIcon: {fileID: 114923280132452082}
+  gridTarget: {fileID: 0}
+  timelineTarget: {fileID: 0}
+  icon: {fileID: 114923280132452082}
 --- !u!1 &1397908886951394
 GameObject:
   m_ObjectHideFlags: 0

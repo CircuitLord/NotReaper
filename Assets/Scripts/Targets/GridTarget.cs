@@ -1,19 +1,16 @@
+﻿using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Models;
-using UnityEngine;
 
 namespace NotReaper.Targets {
 
-	public class GridTarget : MonoBehaviour {
 
-		public TargetIcon targetIcon;
+    public class GridTarget : Target {
+        public TargetHandType handType;
+        public TargetBehavior behavior;
+        public float beatLength = 1;
+        public TargetVelocity velocity;
 
-		public TargetHandType handType;
-		public TargetBehavior behavior;
-		public float beatLength;
-		public TargetVelocity velocity;
-
-		public List<Target> chainedNotes;
-
-	}
+        public List<GridTarget> chainedNotes;
+    }
 }

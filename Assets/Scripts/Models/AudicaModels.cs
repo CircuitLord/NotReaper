@@ -7,51 +7,77 @@ namespace NotReaper.Models {
 
 	//KEEP IN MIND, almost all the song references are to the moggsong, not the mogg.
 	// moggSusatinSongRight references the name of the mogg, the actual file is stored on the AudicaFile object.
+	[Serializable]
 	public class SongDesc {
 		public string songID;
 
-		public string moggSong;
-		public string moggMainSong;
-		public string cachedOggMainSong {
+		public string moggSong = "";
+		public string moggMainSong = "";
+		public string cachedMainSong {
 			get {
-				return $"{this.songID}.ogg";
+				return $"{this.songID}";
 			}
 		}
 
-		public string title;
-		public string artist;
+		public string title = "";
+		public string artist = "";
 
-		public string midiFile;
+		public string midiFile = "";
 
-		public string fusionSpatialized;
+		public string fusionSpatialized = "fusion/guns/default/drums_default_spatial.fusion";
+		public string fusionUnspatialized = "fusion/guns/default/drums_default_sub.fusion";
 
-		public string targetDrums;
+		public string targetDrums = "";
 
-		public string sustainSongRight;
-		public string moggSustainSongRight;
-		public string cachedOggSustainSongRight {
+		public string sustainSongRight = "";
+		public string moggSustainSongRight = "";
+		public string cachedSustainSongRight {
 			get {
-				return $"{this.songID}_sustain_r.ogg";
+				return $"{this.songID}_sustain_r";
+			}
+
+		}
+
+		public string sustainSongLeft = "";
+		public string moggSustainSongLeft = "";
+		public string cachedSustainSongLeft {
+			get {
+				return $"{this.songID}_sustain_l";
 			}
 		}
 
-		public string sustainSongLeft;
-		public string moggSustainSongLeft;
-		public string cachedOggSustainSongLeft {
-			get {
-				return $"{this.songID}_sustain_l.ogg";
-			}
-		}
+		public string fxSong = "";
+		public string moggFxSong = "";
 
-		public string fxSong;
-		public string moggFxSong;
-
-		public double tempo;
-		public string songEndEvent;
-		public double prerollSeconds;
+		public float tempo = 120;
+		public string songEndEvent = "";
+		public float prerollSeconds = 0;
 		public bool useMidiForCues = false;
 		public bool hidden = false;
-		public string mapper;
+		public string mapper = "";
+		public int offset = 0;
+	}
+
+	public class SafeDesc {
+
+		public string songID;
+		public string moggSong = "song.moggsong";
+		public string title;
+		public string artist;
+		public string midiFile = "song.mid";
+		public string fusionSpatialized = "fusion/guns/default/drums_default_spatial.fusion";
+		public string fusionUnspatialized = "fusion/guns/default/drums_default_sub.fusion";
+		public string sustainSongRight = "song_sustain_r.moggsong";
+		public string sustainSongLeft = "song_sustain_l.moggsong";
+		public string fxSong = "song_extras.moggsong";
+		public float tempo = 128.0f; // bpm
+		public string songEndEvent = "event:/song_end/song_end_C#";
+		public float prerollSeconds = 0.0f;
+		public bool useMidiForCues = false;
+		public bool hidden = false;
+		public int offset = 0; // offset
+		public string mapper; // author
+
 	}
 
 	public class DiffsList {
@@ -69,6 +95,7 @@ namespace NotReaper.Models {
 
 	public class AudicaFile {
 		public SongDesc desc;
+		public SafeDesc safeDesc = new SafeDesc();
 		public AudioClip song;
 		public DiffsList diffs = new DiffsList();
 		public AudioClip song_extras;

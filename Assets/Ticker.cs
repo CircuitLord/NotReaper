@@ -35,7 +35,7 @@ public class Ticker : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         if (layermask == (layermask | (1 << other.gameObject.layer))) {
             if (other.transform.position.z > -1) {
-                switch (other.GetComponentInChildren<Target>().velocity) {
+                switch (other.GetComponentInChildren<GridTarget>().velocity) {
                     case TargetVelocity.Standard:
                         {
                             kick.time = 0;

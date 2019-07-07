@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using NotReaper;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -11,7 +12,7 @@ public class PauseModalInstance : MonoBehaviour {
     private UnityAction Action3;
     private UnityAction Action4;
 
-    public TimelineOld timeline;
+    public Timeline timeline;
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Escape) && timeline.projectStarted) {
