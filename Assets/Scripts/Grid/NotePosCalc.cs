@@ -43,8 +43,8 @@ namespace NotReaper.Grid {
 
 				pitch = x + 12 * y;
 
-				offsetX = (x - (pitch % 12) + 5.5f) / xSize;
-				offsetY = (y - (pitch / 12) + 3f) / ySize;
+				offsetX = (target.transform.position.x - (pitch % 12) + 5.5f) / xSize;
+				offsetY = (target.transform.position.y - (pitch / 12) + 3f) / ySize;
 
 				//offsetX = 0; //target.transform.position.x + 5.5f - x;
 				//offsetY = 0; //target.transform.position.y + 3 - y;
