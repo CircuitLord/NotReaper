@@ -37,30 +37,27 @@ namespace NotReaper.Grid {
                     return;
 
                 var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                //Vector2 snapPos = SnapToGrid(mousePos);
-                //var ghostPos = ghost.position;
-                //ghostPos.x = snapPos.x;
-                //ghostPos.y = snapPos.y;
+
                 ghost.position = SnapToGrid(mousePos);
 
-                if (Input.GetMouseButtonDown(0)) {
-                    if (EventSystem.current.IsPointerOverGameObject())
-                        return;
-
-                    timeline.AddTarget(ghost.position.x, ghost.position.y);
-                }
             }
-
-            if (Input.GetMouseButtonDown(1)) {
-                if (EventSystem.current.IsPointerOverGameObject())
-                    return;
-
-                timeline.DeleteTarget(NoteUnderMouse());
-            }
-
             HandleKeybinds();
 
         }
+
+
+        public void TryPlaceNote() {
+            if (!hover) return;
+            timeline.AddTarget(ghost.position.x, ghost.position.y);
+        }
+
+        public void TryRemoveNote() {
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            timeline.DeleteTarget(NoteUnderMouse());
+        }
+
 
         private void HandleKeybinds() {
             if (Input.GetKeyDown(KeyCode.G)) {
@@ -75,23 +72,6 @@ namespace NotReaper.Grid {
 
         }
 
-        private Target NoteUnderMouse() {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1f);
-            ray.direction = Vector3.forward;
-            Debug.DrawRay(ray.origin, ray.direction);
-            if (Physics.Raycast(ray, out hit, 2, notesLayer)) {
-                Transform objectHit = hit.transform;
-
-                Target target = objectHit.GetComponent<Target>().gridTarget;
-
-
-                return target;
-            }
-            return null;
-        }
-
 
         private void OnMouseEnter() {
             hover = true;
@@ -103,8 +83,8 @@ namespace NotReaper.Grid {
             ghost.gameObject.SetActive(false);
         }
 
-        public void SetSnappingMode(SnappingMode snappingMode) {
-            snapMode = snappingMode;
+        public void SetSnappingMode(SnappingMode s) {
+            snapMode = s;
             meleeGrid.SetActive(snapMode == SnappingMode.Melee);
             standardGrid.SetActive(snapMode == SnappingMode.Grid);
         }

@@ -42,9 +42,11 @@ namespace NotReaper {
 
         [SerializeField] private AudioSource aud;
         [SerializeField] private AudioSource previewAud;
+        [SerializeField] private AudioSource leftSustainAud;
+        [SerializeField] private AudioSource rightSustainAud;
         [SerializeField] private Transform spectrogram;
 
-        //[SerializeField] private TextMeshProUGUI curMinutes;
+
         [SerializeField] private TextMeshProUGUI songTimestamp;
         [SerializeField] private TextMeshProUGUI curTick;
         [SerializeField] private Slider bottomTimelineSlider;
@@ -59,6 +61,10 @@ namespace NotReaper {
 
         List<GridTarget> notes;
         public static List<GridTarget> orderedNotes;
+
+        //Contains the notes that the player can actually see.
+        //TODO: Use this to replace the huge calls to noteList
+        public static List<GridTarget> importantNotes;
         List<TimelineTarget> notesTimeline;
         SongDescyay songDesc;
 
@@ -99,10 +105,13 @@ namespace NotReaper {
 
         private DirectorySecurity securityRules = new DirectorySecurity();
 
+        public Metronome metro;
+
         private void Start() {
             notes = new List<GridTarget>();
             orderedNotes = new List<GridTarget>();
             notesTimeline = new List<TimelineTarget>();
+            importantNotes = new List<GridTarget>();
 
             securityRules.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
 
@@ -200,6 +209,7 @@ namespace NotReaper {
 
             if (gridClone.behavior == TargetBehavior.Hold)
                 gridClone.SetBeatLength(beatLength);
+
             else
                 gridClone.SetBeatLength(0.25f);
 
@@ -219,6 +229,19 @@ namespace NotReaper {
                         var particles = note.GetComponentInChildren<ParticleSystem>();
                         if (!particles.isEmitting) {
                             particles.Play();
+
+                            float panPos = (float) (note.transform.position.x / 7.15);
+                            if (note.handType == TargetHandType.Left) {
+                                leftSustainAud.volume = 1.0f;
+
+                                //pan to right position
+                                leftSustainAud.panStereo = panPos;
+                            } else if (note.handType == TargetHandType.Right) {
+                                rightSustainAud.volume = 1.0f;
+                                rightSustainAud.panStereo = panPos;
+                            }
+
+
                             var main = particles.main;
                             main.startColor = note.handType == TargetHandType.Left ? new Color(leftColor.r, leftColor.g, leftColor.b, 1) : new Color(rightColor.r, rightColor.g, rightColor.b, 1);
                         }
@@ -235,6 +258,11 @@ namespace NotReaper {
                         var particles = note.GetComponentInChildren<ParticleSystem>();
                         if (particles.isEmitting) {
                             particles.Stop();
+                            if (note.handType == TargetHandType.Left) {
+                                leftSustainAud.volume = 0.0f;
+                            } else if (note.handType == TargetHandType.Right) {
+                                rightSustainAud.volume = 0.0f;
+                            }
                         }
                     }
                 }
@@ -242,8 +270,9 @@ namespace NotReaper {
         }
 
         private void UpdateChords() {
-            if (orderedNotes.Count > 0)
-                foreach (var note in orderedNotes) {
+            //TODO: ORDERED
+            if (importantNotes.Count > 0)
+                foreach (var note in importantNotes) {
                     if (note && (Mathf.Round(note.transform.position.z) == 0 && note.behavior != TargetBehavior.ChainStart && note.behavior != TargetBehavior.Chain && note.behavior != TargetBehavior.HoldEnd)) {
                         LineRenderer lr = note.GetComponent<LineRenderer>();
 
@@ -255,8 +284,8 @@ namespace NotReaper {
                         var positionList = new List<Vector3>();
                         lr.SetPositions(positionList.ToArray());
                         lr.positionCount = 0;
-
-                        foreach (var note2 in orderedNotes) {
+                        //TODO: Ordered
+                        foreach (var note2 in importantNotes) {
                             if (note.transform.position.z == note2.transform.position.z && note != note2) {
                                 var positionList2 = new List<Vector3>();
 
@@ -346,10 +375,21 @@ namespace NotReaper {
 
         }
 
+
+        public static void AddImportantNote(GridTarget target) {
+            importantNotes.Add(target);
+        }
+
+        public static void RemoveImportantNote(GridTarget target) {
+            importantNotes.Remove(target);
+        }
+
+
         public void DeleteTarget(Target target) {
             if (target == null) return;
             notes.Remove(target.gridTarget);
             orderedNotes.Remove(target.gridTarget);
+            importantNotes.Remove(target.gridTarget);
             var tl = target.timelineTarget.gameObject;
             var g = target.gridTarget.gameObject;
             Destroy(tl);
@@ -378,6 +418,7 @@ namespace NotReaper {
             notes = new List<GridTarget>();
             orderedNotes = new List<GridTarget>();
             notesTimeline = new List<TimelineTarget>();
+            importantNotes = new List<GridTarget>();
 
             var liner = gridTransformParent.gameObject.GetComponentInChildren<LineRenderer>();
             if (liner) {
@@ -476,11 +517,6 @@ namespace NotReaper {
         public void Export() {
             string dirpath = Application.persistentDataPath;
 
-            // Cue[] cues = new Cue[notes.Count];
-            // for (int i = 0; i < notes.Count; i++) {
-            //cues[i] = orderedNotes[i].ToCue(offset);
-            //}
-
             CueFile export = new CueFile();
             export.cues = new List<Cue>();
 
@@ -492,51 +528,6 @@ namespace NotReaper {
 
             AudicaExporter.ExportToAudicaFile(audicaFile);
 
-
-            //string json = JsonUtility.ToJson(export, true);
-            //json = json.Replace("Items", "cues");
-
-            //if (notes.Count > 0)
-            //File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
-
-            //string[] dirpatharr = StandaloneFileBrowser.OpenFolderPanel("Export Location", "", false);
-            //if (dirpatharr.Length > 0) {
-            //push all .cues files to list
-            //List<FileInfo> files = new List<FileInfo>();
-
-            //var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
-            //     if (cueFiles.Length > 0) {
-            //         foreach (var cue in cueFiles) {
-            //             FileInfo file = new FileInfo(cue);
-            //             files.Add(file);
-            //         }
-            //     }
-
-            //     //export desc    
-            //     json = JsonUtility.ToJson(songDesc, true);
-            //     try {
-            //         File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
-            //         FileInfo descfile = new FileInfo(dirpath + "\\temp\\song.desc");
-            //         files.Add(descfile);
-            //     } catch (IOException e) {
-            //         Debug.Log(e.Data + "...DELETING");
-
-            //         FileInfo fileToReplace = new FileInfo(dirpath + "\\temp\\song.desc");
-            //         fileToReplace.Delete();
-            //         try {
-            //             File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
-            //             FileInfo descfile = new FileInfo(dirpath + "\\temp\\song.desc");
-            //             files.Add(descfile);
-            //         } catch (IOException e2) {
-            //             Debug.Log(e2.Message + "....No More attempts");
-            //         }
-            //     }
-
-            //     //compress files and send to location
-            //     Compress(files, dirpatharr[0] + "temp.zip");
-            //     ZipFile.ExtractToDirectory(dirpatharr[0] + "temp.zip", dirpatharr[0]);
-
-            // }
 
         }
 
@@ -634,13 +625,37 @@ namespace NotReaper {
 
             PlayerPrefs.SetString("recentFile", paths[0]);
 
-            //songDesc = new SongDescyay();
+            //Loads all the sounds.
             StartCoroutine(GetAudioClip($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg"));
+            StartCoroutine(LoadLeftSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg"));
+            StartCoroutine(LoadRightSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg"));
 
             foreach (Cue cue in audicaFile.diffs.expert.cues) {
                 AddTarget(cue);
             }
 
+            if (orderedNotes.Count > 0) {
+                foreach (var note in orderedNotes) {
+
+                    if (note.behavior == TargetBehavior.ChainStart && note) {
+                        if (note.chainedNotes.Count > 0) {
+                            if ((note.transform.position.z < 0 && 0 > note.chainedNotes.Last().transform.position.z) || (note.transform.position.z > 0 && 0 < note.chainedNotes.Last().transform.position.z)) {
+                                note.GetComponentsInChildren<LineRenderer>() [1].enabled = false;
+                            } else {
+                                note.GetComponentsInChildren<LineRenderer>() [1].enabled = true;
+                            }
+                        }
+                    }
+
+                    if (note.behavior == TargetBehavior.Hold && note) {
+                        var length = Mathf.Ceil(float.Parse(note.GetComponentInChildren<HoldController>().length.text)) / 480;
+                        if (note.gridTarget.beatLength != length) {
+                            note.gridTarget.SetBeatLength(length);
+                            //Debug.Log(note.beatLength);
+                        }
+                    }
+                }
+            }
 
         }
 
@@ -779,6 +794,36 @@ namespace NotReaper {
             }
         }
 
+        IEnumerator LoadLeftSustain(string uri) {
+            Debug.Log("Loading left sustian.");
+            using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
+                yield return www.SendWebRequest();
+
+                if (www.isNetworkError) {
+                    Debug.Log(www.error);
+                } else {
+                    AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+                    leftSustainAud.clip = myClip;
+                    leftSustainAud.volume = 0f;
+                    Debug.Log("Left sustain loaded.");
+                }
+            }
+        }
+        IEnumerator LoadRightSustain(string uri) {
+            using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
+                yield return www.SendWebRequest();
+
+                if (www.isNetworkError) {
+                    Debug.Log(www.error);
+                } else {
+                    AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+                    rightSustainAud.clip = myClip;
+                    rightSustainAud.volume = 0f;
+
+                }
+            }
+        }
+
 
         public void SetBehavior(TargetBehavior behavior) {
             selectedBehaviour = behavior;
@@ -904,7 +949,8 @@ namespace NotReaper {
         }
 
         public void Update() {
-            if (orderedNotes.Count > 0)
+            //TODO: Ordrerd
+            if (orderedNotes.Count > 0) {
                 foreach (var note in orderedNotes) {
 
                     if (note.behavior == TargetBehavior.ChainStart && note) {
@@ -925,6 +971,7 @@ namespace NotReaper {
                         }
                     }
                 }
+            }
 
             UpdateChords();
 
@@ -949,8 +996,12 @@ namespace NotReaper {
                 if (Input.mouseScrollDelta.y < -0.1f) {
                     time += BeatsToDuration(4f / beatSnap);
                     time = SnapTime(time);
+
+                    //Put in a function
                     aud.time = time;
                     previewAud.time = time;
+                    leftSustainAud.time = time;
+                    rightSustainAud.time = time;
                     if (paused) previewAud.Play();
                 }
             else if (Input.mouseScrollDelta.y > 0.1f) {
@@ -959,16 +1010,24 @@ namespace NotReaper {
                 if (time < 0) time = 0;
                 aud.time = time;
                 previewAud.time = time;
+                leftSustainAud.time = time;
+                rightSustainAud.time = time;
                 if (paused) previewAud.Play();
             }
 
             if (Input.GetKeyDown(KeyCode.Space)) {
                 if (paused) {
                     aud.Play();
+                    metro.StartMetronome();
+
                     previewAud.Pause();
+                    leftSustainAud.Play();
+                    rightSustainAud.Play();
                     paused = false;
                 } else {
                     aud.Pause();
+                    leftSustainAud.Pause();
+                    rightSustainAud.Pause();
                     paused = true;
 
                     //Uncommented

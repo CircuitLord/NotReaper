@@ -1,0 +1,12 @@
+(mogg_path "song_extras.mogg")
+(midi_path "song.mid")
+
+
+(tracks
+   (
+      (mix (0 1) event:/gameplay/song_fx_audio)
+   )
+)
+;
+(pans  (-1     1))
+(vols  (-.8  -.8))

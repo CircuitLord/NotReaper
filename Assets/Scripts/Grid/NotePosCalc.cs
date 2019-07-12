@@ -40,14 +40,10 @@ namespace NotReaper.Grid {
 				x = Mathf.RoundToInt(tempPos.x + 5.5f);
 				y = Mathf.RoundToInt(tempPos.y + 3);
 
-
 				pitch = x + 12 * y;
 
-				offsetX = (target.transform.position.x - (pitch % 12) + 5.5f) / xSize;
-				offsetY = (target.transform.position.y - (pitch / 12) + 3f) / ySize;
-
-				//offsetX = 0; //target.transform.position.x + 5.5f - x;
-				//offsetY = 0; //target.transform.position.y + 3 - y;
+				offsetX = (tempPos.x + 5.5f - x);
+				offsetY = (tempPos.y + 3 - y);
 
 			}
 
@@ -65,9 +61,6 @@ namespace NotReaper.Grid {
 			return cue;
 		}
 
-		//public static Vector2 GetOffset(Cue cue) {
-
-		//}
 
 		public static Vector2 PitchToPos(Cue cue) {
 
@@ -95,7 +88,6 @@ namespace NotReaper.Grid {
 				}
 			} else {
 				x = (cue.pitch % 12) + (float) (cue.gridOffset.x * xSize) - 5.5f;
-				// (x - (cue.pitch % 12) + 5.5f) / xSize = cue.gridOffset.x;
 				x = x * xSize;
 				y = cue.pitch / 12 + (float) (cue.gridOffset.y * ySize) - 3f;
 				y = y * ySize;

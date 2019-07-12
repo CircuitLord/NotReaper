@@ -1,0 +1,11 @@
+(mogg_path "song_sustain_r.mogg")
+(midi_path "song.mid")
+
+(tracks
+  (
+   (sustain_r 0 event:/gameplay/sustain_right)      
+  )
+)
+;                
+(pans (0.0))
+(vols (1.0))

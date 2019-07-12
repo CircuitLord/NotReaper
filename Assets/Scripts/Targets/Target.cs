@@ -14,6 +14,21 @@ namespace NotReaper.Targets {
 
 		public TargetIcon icon;
 
+
+		private void Start() {
+			//icon.SetSizes();
+		}
+
+
+		public void Select() {
+			icon.EnableSelected(gridTarget.behavior);
+		}
+
+		public void Deselect() {
+			icon.DisableSelected();
+		}
+
+
 		public void SetHandType(TargetHandType handType) {
 			gridTarget.handType = handType;
 

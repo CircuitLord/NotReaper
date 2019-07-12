@@ -234,13 +234,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24f0cb2feb8dde140893a217ea68c92a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  standard: {fileID: 0}
-  hold: {fileID: 0}
-  horizontal: {fileID: 0}
-  vertical: {fileID: 0}
-  chainStart: {fileID: 0}
-  chain: {fileID: 0}
-  melee: {fileID: 0}
+  standard: {fileID: 1087541295103852}
+  hold: {fileID: 1710010054623142}
+  horizontal: {fileID: 1559037438479288}
+  vertical: {fileID: 1686911879006412}
+  chainStart: {fileID: 1092672444081228}
+  chain: {fileID: 1583160497340506}
+  melee: {fileID: 1027256154899310}
   line: {fileID: 0}
   sustainDirection: 0.6
 --- !u!1 &1200447452129518

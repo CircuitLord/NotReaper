@@ -15,7 +15,15 @@ public class TargetIcon : MonoBehaviour {
     public GameObject melee;
     public GameObject line;
 
-    //1DA4E5
+
+    public SpriteRenderer standardOutline;
+    public SpriteRenderer holdOutline;
+    public SpriteRenderer horzOutline;
+    public SpriteRenderer vertOutline;
+    public SpriteRenderer chainStartOutline;
+    public SpriteRenderer chainOutline;
+    public SpriteRenderer meleeOutline;
+
 
     private Color leftColor;
     private Color rightColor;
@@ -23,6 +31,43 @@ public class TargetIcon : MonoBehaviour {
     private Color noneColor;
 
     public float sustainDirection = 0.6f;
+
+
+    public bool IsGrid() {
+        if (standardOutline == null) return false;
+        else return false;
+    }
+
+
+    //Sets the proper scale for the icons.
+    public void SetSizes() {
+        if (!IsGrid()) return;
+
+    }
+
+
+    public void EnableSelected(TargetBehavior behavior) {
+        standardOutline.enabled = (behavior == TargetBehavior.Standard);
+        holdOutline.enabled = (behavior == TargetBehavior.Hold);
+        horzOutline.enabled = (behavior == TargetBehavior.Horizontal);
+        vertOutline.enabled = (behavior == TargetBehavior.Vertical);
+        chainStartOutline.enabled = (behavior == TargetBehavior.ChainStart);
+        chainOutline.enabled = (behavior == TargetBehavior.Chain);
+        meleeOutline.enabled = (behavior == TargetBehavior.Melee);
+
+    }
+
+    public void DisableSelected() {
+        if (standardOutline == null) return;
+        standardOutline.enabled = false;
+        holdOutline.enabled = false;
+        horzOutline.enabled = false;
+        vertOutline.enabled = false;
+        chainStartOutline.enabled = false;
+        chainOutline.enabled = false;
+        meleeOutline.enabled = false;
+    }
+
 
     public void SetHandType(TargetHandType handType) {
         foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true)) {

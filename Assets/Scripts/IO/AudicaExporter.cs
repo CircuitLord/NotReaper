@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace NotReaper.IO {
 
-	public class AudicaExporter : MonoBehaviour {
+	public class AudicaExporter {
 
 		public static void ExportToAudicaFile(AudicaFile audicaFile) {
 
@@ -24,11 +24,11 @@ namespace NotReaper.IO {
 			using(var archive = ZipArchive.Open(audicaFile.filepath)) {
 
 
-				AudicaHandler.CheckCacheValid();
+				HandleCache.CheckCacheFolderValid();
 
 				//Write the cues files to disk so we can add them to the audica file.
 				if (audicaFile.diffs.expert.cues != null) {
-					File.WriteAllText($"{Application.dataPath}/.cache/expert.cues", CuesToJson(audicaFile.diffs.expert));
+					File.WriteAllText($"{Application.dataPath}/.cache/expert-new.cues", CuesToJson(audicaFile.diffs.expert));
 				}
 				if (audicaFile.diffs.advanced.cues != null) {
 					File.WriteAllText($"{Application.dataPath}/.cache/advanced-new.cues", CuesToJson(audicaFile.diffs.advanced));
@@ -44,12 +44,12 @@ namespace NotReaper.IO {
 
 					if (entry.ToString() == "expert.cues") {
 						archive.RemoveEntry(entry);
+						break;
 					}
 
 				}
 
-				//archive.RemoveEntry()
-				archive.AddEntry("expert.cues", $"{Application.dataPath}/.cache/expert.cues");
+				archive.AddEntry("expert.cues", $"{Application.dataPath}/.cache/expert-new.cues");
 				archive.SaveTo(audicaFile.filepath + ".temp", SharpCompress.Common.CompressionType.None);
 				archive.Dispose();
 
@@ -64,21 +64,9 @@ namespace NotReaper.IO {
 		}
 
 
-		class TempCues {
-			public List<Cue> cues;
-		}
-
 		public static string CuesToJson(CueFile cueFile) {
 			return JsonUtility.ToJson(cueFile, true);
 		}
-
-
-		//private void Update() {
-		//if (Input.GetKeyDown(KeyCode.L)) {
-		//AudicaFile audicaFile = AudicaHandler.LoadAudicaFile(@"C:\Files\GameStuff\AUDICACustom\Testing\test.audica");
-		//ExportToAudicaFile(audicaFile);
-		//}
-		//}
 
 
 	}

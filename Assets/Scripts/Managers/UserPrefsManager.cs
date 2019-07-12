@@ -10,6 +10,8 @@ public class UserPrefsManager : MonoBehaviour {
     public static Color bothColor { get; set; } = Color.gray;
     public static Color neitherColor { get; set; } = Color.magenta;
 
+    public static Color selectedColor { get; set; } = Color.yellow;
+
     public static float mouseHoldForDrag { get; set; } = 15f;
 
 

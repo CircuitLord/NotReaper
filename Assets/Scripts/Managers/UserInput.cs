@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Grid;
+using NotReaper.Grid.SelectTool;
+using NotReaper.UserInput;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +31,7 @@ namespace NotReaper.Managers {
         private void Start() {
             //default selecitons
             L.isOn = true;
+            standardButton.isOn = true;
         }
 
 
@@ -36,12 +39,12 @@ namespace NotReaper.Managers {
 
             //Doesn't need to use the input manager, no reason to change.
             if (Input.GetMouseButtonDown(0)) {
-                mouseDragPosStart = Input.mousePosition;
+                //mouseDragPosStart = Input.mousePosition;
             }
 
 
             if (Input.GetMouseButton(0)) {
-                mouseChargeLevel += Time.deltaTime * mouseChargeSpeed;
+                //mouseChargeLevel += Time.deltaTime * mouseChargeSpeed;
             }
             if (Input.GetMouseButtonUp(0)) {
                 mouseChargeLevel = 0f;
@@ -60,7 +63,7 @@ namespace NotReaper.Managers {
 
             //Drag square
             if (mouseChargeLevel > UserPrefsManager.mouseHoldForDrag) {
-                mouseButtonHeld = true;
+                //mouseButtonHeld = true;
             }
 
             if (Input.GetKeyDown(KeyCode.P)) {
