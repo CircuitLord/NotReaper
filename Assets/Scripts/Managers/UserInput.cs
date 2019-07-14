@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace NotReaper.Managers {
 
-
+/*
     public class UserInput : MonoBehaviour {
 
         private float mouseChargeLevel = 0f;
@@ -144,4 +144,6 @@ namespace NotReaper.Managers {
 
 
     }
+
+    */
 }

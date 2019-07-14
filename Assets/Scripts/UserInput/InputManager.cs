@@ -5,45 +5,31 @@ using UnityEngine;
 namespace NotReaper.UserInput {
 
 
-	public class InputManager : MonoBehaviour {
+	public static class InputManager {
 
 
 		//Used for singleton
-		public static InputManager IM;
 
 		//Create Keycodes that will be associated with each of our commands.
 		//These can be accessed by any other script in our game
-		public KeyCode selectStandard { get; set; }
-		public KeyCode selectHold { get; set; }
-		public KeyCode selectHorz { get; set; }
-		public KeyCode selectVert { get; set; }
-		public KeyCode selectChainStart { get; set; }
-		public KeyCode selectChainNode { get; set; }
-		public KeyCode selectMelee { get; set; }
-		public KeyCode toggleColor { get; set; }
-		public KeyCode selectSoundKick { get; set; }
-		public KeyCode selectSoundSnare { get; set; }
-		public KeyCode selectSoundPercussion { get; set; }
-		public KeyCode selectSoundChainStart { get; set; }
-		public KeyCode selectSoundChainNode { get; set; }
-		public KeyCode selectSoundMelee { get; set; }
-		public KeyCode selectTool { get; set; }
+		public static KeyCode selectStandard { get; set; }
+		public static KeyCode selectHold { get; set; }
+		public static KeyCode selectHorz { get; set; }
+		public static KeyCode selectVert { get; set; }
+		public static KeyCode selectChainStart { get; set; }
+		public static KeyCode selectChainNode { get; set; }
+		public static KeyCode selectMelee { get; set; }
+		public static KeyCode toggleColor { get; set; }
+		public static KeyCode selectSoundKick { get; set; }
+		public static KeyCode selectSoundSnare { get; set; }
+		public static KeyCode selectSoundPercussion { get; set; }
+		public static KeyCode selectSoundChainStart { get; set; }
+		public static KeyCode selectSoundChainNode { get; set; }
+		public static KeyCode selectSoundMelee { get; set; }
+		public static KeyCode selectTool { get; set; }
 
 
-		void Awake() {
-			//Singleton pattern
-			if (IM == null) {
-				DontDestroyOnLoad(gameObject);
-				IM = this;
-			} else if (IM != this) {
-				Destroy(gameObject);
-			}
-			/*Assign each keycode when the game starts.
-			 * Loads data from PlayerPrefs so if a user quits the game,
-			 * their bindings are loaded next time. Default values
-			 * are assigned to each Keycode via the second parameter
-			 * of the GetString() function
-			 */
+		public static void LoadHotkeys() {
 			selectStandard = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectStandard", "Alpha1"));
 			selectHold = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectHold", "Alpha2"));
 			selectHorz = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectHorz", "Alpha3"));
@@ -62,7 +48,7 @@ namespace NotReaper.UserInput {
 			selectSoundMelee = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectSoundMelee", "Y"));
 
 			selectTool = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectTool", "F"));
-
 		}
+
 	}
 }

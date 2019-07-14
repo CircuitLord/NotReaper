@@ -25,6 +25,8 @@ namespace NotReaper.IO {
 			songMidi.Write(Path.Combine(audicaTemplate, "song.mid"), true, MidiFileFormat.MultiTrack);
 
 
+			HandleCache.CheckSaveFolderValid();
+
 			using(ZipArchive archive = ZipArchive.Create()) {
 				archive.AddAllFromDirectory(audicaTemplate);
 				archive.SaveTo(Path.Combine(Application.persistentDataPath, "saves", songName), SharpCompress.Common.CompressionType.None);

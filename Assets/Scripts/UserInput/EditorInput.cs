@@ -1,25 +1,56 @@
+using NotReaper.Grid;
+using NotReaper.Managers;
+using NotReaper.Models;
+using NotReaper.Tools;
+using NotReaper.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NotReaper.UserInput {
 
 
+	public enum EditorTool { Standard, Hold, Horizontal, Vertical, ChainStart, ChainNode, Melee, DragSelect, ChainBuilder }
+
+
 	public class EditorInput : MonoBehaviour {
 
-		public enum EditorTool { Standard, Hold, Horizontal, Vertical, ChainStart, ChainNode, Melee, DragSelect, ChainBuilder }
-		public enum EditorSnappingMode { Grid, Melee, None }
 
-		public EditorTool selectedTool;
+		public static EditorTool selectedTool = EditorTool.Standard;
+		public static TargetHandType selectedHand = TargetHandType.Left;
+		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
+		public static bool isOverGrid = false;
+		public static bool inUI = false;
 
-		private EditorSnappingMode snappingMode;
+		//public PlaceNote toolPlaceNote;
+		[SerializeField] public EditorToolkit Tools;
+
+		[SerializeField] private Dropdown soundDropdown;
+		[SerializeField] private UINoteHandler UINote;
+
+
+
+
+		public Toggle standardToggle;
+		public Toggle holdToggle;
+		public Toggle chainStartToggle;
+		public Toggle chainNodeToggle;
+		public Toggle horzToggle;
+		public Toggle vertToggle;
+		public Toggle meleeToggle;
 
 
 		private void Start() {
-			selectedTool = EditorTool.Standard;
+			InputManager.LoadHotkeys();
+
+			UINote.SelectStandard();
+			UINote.SelectLeftHand();
+			standardToggle.isOn = true;
 		}
 
-		//I'm using smoot
 		private void Update() {
 
+			if (inUI) return;
+			
 
 			if (Input.GetMouseButtonDown(0)) {
 
@@ -31,68 +62,102 @@ namespace NotReaper.UserInput {
 					case EditorTool.ChainStart:
 					case EditorTool.ChainNode:
 					case EditorTool.Melee:
+						Tools.placeNote.TryPlaceNote();
+						break;
 
 
 					default:
-						return;
+						break;
 				}
 
 
 			}
 
+			if (Input.GetMouseButtonDown(1)) {
+				switch (selectedTool) {
+					case EditorTool.Standard:
+					case EditorTool.Hold:
+					case EditorTool.Horizontal:
+					case EditorTool.Vertical:
+					case EditorTool.ChainStart:
+					case EditorTool.ChainNode:
+					case EditorTool.Melee:
+						Tools.placeNote.TryRemoveNote();
+						break;
 
-			if (Input.GetKeyDown(InputManager.IM.selectStandard)) {
 
-			}
-			if (Input.GetKeyDown(InputManager.IM.selectHold)) {
-				//holdButton.isOn = true;
-			}
-			if (Input.GetKeyDown(InputManager.IM.selectHorz)) {
-				//horzButton.isOn = true;
-			}
-			if (Input.GetKeyDown(InputManager.IM.selectVert)) {
-				//vertButton.isOn = true;
-			}
-			if (Input.GetKeyDown(InputManager.IM.selectChainStart)) {
-				//chainStartButton.isOn = true;
-			}
-			if (Input.GetKeyDown(InputManager.IM.selectChainNode)) {
-				//chainPartButton.isOn = true;
-			}
-			if (Input.GetKeyDown(InputManager.IM.selectMelee)) {
-				//meleeButton.isOn = true;
+					default:
+						break;
+				}
 			}
 
-			if (Input.GetKeyDown(InputManager.IM.toggleColor)) {
-				/*
-								if (L.isOn == false) {
-									L.isOn = true;
-								} else if (R.isOn == false) {
-									R.isOn = true;
-								} else {
-									L.isOn = true;
-								}
-								*/
+
+			if (Input.GetKeyDown(InputManager.selectStandard)) {
+				selectedTool = EditorTool.Standard;
+				standardToggle.isOn = true;
+
+			}
+			if (Input.GetKeyDown(InputManager.selectHold)) {
+				selectedTool = EditorTool.Hold;
+				holdToggle.isOn = true;
+			}
+			if (Input.GetKeyDown(InputManager.selectHorz)) {
+				selectedTool = EditorTool.Horizontal;
+				horzToggle.isOn = true;
+			}
+			if (Input.GetKeyDown(InputManager.selectVert)) {
+				selectedTool = EditorTool.Vertical;
+				vertToggle.isOn = true;
+			}
+			if (Input.GetKeyDown(InputManager.selectChainStart)) {
+				selectedTool = EditorTool.ChainStart;
+				chainStartToggle.isOn = true;
+			}
+			if (Input.GetKeyDown(InputManager.selectChainNode)) {
+				selectedTool = EditorTool.ChainNode;
+				chainNodeToggle.isOn = true;
+			}
+			if (Input.GetKeyDown(InputManager.selectMelee)) {
+				selectedTool = EditorTool.Melee;
+				meleeToggle.isOn = true;
+			}
+
+			if (Input.GetKeyDown(InputManager.toggleColor)) {
+
+				if (selectedHand == TargetHandType.Left) {
+					selectedHand = TargetHandType.Right;
+					UINote.SelectRightHand();
+				}
+
+				else if (selectedHand == TargetHandType.Right) {
+					selectedHand = TargetHandType.Left;
+					UINote.SelectLeftHand();
+				} 
+				
+				else {
+					selectedHand = TargetHandType.Left;
+					UINote.SelectLeftHand();
+				}
 
 			}
 
-			if (Input.GetKeyDown(InputManager.IM.selectSoundKick)) {
-				//soundSelect.value = 0;
+			if (Input.GetKeyDown(InputManager.selectSoundKick)) {
+				soundDropdown.value = 0;
 			}
-			if (Input.GetKeyDown(InputManager.IM.selectSoundSnare)) {
-				//soundSelect.value = 1;
+			if (Input.GetKeyDown(InputManager.selectSoundSnare)) {
+				soundDropdown.value = 1;
 			}
-			if (Input.GetKeyDown(InputManager.IM.selectSoundPercussion)) {
-				//soundSelect.value = 2;
+			if (Input.GetKeyDown(InputManager.selectSoundPercussion)) {
+				soundDropdown.value = 2;
 			}
-			if (Input.GetKeyDown(InputManager.IM.selectSoundChainStart)) {
-				//soundSelect.value = 3;
+			if (Input.GetKeyDown(InputManager.selectSoundChainStart)) {
+				soundDropdown.value = 3;
 			}
-			if (Input.GetKeyDown(InputManager.IM.selectSoundChainNode)) {
-				//soundSelect.value = 4;
+			if (Input.GetKeyDown(InputManager.selectSoundChainNode)) {
+				soundDropdown.value = 4;
 			}
-			if (Input.GetKeyDown(InputManager.IM.selectSoundMelee)) {
-				//soundSelect.value = 5;
+			if (Input.GetKeyDown(InputManager.selectSoundMelee)) {
+				soundDropdown.value = 5;
 			}
 		}
 

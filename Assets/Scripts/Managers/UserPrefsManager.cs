@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class UserPrefsManager : MonoBehaviour {
 
-    public static Color leftColor { get; set; } = Color.blue;
-    public static Color rightColor { get; set; } = Color.green;
+    public static Color leftColor { get; set; } = new Color(1f, 0.4f, 0.67f);
+    public static Color rightColor { get; set; } = new Color(0f, 0.67f, 0.87f);
     public static Color bothColor { get; set; } = Color.gray;
     public static Color neitherColor { get; set; } = Color.magenta;
 

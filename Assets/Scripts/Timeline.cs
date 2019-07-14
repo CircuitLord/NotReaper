@@ -11,6 +11,7 @@ using NotReaper.Grid;
 using NotReaper.IO;
 using NotReaper.Models;
 using NotReaper.Targets;
+using NotReaper.UI;
 using SFB;
 using TMPro;
 using UnityEngine;
@@ -26,9 +27,8 @@ namespace NotReaper {
         public static AudicaFile audicaFile;
 
         public bool SustainParticles = true;
-        public OptionsMenu.DropdownToVelocity CurrentSound;
+        public DropdownToVelocity CurrentSound;
         public static Timeline TimelineStatic;
-        public LoadModalInstance loadmodal;
         public DifficultySelection DifficultySelection_s;
         public float playbackSpeed = 1f;
 
@@ -125,8 +125,6 @@ namespace NotReaper {
             bothColor = UserPrefsManager.bothColor;
             neitherColor = UserPrefsManager.neitherColor;
 
-            loadmodal.LoadPanelStart();
-
             //SetSnapWithSliderAction = new UnityAction(SetSnapWithSlider(value));
 
             ///beatSnapSelector.onValueChanged.AddListener(SetSnapWithSlider());
@@ -171,27 +169,27 @@ namespace NotReaper {
             //set velocity
             if (userAdded) {
                 switch (CurrentSound) {
-                    case OptionsMenu.DropdownToVelocity.Standard:
+                    case DropdownToVelocity.Standard:
                         gridClone.velocity = TargetVelocity.Standard;
                         break;
 
-                    case OptionsMenu.DropdownToVelocity.Snare:
+                    case DropdownToVelocity.Snare:
                         gridClone.velocity = TargetVelocity.Snare;
                         break;
 
-                    case OptionsMenu.DropdownToVelocity.Percussion:
+                    case DropdownToVelocity.Percussion:
                         gridClone.velocity = TargetVelocity.Percussion;
                         break;
 
-                    case OptionsMenu.DropdownToVelocity.ChainStart:
+                    case DropdownToVelocity.ChainStart:
                         gridClone.velocity = TargetVelocity.ChainStart;
                         break;
 
-                    case OptionsMenu.DropdownToVelocity.Chain:
+                    case DropdownToVelocity.Chain:
                         gridClone.velocity = TargetVelocity.Chain;
                         break;
 
-                    case OptionsMenu.DropdownToVelocity.Melee:
+                    case DropdownToVelocity.Melee:
                         gridClone.velocity = TargetVelocity.Melee;
                         break;
 
@@ -612,18 +610,26 @@ namespace NotReaper {
 
         }
 
-        public void LoadAudicaFile() {
+        public void LoadAudicaFile(bool loadRecent = false) {
 
-            if (audicaFile != null) return;
+            //if (audicaFile != null) return;
 
             DeleteTargets();
 
-            string[] paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Application.persistentDataPath, "audica", false);
+            if (loadRecent) {
+                audicaFile = AudicaHandler.LoadAudicaFile(PlayerPrefs.GetString("recentFile"));
+                if (audicaFile == null) return;
 
-            audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
+            } else {
+
+                string[] paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Application.persistentDataPath, "audica", false);
+
+                audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
+                PlayerPrefs.SetString("recentFile", paths[0]);
+            }
+
             SetOffset(audicaFile.desc.offset);
 
-            PlayerPrefs.SetString("recentFile", paths[0]);
 
             //Loads all the sounds.
             StartCoroutine(GetAudioClip($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg"));
@@ -651,7 +657,6 @@ namespace NotReaper {
                         var length = Mathf.Ceil(float.Parse(note.GetComponentInChildren<HoldController>().length.text)) / 480;
                         if (note.gridTarget.beatLength != length) {
                             note.gridTarget.SetBeatLength(length);
-                            //Debug.Log(note.beatLength);
                         }
                     }
                 }
@@ -822,6 +827,16 @@ namespace NotReaper {
 
                 }
             }
+        }
+
+
+
+        public void UpdateSongDesc(string songID, string title, int bpm, string songEndEvent = "C#", string mapper = "") {
+            audicaFile.desc.songID = songID;
+            audicaFile.desc.title = title;
+            audicaFile.desc.tempo = bpm;
+            audicaFile.desc.songEndEvent = songEndEvent;
+            audicaFile.desc.mapper = mapper;
         }
 
 
@@ -997,32 +1012,30 @@ namespace NotReaper {
                     time += BeatsToDuration(4f / beatSnap);
                     time = SnapTime(time);
 
-                    //Put in a function
-                    aud.time = time;
-                    previewAud.time = time;
-                    leftSustainAud.time = time;
-                    rightSustainAud.time = time;
+                    SafeSetTime();
                     if (paused) previewAud.Play();
                 }
-            else if (Input.mouseScrollDelta.y > 0.1f) {
-                time -= BeatsToDuration(4f / beatSnap);
-                time = SnapTime(time);
-                if (time < 0) time = 0;
-                aud.time = time;
-                previewAud.time = time;
-                leftSustainAud.time = time;
-                rightSustainAud.time = time;
-                if (paused) previewAud.Play();
-            }
+            else if (Input.mouseScrollDelta.y > 0.1f)
+				{
+					time -= BeatsToDuration(4f / beatSnap);
+					time = SnapTime(time);
+					SafeSetTime();
+					if (paused) previewAud.Play();
+				}
 
-            if (Input.GetKeyDown(KeyCode.Space)) {
+			if (Input.GetKeyDown(KeyCode.Space)) {
                 if (paused) {
                     aud.Play();
-                    metro.StartMetronome();
+                    //metro.StartMetronome();
 
                     previewAud.Pause();
-                    leftSustainAud.Play();
-                    rightSustainAud.Play();
+
+                    if (time < leftSustainAud.clip.length) {
+                        leftSustainAud.Play();
+                        rightSustainAud.Play();
+
+                    }
+
                     paused = false;
                 } else {
                     aud.Pause();
@@ -1052,7 +1065,31 @@ namespace NotReaper {
             bottomTimelineSlider.value = GetPercentagePlayed();
         }
 
-        void OnMouseOver() {
+		private void SafeSetTime() {
+			if (time < 0) time = 0;
+
+			if (time > aud.clip.length)
+			{
+				time = aud.clip.length;
+			}
+			aud.time = time;
+			previewAud.time = time;
+
+			float tempTime = time;
+			if (time > leftSustainAud.clip.length)
+			{
+				tempTime = leftSustainAud.clip.length;
+			}
+			leftSustainAud.time = tempTime;
+
+			if (time > rightSustainAud.clip.length)
+			{
+				tempTime = rightSustainAud.clip.length;
+			}
+			rightSustainAud.time = tempTime;
+		}
+
+		void OnMouseOver() {
             hover = true;
         }
 
@@ -1061,7 +1098,7 @@ namespace NotReaper {
         }
 
         public float GetPercentagePlayed() {
-            if (aud.clip != null && aud.isPlaying)
+            if (aud.clip != null)
                 return (time / aud.clip.length);
 
             else

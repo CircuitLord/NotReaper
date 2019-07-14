@@ -1,4 +1,6 @@
+using NotReaper.Grid;
 using NotReaper.Targets;
+using NotReaper.UserInput;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,17 +9,20 @@ namespace NotReaper.Tools {
 
 	public class PlaceNote : MonoBehaviour {
 
-		Timeline timeline;
+		public Timeline timeline;
 
 		public Transform ghost;
 		public LayerMask notesLayer;
-
-
-		bool hover;
+		public NoteGridSnap noteSnap;
 
 
 		public void TryPlaceNote() {
-			if (!hover) return;
+			if (!EditorInput.isOverGrid) return;
+
+			foreach (GridTarget target in Timeline.importantNotes) {
+				if ((target.transform.position.z == ghost.position.z) && (target.handType == EditorInput.selectedHand)) return;
+			}
+
 			timeline.AddTarget(ghost.position.x, ghost.position.y);
 		}
 
@@ -29,15 +34,7 @@ namespace NotReaper.Tools {
 		}
 
 
-		private void OnMouseEnter() {
-			hover = true;
-			ghost.gameObject.SetActive(true);
-		}
 
-		private void OnMouseExit() {
-			hover = false;
-			ghost.gameObject.SetActive(false);
-		}
 
 		private Target NoteUnderMouse() {
 			RaycastHit hit;

@@ -3,36 +3,34 @@ using System.Collections.Generic;
 using NotReaper.Targets;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using NotReaper.UserInput;
 
 namespace NotReaper.Grid {
 
 
+    public enum SnappingMode { None, Grid, Melee }
+
     public class NoteGridSnap : MonoBehaviour {
 
-        public enum SnappingMode { None, Grid, Melee }
 
-        [SerializeField] private float xSize;
-        [SerializeField] private float ySize;
+        [SerializeField] public float xSize;
+        [SerializeField] public float ySize;
 
-        private Vector2 gridOffset;
-
-        static SnappingMode snapMode = SnappingMode.Grid;
-        bool hover = false;
+        private SnappingMode snapMode = SnappingMode.Grid;
 
         public Transform ghost;
-        public LayerMask notesLayer;
         public GameObject standardGrid;
         public GameObject meleeGrid;
-        public Timeline timeline;
+
+        
 
 
         private void Awake() {
             SetSnappingMode(SnappingMode.Grid);
-            gridOffset = transform.position;
         }
 
         private void Update() {
-            if (hover) {
+            if (EditorInput.isOverGrid) {
                 if (EventSystem.current.IsPointerOverGameObject())
                     return;
 
@@ -43,19 +41,6 @@ namespace NotReaper.Grid {
             }
             HandleKeybinds();
 
-        }
-
-
-        public void TryPlaceNote() {
-            if (!hover) return;
-            timeline.AddTarget(ghost.position.x, ghost.position.y);
-        }
-
-        public void TryRemoveNote() {
-            if (EventSystem.current.IsPointerOverGameObject())
-                return;
-
-            timeline.DeleteTarget(NoteUnderMouse());
         }
 
 
@@ -73,15 +58,25 @@ namespace NotReaper.Grid {
         }
 
 
-        private void OnMouseEnter() {
-            hover = true;
+        public void EnableHoverTarget() {
             ghost.gameObject.SetActive(true);
         }
 
-        private void OnMouseExit() {
-            hover = false;
+        public void DisableHoverTarget() {
             ghost.gameObject.SetActive(false);
         }
+
+        private void OnMouseEnter() {
+            EnableHoverTarget();
+            EditorInput.isOverGrid = true;
+            
+        }
+
+        private void OnMouseExit() {
+            DisableHoverTarget();
+            EditorInput.isOverGrid = false;
+        }
+
 
         public void SetSnappingMode(SnappingMode s) {
             snapMode = s;
