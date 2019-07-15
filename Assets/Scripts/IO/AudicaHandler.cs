@@ -73,10 +73,10 @@ namespace NotReaper.IO {
 				audicaFile.diffs.advanced = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.advanced}.cues"));
 			}
 			if (standard) {
-				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.standard}.cues"));
+				audicaFile.diffs.standard = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.standard}.cues"));
 			}
 			if (easy) {
-				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.easy}.cues"));
+				audicaFile.diffs.easy = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.easy}.cues"));
 			}
 
 			MemoryStream temp = new MemoryStream();

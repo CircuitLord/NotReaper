@@ -3,7 +3,7 @@
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
-		_FadeThreshold("Fade In Distance", Float) = 1
+		_FadeThreshold("Fade In Distance", Float) = 2
 		_Tint("Tint", Color) = (1,1,1,1)
 	}
 		SubShader

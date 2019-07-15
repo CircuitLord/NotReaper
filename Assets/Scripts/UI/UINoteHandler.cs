@@ -107,6 +107,7 @@ namespace NotReaper.UI {
             timeline.SetVelocity(TargetVelocity.Melee);
             soundDropdown.value = (int) DropdownToVelocity.Melee;
             hover.SetBehavior(TargetBehavior.Melee);
+            SelectEitherHand();
             noteGrid.SetSnappingMode(SnappingMode.Melee);
         }
     }

@@ -44,7 +44,7 @@ namespace NotReaper.UI {
 
         public void NewSongDesc() {
 
-            string[] paths = StandaloneFileBrowser.OpenFilePanel("OGG File", Application.persistentDataPath, "ogg", false);
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("OGG File", Application.dataPath, "ogg", false);
             oggPath = paths[0];
 
             isNewSong = true;

@@ -13,8 +13,8 @@ namespace NotReaper.IO {
 		}
 
 		public static void CheckSaveFolderValid() {
-			if (!Directory.Exists($"{Application.persistentDataPath}/saves")) {
-				Directory.CreateDirectory($"{Application.persistentDataPath}/saves");
+			if (!Directory.Exists($"{Application.dataPath}/saves")) {
+				Directory.CreateDirectory($"{Application.dataPath}/saves");
 			}
 		}
 

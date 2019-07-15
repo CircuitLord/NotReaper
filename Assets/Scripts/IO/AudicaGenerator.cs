@@ -63,7 +63,7 @@ namespace NotReaper.IO {
 			File.WriteAllText(Path.Combine(streamAssets, "song.desc"), JsonUtility.ToJson(songDesc, true));
 
 
-			HandleCache.CheckSaveFolderValid();
+			
 
 			/*
 			ZipArchive zip = ZipArchive.Open(Path.Combine(streamAssets, "AudicaTemplate.zip"));
@@ -91,6 +91,8 @@ namespace NotReaper.IO {
 			*/
 		
 		
+			HandleCache.CheckSaveFolderValid();
+
 			System.Diagnostics.Process myProcess = new System.Diagnostics.Process();
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
@@ -106,10 +108,10 @@ namespace NotReaper.IO {
 
 			myProcess.WaitForExit();
 
-			File.Move(Path.Combine(ogg2AudicaFolder, "out.audica"), Path.Combine(Application.persistentDataPath, "saves", songID + ".audica"));
+			File.Move(Path.Combine(ogg2AudicaFolder, "out.audica"), Path.Combine(Application.dataPath, "saves", songID + ".audica"));
 
 
-			return Path.Combine(Application.persistentDataPath, "saves", songID + ".audica");
+			return Path.Combine(Application.dataPath, "saves", songID + ".audica");
 
 
 		}

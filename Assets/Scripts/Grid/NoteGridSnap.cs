@@ -105,9 +105,9 @@ namespace NotReaper.Grid {
                 case SnappingMode.Grid:
                     return GetNearestPointOnGrid(pos);
                 case SnappingMode.Melee:
-                    return new Vector3(Mathf.Sign(pos.x) * 2, Mathf.Sign(pos.y), pos.z);
+                    return new Vector3(Mathf.Sign(pos.x * xSize) * 2, Mathf.Sign(pos.y * ySize), pos.z + 5);
             }
-            return pos;
+            return new Vector3(pos.x, pos.y, pos.z + 5);
         }
 
 
