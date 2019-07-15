@@ -3,6 +3,7 @@ using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.UI;
 using NotReaper.Notifications;
+using NotReaper.Targets;
 
 namespace NotReaper.UI {
 
@@ -54,7 +55,7 @@ namespace NotReaper.UI {
         public void SelectStandard() {
             timeline.SetBehavior(TargetBehavior.Standard);
             timeline.SetVelocity(TargetVelocity.Standard);
-            //soundDropdown.value = (int) DropdownToVelocity.Standard;
+            soundDropdown.value = (int) DropdownToVelocity.Standard;
             hover.SetBehavior(TargetBehavior.Standard);
             noteGrid.SetSnappingMode(SnappingMode.Grid);
             //notification.ShowNotification("STANDARD", "A new note tool was selected, causing a notification to come.", 5);
@@ -64,7 +65,7 @@ namespace NotReaper.UI {
         public void SelectHold() {
             timeline.SetBehavior(TargetBehavior.Hold);
             timeline.SetVelocity(TargetVelocity.Hold);
-            //soundDropdown.value = (int) DropdownToVelocity.Standard;
+            soundDropdown.value = (int) DropdownToVelocity.Standard;
             hover.SetBehavior(TargetBehavior.Hold);
             noteGrid.SetSnappingMode(SnappingMode.Grid);
         }
@@ -88,7 +89,7 @@ namespace NotReaper.UI {
         public void SelectHorizontal() {
             timeline.SetBehavior(TargetBehavior.Horizontal);
             timeline.SetVelocity(TargetVelocity.Horizontal);
-            //soundDropdown.value = (int) DropdownToVelocity.Standard;
+            soundDropdown.value = (int) DropdownToVelocity.Standard;
             hover.SetBehavior(TargetBehavior.Horizontal);
             noteGrid.SetSnappingMode(SnappingMode.Grid);
         }
@@ -96,7 +97,7 @@ namespace NotReaper.UI {
         public void SelectVertical() {
             timeline.SetBehavior(TargetBehavior.Vertical);
             timeline.SetVelocity(TargetVelocity.Vertical);
-            //soundDropdown.value = (int) DropdownToVelocity.Standard;
+            soundDropdown.value = (int) DropdownToVelocity.Standard;
             hover.SetBehavior(TargetBehavior.Vertical);
             noteGrid.SetSnappingMode(SnappingMode.Grid);
         }
@@ -104,7 +105,7 @@ namespace NotReaper.UI {
         public void SelectMelee() {
             timeline.SetBehavior(TargetBehavior.Melee);
             timeline.SetVelocity(TargetVelocity.Melee);
-            //soundDropdown.value = (int) DropdownToVelocity.Melee;
+            soundDropdown.value = (int) DropdownToVelocity.Melee;
             hover.SetBehavior(TargetBehavior.Melee);
             noteGrid.SetSnappingMode(SnappingMode.Melee);
         }

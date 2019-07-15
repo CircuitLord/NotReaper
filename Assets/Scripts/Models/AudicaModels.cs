@@ -49,7 +49,7 @@ namespace NotReaper.Models {
 		public string fxSong = "";
 		public string moggFxSong = "";
 
-		public float tempo = 120;
+		public float tempo = 120.0f;
 		public string songEndEvent = "";
 		public float prerollSeconds = 0;
 		public bool useMidiForCues = false;
@@ -70,7 +70,7 @@ namespace NotReaper.Models {
 		public string sustainSongRight = "song_sustain_r.moggsong";
 		public string sustainSongLeft = "song_sustain_l.moggsong";
 		public string fxSong = "song_extras.moggsong";
-		public float tempo = 128.0f; // bpm
+		public int tempo = 128; // bpm
 		public string songEndEvent = "event:/song_end/song_end_C#";
 		public float prerollSeconds = 0.0f;
 		public bool useMidiForCues = false;
@@ -94,7 +94,7 @@ namespace NotReaper.Models {
 	}
 
 	public class AudicaFile {
-		public SongDesc desc;
+		public SongDesc desc = new SongDesc();
 		public SafeDesc safeDesc = new SafeDesc();
 		public AudioClip song;
 		public DiffsList diffs = new DiffsList();

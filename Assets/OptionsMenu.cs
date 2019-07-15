@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NotReaper;
 using NotReaper.Grid;
 using NotReaper.Models;
+using NotReaper.Targets;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -23,6 +23,7 @@ namespace NotReaper.UserInput {
 
 		//public PlaceNote toolPlaceNote;
 		[SerializeField] public EditorToolkit Tools;
+		[SerializeField] private Timeline timeline;
 
 		[SerializeField] private Dropdown soundDropdown;
 		[SerializeField] private UINoteHandler UINote;
@@ -92,34 +93,66 @@ namespace NotReaper.UserInput {
 			}
 
 
+			if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
+				timeline.TogglePlayback();
+			}
+
+
+
 			if (Input.GetKeyDown(InputManager.selectStandard)) {
+
+				if (selectedTool == EditorTool.Melee) 
+					UINote.SelectLeftHand();
+
+				
 				selectedTool = EditorTool.Standard;
 				standardToggle.isOn = true;
 
 			}
 			if (Input.GetKeyDown(InputManager.selectHold)) {
+				if (selectedTool == EditorTool.Melee) 
+					UINote.SelectLeftHand();
+
+	
+				
 				selectedTool = EditorTool.Hold;
 				holdToggle.isOn = true;
 			}
 			if (Input.GetKeyDown(InputManager.selectHorz)) {
+				if (selectedTool == EditorTool.Melee) 
+					UINote.SelectLeftHand();
+
 				selectedTool = EditorTool.Horizontal;
 				horzToggle.isOn = true;
 			}
 			if (Input.GetKeyDown(InputManager.selectVert)) {
+				if (selectedTool == EditorTool.Melee) 
+					UINote.SelectLeftHand();
+				
+
 				selectedTool = EditorTool.Vertical;
 				vertToggle.isOn = true;
 			}
 			if (Input.GetKeyDown(InputManager.selectChainStart)) {
+				if (selectedTool == EditorTool.Melee) 
+					UINote.SelectLeftHand();
+				
+
 				selectedTool = EditorTool.ChainStart;
 				chainStartToggle.isOn = true;
 			}
 			if (Input.GetKeyDown(InputManager.selectChainNode)) {
+				if (selectedTool == EditorTool.Melee) 
+					UINote.SelectLeftHand();
+
 				selectedTool = EditorTool.ChainNode;
 				chainNodeToggle.isOn = true;
 			}
 			if (Input.GetKeyDown(InputManager.selectMelee)) {
 				selectedTool = EditorTool.Melee;
 				meleeToggle.isOn = true;
+				UINote.SelectEitherHand();
+
 			}
 
 			if (Input.GetKeyDown(InputManager.toggleColor)) {

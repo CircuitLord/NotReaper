@@ -59,6 +59,8 @@ namespace NotReaper {
         private Color bothColor;
         private Color neitherColor;
 
+        public float sustainVolume;
+
         List<GridTarget> notes;
         public static List<GridTarget> orderedNotes;
 
@@ -103,7 +105,7 @@ namespace NotReaper {
         private bool paused = true;
         public bool projectStarted = false;
 
-        private DirectorySecurity securityRules = new DirectorySecurity();
+        //private DirectorySecurity securityRules = new DirectorySecurity();
 
         public Metronome metro;
 
@@ -113,7 +115,7 @@ namespace NotReaper {
             notesTimeline = new List<TimelineTarget>();
             importantNotes = new List<GridTarget>();
 
-            securityRules.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
+            //securityRules.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
 
             gridNotesStatic = gridTransformParent;
             timelineNotesStatic = timelineTransformParent;
@@ -159,6 +161,7 @@ namespace NotReaper {
             // Add to grid
             var gridClone = Instantiate(gridNotePrefab, gridTransformParent);
             gridClone.GetComponentInChildren<HoldController>().length.text = "" + beatLength;
+
             gridClone.transform.localPosition = new Vector3(x, y, beatTime);
 
             gridClone.timelineTarget = timelineClone;
@@ -230,12 +233,11 @@ namespace NotReaper {
 
                             float panPos = (float) (note.transform.position.x / 7.15);
                             if (note.handType == TargetHandType.Left) {
-                                leftSustainAud.volume = 1.0f;
-
-                                //pan to right position
+                                leftSustainAud.volume = sustainVolume;
                                 leftSustainAud.panStereo = panPos;
+
                             } else if (note.handType == TargetHandType.Right) {
-                                rightSustainAud.volume = 1.0f;
+                                rightSustainAud.volume = sustainVolume;
                                 rightSustainAud.panStereo = panPos;
                             }
 
@@ -529,6 +531,15 @@ namespace NotReaper {
 
         }
 
+        public void ExportAndPlay() {
+            Export();
+            string songFolder = PathLogic.GetSongFolder();
+            File.Copy(audicaFile.filepath, Path.Combine(songFolder, audicaFile.desc.songID + ".audica"));
+
+            string newPath = Path.GetFullPath(Path.Combine(songFolder, @"..\..\..\..\"));
+            System.Diagnostics.Process.Start(Path.Combine(newPath, "Audica.exe"));
+        }
+
         public void ExportCueToTemp() {
             Cue[] cues = new Cue[notes.Count];
             for (int i = 0; i < notes.Count; i++) {
@@ -548,7 +559,7 @@ namespace NotReaper {
             string dirpath = Application.persistentDataPath;
 
             if (!System.IO.Directory.Exists(dirpath + "\\TempSave\\")) {
-                System.IO.Directory.CreateDirectory(dirpath + "\\TempSave\\", securityRules);
+                //System.IO.Directory.CreateDirectory(dirpath + "\\TempSave\\", securityRules);
 
             }
 
@@ -589,12 +600,12 @@ namespace NotReaper {
             if (audioFiles.Length > 0) {
                 FileInfo oggFile = new FileInfo(audioFiles[0]);
                 if (!System.IO.Directory.Exists(dirpath + "\\temp\\")) {
-                    System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
+                    //System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
                 } else {
                     DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
                     direct.Delete(true);
 
-                    System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
+                    //System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
                 }
                 oggFile.CopyTo(dirpath + "\\temp\\" + oggFile.Name, true);
 
@@ -610,19 +621,22 @@ namespace NotReaper {
 
         }
 
-        public void LoadAudicaFile(bool loadRecent = false) {
+        public void LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
             //if (audicaFile != null) return;
 
             DeleteTargets();
 
             if (loadRecent) {
-                audicaFile = AudicaHandler.LoadAudicaFile(PlayerPrefs.GetString("recentFile"));
+                audicaFile = AudicaHandler.LoadAudicaFile(PlayerPrefs.GetString("recentFile", null));
                 if (audicaFile == null) return;
+
+            } else if (filePath != null) {
+                audicaFile = AudicaHandler.LoadAudicaFile(filePath);
 
             } else {
 
-                string[] paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Application.persistentDataPath, "audica", false);
+                string[] paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Path.Combine(Application.persistentDataPath), "audica", false);
 
                 audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
                 PlayerPrefs.SetString("recentFile", paths[0]);
@@ -673,12 +687,12 @@ namespace NotReaper {
                 //move zip to temp folder
                 string dirpath = Application.persistentDataPath;
                 if (!System.IO.Directory.Exists(dirpath + "\\temp\\")) {
-                    System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
+                    //System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
                 } else {
                     DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
                     direct.Delete(true);
 
-                    System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
+                    //System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
                 }
 
                 //unzip save into temp
@@ -830,13 +844,15 @@ namespace NotReaper {
         }
 
 
-
-        public void UpdateSongDesc(string songID, string title, int bpm, string songEndEvent = "C#", string mapper = "") {
+        public void UpdateSongDesc(string songID, string title, int bpm, string songEndEvent = "C#", string mapper = "", int offset = 0) {
             audicaFile.desc.songID = songID;
             audicaFile.desc.title = title;
             audicaFile.desc.tempo = bpm;
             audicaFile.desc.songEndEvent = songEndEvent;
             audicaFile.desc.mapper = mapper;
+            audicaFile.desc.offset = offset;
+            SetBPM(bpm);
+            SetOffset(offset);
         }
 
 
@@ -979,7 +995,9 @@ namespace NotReaper {
                     }
 
                     if (note.behavior == TargetBehavior.Hold && note) {
-                        var length = Mathf.Ceil(float.Parse(note.GetComponentInChildren<HoldController>().length.text)) / 480;
+                        float temp = 480;
+                        float.TryParse(note.GetComponentInChildren<HoldController>().length.text, out temp);
+                        var length = Mathf.Ceil(temp) / 480;
                         if (note.gridTarget.beatLength != length) {
                             note.gridTarget.SetBeatLength(length);
                             //Debug.Log(note.beatLength);
@@ -1015,40 +1033,15 @@ namespace NotReaper {
                     SafeSetTime();
                     if (paused) previewAud.Play();
                 }
-            else if (Input.mouseScrollDelta.y > 0.1f)
-				{
-					time -= BeatsToDuration(4f / beatSnap);
-					time = SnapTime(time);
-					SafeSetTime();
-					if (paused) previewAud.Play();
-				}
+            else if (Input.mouseScrollDelta.y > 0.1f) {
+                time -= BeatsToDuration(4f / beatSnap);
+                time = SnapTime(time);
+                SafeSetTime();
+                if (paused) previewAud.Play();
+            }
 
-			if (Input.GetKeyDown(KeyCode.Space)) {
-                if (paused) {
-                    aud.Play();
-                    //metro.StartMetronome();
+            if (Input.GetKeyDown(KeyCode.Space)) {
 
-                    previewAud.Pause();
-
-                    if (time < leftSustainAud.clip.length) {
-                        leftSustainAud.Play();
-                        rightSustainAud.Play();
-
-                    }
-
-                    paused = false;
-                } else {
-                    aud.Pause();
-                    leftSustainAud.Pause();
-                    rightSustainAud.Pause();
-                    paused = true;
-
-                    //Uncommented
-                    //time = SnapTime(time);
-                    if (time < 0) time = 0;
-                    if (time > aud.clip.length) time = aud.clip.length;
-
-                }
             }
 
             SetBeatTime(time);
@@ -1065,31 +1058,57 @@ namespace NotReaper {
             bottomTimelineSlider.value = GetPercentagePlayed();
         }
 
-		private void SafeSetTime() {
-			if (time < 0) time = 0;
 
-			if (time > aud.clip.length)
-			{
-				time = aud.clip.length;
-			}
-			aud.time = time;
-			previewAud.time = time;
+        public void TogglePlayback() {
+            if (paused) {
+                aud.Play();
+                //metro.StartMetronome();
 
-			float tempTime = time;
-			if (time > leftSustainAud.clip.length)
-			{
-				tempTime = leftSustainAud.clip.length;
-			}
-			leftSustainAud.time = tempTime;
+                previewAud.Pause();
 
-			if (time > rightSustainAud.clip.length)
-			{
-				tempTime = rightSustainAud.clip.length;
-			}
-			rightSustainAud.time = tempTime;
-		}
+                if (time < leftSustainAud.clip.length) {
+                    leftSustainAud.Play();
+                    rightSustainAud.Play();
 
-		void OnMouseOver() {
+                }
+
+                paused = false;
+            } else {
+                aud.Pause();
+                leftSustainAud.Pause();
+                rightSustainAud.Pause();
+                paused = true;
+
+                //Uncommented
+                //time = SnapTime(time);
+                if (time < 0) time = 0;
+                if (time > aud.clip.length) time = aud.clip.length;
+
+            }
+        }
+
+        private void SafeSetTime() {
+            if (time < 0) time = 0;
+
+            if (time > aud.clip.length) {
+                time = aud.clip.length;
+            }
+            aud.time = time;
+            previewAud.time = time;
+
+            float tempTime = time;
+            if (time > leftSustainAud.clip.length) {
+                tempTime = leftSustainAud.clip.length;
+            }
+            leftSustainAud.time = tempTime;
+
+            if (time > rightSustainAud.clip.length) {
+                tempTime = rightSustainAud.clip.length;
+            }
+            rightSustainAud.time = tempTime;
+        }
+
+        void OnMouseOver() {
             hover = true;
         }
 

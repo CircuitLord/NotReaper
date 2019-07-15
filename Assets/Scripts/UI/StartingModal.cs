@@ -14,18 +14,18 @@ namespace NotReaper.UI {
         public Timeline timeline;
 
         public TextMeshProUGUI recentText;
+        public SongDescModal songDescModal;
 
         void Start() {
             EditorInput.inUI = true;
+            recentText.text = "OPEN RECENT: " + PlayerPrefs.GetString("recentFile", "none");
             startingModal.SetActive(true);
-            recentText.text = "OPEN RECENT: coming soon";
         }
 
         public void Deactivate() {
-            startingModal.SetActive(false);
             EditorInput.inUI = false;
+            startingModal.SetActive(false);
         }
-
 
 
         public void LoadExistingAudica() {
@@ -34,12 +34,12 @@ namespace NotReaper.UI {
         }
 
         public void NewAudica() {
-            
             Deactivate();
+            songDescModal.NewSongDesc();
         }
 
         public void LoadRecentAudica() {
-
+            timeline.LoadAudicaFile(true);
             Deactivate();
         }
 

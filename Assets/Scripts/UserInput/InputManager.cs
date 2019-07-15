@@ -26,7 +26,10 @@ namespace NotReaper.UserInput {
 		public static KeyCode selectSoundChainStart { get; set; }
 		public static KeyCode selectSoundChainNode { get; set; }
 		public static KeyCode selectSoundMelee { get; set; }
+		
 		public static KeyCode selectTool { get; set; }
+
+		public static KeyCode timelineTogglePlay { get; set; }
 
 
 		public static void LoadHotkeys() {
@@ -48,6 +51,8 @@ namespace NotReaper.UserInput {
 			selectSoundMelee = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectSoundMelee", "Y"));
 
 			selectTool = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectTool", "F"));
+			timelineTogglePlay = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("timelineTogglePlay", "Space"));
+			
 		}
 
 	}

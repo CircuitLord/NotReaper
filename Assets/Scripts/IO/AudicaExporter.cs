@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Ionic.Zip;
 using Newtonsoft.Json;
 using NotReaper.Models;
@@ -13,6 +14,7 @@ namespace NotReaper.IO {
 
 	public class AudicaExporter {
 
+		
 		public static void ExportToAudicaFile(AudicaFile audicaFile) {
 
 			if (!File.Exists(audicaFile.filepath)) {
@@ -20,6 +22,7 @@ namespace NotReaper.IO {
 				return;
 			}
 
+			Encoding encoding = Encoding.GetEncoding(437);
 
 			using(var archive = ZipArchive.Open(audicaFile.filepath)) {
 
@@ -40,16 +43,21 @@ namespace NotReaper.IO {
 					File.WriteAllText($"{Application.dataPath}/.cache/easy-new.cues", CuesToJson(audicaFile.diffs.easy));
 				}
 
+				File.WriteAllText($"{Application.dataPath}/.cache/song-new.desc", JsonUtility.ToJson(audicaFile.desc));
+
 				foreach (ZipArchiveEntry entry in archive.Entries) {
 
 					if (entry.ToString() == "expert.cues") {
 						archive.RemoveEntry(entry);
-						break;
+						
+					} else if (entry.ToString() == "song.desc") {
+						archive.RemoveEntry(entry);
 					}
 
 				}
 
 				archive.AddEntry("expert.cues", $"{Application.dataPath}/.cache/expert-new.cues");
+				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/song-new.desc");
 				archive.SaveTo(audicaFile.filepath + ".temp", SharpCompress.Common.CompressionType.None);
 				archive.Dispose();
 

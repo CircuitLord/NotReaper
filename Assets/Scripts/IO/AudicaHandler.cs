@@ -15,6 +15,8 @@ namespace NotReaper.IO {
 
 			AudicaFile audicaFile = new AudicaFile();
 
+			
+
 			ZipFile audicaZip = ZipFile.Read(path);
 
 			string appPath = Application.dataPath;
@@ -31,24 +33,8 @@ namespace NotReaper.IO {
 					entry.Extract(ms);
 					string tempDesc = Encoding.UTF8.GetString(ms.ToArray());
 
-					audicaFile.desc = JsonUtility.FromJson<SongDesc>(tempDesc);
-					audicaFile.safeDesc.songID = audicaFile.desc.songID;
-					audicaFile.safeDesc.moggSong = audicaFile.desc.moggSong;
-					audicaFile.safeDesc.title = audicaFile.desc.title;
-					audicaFile.safeDesc.artist = audicaFile.desc.artist;
-					audicaFile.safeDesc.midiFile = audicaFile.desc.midiFile;
-					audicaFile.safeDesc.fusionSpatialized = audicaFile.desc.fusionSpatialized;
-					audicaFile.safeDesc.fusionUnspatialized = audicaFile.desc.fusionUnspatialized;
-					audicaFile.safeDesc.sustainSongRight = audicaFile.desc.sustainSongRight;
-					audicaFile.safeDesc.sustainSongLeft = audicaFile.desc.sustainSongLeft;
-					audicaFile.safeDesc.fxSong = audicaFile.desc.fxSong;
-					audicaFile.safeDesc.tempo = audicaFile.desc.tempo;
-					audicaFile.safeDesc.songEndEvent = audicaFile.desc.songEndEvent;
-					audicaFile.safeDesc.prerollSeconds = audicaFile.desc.prerollSeconds;
-					audicaFile.safeDesc.useMidiForCues = audicaFile.desc.useMidiForCues;
-					audicaFile.safeDesc.hidden = audicaFile.desc.hidden;
-					audicaFile.safeDesc.offset = audicaFile.desc.offset;
-					audicaFile.safeDesc.mapper = audicaFile.desc.mapper;
+					JsonUtility.FromJsonOverwrite(tempDesc, audicaFile.desc);
+
 
 					ms.Dispose();
 					continue;

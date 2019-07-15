@@ -1,0 +1,18 @@
+{
+    "songID": "templatesongv2",
+    "moggSong": "song.moggsong",
+    "title": "TemplateSong",
+    "artist": "AMG",
+    "midiFile": "song.mid",
+    "fusionSpatialized": "fusion/guns/default/drums_default_spatial.fusion",
+    "fusionUnspatialized": "fusion/guns/default/drums_default_sub.fusion",
+    "sustainSongRight": "song_sustain_r.moggsong",
+    "sustainSongLeft": "song_sustain_l.moggsong",
+    "fxSong": "song_extras.moggsong",
+    "tempo": 128.0,
+    "songEndEvent": "event:/song_end/song_end_C#",
+    "prerollSeconds": 0.5,
+    "useMidiForCues": false,
+    "hidden": false,
+    "mapper": ""
+}
