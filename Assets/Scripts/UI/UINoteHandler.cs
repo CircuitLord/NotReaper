@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using NotReaper.Notifications;
 using NotReaper.Targets;
+using NotReaper.UserInput;
 
 namespace NotReaper.UI {
 
@@ -53,6 +54,7 @@ namespace NotReaper.UI {
 
 
         public void SelectStandard() {
+            EditorInput.selectedTool = EditorTool.Standard;
             timeline.SetBehavior(TargetBehavior.Standard);
             timeline.SetVelocity(TargetVelocity.Standard);
             soundDropdown.value = (int) DropdownToVelocity.Standard;
@@ -63,6 +65,7 @@ namespace NotReaper.UI {
         }
 
         public void SelectHold() {
+            EditorInput.selectedTool = EditorTool.Hold;
             timeline.SetBehavior(TargetBehavior.Hold);
             timeline.SetVelocity(TargetVelocity.Hold);
             soundDropdown.value = (int) DropdownToVelocity.Standard;
@@ -71,6 +74,7 @@ namespace NotReaper.UI {
         }
 
         public void SelectChainNode() {
+            EditorInput.selectedTool = EditorTool.ChainNode;
             timeline.SetBehavior(TargetBehavior.Chain);
             timeline.SetVelocity(TargetVelocity.Chain);
             soundDropdown.value = (int) DropdownToVelocity.Chain;
@@ -79,6 +83,7 @@ namespace NotReaper.UI {
         }
 
         public void SelectChainStart() {
+            EditorInput.selectedTool = EditorTool.ChainStart;
             timeline.SetBehavior(TargetBehavior.ChainStart);
             timeline.SetVelocity(TargetVelocity.ChainStart);
             soundDropdown.value = (int) DropdownToVelocity.ChainStart;
@@ -87,6 +92,7 @@ namespace NotReaper.UI {
         }
 
         public void SelectHorizontal() {
+            EditorInput.selectedTool = EditorTool.Horizontal;
             timeline.SetBehavior(TargetBehavior.Horizontal);
             timeline.SetVelocity(TargetVelocity.Horizontal);
             soundDropdown.value = (int) DropdownToVelocity.Standard;
@@ -95,6 +101,7 @@ namespace NotReaper.UI {
         }
 
         public void SelectVertical() {
+            EditorInput.selectedTool = EditorTool.Vertical;
             timeline.SetBehavior(TargetBehavior.Vertical);
             timeline.SetVelocity(TargetVelocity.Vertical);
             soundDropdown.value = (int) DropdownToVelocity.Standard;
@@ -103,6 +110,7 @@ namespace NotReaper.UI {
         }
 
         public void SelectMelee() {
+            EditorInput.selectedTool = EditorTool.Melee;
             timeline.SetBehavior(TargetBehavior.Melee);
             timeline.SetVelocity(TargetVelocity.Melee);
             soundDropdown.value = (int) DropdownToVelocity.Melee;

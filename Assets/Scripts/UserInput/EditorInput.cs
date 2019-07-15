@@ -149,6 +149,7 @@ namespace NotReaper.UserInput {
 				chainNodeToggle.isOn = true;
 			}
 			if (Input.GetKeyDown(InputManager.selectMelee)) {
+				selectedHand = TargetHandType.Either;
 				selectedTool = EditorTool.Melee;
 				meleeToggle.isOn = true;
 				UINote.SelectEitherHand();

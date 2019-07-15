@@ -20,7 +20,7 @@ namespace NotReaper.Tools {
 			if (!EditorInput.isOverGrid) return;
 
 			foreach (GridTarget target in Timeline.importantNotes) {
-				if ((target.transform.position.z == ghost.position.z) && (target.handType == EditorInput.selectedHand)) return;
+				if ((target.transform.position.z == ghost.position.z) && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 
 			timeline.AddTarget(ghost.position.x, ghost.position.y);
