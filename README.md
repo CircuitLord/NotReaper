@@ -8,8 +8,16 @@ Both previous versions stopped development, so I began work on NotReaper, which 
 
 If none of that means anything to you, NotReaper is a custom map and community map builder for the VR ryhthm game, Audica.
 
-It's currently still in active development, and I will be releasing the first version soon.
+Tutorial:
 
-##Features and Planned Features
-Direct loading of Audica files.
+
+It's currently still in active development.
+
+[![tutorial](https://img.youtube.com/vi/0Y7vxmYdX-I/0.jpg)](https://www.youtube.com/watch?v=0Y7vxmYdX-I)
+
+
+Finding NotReaper useful? I'm glad! :) If you really want to, you can donate here:
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VEEKJW2CSJVZG&currency_code=USD&source=url)
+
 
