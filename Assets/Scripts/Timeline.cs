@@ -155,8 +155,21 @@ namespace NotReaper {
 
         public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false) {
             // Add to timeline
+
+            float yOffset = 0;
+            float zOffset = 0;
+
+            //Calculate the note offset for visual purpose on the timeline.
+            if (handType == TargetHandType.Left) {
+                yOffset = 0.1f;
+                zOffset = -0.2f;
+            } else if (handType == TargetHandType.Right) {
+                yOffset = -0.1f;
+                zOffset = -0.1f;
+            }
+
             var timelineClone = Instantiate(timelineNotePrefab, timelineTransformParent);
-            timelineClone.transform.localPosition = new Vector3(beatTime, 0, 0);
+            timelineClone.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
 
             // Add to grid
             var gridClone = Instantiate(gridNotePrefab, gridTransformParent);
