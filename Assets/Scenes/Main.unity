@@ -96,7 +96,6 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
-    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -2369,7 +2368,6 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8621,11 +8619,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-<<<<<<< HEAD
   m_AnchoredPosition: {x: 90, y: 28.375}
-=======
-  m_AnchoredPosition: {x: 90.00008, y: 28.349976}
->>>>>>> 4aee123353afa3c81528e1f51be62ba0be756970
   m_SizeDelta: {x: 116.599976, y: 34.700012}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &448654834
@@ -9012,11 +9006,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-<<<<<<< HEAD
   m_AnchoredPosition: {x: 0, y: -0.00002861023}
-=======
-  m_AnchoredPosition: {x: 0, y: -0.000017166138}
->>>>>>> 4aee123353afa3c81528e1f51be62ba0be756970
   m_SizeDelta: {x: 0, y: 28}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &477935557
@@ -9335,7 +9325,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -9688,7 +9677,6 @@ LineRenderer:
   m_MotionVectors: 0
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
-  m_RayTracingMode: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -12157,7 +12145,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -5.5500164, y: 0}
+  m_AnchoredPosition: {x: -5.5500145, y: 0}
   m_SizeDelta: {x: 11.100003, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &684105163
@@ -13688,9 +13676,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780644642}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 9
   m_Type: 2
-  m_Shape: 0
   m_Color: {r: 1, g: 0.41711235, b: 0, a: 1}
   m_Intensity: 5.5
   m_Range: 43.39
@@ -14049,9 +14036,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 800568916}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 9
   m_Type: 1
-  m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1.38
   m_Range: 10
@@ -18780,8 +18766,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1454869375}
   m_HandleRect: {fileID: 1454869374}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.8133332
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -18880,7 +18866,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -23062,11 +23047,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-<<<<<<< HEAD
   m_AnchoredPosition: {x: 231.31247, y: 25.125}
-=======
-  m_AnchoredPosition: {x: 231.3, y: 25.099976}
->>>>>>> 4aee123353afa3c81528e1f51be62ba0be756970
   m_SizeDelta: {x: 120, y: 394.3}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1308234263
@@ -27717,7 +27698,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -28360,7 +28340,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -28428,7 +28407,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -5.5500164, y: 0}
+  m_AnchoredPosition: {x: -5.5500145, y: 0}
   m_SizeDelta: {x: 11.100003, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1589055466
@@ -28681,7 +28660,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -29763,7 +29741,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -317.99997, y: 470.625}
+  m_AnchoredPosition: {x: -318, y: 470.625}
   m_SizeDelta: {x: -400.39993, y: -103.89606}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1663611513
@@ -31278,9 +31256,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1740701986}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 9
   m_Type: 1
-  m_Shape: 0
   m_Color: {r: 0.9716981, g: 0.883995, b: 0.66460484, a: 1}
   m_Intensity: 0.38
   m_Range: 10
@@ -32788,7 +32765,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -32856,7 +32832,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -5.5500164, y: 0}
+  m_AnchoredPosition: {x: -5.5500145, y: 0}
   m_SizeDelta: {x: 11.100003, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1812255230
@@ -33108,9 +33084,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835979866}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 9
   m_Type: 2
-  m_Shape: 0
   m_Color: {r: 0.9433962, g: 0.9173241, b: 0.6719473, a: 1}
   m_Intensity: 4.5
   m_Range: 25.1
@@ -35350,7 +35325,7 @@ Transform:
   m_GameObject: {fileID: 1969859919}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 12, y: 7, z: 1}
+  m_LocalScale: {x: 12, y: 7, z: 2}
   m_Children: []
   m_Father: {fileID: 484068141}
   m_RootOrder: 5
@@ -37736,9 +37711,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2118744310}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 9
   m_Type: 2
-  m_Shape: 0
   m_Color: {r: 0.06132078, g: 0.51501554, b: 1, a: 1}
   m_Intensity: 7.4
   m_Range: 27.79

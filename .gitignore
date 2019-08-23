@@ -9,7 +9,7 @@ Assets/AssetStoreTools*
 .vs/
 
 CACHE/
-Assets/ModernUIPack/
+#Assets/ModernUIPack/
 Assets/TextMesh Pro/
 Assets/Lomenu UI/
 Assets/.cache/
