@@ -65,8 +65,10 @@ namespace NotReaper {
         public static List<GridTarget> orderedNotes;
 
         //Contains the notes that the player can actually see.
+        public static List<GridTarget> selectableNotes;
+
         //TODO: Use this to replace the huge calls to noteList
-        public static List<GridTarget> importantNotes;
+        public static List<GridTarget> loadedNotes;
         List<TimelineTarget> notesTimeline;
         SongDescyay songDesc;
 
@@ -113,7 +115,8 @@ namespace NotReaper {
             notes = new List<GridTarget>();
             orderedNotes = new List<GridTarget>();
             notesTimeline = new List<TimelineTarget>();
-            importantNotes = new List<GridTarget>();
+            selectableNotes = new List<GridTarget>();
+            loadedNotes = new List<GridTarget>();
 
             //securityRules.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
 
@@ -237,7 +240,7 @@ namespace NotReaper {
         }
 
         private void UpdateSustains() {
-            foreach (var note in orderedNotes) {
+            foreach (var note in loadedNotes) {
                 if (note.behavior == TargetBehavior.Hold) {
                     if ((note.transform.position.z < 0) && (note.transform.position.z + note.beatLength > 0)) {
                         var particles = note.GetComponentInChildren<ParticleSystem>();
@@ -284,8 +287,8 @@ namespace NotReaper {
 
         private void UpdateChords() {
             //TODO: ORDERED
-            if (importantNotes.Count > 0)
-                foreach (var note in importantNotes) {
+            if (loadedNotes.Count > 0)
+                foreach (var note in loadedNotes) {
                     if (note && (Mathf.Round(note.transform.position.z) == 0 && note.behavior != TargetBehavior.ChainStart && note.behavior != TargetBehavior.Chain && note.behavior != TargetBehavior.HoldEnd)) {
                         LineRenderer lr = note.GetComponent<LineRenderer>();
 
@@ -298,7 +301,7 @@ namespace NotReaper {
                         lr.SetPositions(positionList.ToArray());
                         lr.positionCount = 0;
                         //TODO: Ordered
-                        foreach (var note2 in importantNotes) {
+                        foreach (var note2 in loadedNotes) {
                             if (note.transform.position.z == note2.transform.position.z && note != note2) {
                                 var positionList2 = new List<Vector3>();
 
@@ -389,20 +392,28 @@ namespace NotReaper {
         }
 
 
-        public static void AddImportantNote(GridTarget target) {
-            importantNotes.Add(target);
+        public static void AddSelectableNote(GridTarget target) {
+            selectableNotes.Add(target);
         }
 
-        public static void RemoveImportantNote(GridTarget target) {
-            importantNotes.Remove(target);
+        public static void RemoveSelectableNote(GridTarget target) {
+            selectableNotes.Remove(target);
         }
 
+        public static void AddLoadedNote(GridTarget target) {
+            loadedNotes.Add(target);
+        }
+
+        public static void RemoveLoadedNote(GridTarget target) {
+            loadedNotes.Remove(target);
+        }
 
         public void DeleteTarget(Target target) {
             if (target == null) return;
             notes.Remove(target.gridTarget);
             orderedNotes.Remove(target.gridTarget);
-            importantNotes.Remove(target.gridTarget);
+            selectableNotes.Remove(target.gridTarget);
+            loadedNotes.Remove(target.gridTarget);
             var tl = target.timelineTarget.gameObject;
             var g = target.gridTarget.gameObject;
             Destroy(tl);
@@ -431,7 +442,8 @@ namespace NotReaper {
             notes = new List<GridTarget>();
             orderedNotes = new List<GridTarget>();
             notesTimeline = new List<TimelineTarget>();
-            importantNotes = new List<GridTarget>();
+            selectableNotes = new List<GridTarget>();
+            loadedNotes = new List<GridTarget>();
 
             var liner = gridTransformParent.gameObject.GetComponentInChildren<LineRenderer>();
             if (liner) {
@@ -1067,7 +1079,6 @@ namespace NotReaper {
             SetCurrentTime();
             SetCurrentTick();
 
-            //My stuff
             bottomTimelineSlider.value = GetPercentagePlayed();
         }
 

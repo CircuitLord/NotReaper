@@ -29,7 +29,7 @@ namespace NotReaper.Grid.SelectTool {
 			if (Input.GetKeyUp(KeyCode.F)) {
 
 
-				foreach (GridTarget target in Timeline.importantNotes) {
+				foreach (GridTarget target in Timeline.selectableNotes) {
 
 					if (target == null) return;
 

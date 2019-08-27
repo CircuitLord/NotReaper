@@ -7,12 +7,12 @@ using UnityEngine;
 namespace NotReaper.Grid {
 
     //Supplies the timeline with the notes the user can see.
-    public class ImportantNotes : MonoBehaviour {
+    public class SelectableNotes : MonoBehaviour {
 
         private void OnTriggerEnter(Collider other) {
             GridTarget target = other.GetComponentInChildren<GridTarget>();
             if (target) {
-                Timeline.AddImportantNote(target);
+                Timeline.AddSelectableNote(target);
             }
 
 
@@ -21,7 +21,7 @@ namespace NotReaper.Grid {
         private void OnTriggerExit(Collider other) {
             GridTarget target = other.GetComponentInChildren<GridTarget>();
             if (target) {
-                Timeline.RemoveImportantNote(target);
+                Timeline.RemoveSelectableNote(target);
             }
         }
 
