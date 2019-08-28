@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,8 +9,10 @@ using System.Security.Principal;
 using Michsky.UI.ModernUIPack;
 using NotReaper.Grid;
 using NotReaper.IO;
+using NotReaper.Managers;
 using NotReaper.Models;
 using NotReaper.Targets;
+using NotReaper.Tools;
 using NotReaper.UI;
 using SFB;
 using TMPro;
@@ -111,6 +113,10 @@ namespace NotReaper {
 
         public Metronome metro;
 
+
+        //Tools
+        [SerializeField] public EditorToolkit Tools;
+
         private void Start() {
             notes = new List<GridTarget>();
             orderedNotes = new List<GridTarget>();
@@ -151,10 +157,36 @@ namespace NotReaper {
             else
                 AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, 1, cue.velocity, cue.handType, cue.behavior, false);
         }
+        
 
+        //Use when adding a singular target to the project (from the user)
         public void AddTarget(float x, float y) {
             AddTarget(x, y, BeatTime(), 1, TargetVelocity.Standard, selectedHandType, selectedBehaviour, true);
+
+            //Add to undo redo manager.
+            Action action = new Action();
+            action.type = ActionType.AddNote;
+            action.affectedTargets.Add(notes.Last());
+
+            Tools.undoRedoManager.AddAction(action);
+            
         }
+
+        //Use for adding a target from redo/undo
+        public void AddTarget(GridTarget target, bool genUndoAction) {
+            AddTarget(target.oldRedoPosition.x, target.oldRedoPosition.y, target.oldRedoPosition.z, target.beatLength, target.velocity, target.handType, target.behavior, true);
+
+            if (genUndoAction) {
+                Action action = new Action();
+                action.type = ActionType.AddNote;
+                action.affectedTargets.Add(notes.Last());
+
+                Tools.undoRedoManager.AddAction(action, false);
+            }
+
+        }
+
+        //TODO: New function for add target to add multipule notes at once, and combine them into one action for the undo redo manager
 
         public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false) {
             // Add to timeline
@@ -237,6 +269,11 @@ namespace NotReaper {
 
             UpdateTrail();
             UpdateChainConnectors();
+
+
+
+
+
         }
 
         private void UpdateSustains() {
@@ -406,6 +443,21 @@ namespace NotReaper {
 
         public static void RemoveLoadedNote(GridTarget target) {
             loadedNotes.Remove(target);
+        }
+
+        public void DeleteTarget(Target target, bool genUndoAction) {
+            if (target.gridTarget != null) {
+                target.gridTarget.oldRedoPosition = target.gridTarget.transform.localPosition;
+            }
+            DeleteTarget(target);
+
+            if (genUndoAction) {
+                Action action = new Action();
+                action.affectedTargets.Add(target.gridTarget);
+                action.type = ActionType.RemoveNote;
+                Tools.undoRedoManager.AddAction(action);
+            }
+
         }
 
         public void DeleteTarget(Target target) {
@@ -621,7 +673,7 @@ namespace NotReaper {
             songDesc = new SongDescyay();
 
             //locate and copy ogg file to temp folder (used to save the project later)
-            var audioFiles = StandaloneFileBrowser.OpenFilePanel("Import .ogg file", System.Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "ogg", false);
+            var audioFiles = StandaloneFileBrowser.OpenFilePanel("Import .ogg file", System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyMusic), "ogg", false);
             if (audioFiles.Length > 0) {
                 FileInfo oggFile = new FileInfo(audioFiles[0]);
                 if (!System.IO.Directory.Exists(dirpath + "\\temp\\")) {

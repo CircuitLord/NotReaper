@@ -30,7 +30,7 @@ namespace NotReaper.Tools {
 			if (EventSystem.current.IsPointerOverGameObject())
 				return;
 
-			timeline.DeleteTarget(NoteUnderMouse());
+			timeline.DeleteTarget(NoteUnderMouse(), true);
 		}
 
 

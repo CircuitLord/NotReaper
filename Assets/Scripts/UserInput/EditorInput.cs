@@ -28,6 +28,8 @@ namespace NotReaper.UserInput {
 		[SerializeField] private Dropdown soundDropdown;
 		[SerializeField] private UINoteHandler UINote;
 
+		
+
 
 
 
@@ -48,9 +50,27 @@ namespace NotReaper.UserInput {
 			standardToggle.isOn = true;
 		}
 
+		bool isCTRLDown;
+		bool isShiftDown;
+
 		private void Update() {
 
 			if (inUI) return;
+
+			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
+				isCTRLDown = true;
+			} else {
+				isCTRLDown = true;
+			}
+
+			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
+				isShiftDown = true;
+			} else {
+				isShiftDown = false;
+			}
+
+
+
 			
 
 			if (Input.GetMouseButtonDown(0)) {
@@ -178,21 +198,33 @@ namespace NotReaper.UserInput {
 			if (Input.GetKeyDown(InputManager.selectSoundKick)) {
 				soundDropdown.value = 0;
 			}
-			if (Input.GetKeyDown(InputManager.selectSoundSnare)) {
+			else if (Input.GetKeyDown(InputManager.selectSoundSnare)) {
 				soundDropdown.value = 1;
 			}
-			if (Input.GetKeyDown(InputManager.selectSoundPercussion)) {
+			else if (Input.GetKeyDown(InputManager.selectSoundPercussion)) {
 				soundDropdown.value = 2;
 			}
-			if (Input.GetKeyDown(InputManager.selectSoundChainStart)) {
+			else if (Input.GetKeyDown(InputManager.selectSoundChainStart)) {
 				soundDropdown.value = 3;
 			}
-			if (Input.GetKeyDown(InputManager.selectSoundChainNode)) {
+			else if (Input.GetKeyDown(InputManager.selectSoundChainNode)) {
 				soundDropdown.value = 4;
 			}
-			if (Input.GetKeyDown(InputManager.selectSoundMelee)) {
+			else if (Input.GetKeyDown(InputManager.selectSoundMelee)) {
 				soundDropdown.value = 5;
 			}
+
+
+			if (!isShiftDown && isCTRLDown && Input.GetKeyDown(InputManager.undo)) {
+				Tools.undoRedoManager.Undo();
+				Debug.Log("Undoing...");
+			}
+
+			if (isShiftDown && isCTRLDown && Input.GetKeyDown(InputManager.redo)) {
+				Tools.undoRedoManager.Redo();
+				Debug.Log("Redoing...");
+			}
+
 		}
 
 	}

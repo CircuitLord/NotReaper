@@ -12,5 +12,7 @@ namespace NotReaper.Targets {
         public TargetVelocity velocity;
 
         public List<GridTarget> chainedNotes;
+
+        public UnityEngine.Vector3 oldRedoPosition;
     }
 }

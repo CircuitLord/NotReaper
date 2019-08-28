@@ -31,6 +31,10 @@ namespace NotReaper.UserInput {
 
 		public static KeyCode timelineTogglePlay { get; set; }
 
+		public static KeyCode undo { get; set; } = KeyCode.Z;
+
+		public static KeyCode redo { get; set; } = KeyCode.Z;
+
 
 		public static void LoadHotkeys() {
 			selectStandard = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectStandard", "Alpha1"));
