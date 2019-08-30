@@ -121,6 +121,8 @@ namespace NotReaper.Targets {
                 if (beatLength >= 1) {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
+                    beatLength = beatLength / 480;
+                    Debug.Log("setting sustain length to: " + beatLength / 0.7f);
                     l.SetPosition(2, new Vector3(beatLength / 0.7f, sustainDirection, 0.0f));
                 } else {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));

@@ -174,7 +174,7 @@ namespace NotReaper {
 
         //Use for adding a target from redo/undo
         public void AddTarget(GridTarget target, bool genUndoAction) {
-            AddTarget(target.oldRedoPosition.x, target.oldRedoPosition.y, target.oldRedoPosition.z, target.beatLength, target.velocity, target.handType, target.behavior, true);
+            AddTarget(target.oldRedoPosition.x, target.oldRedoPosition.y, target.oldRedoPosition.z, target.beatLength, target.velocity, target.handType, target.behavior, false);
 
             if (genUndoAction) {
                 Action action = new Action();
@@ -208,7 +208,13 @@ namespace NotReaper {
 
             // Add to grid
             var gridClone = Instantiate(gridNotePrefab, gridTransformParent);
-            gridClone.GetComponentInChildren<HoldController>().length.text = "" + beatLength;
+
+            if (velocity == TargetVelocity.Hold && beatLength == 1f) {
+                //beatLength = 480;
+            }
+
+
+            gridClone.GetComponentInChildren<HoldTargetManager>().sustainLength = beatLength;
 
             gridClone.transform.localPosition = new Vector3(x, y, beatTime);
 
@@ -257,7 +263,7 @@ namespace NotReaper {
             gridClone.SetBehavior(behavior);
 
             if (gridClone.behavior == TargetBehavior.Hold)
-                gridClone.SetBeatLength(beatLength);
+                 gridClone.SetBeatLength(beatLength);
 
             else
                 gridClone.SetBeatLength(0.25f);
@@ -732,6 +738,7 @@ namespace NotReaper {
             }
 
             if (orderedNotes.Count > 0) {
+
                 foreach (var note in orderedNotes) {
 
                     if (note.behavior == TargetBehavior.ChainStart && note) {
@@ -745,8 +752,9 @@ namespace NotReaper {
                     }
 
                     if (note.behavior == TargetBehavior.Hold && note) {
-                        var length = Mathf.Ceil(float.Parse(note.GetComponentInChildren<HoldController>().length.text)) / 480;
+                        var length = Mathf.Ceil(note.GetComponentInChildren<HoldTargetManager>().sustainLength);
                         if (note.gridTarget.beatLength != length) {
+
                             note.gridTarget.SetBeatLength(length);
                         }
                     }
@@ -1076,7 +1084,7 @@ namespace NotReaper {
                         float.TryParse(note.GetComponentInChildren<HoldController>().length.text, out temp);
                         var length = Mathf.Ceil(temp) / 480;
                         if (note.gridTarget.beatLength != length) {
-                            note.gridTarget.SetBeatLength(length);
+                            //note.gridTarget.SetBeatLength(length);
                             //Debug.Log(note.beatLength);
                         }
                     }
@@ -1099,17 +1107,15 @@ namespace NotReaper {
                     }
                 }
             }
-            if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
+            //if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
 
-                //Fixed the timeline scroll direction.
+            if (Input.mouseScrollDelta.y < -0.1f) {
+                time += BeatsToDuration(4f / beatSnap);
+                time = SnapTime(time);
 
-                if (Input.mouseScrollDelta.y < -0.1f) {
-                    time += BeatsToDuration(4f / beatSnap);
-                    time = SnapTime(time);
-
-                    SafeSetTime();
-                    if (paused) previewAud.Play();
-                }
+                SafeSetTime();
+                if (paused) previewAud.Play();
+            }
             else if (Input.mouseScrollDelta.y > 0.1f) {
                 time -= BeatsToDuration(4f / beatSnap);
                 time = SnapTime(time);

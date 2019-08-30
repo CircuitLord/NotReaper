@@ -90,7 +90,7 @@ namespace NotReaper.Tools {
 				case ActionType.RemoveNote:
 					//Re-add the target based on all the previous stats from the target;
 					Target tar = action.affectedTarget;
-					timeline.AddTarget(tar.gridTarget.transform.position.x, tar.gridTarget.transform.position.y, tar.gridTarget.transform.position.z, tar.gridTarget.beatLength, tar.gridTarget.velocity, tar.gridTarget.handType, tar.gridTarget.behavior, true);
+					timeline.AddTarget(tar.gridTarget.transform.position.x, tar.gridTarget.transform.position.y, tar.gridTarget.transform.position.z, tar.gridTarget.beatLength, tar.gridTarget.velocity, tar.gridTarget.handType, tar.gridTarget.behavior, false);
 					break;
 
 				case ActionType.MultiRemoveNote:

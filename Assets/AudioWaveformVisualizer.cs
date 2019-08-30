@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,11 +16,15 @@ public class AudioWaveformVisualizer : MonoBehaviour {
 
     private bool formenabled;
 
+
+    public Renderer Spectrogram2;
+
     public void Init() {
-        GetComponent<Renderer>().material.mainTexture = PaintWaveformSpectrum(Mathf.CeilToInt(aud.clip.length * 50), 50);
+        GetComponent<Renderer>().material.mainTexture = PaintWaveformSpectrum(Mathf.CeilToInt(aud.clip.length * 25), 50);
+        //Spectrogram2.material.mainTexture = PaintWaveformSpectrum(Mathf.CeilToInt(aud.clip.length * 50), 50, 0);
     }
 
-    public Texture2D PaintWaveformSpectrum(int width, int height) {
+    public Texture2D PaintWaveformSpectrum(int width, int height, int offset = 0) {
         Texture2D tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
         float[] samples = new float[aud.clip.samples];
         float[] waveform = new float[width];
@@ -45,7 +50,7 @@ public class AudioWaveformVisualizer : MonoBehaviour {
             }
         }
 
-        for (int x = 0; x < waveform.Length; x++) {
+        for (int x = offset; x < waveform.Length; x++) {
             for (int y = 0; y <= waveform[x] * ((float) height * .75f); y++) {
                 tex.SetPixel(x, (height / 2) + y, colour);
                 tex.SetPixel(x, (height / 2) - y, colour);
