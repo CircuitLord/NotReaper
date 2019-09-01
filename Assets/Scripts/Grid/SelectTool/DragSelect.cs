@@ -32,11 +32,11 @@ namespace NotReaper.Grid.SelectTool {
 				foreach (GridTarget target in Timeline.selectableNotes) {
 
 					if (target == null) return;
-
-					if (IsWithinSelectionBounds(target.gameObject)) {
-						target.Select();
-						selectedTargets.Add(target);
-					}
+				//FIXME: selecting notes
+					//if (IsWithinSelectionBounds(target.gameObject)) {
+					//	target.Select();
+					//	selectedTargets.Add(target);
+					//}
 				}
 
 

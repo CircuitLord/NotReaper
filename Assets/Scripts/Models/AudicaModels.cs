@@ -125,6 +125,7 @@ namespace NotReaper.Models {
 		public int pitch;
 		public TargetVelocity velocity = TargetVelocity.Standard;
 		public GridOffset gridOffset = new GridOffset { x = 0, y = 0 };
+		public float zOffset = 0;
 		public TargetHandType handType = TargetHandType.Right;
 		public TargetBehavior behavior = TargetBehavior.Standard;
 

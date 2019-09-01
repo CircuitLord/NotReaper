@@ -90,12 +90,12 @@ namespace NotReaper.Tools {
 				case ActionType.RemoveNote:
 					//Re-add the target based on all the previous stats from the target;
 					Target tar = action.affectedTarget;
-					timeline.AddTarget(tar.gridTarget.transform.position.x, tar.gridTarget.transform.position.y, tar.gridTarget.transform.position.z, tar.gridTarget.beatLength, tar.gridTarget.velocity, tar.gridTarget.handType, tar.gridTarget.behavior, false);
+					//timeline.AddTarget(tar.gridTarget.transform.position.x, tar.gridTarget.transform.position.y, tar.gridTarget.transform.position.z, tar.gridTarget.beatLength, tar.gridTarget.velocity, tar.gridTarget.handType, tar.gridTarget.behavior, false);
 					break;
 
 				case ActionType.MultiRemoveNote:
 					foreach (Target target in action.affectedTargets) {
-						timeline.AddTarget(target.gridTarget.transform.position.x, target.gridTarget.transform.position.y, target.gridTarget.transform.position.z, target.gridTarget.beatLength, target.gridTarget.velocity, target.gridTarget.handType, target.gridTarget.behavior, false);
+						//timeline.AddTarget(target.gridTarget.transform.position.x, target.gridTarget.transform.position.y, target.gridTarget.transform.position.z, target.gridTarget.beatLength, target.gridTarget.velocity, target.gridTarget.handType, target.gridTarget.behavior, false);
 					}
 					break;
 				
@@ -116,12 +116,12 @@ namespace NotReaper.Tools {
 			switch (action.type) {
 				case ActionType.AddNote:
 					Target tar = action.affectedTarget;
-					timeline.AddTarget(tar.gridTarget, true);
+					//timeline.AddTarget(tar.gridTarget, true);
 					break;
 
 				case ActionType.MultiAddNote:
 					foreach (Target target in action.affectedTargets) {
-						timeline.AddTarget(target.gridTarget, true);
+						//timeline.AddTarget(target.gridTarget, true);
 					}
 					break;
 

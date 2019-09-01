@@ -1,5 +1,4 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -63,19 +62,20 @@ namespace NotReaper {
 
         public float sustainVolume;
 
-        List<GridTarget> notes;
-        public static List<GridTarget> orderedNotes;
+        List<Target> notes;
+        public static List<Target> orderedNotes;
 
         //Contains the notes that the player can actually see.
-        public static List<GridTarget> selectableNotes;
+        public static List<Target> selectableNotes;
 
-        //TODO: Use this to replace the huge calls to noteList
-        public static List<GridTarget> loadedNotes;
-        List<TimelineTarget> notesTimeline;
+        public static List<Target> loadedNotes;
+        //List<TargetIcon> notesTimeline;
         SongDescyay songDesc;
 
-        public GridTarget gridNotePrefab;
-        public TimelineTarget timelineNotePrefab;
+
+        public TargetIcon timelineTargetIconPrefab;
+        public TargetIcon gridTargetIconPrefab;
+
 
         public float previewDuration = 0.1f;
 
@@ -83,7 +83,7 @@ namespace NotReaper {
 
         private int beatSnap = 4;
         private int scale = 20;
-        private float targetScale = 1f;
+        private float targetScale = 0.7f;
         private float scaleOffset = 0;
         private static float bpm = 60;
         private static int offset = 0;
@@ -118,11 +118,11 @@ namespace NotReaper {
         [SerializeField] public EditorToolkit Tools;
 
         private void Start() {
-            notes = new List<GridTarget>();
-            orderedNotes = new List<GridTarget>();
-            notesTimeline = new List<TimelineTarget>();
-            selectableNotes = new List<GridTarget>();
-            loadedNotes = new List<GridTarget>();
+            notes = new List<Target>();
+            orderedNotes = new List<Target>();
+            //notesTimeline = new List<TimelineTarget>();
+            selectableNotes = new List<Target>();
+            loadedNotes = new List<Target>();
 
             //securityRules.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
 
@@ -157,7 +157,7 @@ namespace NotReaper {
             else
                 AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, 1, cue.velocity, cue.handType, cue.behavior, false);
         }
-        
+
 
         //Use when adding a singular target to the project (from the user)
         public void AddTarget(float x, float y) {
@@ -169,7 +169,7 @@ namespace NotReaper {
             action.affectedTargets.Add(notes.Last());
 
             Tools.undoRedoManager.AddAction(action);
-            
+
         }
 
         //Use for adding a target from redo/undo
@@ -189,7 +189,8 @@ namespace NotReaper {
         //TODO: New function for add target to add multipule notes at once, and combine them into one action for the undo redo manager
 
         public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false) {
-            // Add to timeline
+
+            Target target = new Target();
 
             float yOffset = 0;
             float zOffset = 0;
@@ -203,89 +204,97 @@ namespace NotReaper {
                 zOffset = -0.1f;
             }
 
-            var timelineClone = Instantiate(timelineNotePrefab, timelineTransformParent);
-            timelineClone.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
+            
+
+        //NEW CODE:
+            target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
+            //timelineTransformParent.gameObject.GetComponentInChildren<TargetIcon>()
+            target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
+
+            target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
+            target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
+
+
+            //var timelineClone = Instantiate(timelineNotePrefab, timelineTransformParent);
+            //timelineClone.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
 
             // Add to grid
-            var gridClone = Instantiate(gridNotePrefab, gridTransformParent);
+            //var gridClone = Instantiate(gridNotePrefab, gridTransformParent);
 
-            if (velocity == TargetVelocity.Hold && beatLength == 1f) {
-                //beatLength = 480;
-            }
+            //gridClone.GetComponentInChildren<HoldTargetManager>().sustainLength = beatLength;
 
+            //gridClone.transform.localPosition = new Vector3(x, y, beatTime);
 
-            gridClone.GetComponentInChildren<HoldTargetManager>().sustainLength = beatLength;
-
-            gridClone.transform.localPosition = new Vector3(x, y, beatTime);
-
-            gridClone.timelineTarget = timelineClone;
-            timelineClone.timelineTarget = timelineClone;
-            gridClone.gridTarget = gridClone;
-            timelineClone.gridTarget = gridClone;
+            //gridClone.timelineTarget = timelineClone;
+            //timelineClone.timelineTarget = timelineClone;
+            //gridClone.gridTarget = gridClone;
+            //timelineClone.gridTarget = gridClone;
 
             //set velocity
             if (userAdded) {
                 switch (CurrentSound) {
                     case DropdownToVelocity.Standard:
-                        gridClone.velocity = TargetVelocity.Standard;
+                        //gridClone.velocity = TargetVelocity.Standard;
+                        target.SetVelocity(TargetVelocity.Standard);
                         break;
 
                     case DropdownToVelocity.Snare:
-                        gridClone.velocity = TargetVelocity.Snare;
+                        target.SetVelocity(TargetVelocity.Snare);
                         break;
 
                     case DropdownToVelocity.Percussion:
-                        gridClone.velocity = TargetVelocity.Percussion;
+                        target.SetVelocity(TargetVelocity.Percussion);
                         break;
 
                     case DropdownToVelocity.ChainStart:
-                        gridClone.velocity = TargetVelocity.ChainStart;
+                        target.SetVelocity(TargetVelocity.ChainStart);
                         break;
 
                     case DropdownToVelocity.Chain:
-                        gridClone.velocity = TargetVelocity.Chain;
+                        target.SetVelocity(TargetVelocity.Chain);
                         break;
 
                     case DropdownToVelocity.Melee:
-                        gridClone.velocity = TargetVelocity.Melee;
+                        target.SetVelocity(TargetVelocity.Melee);
                         break;
 
                     default:
-                        gridClone.velocity = velocity;
+                        target.SetVelocity(TargetVelocity.Standard);
                         break;
 
                 }
             } else {
-                gridClone.SetVelocity(velocity);
+                target.SetVelocity(velocity);
             }
 
-            gridClone.SetHandType(handType);
-            gridClone.SetBehavior(behavior);
+            target.SetHandType(handType);
+            target.SetBehavior(behavior);
 
-            if (gridClone.behavior == TargetBehavior.Hold)
-                 gridClone.SetBeatLength(beatLength);
+            if (target.behavior == TargetBehavior.Hold)
+                target.SetBeatLength(beatLength);
 
             else
-                gridClone.SetBeatLength(0.25f);
+                target.SetBeatLength(0.25f);
 
-            notes.Add(gridClone);
-            notesTimeline.Add(timelineClone);
+            notes.Add(target);
+            //notesTimeline.Add(timelineClone);
 
-            orderedNotes = notes.OrderBy(v => v.transform.position.z).ToList();
+            orderedNotes = notes.OrderBy(v => v.gridTargetIcon.transform.position.z).ToList();
 
-            UpdateTrail();
-            UpdateChainConnectors();
+            //UpdateTrail();
+            //UpdateChainConnectors();
 
-
-
+            //target.timelineTargetIcon.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
 
 
         }
 
         private void UpdateSustains() {
+            /*
             foreach (var note in loadedNotes) {
                 if (note.behavior == TargetBehavior.Hold) {
-                    if ((note.transform.position.z < 0) && (note.transform.position.z + note.beatLength > 0)) {
+                    if ((note.gridTargetIcon.transform.position.z < 0) && (note.gridTargetIcon.transform.position.z + note.beatLength > 0)) {
+                        
                         var particles = note.GetComponentInChildren<ParticleSystem>();
                         if (!particles.isEmitting) {
                             particles.Play();
@@ -313,6 +322,7 @@ namespace NotReaper {
                         }
 
                         particles.SetParticles(parts, particles.particleCount);
+                        
                     } else {
                         var particles = note.GetComponentInChildren<ParticleSystem>();
                         if (particles.isEmitting) {
@@ -326,9 +336,11 @@ namespace NotReaper {
                     }
                 }
             }
+            */
         }
 
         private void UpdateChords() {
+            /*
             //TODO: ORDERED
             if (loadedNotes.Count > 0)
                 foreach (var note in loadedNotes) {
@@ -371,10 +383,12 @@ namespace NotReaper {
                         }
                     }
                 }
-
+            */
         }
 
         private void UpdateChainConnectors() {
+
+            /*
             if (orderedNotes.Count > 0)
                 foreach (var note in orderedNotes) {
                     if (note.behavior == TargetBehavior.ChainStart) {
@@ -431,6 +445,7 @@ namespace NotReaper {
                         }
                     }
                 }
+                */
 
         }
 
@@ -452,21 +467,23 @@ namespace NotReaper {
         }
 
         public void DeleteTarget(Target target, bool genUndoAction) {
-            if (target.gridTarget != null) {
-                target.gridTarget.oldRedoPosition = target.gridTarget.transform.localPosition;
+            if (target.gridTargetIcon != null) {
+                //TODO: Add undo back later
+                //target.gridTarget.oldRedoPosition = target.gridTarget.transform.localPosition;
             }
             DeleteTarget(target);
 
-            if (genUndoAction) {
-                Action action = new Action();
-                action.affectedTargets.Add(target.gridTarget);
-                action.type = ActionType.RemoveNote;
-                Tools.undoRedoManager.AddAction(action);
-            }
+           // if (genUndoAction) {
+            //    Action action = new Action();
+            //    action.affectedTargets.Add(target.gridTarget);
+            //    action.type = ActionType.RemoveNote;
+            //    Tools.undoRedoManager.AddAction(action);
+           // }
 
         }
 
         public void DeleteTarget(Target target) {
+            /*
             if (target == null) return;
             notes.Remove(target.gridTarget);
             orderedNotes.Remove(target.gridTarget);
@@ -478,30 +495,33 @@ namespace NotReaper {
             Destroy(g);
             UpdateChainConnectors();
             UpdateChords();
+            */
         }
 
         private void DeleteTargets() {
+            //TODO: Fix deleting notes
             Debug.Log("del targs");
-            foreach (GridTarget obj in notes) {
-                if (obj)
-                    Destroy(obj.gameObject);
+            foreach (Target obj in notes) {
+                //if (obj)
+                    Destroy(obj.gridTargetIcon);
+                    Destroy(obj.timelineTargetIcon);
             }
 
-            foreach (GridTarget obj in orderedNotes) {
-                if (obj)
-                    Destroy(obj.gameObject);
-            }
+            //foreach (GridTarget obj in orderedNotes) {
+            //    if (obj)
+            //        Destroy(obj.gameObject);
+            //}
 
-            foreach (TimelineTarget obj in notesTimeline) {
-                if (obj)
-                    Destroy(obj.gameObject);
-            }
+            //foreach (TimelineTarget obj in notesTimeline) {
+            //    if (obj)
+             //       Destroy(obj.gameObject);
+            //}
 
-            notes = new List<GridTarget>();
-            orderedNotes = new List<GridTarget>();
-            notesTimeline = new List<TimelineTarget>();
-            selectableNotes = new List<GridTarget>();
-            loadedNotes = new List<GridTarget>();
+            //notes = new List<Tar>();
+            //orderedNotes = new List<GridTarget>();
+            //notesTimeline = new List<TimelineTarget>();
+            //selectableNotes = new List<GridTarget>();
+            //loadedNotes = new List<GridTarget>();
 
             var liner = gridTransformParent.gameObject.GetComponentInChildren<LineRenderer>();
             if (liner) {
@@ -548,6 +568,7 @@ namespace NotReaper {
                 foreach (Cue cue in cues) {
                     AddTarget(cue);
                 }
+
                 songLoaded = true;
             } else {
                 Debug.Log("cues not found");
@@ -670,8 +691,8 @@ namespace NotReaper {
         public void NewFile() {
             DeleteTargets();
 
-            notes = new List<GridTarget>();
-            notesTimeline = new List<TimelineTarget>();
+            notes = new List<Target>();
+            //notesTimeline = new List<TimelineTarget>();
 
             string dirpath = Application.persistentDataPath;
 
@@ -738,6 +759,7 @@ namespace NotReaper {
             }
 
             if (orderedNotes.Count > 0) {
+                /*
 
                 foreach (var note in orderedNotes) {
 
@@ -759,6 +781,7 @@ namespace NotReaper {
                         }
                     }
                 }
+                */
             }
 
         }
@@ -1066,6 +1089,7 @@ namespace NotReaper {
 
         public void Update() {
             //TODO: Ordrerd
+            /*
             if (orderedNotes.Count > 0) {
                 foreach (var note in orderedNotes) {
 
@@ -1090,6 +1114,7 @@ namespace NotReaper {
                     }
                 }
             }
+            */
 
             UpdateChords();
 
@@ -1115,8 +1140,7 @@ namespace NotReaper {
 
                 SafeSetTime();
                 if (paused) previewAud.Play();
-            }
-            else if (Input.mouseScrollDelta.y > 0.1f) {
+            } else if (Input.mouseScrollDelta.y > 0.1f) {
                 time -= BeatsToDuration(4f / beatSnap);
                 time = SnapTime(time);
                 SafeSetTime();
@@ -1246,10 +1270,10 @@ namespace NotReaper {
             if (!SustainParticles) {
                 foreach (var note in orderedNotes) {
                     if (note.behavior == TargetBehavior.Hold) {
-                        var particles = note.GetComponentInChildren<ParticleSystem>();
-                        if (particles.isEmitting) {
-                            particles.Stop();
-                        }
+                        //var particles = note.GetComponentInChildren<ParticleSystem>();
+                        //if (particles.isEmitting) {
+                        //    particles.Stop();
+                        //}
                     }
                 }
             }

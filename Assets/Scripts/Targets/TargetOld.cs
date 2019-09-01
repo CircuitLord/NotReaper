@@ -6,8 +6,10 @@ using UnityEngine;
 
 namespace NotReaper.Targets {
 
+/*
+
 	//Stores references to a timelineTarget and it's corrosponding gridTarget
-	public class Target : MonoBehaviour {
+	public class TargetOld : MonoBehaviour {
 
 		public GridTarget gridTarget;
 		public TimelineTarget timelineTarget;
@@ -54,4 +56,5 @@ namespace NotReaper.Targets {
 		}
 
 	}
+	*/
 }

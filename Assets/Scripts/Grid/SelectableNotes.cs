@@ -11,18 +11,19 @@ namespace NotReaper.Grid {
 
         private void OnTriggerEnter(Collider other) {
             GridTarget target = other.GetComponentInChildren<GridTarget>();
-            if (target) {
-                Timeline.AddSelectableNote(target);
-            }
+            //FIXME: Selectable notes loading
+            //if (target) {
+            //    Timeline.AddSelectableNote(target);
+            //}
 
 
         }
 
         private void OnTriggerExit(Collider other) {
             GridTarget target = other.GetComponentInChildren<GridTarget>();
-            if (target) {
-                Timeline.RemoveSelectableNote(target);
-            }
+            //if (target) {
+            //    Timeline.RemoveSelectableNote(target);
+            //}
         }
 
     }

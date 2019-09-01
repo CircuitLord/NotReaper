@@ -28,23 +28,26 @@ namespace NotReaper.Targets {
         public SpriteRenderer meleeOutline;
 
 
-        private Color leftColor;
-        private Color rightColor;
-        private Color eitherColor;
-        private Color noneColor;
+
 
         public float sustainDirection = 0.6f;
 
 
         public bool IsGrid() {
             if (standardOutline == null) return false;
-            else return false;
+            else return true;
+        }
+
+        private void Start() {
+            //SetSizes();
         }
 
 
         //Sets the proper scale for the icons.
         public void SetSizes() {
-            if (!IsGrid()) return;
+            if (IsGrid()) return;
+            
+            transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
 
         }
 

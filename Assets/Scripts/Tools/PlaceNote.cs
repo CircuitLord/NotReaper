@@ -19,8 +19,8 @@ namespace NotReaper.Tools {
 		public void TryPlaceNote() {
 			if (!EditorInput.isOverGrid) return;
 
-			foreach (GridTarget target in Timeline.selectableNotes) {
-				if ((target.transform.position.z == ghost.position.z) && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
+			foreach (Target target in Timeline.selectableNotes) {
+				if ((target.gridTargetIcon.transform.position.z == ghost.position.z) && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 
 			timeline.AddTarget(ghost.position.x, ghost.position.y);
@@ -30,7 +30,8 @@ namespace NotReaper.Tools {
 			if (EventSystem.current.IsPointerOverGameObject())
 				return;
 
-			timeline.DeleteTarget(NoteUnderMouse(), true);
+			//FIXME: DELTETING NOTES
+			//timeline.DeleteTarget(NoteUnderMouse(), true);
 		}
 
 
@@ -45,8 +46,8 @@ namespace NotReaper.Tools {
 			if (Physics.Raycast(ray, out hit, 2, notesLayer)) {
 				Transform objectHit = hit.transform;
 
-				Target target = objectHit.GetComponent<Target>().gridTarget;
-
+				Target target = objectHit.GetComponent<Target>();
+				//FIXME: DELETING NOTES
 
 				return target;
 			}

@@ -24513,9 +24513,9 @@ MonoBehaviour:
   bottomTimelineSlider: {fileID: 1967774228}
   beatSnapSelector: {fileID: 1181687404}
   sustainVolume: 0
-  gridNotePrefab: {fileID: 114558858861377176, guid: 8dac4ff2c874518409e2131dc5b24b40,
+  timelineTargetIconPrefab: {fileID: 9190679311828121994, guid: cc3a0d1268cd93baea91ce44c99571e4,
     type: 3}
-  timelineNotePrefab: {fileID: 114414660488835220, guid: 2aeda764c9ef8f6419003d7e9375d7b7,
+  gridTargetIconPrefab: {fileID: 7738343387274863048, guid: b91228a565de6cae6bc7c636b9f6efec,
     type: 3}
   previewDuration: 0.1
   songLoaded: 0
@@ -38528,6 +38528,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2232741643246090343, guid: cf778a596d1421d4eb8313e6bd877720,
+        type: 3}
+      propertyPath: m_Name
+      value: Grid
+      objectReference: {fileID: 0}
     - target: {fileID: 2232741643246090337, guid: cf778a596d1421d4eb8313e6bd877720,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -38582,11 +38587,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2232741643246090343, guid: cf778a596d1421d4eb8313e6bd877720,
-        type: 3}
-      propertyPath: m_Name
-      value: Grid
       objectReference: {fileID: 0}
     - target: {fileID: 2232741641849475778, guid: cf778a596d1421d4eb8313e6bd877720,
         type: 3}

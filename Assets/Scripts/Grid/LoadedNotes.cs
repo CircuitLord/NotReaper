@@ -11,18 +11,18 @@ namespace NotReaper.Grid {
 
         private void OnTriggerEnter(Collider other) {
             GridTarget target = other.GetComponentInChildren<GridTarget>();
-            if (target) {
-                Timeline.AddLoadedNote(target);
-            }
+            //if (target) {
+            //    Timeline.AddLoadedNote(target);
+            //}
 
 
         }
 
         private void OnTriggerExit(Collider other) {
-            GridTarget target = other.GetComponentInChildren<GridTarget>();
-            if (target) {
-                Timeline.RemoveLoadedNote(target);
-            }
+            //GridTarget target = other.GetComponentInChildren<GridTarget>();
+            //if (target) {
+            //    Timeline.RemoveLoadedNote(target);
+            //}
         }
 
     }
