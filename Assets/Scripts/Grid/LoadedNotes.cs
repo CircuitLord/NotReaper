@@ -10,19 +10,21 @@ namespace NotReaper.Grid {
     public class LoadedNotes : MonoBehaviour {
 
         private void OnTriggerEnter(Collider other) {
-            //GridTarget target = other.GetComponentInChildren<GridTarget>();
-            //if (target) {
-            //    Timeline.AddLoadedNote(target);
-            //}
+            TargetIcon targetIcon = other.GetComponent<TargetIcon>();
+            if (targetIcon) {
+                //Timeline.AddLoadedNote(target);
+                targetIcon.IconEnterLoadedNotes();
+
+            }
 
 
         }
 
         private void OnTriggerExit(Collider other) {
-            //GridTarget target = other.GetComponentInChildren<GridTarget>();
-            //if (target) {
-            //    Timeline.RemoveLoadedNote(target);
-            //}
+            TargetIcon targetIcon = other.GetComponent<TargetIcon>();
+            if (targetIcon) {
+                targetIcon.IconExitLoadedNotes();
+            }
         }
 
     }

@@ -175,8 +175,8 @@ namespace NotReaper {
         }
 
         //Use for adding a target from redo/undo
-        public void AddTarget(GridTarget target, bool genUndoAction) {
-            //AddTarget(target.oldRedoPosition.x, target.oldRedoPosition.y, target.oldRedoPosition.z, target.beatLength, target.velocity, target.handType, target.behavior, false);
+        public void AddTarget(Target target, bool genUndoAction) {
+            //AddTarget(target.gridTargetIcon..x, target.oldRedoPosition.y, target.oldRedoPosition.z, target.beatLength, target.velocity, target.handType, target.behavior, false);
 
             if (genUndoAction) {
                 NRAction action = new NRAction();
@@ -231,19 +231,13 @@ namespace NotReaper {
             target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
 
 
+
             //Use when the rest of the inputs aren't supplied, get them from the EditorInput script.
             if (userAdded) {
 
                 target.SetHandType(EditorInput.selectedHand);
 
                 target.SetBehavior(EditorInput.selectedBehavior);
-
-                if (target.behavior == TargetBehavior.Hold) {
-                    target.SetBeatLength(beatLength);
-                } else {
-                    target.SetBeatLength(0.25f);
-                }
-
 
                 switch (CurrentSound) {
                     case DropdownToVelocity.Standard:
@@ -284,25 +278,31 @@ namespace NotReaper {
 
                 target.SetBehavior(behavior);
 
-                if (target.behavior == TargetBehavior.Hold) {
-                    target.SetBeatLength(beatLength);
-                } else {
-                    target.SetBeatLength(0.25f);
-                }
-
                 target.SetVelocity(velocity);
-
-
             }
+
+
+            if (target.behavior == TargetBehavior.Hold) {
+                target.SetBeatLength(beatLength);
+            } else {
+                target.SetBeatLength(0.25f);
+            }
+
+            //Now that all inital dependencies are met, we can init the target. (Loads sustain controller)
+            target.Init();
 
             notes.Add(target);
 
             orderedNotes = notes.OrderBy(v => v.gridTargetIcon.transform.position.z).ToList();
 
-            target.Init();
 
-            //Subscribe to the delete note event so we can delete it if the user wants.
+            //Subscribe to the delete note event so we can delete it if the user wants. And other events.
             target.DeleteNoteEvent += DeleteTarget;
+
+            target.TargetEnterLoadedNotesEvent += AddLoadedNote;
+            target.TargetExitLoadedNotesEvent += RemoveLoadedNote;
+
+            target.MakeTimelineUpdateSustainLengthEvent += UpdateSustainLength;
 
             //UpdateTrail();
             //UpdateChainConnectors();
@@ -311,16 +311,16 @@ namespace NotReaper {
 
 
         private void UpdateSustains() {
-            /*
-            foreach (var note in loadedNotes) {
+            
+            foreach (var note in notes) {
                 if (note.behavior == TargetBehavior.Hold) {
-                    if ((note.gridTargetIcon.transform.position.z < 0) && (note.gridTargetIcon.transform.position.z + note.beatLength > 0)) {
+                    if ((note.gridTargetIcon.transform.position.z < 0) && (note.gridTargetIcon.transform.position.z + note.beatLength / 480f > 0)) {
                         
-                        var particles = note.GetComponentInChildren<ParticleSystem>();
+                        var particles = note.gridTargetIcon.GetComponentInChildren<ParticleSystem>();
                         if (!particles.isEmitting) {
                             particles.Play();
 
-                            float panPos = (float) (note.transform.position.x / 7.15);
+                            float panPos = (float) (note.gridTargetIcon.transform.position.x / 7.15);
                             if (note.handType == TargetHandType.Left) {
                                 leftSustainAud.volume = sustainVolume;
                                 leftSustainAud.panStereo = panPos;
@@ -345,7 +345,7 @@ namespace NotReaper {
                         particles.SetParticles(parts, particles.particleCount);
                         
                     } else {
-                        var particles = note.GetComponentInChildren<ParticleSystem>();
+                        var particles = note.gridTargetIcon.GetComponentInChildren<ParticleSystem>();
                         if (particles.isEmitting) {
                             particles.Stop();
                             if (note.handType == TargetHandType.Left) {
@@ -357,7 +357,7 @@ namespace NotReaper {
                     }
                 }
             }
-            */
+            
         }
 
         private void UpdateChords() {
@@ -471,20 +471,35 @@ namespace NotReaper {
         }
 
 
-        public static void AddSelectableNote(GridTarget target) {
+        public static void AddSelectableNote(Target target) {
             selectableNotes.Add(target);
         }
 
-        public static void RemoveSelectableNote(GridTarget target) {
+        public static void RemoveSelectableNote(Target target) {
             selectableNotes.Remove(target);
         }
 
-        public static void AddLoadedNote(GridTarget target) {
+        public static void AddLoadedNote(Target target) {
             loadedNotes.Add(target);
         }
 
-        public static void RemoveLoadedNote(GridTarget target) {
+        public static void RemoveLoadedNote(Target target) {
             loadedNotes.Remove(target);
+        }
+
+        /// <summary>
+        /// Updates a sustain length from the buttons next to sustains.
+        /// </summary>
+        /// <param name="target">The target to affect</param>
+        /// <param name="increase">If true, increase by one beat snap, if false, the opposite.</param>
+        public void UpdateSustainLength(Target target, bool increase) {
+            if (target.behavior != TargetBehavior.Hold) return;
+
+            if (increase) {
+                target.UpdateSustainBeatLength(target.beatLength += (480));
+            } else {
+                target.UpdateSustainBeatLength(Mathf.Max(target.beatLength -= (480), 0));
+            }
         }
 
         //public void DeleteTarget(Target target, bool genUndoAction) {
@@ -1192,7 +1207,7 @@ namespace NotReaper {
             SetCurrentTime();
             SetCurrentTick();
 
-            bottomTimelineSlider.value = GetPercentagePlayed();
+            bottomTimelineSlider.SetValueWithoutNotify(GetPercentagePlayed());
         }
 
 

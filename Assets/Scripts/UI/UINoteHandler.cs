@@ -24,8 +24,6 @@ namespace NotReaper.UI {
 
         public NoteGridSnap noteGrid;
 
-        public Notification notification;
-
         public EditorInput editorInput;
 
 

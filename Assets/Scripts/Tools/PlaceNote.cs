@@ -15,6 +15,8 @@ namespace NotReaper.Tools {
 		public LayerMask notesLayer;
 		public NoteGridSnap noteSnap;
 
+		
+
 
 		public void TryPlaceNote() {
 			if (!EditorInput.isOverGrid) return;
@@ -30,13 +32,8 @@ namespace NotReaper.Tools {
 			if (EventSystem.current.IsPointerOverGameObject())
 				return;
 
-			//FIXME: DELTETING NOTES
-			//timeline.DeleteTarget(NoteUnderMouse(), true);
-			Debug.Log("Searching for note");
-
 			TargetIcon targetIcon = IconUnderMouse();
 			if (targetIcon) {
-				Debug.Log("Found note, trying to remove.");
 				targetIcon.OnTryRemove();
 			}
 		}
@@ -47,14 +44,13 @@ namespace NotReaper.Tools {
 		private TargetIcon IconUnderMouse() {
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1f);
+			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1.25f);
 			ray.direction = Vector3.forward;
 			Debug.DrawRay(ray.origin, ray.direction);
-			if (Physics.Raycast(ray, out hit, 2, notesLayer)) {
+			if (Physics.Raycast(ray, out hit, 2.5f, notesLayer)) {
 				Transform objectHit = hit.transform;
 
 				TargetIcon targetIcon = objectHit.GetComponent<TargetIcon>();
-				//FIXME: DELETING NOTES
 
 				return targetIcon;
 			}

@@ -30,9 +30,11 @@ namespace NotReaper.Targets {
         public SpriteRenderer meleeOutline;
 
 
-
+        public TargetVelocity velocity = TargetVelocity.Standard;
 
         public float sustainDirection = 0.6f;
+
+        //public float beatLength = 0.25f;
 
 
         public bool IsGrid() {
@@ -40,22 +42,8 @@ namespace NotReaper.Targets {
             else return true;
         }
 
-        private void Start() {
-            //SetSizes();
-
-        }
 
 
-        //Sets the proper scale for the icons.
-        public void SetSizes() {
-            if (IsGrid()) return;
-            
-            //transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
-
-        }
-
-
-        //TODO: Event for when note right clicked on -> to target clas
 
         /// <summary>
         /// For when the note is right clicked on. Bool is for if it should gen an undo action
@@ -70,7 +58,16 @@ namespace NotReaper.Targets {
             Destroy(gameObject);
         }
 
+        public event Action IconEnterLoadedNotesEvent;
+        public event Action IconExitLoadedNotesEvent;
 
+        public void IconEnterLoadedNotes() {
+            IconEnterLoadedNotesEvent();
+        }
+
+        public void IconExitLoadedNotes() {
+            IconExitLoadedNotesEvent();
+        }
 
 
 

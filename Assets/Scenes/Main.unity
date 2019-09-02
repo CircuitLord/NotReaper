@@ -21969,7 +21969,6 @@ MonoBehaviour:
   soundDropdown: {fileID: 1223223314}
   hover: {fileID: 586330113}
   noteGrid: {fileID: 2232741641849475778}
-  notification: {fileID: 0}
   editorInput: {fileID: 0}
 --- !u!114 &1258393250
 MonoBehaviour:
@@ -22000,7 +21999,6 @@ MonoBehaviour:
   Tools: {fileID: 1258393250}
   timeline: {fileID: 1395334176}
   soundDropdown: {fileID: 1223223314}
-  UINote: {fileID: 1258393249}
   standardToggle: {fileID: 507931858}
   holdToggle: {fileID: 2013539630}
   chainStartToggle: {fileID: 161010861}
@@ -22008,8 +22006,8 @@ MonoBehaviour:
   horzToggle: {fileID: 459841839}
   vertToggle: {fileID: 2072550148}
   meleeToggle: {fileID: 896854140}
-  hover: {fileID: 0}
-  noteGrid: {fileID: 0}
+  hover: {fileID: 586330113}
+  noteGrid: {fileID: 2232741641849475778}
 --- !u!114 &1258393252
 MonoBehaviour:
   m_ObjectHideFlags: 0

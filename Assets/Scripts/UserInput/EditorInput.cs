@@ -30,7 +30,6 @@ namespace NotReaper.UserInput {
 		[SerializeField] private Timeline timeline;
 
 		[SerializeField] private Dropdown soundDropdown;
-		[SerializeField] private UINoteHandler UINote;
 
 		public Toggle standardToggle;
 		public Toggle holdToggle;
@@ -66,7 +65,6 @@ namespace NotReaper.UserInput {
 		/// </summary>
 		/// <param name="velocity">The "sound" type to play.</param>
 		public void SelectVelocity(DropdownToVelocity velocity) {
-			selectedVelocity = velocity;
 			
 			switch (velocity) {
 				case DropdownToVelocity.Standard:
@@ -94,22 +92,23 @@ namespace NotReaper.UserInput {
 				
 				
 			}
+
+			selectedVelocity = velocity;
 			
 		}
 
 		public void SelectTool(EditorTool tool) {
 
-			selectedTool = tool;
-
-            //noteGrid.SetSnappingMode(SnappingMode.Grid);
+            
 
 			//Update the UI based on the tool:
-			switch (selectedTool) {
+			switch (tool) {
 				case EditorTool.Standard:
 					selectedBehavior = TargetBehavior.Standard;
 					standardToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Standard);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					noteGrid.SetSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Hold:
@@ -117,6 +116,7 @@ namespace NotReaper.UserInput {
 					holdToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Hold);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					noteGrid.SetSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Horizontal:
@@ -124,6 +124,7 @@ namespace NotReaper.UserInput {
 					horzToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Horizontal);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					noteGrid.SetSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Vertical:
@@ -131,6 +132,7 @@ namespace NotReaper.UserInput {
 					vertToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Vertical);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					noteGrid.SetSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.ChainStart:
@@ -138,6 +140,7 @@ namespace NotReaper.UserInput {
 					chainStartToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.ChainStart);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.ChainStart);
+					noteGrid.SetSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.ChainNode:
@@ -145,6 +148,7 @@ namespace NotReaper.UserInput {
 					chainNodeToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Chain);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Chain);
+					noteGrid.SetSnappingMode(SnappingMode.None);
 					break;
 
 				case EditorTool.Melee:
@@ -152,12 +156,15 @@ namespace NotReaper.UserInput {
 					meleeToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Melee);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Melee);
+					noteGrid.SetSnappingMode(SnappingMode.Melee);
+					SelectHand(TargetHandType.Either);
 					break;
 
 				default:
 					break;
 			}
 
+			selectedTool = tool;
 
 		}
 
@@ -234,67 +241,37 @@ namespace NotReaper.UserInput {
 
 			}
 			if (Input.GetKeyDown(InputManager.selectHold)) {
-				if (selectedTool == EditorTool.Melee) 
-					UINote.SelectLeftHand();
-
-	
-				
-				selectedTool = EditorTool.Hold;
-				holdToggle.isOn = true;
+				SelectTool(EditorTool.Hold);
 			}
 			if (Input.GetKeyDown(InputManager.selectHorz)) {
-				if (selectedTool == EditorTool.Melee) 
-					UINote.SelectLeftHand();
-
-				selectedTool = EditorTool.Horizontal;
-				horzToggle.isOn = true;
+				SelectTool(EditorTool.Horizontal);
 			}
 			if (Input.GetKeyDown(InputManager.selectVert)) {
-				if (selectedTool == EditorTool.Melee) 
-					UINote.SelectLeftHand();
-				
-
-				selectedTool = EditorTool.Vertical;
-				vertToggle.isOn = true;
+				SelectTool(EditorTool.Vertical);
 			}
 			if (Input.GetKeyDown(InputManager.selectChainStart)) {
-				if (selectedTool == EditorTool.Melee) 
-					UINote.SelectLeftHand();
-				
-
-				selectedTool = EditorTool.ChainStart;
-				chainStartToggle.isOn = true;
+				SelectTool(EditorTool.ChainStart);
 			}
 			if (Input.GetKeyDown(InputManager.selectChainNode)) {
-				if (selectedTool == EditorTool.Melee) 
-					UINote.SelectLeftHand();
-
-				selectedTool = EditorTool.ChainNode;
-				chainNodeToggle.isOn = true;
+				SelectTool(EditorTool.ChainNode);
 			}
 			if (Input.GetKeyDown(InputManager.selectMelee)) {
-				selectedHand = TargetHandType.Either;
-				selectedTool = EditorTool.Melee;
-				meleeToggle.isOn = true;
-				UINote.SelectEitherHand();
+				SelectTool(EditorTool.Melee);
 
 			}
 
 			if (Input.GetKeyDown(InputManager.toggleColor)) {
 
 				if (selectedHand == TargetHandType.Left) {
-					selectedHand = TargetHandType.Right;
-					UINote.SelectRightHand();
+					SelectHand(TargetHandType.Right);
 				}
 
 				else if (selectedHand == TargetHandType.Right) {
-					selectedHand = TargetHandType.Left;
-					UINote.SelectLeftHand();
+					SelectHand(TargetHandType.Left);
 				} 
 				
 				else {
-					selectedHand = TargetHandType.Left;
-					UINote.SelectLeftHand();
+					SelectHand(TargetHandType.Left);
 				}
 
 			}

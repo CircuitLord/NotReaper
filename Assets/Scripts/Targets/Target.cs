@@ -16,6 +16,9 @@ namespace NotReaper.Targets {
 		public float beatLength = 0.25f;
 		public bool isSelected = false;
 
+		public Vector3 gridTargetPos;
+		//public Vector3 timelineTargetPos;
+
 
 		//Events and stuff:
 		public event Action<Target, bool> DeleteNoteEvent;
@@ -23,9 +26,43 @@ namespace NotReaper.Targets {
 			DeleteNoteEvent(this, genUndoAction);
 		}
 
+		public event Action<Target> TargetEnterLoadedNotesEvent;
+		public void TargetEnterLoadedNotes() {
+			TargetEnterLoadedNotesEvent(this);
+		}
 
+		public event Action<Target> TargetExitLoadedNotesEvent;
+		public void TargetExitLoadedNotes() {
+			TargetExitLoadedNotesEvent(this);
+		}
+
+		//I'm so good at naming stuff.
+		public event Action<Target, bool> MakeTimelineUpdateSustainLengthEvent;
+		public void MakeTimelineUpdateSustainLength(bool increase) {
+			MakeTimelineUpdateSustainLengthEvent(this, increase);
+		}
+
+
+		//Do some stuff after all the target's references have been filled in by the timeline.
 		public void Init() {
 			gridTargetIcon.OnTryRemoveEvent += DeleteNote;
+			timelineTargetIcon.OnTryRemoveEvent += DeleteNote;
+
+			gridTargetIcon.IconEnterLoadedNotesEvent += TargetEnterLoadedNotes;
+			gridTargetIcon.IconExitLoadedNotesEvent += TargetExitLoadedNotes;
+
+			if (behavior == TargetBehavior.Hold) {
+				var gridHoldTargetManager = gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
+
+				gridHoldTargetManager.sustainLength = beatLength;
+				gridHoldTargetManager.LoadSustainController();
+
+				gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength;
+			}
+
+		
+			gridTargetPos = gridTargetIcon.transform.localPosition;
+
 		}
 
 		//Wrapper function for setting the hand types of both targets.
@@ -44,14 +81,25 @@ namespace NotReaper.Targets {
 
 		public void SetBeatLength(float newBeatLength) {
 			beatLength = newBeatLength;
+			
 
 			if (behavior == TargetBehavior.Hold) {
 				timelineTargetIcon.SetSustainLength(newBeatLength);
 			}
 		}
 
+		public void UpdateSustainBeatLength(float newBeatLength) {
+			if (behavior != TargetBehavior.Hold) return;
+			SetBeatLength(newBeatLength);
+			//Updates the grid icon target sustain length.
+			gridTargetIcon.GetComponentInChildren<HoldTargetManager>().UpdateSustainLength(newBeatLength);
+		}
+
 		public void SetVelocity(TargetVelocity newVel) {
 			velocity = newVel;
+			gridTargetIcon.velocity = velocity;
+			timelineTargetIcon.velocity = velocity;
+
 		}
 
 		public void Select() {

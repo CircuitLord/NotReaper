@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2633904944298091780}
   - component: {fileID: 9190679311828121994}
+  - component: {fileID: 7134394305720867247}
   m_Layer: 9
-  m_Name: Icon
+  m_Name: TLTargetIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,6 +68,19 @@ MonoBehaviour:
   chainOutline: {fileID: 0}
   meleeOutline: {fileID: 0}
   sustainDirection: 0.6
+--- !u!135 &7134394305720867247
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 103567763032441297}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &169522044578834028
 GameObject:
   m_ObjectHideFlags: 0

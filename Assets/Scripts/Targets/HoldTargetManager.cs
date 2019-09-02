@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,13 +17,13 @@ namespace NotReaper.Targets {
 
         private float PlacementBeatTime = 0;
 
-        private GridTarget parentTarget;
+        private TargetIcon parentIcon;
 
         public float sustainLength = 480;
 
 
-        void Start() {
-            parentTarget = gameObject.GetComponentsInParent<GridTarget>() [0];
+        public void LoadSustainController() {
+            parentIcon = gameObject.GetComponentsInParent<TargetIcon>()[0];
 
             endMarker = Instantiate(endMarkerPrefab, gameObject.transform.position + new Vector3(0, 0, sustainLength / 480f), Quaternion.identity, Timeline.gridNotesStatic);
 
@@ -34,21 +35,41 @@ namespace NotReaper.Targets {
             endMarkerTl.SetActive(true);
         }
 
+
+        public void UpdateSustainLength(float newLength) {
+            sustainLength = newLength;
+            endMarker.transform.position = new Vector3(endMarker.transform.position.x, endMarker.transform.position.y, gameObject.transform.position.z + sustainLength / 480f);
+        }
+
+        /// <summary>
+        /// Called when the user clicks on the arrows to change the sustain length. True is increase, false is decrease.
+        /// </summary>
+        public event Action<bool> OnTryChangeSustainEvent;
+
+        public void IncreaseSustainLength() {
+            OnTryChangeSustainEvent(true);
+        }
+
+        public void DecreaseSustainLength() {
+            OnTryChangeSustainEvent(false);
+        }
+
+
         // Update is called once per frame
-        void Update() {
+        //void Update() {
 
 
-            endMarker.transform.position = new Vector3(endMarker.transform.position.x, endMarker.transform.position.y, gameObject.transform.position.z + sustainLength); //int.Parse(length.text) / 480f);
-            endMarkerTl.transform.localScale = new Vector3(.3f, .3f, .3f);
-            //endMarkerTl.transform.position = new Vector3(parentTarget.transform.position.z + parentTarget.beatLength, endMarkerTl.transform.position.y, endMarkerTl.transform.position.z);
+            //endMarker.transform.position = new Vector3(endMarker.transform.position.x, endMarker.transform.position.y, gameObject.transform.position.z + sustainLength / 480f); //int.Parse(length.text) / 480f);
+            //endMarkerTl.transform.localScale = new Vector3(.3f, .3f, .3f);
+            //endMarkerTl.transform.position = new Vector3(parentIcon.transform.position.z + parentIcon.beatLength, endMarkerTl.transform.position.y, endMarkerTl.transform.position.z);
 
-            if (gameObject.transform.position.z == 0) {
+            //if (gameObject.transform.position.z == 0) {
                 //length.gameObject.SetActive(true);
-            } else {
+            //} else {
 
                 //length.gameObject.SetActive(false);
-            }
-        }
+            //}
+        //}
 
         void OnDestroy() {
 
