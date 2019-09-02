@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Models;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace NotReaper.Targets {
         public GameObject chain;
         public GameObject melee;
         public GameObject line;
+
 
 
         public SpriteRenderer standardOutline;
@@ -40,6 +42,7 @@ namespace NotReaper.Targets {
 
         private void Start() {
             //SetSizes();
+
         }
 
 
@@ -47,9 +50,29 @@ namespace NotReaper.Targets {
         public void SetSizes() {
             if (IsGrid()) return;
             
-            transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+            //transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
 
         }
+
+
+        //TODO: Event for when note right clicked on -> to target clas
+
+        /// <summary>
+        /// For when the note is right clicked on. Bool is for if it should gen an undo action
+        /// </summary>
+        public event Action<bool> OnTryRemoveEvent;
+
+        public void OnTryRemove() {
+            OnTryRemoveEvent(true);
+        }
+
+        public void Remove() {
+            Destroy(gameObject);
+        }
+
+
+
+
 
 
         public void EnableSelected(TargetBehavior behavior) {

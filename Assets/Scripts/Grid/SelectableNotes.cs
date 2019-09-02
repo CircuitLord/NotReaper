@@ -10,7 +10,7 @@ namespace NotReaper.Grid {
     public class SelectableNotes : MonoBehaviour {
 
         private void OnTriggerEnter(Collider other) {
-            GridTarget target = other.GetComponentInChildren<GridTarget>();
+            //GridTarget target = other.GetComponentInChildren<GridTarget>();
             //FIXME: Selectable notes loading
             //if (target) {
             //    Timeline.AddSelectableNote(target);
@@ -20,7 +20,7 @@ namespace NotReaper.Grid {
         }
 
         private void OnTriggerExit(Collider other) {
-            GridTarget target = other.GetComponentInChildren<GridTarget>();
+            //GridTarget target = other.GetComponentInChildren<GridTarget>();
             //if (target) {
             //    Timeline.RemoveSelectableNote(target);
             //}

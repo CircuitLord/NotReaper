@@ -20,6 +20,7 @@ namespace NotReaper.UserInput {
 		public static EditorTool selectedTool = EditorTool.Standard;
 		public static TargetHandType selectedHand = TargetHandType.Left;
 		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
+		public static TargetBehavior selectedBehavior = TargetBehavior.Standard;
 		public static DropdownToVelocity selectedVelocity = DropdownToVelocity.Standard;
 		public static bool isOverGrid = false;
 		public static bool inUI = false;
@@ -105,42 +106,49 @@ namespace NotReaper.UserInput {
 			//Update the UI based on the tool:
 			switch (selectedTool) {
 				case EditorTool.Standard:
+					selectedBehavior = TargetBehavior.Standard;
 					standardToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Standard);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
 					break;
 
 				case EditorTool.Hold:
+					selectedBehavior = TargetBehavior.Hold;
 					holdToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Hold);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
 					break;
 
 				case EditorTool.Horizontal:
+					selectedBehavior = TargetBehavior.Horizontal;
 					horzToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Horizontal);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
 					break;
 
 				case EditorTool.Vertical:
+					selectedBehavior = TargetBehavior.Vertical;
 					vertToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Vertical);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
 					break;
 
 				case EditorTool.ChainStart:
+					selectedBehavior = TargetBehavior.ChainStart;
 					chainStartToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.ChainStart);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.ChainStart);
 					break;
 
 				case EditorTool.ChainNode:
+					selectedBehavior = TargetBehavior.Chain;
 					chainNodeToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Chain);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Chain);
 					break;
 
 				case EditorTool.Melee:
+					selectedBehavior = TargetBehavior.Melee;
 					meleeToggle.SetIsOnWithoutNotify(true);
 					hover.SetBehavior(TargetBehavior.Melee);
 					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Melee);

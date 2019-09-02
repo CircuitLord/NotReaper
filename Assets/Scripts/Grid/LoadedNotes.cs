@@ -10,7 +10,7 @@ namespace NotReaper.Grid {
     public class LoadedNotes : MonoBehaviour {
 
         private void OnTriggerEnter(Collider other) {
-            GridTarget target = other.GetComponentInChildren<GridTarget>();
+            //GridTarget target = other.GetComponentInChildren<GridTarget>();
             //if (target) {
             //    Timeline.AddLoadedNote(target);
             //}

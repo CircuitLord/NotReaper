@@ -32,12 +32,19 @@ namespace NotReaper.Tools {
 
 			//FIXME: DELTETING NOTES
 			//timeline.DeleteTarget(NoteUnderMouse(), true);
+			Debug.Log("Searching for note");
+
+			TargetIcon targetIcon = IconUnderMouse();
+			if (targetIcon) {
+				Debug.Log("Found note, trying to remove.");
+				targetIcon.OnTryRemove();
+			}
 		}
 
 
 
 
-		private Target NoteUnderMouse() {
+		private TargetIcon IconUnderMouse() {
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1f);
@@ -46,10 +53,10 @@ namespace NotReaper.Tools {
 			if (Physics.Raycast(ray, out hit, 2, notesLayer)) {
 				Transform objectHit = hit.transform;
 
-				Target target = objectHit.GetComponent<Target>();
+				TargetIcon targetIcon = objectHit.GetComponent<TargetIcon>();
 				//FIXME: DELETING NOTES
 
-				return target;
+				return targetIcon;
 			}
 			return null;
 		}

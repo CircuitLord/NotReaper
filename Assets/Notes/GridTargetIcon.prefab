@@ -841,6 +841,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5012048490355646076}
   - component: {fileID: 7738343387274863048}
+  - component: {fileID: 4976088772993325799}
+  - component: {fileID: 4862770489253777872}
   m_Layer: 9
   m_Name: GridTargetIcon
   m_TagString: Untagged
@@ -898,6 +900,35 @@ MonoBehaviour:
   chainOutline: {fileID: 4009600328716323749}
   meleeOutline: {fileID: 3491583216713177421}
   sustainDirection: 0.6
+--- !u!135 &4976088772993325799
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4317571393865384872}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &4862770489253777872
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4317571393865384872}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &4440669226093902584
 GameObject:
   m_ObjectHideFlags: 0
@@ -2452,10 +2483,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8541870369256553294}
     m_Modifications:
-    - target: {fileID: 1117105563069256, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
-      propertyPath: m_Name
-      value: HoldDecrease
-      objectReference: {fileID: 0}
     - target: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2561,6 +2588,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1117105563069256, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
+      propertyPath: m_Name
+      value: HoldDecrease
+      objectReference: {fileID: 0}
     - target: {fileID: 114770111749942012, guid: 8103067a880c7b7409a24decfafc5617,
         type: 3}
       propertyPath: m_Sprite
@@ -2588,10 +2619,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8541870369256553294}
     m_Modifications:
-    - target: {fileID: 1117105563069256, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
-      propertyPath: m_Name
-      value: HoldIncrease
-      objectReference: {fileID: 0}
     - target: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2696,6 +2723,10 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1117105563069256, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
+      propertyPath: m_Name
+      value: HoldIncrease
       objectReference: {fileID: 0}
     - target: {fileID: 114770111749942012, guid: 8103067a880c7b7409a24decfafc5617,
         type: 3}

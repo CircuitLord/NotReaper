@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using NotReaper.Models;
 
@@ -15,6 +16,17 @@ namespace NotReaper.Targets {
 		public float beatLength = 0.25f;
 		public bool isSelected = false;
 
+
+		//Events and stuff:
+		public event Action<Target, bool> DeleteNoteEvent;
+		public void DeleteNote(bool genUndoAction = true) {
+			DeleteNoteEvent(this, genUndoAction);
+		}
+
+
+		public void Init() {
+			gridTargetIcon.OnTryRemoveEvent += DeleteNote;
+		}
 
 		//Wrapper function for setting the hand types of both targets.
 		public void SetHandType(TargetHandType newType) {
@@ -53,6 +65,8 @@ namespace NotReaper.Targets {
 			gridTargetIcon.DisableSelected();
 			isSelected = false;
 		}
+
+
 
 
 	}

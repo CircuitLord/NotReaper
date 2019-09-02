@@ -14,12 +14,12 @@ namespace NotReaper.Tools {
 		/// <summary>
 		/// Contains the complete list of actions the user has done recently.
 		/// </summary>
-		public List<Action> actions = new List<Action>();
+		public List<NRAction> actions = new List<NRAction>();
 
 		/// <summary>
 		/// Contains the actions the user has "undone" for future use.
 		/// </summary>
-		public List<Action> redoActions = new List<Action>();
+		public List<NRAction> redoActions = new List<NRAction>();
 
 		public int maxSavedActions = 20;
 		
@@ -32,7 +32,7 @@ namespace NotReaper.Tools {
 		public void Undo() {
 			if (actions.Count <= 0) return;
 
-			Action action = actions.Last();
+			NRAction action = actions.Last();
 			Debug.Log("Undoing action:" + action.type.ToString());
 
 			InvertAction(action);
@@ -54,7 +54,7 @@ namespace NotReaper.Tools {
 
 			if (redoActions.Count <= 0) return;
 
-			Action action = redoActions.Last();
+			NRAction action = redoActions.Last();
 
 			Debug.Log("Redoing action:" + action.type.ToString());
 
@@ -72,7 +72,7 @@ namespace NotReaper.Tools {
 		}
 
 		//Use for undo
-		public void InvertAction(Action action) {
+		public void InvertAction(NRAction action) {
 
 			switch (action.type) {
 				
@@ -111,7 +111,7 @@ namespace NotReaper.Tools {
 
 
 		//Use for redo | calls functions that gen undo actions for the undo list.
-		public void RunAction(Action action) {
+		public void RunAction(NRAction action) {
 			//TODO: Targets lose their transform when they get removed, so we can't restore it from the og transform values anymore
 			switch (action.type) {
 				case ActionType.AddNote:
@@ -144,7 +144,7 @@ namespace NotReaper.Tools {
 
 
 
-		public void AddAction(Action action, bool clearRedoActions = true) {
+		public void AddAction(NRAction action, bool clearRedoActions = true) {
 			if (actions.Count <= maxSavedActions) {
 				actions.Add(action);
 			} else {
@@ -155,7 +155,7 @@ namespace NotReaper.Tools {
 				actions.Add(action);
 			}
 
-			if (clearRedoActions) redoActions = new List<Action>();
+			if (clearRedoActions) redoActions = new List<NRAction>();
 
 
 
@@ -184,7 +184,7 @@ namespace NotReaper.Tools {
 		
 	}
 
-	public class Action {
+	public class NRAction {
 		public ActionType type = ActionType.AddNote;
 		public List<Target> affectedTargets = new List<Target>();
 		public Target affectedTarget {

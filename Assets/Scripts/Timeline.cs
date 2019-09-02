@@ -13,13 +13,13 @@ using NotReaper.Models;
 using NotReaper.Targets;
 using NotReaper.Tools;
 using NotReaper.UI;
+using NotReaper.UserInput;
 using SFB;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using NotReaper.UserInput;
 
 namespace NotReaper {
 
@@ -63,7 +63,7 @@ namespace NotReaper {
 
         public float sustainVolume;
 
-        List<Target> notes;
+        public List<Target> notes;
         public static List<Target> orderedNotes;
 
         //Contains the notes that the player can actually see.
@@ -154,31 +154,32 @@ namespace NotReaper {
             Vector2 pos = NotePosCalc.PitchToPos(cue);
 
             if (cue.tickLength / 480 >= 1)
-                AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, cue.tickLength, cue.velocity, cue.handType, cue.behavior, false);
+                //AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, cue.tickLength, cue.velocity, cue.handType, cue.behavior, false);
+                AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, false, cue.tickLength, cue.velocity, cue.handType, cue.behavior);
             else
-                AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, 1, cue.velocity, cue.handType, cue.behavior, false);
+                AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, false, cue.tickLength, cue.velocity, cue.handType, cue.behavior);
         }
 
 
         //Use when adding a singular target to the project (from the user)
         public void AddTarget(float x, float y) {
-            AddTarget(x, y, BeatTime(), 1, TargetVelocity.Standard, selectedHandType, selectedBehaviour, true);
+            AddTarget(x, y, BeatTime(), true);
 
             //Add to undo redo manager.
-            Action action = new Action();
-            action.type = ActionType.AddNote;
-            action.affectedTargets.Add(notes.Last());
+            //NRAction action = new NRAction();
+            //action.type = ActionType.AddNote;
+            //action.affectedTargets.Add(notes.Last());
 
-            Tools.undoRedoManager.AddAction(action);
+            //Tools.undoRedoManager.AddAction(action);
 
         }
 
         //Use for adding a target from redo/undo
         public void AddTarget(GridTarget target, bool genUndoAction) {
-            AddTarget(target.oldRedoPosition.x, target.oldRedoPosition.y, target.oldRedoPosition.z, target.beatLength, target.velocity, target.handType, target.behavior, false);
+            //AddTarget(target.oldRedoPosition.x, target.oldRedoPosition.y, target.oldRedoPosition.z, target.beatLength, target.velocity, target.handType, target.behavior, false);
 
             if (genUndoAction) {
-                Action action = new Action();
+                NRAction action = new NRAction();
                 action.type = ActionType.AddNote;
                 action.affectedTargets.Add(notes.Last());
 
@@ -187,7 +188,13 @@ namespace NotReaper {
 
         }
 
-        //TODO: New function for add target to add multipule notes at once, and combine them into one action for the undo redo manager
+
+        public void AddTargets(List<Target> targets) {
+            foreach (Target target in targets) {
+                AddTarget(target.gridTargetIcon.transform.localPosition.x, target.gridTargetIcon.transform.position.y, target.gridTargetIcon.transform.position.z, false, target.beatLength, target.velocity, target.handType, target.behavior);
+            }
+        }
+
 
         /// <summary>
         /// Adds a target to the timeline.
@@ -196,10 +203,11 @@ namespace NotReaper {
         /// <param name="y">y pos</param>
         /// <param name="beatTime">Beat time to add the note to</param>
         /// <param name="userAdded">If true, fetch values for currently selected note type from EditorInput, if not, use values provided in function.</param>
+        /// <param name="beatLength"></param>
         /// <param name="velocity"></param>
         /// <param name="handType"></param>
         /// <param name="behavior"></param>
-        public void AddTarget(float x, float y, float beatTime, bool userAdded, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
+        public void AddTarget(float x, float y, float beatTime, bool userAdded = true, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
 
 
             float yOffset = 0;
@@ -223,17 +231,22 @@ namespace NotReaper {
             target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
 
 
+            //Use when the rest of the inputs aren't supplied, get them from the EditorInput script.
             if (userAdded) {
 
                 target.SetHandType(EditorInput.selectedHand);
 
-                
+                target.SetBehavior(EditorInput.selectedBehavior);
+
+                if (target.behavior == TargetBehavior.Hold) {
+                    target.SetBeatLength(beatLength);
+                } else {
+                    target.SetBeatLength(0.25f);
+                }
 
 
-                //TODO: Replace with editor input?
                 switch (CurrentSound) {
                     case DropdownToVelocity.Standard:
-                        //gridClone.velocity = TargetVelocity.Standard;
                         target.SetVelocity(TargetVelocity.Standard);
                         break;
 
@@ -262,120 +275,40 @@ namespace NotReaper {
                         break;
 
                 }
-            } else {
-                target.SetVelocity(velocity);  
             }
 
+            //If userAdded false, we use the supplied inputs to generate the note.
+            else {
 
+                target.SetHandType(handType);
 
+                target.SetBehavior(behavior);
 
-
-        }
-
-
-        
-
-
-        public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false) {
-
-            Target target = new Target();
-
-            float yOffset = 0;
-            float zOffset = 0;
-
-            //Calculate the note offset for visual purpose on the timeline.
-            if (handType == TargetHandType.Left) {
-                yOffset = 0.1f;
-                zOffset = -0.2f;
-            } else if (handType == TargetHandType.Right) {
-                yOffset = -0.1f;
-                zOffset = -0.1f;
-            }
-
-            
-
-        //NEW CODE:
-            target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
-            //timelineTransformParent.gameObject.GetComponentInChildren<TargetIcon>()
-            target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
-
-            target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
-            target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
-
-
-            //var timelineClone = Instantiate(timelineNotePrefab, timelineTransformParent);
-            //timelineClone.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
-
-            // Add to grid
-            //var gridClone = Instantiate(gridNotePrefab, gridTransformParent);
-
-            //gridClone.GetComponentInChildren<HoldTargetManager>().sustainLength = beatLength;
-
-            //gridClone.transform.localPosition = new Vector3(x, y, beatTime);
-
-            //gridClone.timelineTarget = timelineClone;
-            //timelineClone.timelineTarget = timelineClone;
-            //gridClone.gridTarget = gridClone;
-            //timelineClone.gridTarget = gridClone;
-
-            //set velocity
-            if (userAdded) {
-                switch (CurrentSound) {
-                    case DropdownToVelocity.Standard:
-                        //gridClone.velocity = TargetVelocity.Standard;
-                        target.SetVelocity(TargetVelocity.Standard);
-                        break;
-
-                    case DropdownToVelocity.Snare:
-                        target.SetVelocity(TargetVelocity.Snare);
-                        break;
-
-                    case DropdownToVelocity.Percussion:
-                        target.SetVelocity(TargetVelocity.Percussion);
-                        break;
-
-                    case DropdownToVelocity.ChainStart:
-                        target.SetVelocity(TargetVelocity.ChainStart);
-                        break;
-
-                    case DropdownToVelocity.Chain:
-                        target.SetVelocity(TargetVelocity.Chain);
-                        break;
-
-                    case DropdownToVelocity.Melee:
-                        target.SetVelocity(TargetVelocity.Melee);
-                        break;
-
-                    default:
-                        target.SetVelocity(TargetVelocity.Standard);
-                        break;
-
+                if (target.behavior == TargetBehavior.Hold) {
+                    target.SetBeatLength(beatLength);
+                } else {
+                    target.SetBeatLength(0.25f);
                 }
-            } else {
+
                 target.SetVelocity(velocity);
+
+
             }
-
-            target.SetHandType(handType);
-            target.SetBehavior(behavior);
-
-            if (target.behavior == TargetBehavior.Hold)
-                target.SetBeatLength(beatLength);
-
-            else
-                target.SetBeatLength(0.25f);
 
             notes.Add(target);
-            //notesTimeline.Add(timelineClone);
 
             orderedNotes = notes.OrderBy(v => v.gridTargetIcon.transform.position.z).ToList();
+
+            target.Init();
+
+            //Subscribe to the delete note event so we can delete it if the user wants.
+            target.DeleteNoteEvent += DeleteTarget;
 
             //UpdateTrail();
             //UpdateChainConnectors();
 
-            //target.timelineTargetIcon.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
-
-
         }
+
 
         private void UpdateSustains() {
             /*
@@ -554,36 +487,46 @@ namespace NotReaper {
             loadedNotes.Remove(target);
         }
 
-        public void DeleteTarget(Target target, bool genUndoAction) {
-            if (target.gridTargetIcon != null) {
-                //TODO: Add undo back later
-                //target.gridTarget.oldRedoPosition = target.gridTarget.transform.localPosition;
-            }
-            DeleteTarget(target);
+        //public void DeleteTarget(Target target, bool genUndoAction) {
+        //if (target.gridTargetIcon != null) {
+        //TODO: Add undo back later
+        //target.gridTarget.oldRedoPosition = target.gridTarget.transform.localPosition;
+        //}
+        //DeleteTarget(target);
 
-           // if (genUndoAction) {
-            //    Action action = new Action();
-            //    action.affectedTargets.Add(target.gridTarget);
-            //    action.type = ActionType.RemoveNote;
-            //    Tools.undoRedoManager.AddAction(action);
-           // }
+        // if (genUndoAction) {
+        //    Action action = new Action();
+        //    action.affectedTargets.Add(target.gridTarget);
+        //    action.type = ActionType.RemoveNote;
+        //    Tools.undoRedoManager.AddAction(action);
+        // }
 
-        }
+        //}
 
-        public void DeleteTarget(Target target) {
-            /*
+
+        public void DeleteTarget(Target target, bool genUndoAction = true) {
+
             if (target == null) return;
-            notes.Remove(target.gridTarget);
-            orderedNotes.Remove(target.gridTarget);
-            selectableNotes.Remove(target.gridTarget);
-            loadedNotes.Remove(target.gridTarget);
-            var tl = target.timelineTarget.gameObject;
-            var g = target.gridTarget.gameObject;
-            Destroy(tl);
-            Destroy(g);
-            UpdateChainConnectors();
-            UpdateChords();
-            */
+
+            notes.Remove(target);
+            orderedNotes.Remove(target);
+            selectableNotes.Remove(target);
+            loadedNotes.Remove(target);
+            Destroy(target.gridTargetIcon.gameObject);
+            Destroy(target.timelineTargetIcon.gameObject);
+
+            target = null;
+
+            if (genUndoAction) {
+                //NRAction action = new NRAction();
+                //action.affectedTargets.Add(target.gridTarget);
+                //action.type = ActionType.RemoveNote;
+                //Tools.undoRedoManager.AddAction(action);
+            }
+
+            //UpdateChainConnectors();
+            //UpdateChords();
+
         }
 
         private void DeleteTargets() {
@@ -591,8 +534,8 @@ namespace NotReaper {
             Debug.Log("del targs");
             foreach (Target obj in notes) {
                 //if (obj)
-                    Destroy(obj.gridTargetIcon);
-                    Destroy(obj.timelineTargetIcon);
+                Destroy(obj.gridTargetIcon);
+                Destroy(obj.timelineTargetIcon);
             }
 
             //foreach (GridTarget obj in orderedNotes) {
@@ -602,7 +545,7 @@ namespace NotReaper {
 
             //foreach (TimelineTarget obj in notesTimeline) {
             //    if (obj)
-             //       Destroy(obj.gameObject);
+            //       Destroy(obj.gameObject);
             //}
 
             //notes = new List<Tar>();
