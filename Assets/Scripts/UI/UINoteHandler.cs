@@ -26,97 +26,69 @@ namespace NotReaper.UI {
 
         public Notification notification;
 
+        public EditorInput editorInput;
+
 
         public void SoundWasChanged(Dropdown dpd) {
             timeline.CurrentSound = (DropdownToVelocity) dpd.value;
+
+            editorInput.SelectVelocity((DropdownToVelocity) dpd.value);
         }
 
 
         public void SelectLeftHand() {
-            timeline.SetHandType(TargetHandType.Left);
-            hover.SetHandType(TargetHandType.Left);
+            editorInput.SelectHand(TargetHandType.Left);
         }
 
         public void SelectRightHand() {
-            timeline.SetHandType(TargetHandType.Right);
-            hover.SetHandType(TargetHandType.Right);
+            editorInput.SelectHand(TargetHandType.Right);
         }
 
         public void SelectEitherHand() {
-            timeline.SetHandType(TargetHandType.Either);
-            hover.SetHandType(TargetHandType.Either);
+            editorInput.SelectHand(TargetHandType.Either);
         }
 
         public void SelectNoHand() {
-            timeline.SetHandType(TargetHandType.None);
-            hover.SetHandType(TargetHandType.None);
+            //timeline.SetHandType(TargetHandType.None);
+            //hover.SetHandType(TargetHandType.None);
+            editorInput.SelectHand(TargetHandType.None);
         }
 
 
         public void SelectStandard() {
-            EditorInput.selectedTool = EditorTool.Standard;
-            timeline.SetBehavior(TargetBehavior.Standard);
-            timeline.SetVelocity(TargetVelocity.Standard);
-            soundDropdown.value = (int) DropdownToVelocity.Standard;
-            hover.SetBehavior(TargetBehavior.Standard);
-            noteGrid.SetSnappingMode(SnappingMode.Grid);
-            //notification.ShowNotification("STANDARD", "A new note tool was selected, causing a notification to come.", 5);
+            //EditorInput.selectedTool = EditorTool.Standard;
+            //timeline.SetBehavior(TargetBehavior.Standard);
+            //timeline.SetVelocity(TargetVelocity.Standard);
+            //soundDropdown.value = (int) DropdownToVelocity.Standard;
+            //hover.SetBehavior(TargetBehavior.Standard);
+            //noteGrid.SetSnappingMode(SnappingMode.Grid);
+            //EditorInput.selectedTool()
+            editorInput.SelectTool(EditorTool.Standard);
 
         }
 
         public void SelectHold() {
-            EditorInput.selectedTool = EditorTool.Hold;
-            timeline.SetBehavior(TargetBehavior.Hold);
-            timeline.SetVelocity(TargetVelocity.Hold);
-            soundDropdown.value = (int) DropdownToVelocity.Standard;
-            hover.SetBehavior(TargetBehavior.Hold);
-            noteGrid.SetSnappingMode(SnappingMode.Grid);
+            editorInput.SelectTool(EditorTool.Hold);
         }
 
         public void SelectChainNode() {
-            EditorInput.selectedTool = EditorTool.ChainNode;
-            timeline.SetBehavior(TargetBehavior.Chain);
-            timeline.SetVelocity(TargetVelocity.Chain);
-            soundDropdown.value = (int) DropdownToVelocity.Chain;
-            hover.SetBehavior(TargetBehavior.Chain);
-            noteGrid.SetSnappingMode(SnappingMode.Grid);
+            editorInput.SelectTool(EditorTool.ChainNode);
         }
 
         public void SelectChainStart() {
-            EditorInput.selectedTool = EditorTool.ChainStart;
-            timeline.SetBehavior(TargetBehavior.ChainStart);
-            timeline.SetVelocity(TargetVelocity.ChainStart);
-            soundDropdown.value = (int) DropdownToVelocity.ChainStart;
-            hover.SetBehavior(TargetBehavior.ChainStart);
-            noteGrid.SetSnappingMode(SnappingMode.Grid);
+            editorInput.SelectTool(EditorTool.ChainStart);
         }
 
         public void SelectHorizontal() {
-            EditorInput.selectedTool = EditorTool.Horizontal;
-            timeline.SetBehavior(TargetBehavior.Horizontal);
-            timeline.SetVelocity(TargetVelocity.Horizontal);
-            soundDropdown.value = (int) DropdownToVelocity.Standard;
-            hover.SetBehavior(TargetBehavior.Horizontal);
-            noteGrid.SetSnappingMode(SnappingMode.Grid);
+            editorInput.SelectTool(EditorTool.Horizontal);
         }
 
         public void SelectVertical() {
-            EditorInput.selectedTool = EditorTool.Vertical;
-            timeline.SetBehavior(TargetBehavior.Vertical);
-            timeline.SetVelocity(TargetVelocity.Vertical);
-            soundDropdown.value = (int) DropdownToVelocity.Standard;
-            hover.SetBehavior(TargetBehavior.Vertical);
-            noteGrid.SetSnappingMode(SnappingMode.Grid);
+            editorInput.SelectTool(EditorTool.Vertical);
         }
 
         public void SelectMelee() {
-            EditorInput.selectedTool = EditorTool.Melee;
-            timeline.SetBehavior(TargetBehavior.Melee);
-            timeline.SetVelocity(TargetVelocity.Melee);
-            soundDropdown.value = (int) DropdownToVelocity.Melee;
-            hover.SetBehavior(TargetBehavior.Melee);
-            SelectEitherHand();
-            noteGrid.SetSnappingMode(SnappingMode.Melee);
+            editorInput.SelectTool(EditorTool.Melee);
         }
     }
 }

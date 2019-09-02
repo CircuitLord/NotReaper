@@ -21970,6 +21970,7 @@ MonoBehaviour:
   hover: {fileID: 586330113}
   noteGrid: {fileID: 2232741641849475778}
   notification: {fileID: 0}
+  editorInput: {fileID: 0}
 --- !u!114 &1258393250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22007,6 +22008,8 @@ MonoBehaviour:
   horzToggle: {fileID: 459841839}
   vertToggle: {fileID: 2072550148}
   meleeToggle: {fileID: 896854140}
+  hover: {fileID: 0}
+  noteGrid: {fileID: 0}
 --- !u!114 &1258393252
 MonoBehaviour:
   m_ObjectHideFlags: 0

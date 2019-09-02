@@ -19,6 +19,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using NotReaper.UserInput;
 
 namespace NotReaper {
 
@@ -187,6 +188,93 @@ namespace NotReaper {
         }
 
         //TODO: New function for add target to add multipule notes at once, and combine them into one action for the undo redo manager
+
+        /// <summary>
+        /// Adds a target to the timeline.
+        /// </summary>
+        /// <param name="x">x pos</param>
+        /// <param name="y">y pos</param>
+        /// <param name="beatTime">Beat time to add the note to</param>
+        /// <param name="userAdded">If true, fetch values for currently selected note type from EditorInput, if not, use values provided in function.</param>
+        /// <param name="velocity"></param>
+        /// <param name="handType"></param>
+        /// <param name="behavior"></param>
+        public void AddTarget(float x, float y, float beatTime, bool userAdded, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
+
+
+            float yOffset = 0;
+            float zOffset = 0;
+
+            //Calculate the note offset for visual purpose on the timeline.
+            if (handType == TargetHandType.Left) {
+                yOffset = 0.1f;
+                zOffset = -0.2f;
+            } else if (handType == TargetHandType.Right) {
+                yOffset = -0.1f;
+                zOffset = -0.1f;
+            }
+
+            Target target = new Target();
+
+            target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
+            target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
+
+            target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
+            target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
+
+
+            if (userAdded) {
+
+                target.SetHandType(EditorInput.selectedHand);
+
+                
+
+
+                //TODO: Replace with editor input?
+                switch (CurrentSound) {
+                    case DropdownToVelocity.Standard:
+                        //gridClone.velocity = TargetVelocity.Standard;
+                        target.SetVelocity(TargetVelocity.Standard);
+                        break;
+
+                    case DropdownToVelocity.Snare:
+                        target.SetVelocity(TargetVelocity.Snare);
+                        break;
+
+                    case DropdownToVelocity.Percussion:
+                        target.SetVelocity(TargetVelocity.Percussion);
+                        break;
+
+                    case DropdownToVelocity.ChainStart:
+                        target.SetVelocity(TargetVelocity.ChainStart);
+                        break;
+
+                    case DropdownToVelocity.Chain:
+                        target.SetVelocity(TargetVelocity.Chain);
+                        break;
+
+                    case DropdownToVelocity.Melee:
+                        target.SetVelocity(TargetVelocity.Melee);
+                        break;
+
+                    default:
+                        target.SetVelocity(TargetVelocity.Standard);
+                        break;
+
+                }
+            } else {
+                target.SetVelocity(velocity);  
+            }
+
+
+
+
+
+        }
+
+
+        
+
 
         public void AddTarget(float x, float y, float beatTime, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Either, TargetBehavior behavior = TargetBehavior.Standard, bool userAdded = false) {
 
