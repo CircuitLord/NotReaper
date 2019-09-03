@@ -10,6 +10,9 @@ Assets/AssetStoreTools*
 Assets/saves/
 Assets/StreamingAssets/Ogg2Audica/song.mogg
 CACHE/
+Assets/StreamingAssets/build_info.txt
+Assets/StreamingAssets/Ogg2Audica/song.desc.meta
+
 #Assets/ModernUIPack/
 Assets/TextMesh Pro/
 Assets/Lomenu UI/
@@ -40,7 +43,4 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-advanced.cues
-edica.cues
 song.desc
-weaponized.ogg
