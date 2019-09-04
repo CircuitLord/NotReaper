@@ -99,8 +99,6 @@ namespace NotReaper.UserInput {
 
 		public void SelectTool(EditorTool tool) {
 
-            
-
 			//Update the UI based on the tool:
 			switch (tool) {
 				case EditorTool.Standard:
@@ -160,6 +158,14 @@ namespace NotReaper.UserInput {
 					SelectHand(TargetHandType.Either);
 					break;
 
+				case EditorTool.ChainBuilder:
+					selectedBehavior = TargetBehavior.None;
+					
+					hover.SetBehavior(TargetBehavior.None);
+
+					Tools.chainBuilder.Activate(true);
+					break;
+
 				default:
 					break;
 			}
@@ -186,6 +192,10 @@ namespace NotReaper.UserInput {
 			}
 
 
+			if (Input.GetKeyDown(KeyCode.T)) {
+				Tools.chainBuilder.NewChain(new Vector2(0, 0));
+			}
+
 
 			
 
@@ -200,6 +210,10 @@ namespace NotReaper.UserInput {
 					case EditorTool.ChainNode:
 					case EditorTool.Melee:
 						Tools.placeNote.TryPlaceNote();
+						break;
+
+					case EditorTool.ChainBuilder:
+						//We let the chain builder script handle input since we activated it from SelectTool()
 						break;
 
 

@@ -88,5 +88,13 @@ namespace NotReaper.UI {
         public void SelectMelee() {
             editorInput.SelectTool(EditorTool.Melee);
         }
+
+        public void SelectDragSelect() {
+            editorInput.SelectTool(EditorTool.DragSelect);
+        }
+
+        public void SelectChainBuilder() {
+            editorInput.SelectTool(EditorTool.ChainBuilder);
+        }
     }
 }

@@ -9,22 +9,40 @@ namespace NotReaper.Tools.ChainBuilder {
 		[HideInInspector] public float gizmoSize = 0.1f;
 		[HideInInspector] public Color gizmoColor = new Color(1, 0, 0, 0.5f);
 
-		void OnDrawGizmos() {
-			if (showGizmo == true) {
-				Gizmos.color = gizmoColor;
+		[HideInInspector] public bool isChainStart = false;
 
-				Gizmos.DrawSphere(this.transform.position, gizmoSize);
-			}
+		public GameObject chainStartIcon;
+		public GameObject chainNodeIcon;
+
+		public void MakeChainStart() {
+			isChainStart = true;
+			chainNodeIcon.SetActive(false);
+			chainStartIcon.SetActive(true);
 		}
 
-		//update parent line when this point moved
-		void OnDrawGizmosSelected() {
-			CurvedLineRenderer curvedLine = this.transform.parent.GetComponent<CurvedLineRenderer>();
+		public void MakeChainNode() {
+			isChainStart = false;
+			chainNodeIcon.SetActive(true);
+			chainStartIcon.SetActive(false);
 
-			if (curvedLine != null) {
-				curvedLine.Update();
-			}
 		}
+
+		// void OnDrawGizmos() {
+		// 	if (showGizmo == true) {
+		// 		Gizmos.color = gizmoColor;
+
+		// 		Gizmos.DrawSphere(this.transform.position, gizmoSize);
+		// 	}
+		// }
+
+		// //update parent line when this point moved
+		// void OnDrawGizmosSelected() {
+		// 	CurvedLineRenderer curvedLine = this.transform.parent.GetComponent<CurvedLineRenderer>();
+
+		// 	if (curvedLine != null) {
+		// 		curvedLine.Update();
+		// 	}
+		// }
 	}
 
 }

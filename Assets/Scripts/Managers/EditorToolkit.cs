@@ -1,4 +1,5 @@
 using NotReaper.Tools;
+using NotReaper.Tools.ChainBuilder;
 using UnityEngine;
 
 
@@ -14,6 +15,8 @@ namespace NotReaper.Managers {
 		[SerializeField] public PlaceNote placeNote;
 
 		[SerializeField] public UndoRedoManager undoRedoManager;
+
+		public ChainBuilder chainBuilder;
 
 
 
