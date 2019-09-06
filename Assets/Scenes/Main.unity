@@ -15846,16 +15846,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d992e57e6ec42515872b58f6513b47e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeline: {fileID: 1395334176}
   curvedLinePrefab: {fileID: 3211633624199474178, guid: a200240346cb8da529c8f96d3867d2b4,
     type: 3}
   linePointPrefab: {fileID: 1466057061964306760, guid: 97dea54a00ca4230c8db2340139be18b,
+    type: 3}
+  nodeTempPointPrefab: {fileID: 7291357760286924050, guid: 793edbc145dd1aa4f87a62ab13bd5f46,
     type: 3}
   chainBuilderLinesParent: {fileID: 1809140684}
   chainBuilderLayer:
     serializedVersion: 2
     m_Bits: 2048
   isDragging: 0
+  isEditMode: 0
   activeChain: {fileID: 0}
 --- !u!61 &869528926
 BoxCollider2D:

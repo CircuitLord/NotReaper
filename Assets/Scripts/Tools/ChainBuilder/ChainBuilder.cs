@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NotReaper.UserInput;
 using UnityEngine;
 
@@ -7,21 +8,24 @@ namespace NotReaper.Tools.ChainBuilder {
 
 	public class ChainBuilder : MonoBehaviour {
 
-		public Timeline timeline;
 
 		public GameObject curvedLinePrefab;
 		public GameObject linePointPrefab;
+		public GameObject nodeTempPointPrefab;
 
-		public Transform chainBuilderLinesParent;
+		[SerializeField] private Transform chainBuilderLinesParent;
+		private Transform tempNodeIconsParent;
 
 		public LayerMask chainBuilderLayer;
 
 		public bool isDragging = false;
-		private Transform draggingPoint;
+		public bool isEditMode = false;
+		bool activated = false;
 
+		private Transform draggingPoint;
 		public GameObject activeChain;
 
-		bool activated = false;
+		private int prevDrawPointsAmt = 0;
 
 
 
@@ -35,6 +39,24 @@ namespace NotReaper.Tools.ChainBuilder {
 
 		}
 		
+
+		/// <summary>
+		/// Sets the tool to be in select mode.
+		/// </summary>
+		public void SelectMode() {
+
+			//TODO: Check if we want to apply or save our current chain
+			if (activeChain) {
+
+			}
+
+			isEditMode = false;
+		}
+
+		public void EditMode() {
+			//TODO: Find which chain we clicked on to trigger edit mode
+			isEditMode = true;
+		}
 
 
 
@@ -65,6 +87,7 @@ namespace NotReaper.Tools.ChainBuilder {
 		}
 
 
+		
 		public GameObject AddPointToActive(Vector3 pos, bool isChainStart = false) {
 			var point = Instantiate(linePointPrefab, new Vector3(pos.x, pos.y, 0f), Quaternion.identity, activeChain.transform);
 			if (isChainStart)
@@ -88,7 +111,8 @@ namespace NotReaper.Tools.ChainBuilder {
 					isDragging = true;
 
 				} else {
-					AddPointToActive(Camera.main.ScreenToWorldPoint(Input.mousePosition), false);
+					draggingPoint = AddPointToActive(Camera.main.ScreenToWorldPoint(Input.mousePosition), false).transform;
+					isDragging = true;
 				}
 			}
 
@@ -107,12 +131,80 @@ namespace NotReaper.Tools.ChainBuilder {
 
 			if (!Input.GetMouseButton(0)) isDragging = false;
 
+			if (Input.GetKeyDown(KeyCode.U)) {
+				List<Vector2> points = FindPointsAlongChain(40);
+				if (points != null) DrawPointsAlongChain(points);
+			}
+
+
+			//Draw points along active chain
+			//List<Vector2> points = FindPointsAlongChain(10);
+			//if (points != null) DrawPointsAlongChain(points);
+
+
 
 		}
 
 
 
+		private void DrawPointsAlongChain(List<Vector2> points) {
 
+			tempNodeIconsParent = activeChain.transform.Find("TempNodeIcons");
+
+			RemoveTempPointsAlongChain();
+
+			foreach (Vector2 point in points) {
+				Instantiate(nodeTempPointPrefab, new Vector3(point.x, point.y, 0f), Quaternion.identity, tempNodeIconsParent);
+			}
+		}
+
+		private void RemoveTempPointsAlongChain() {
+			foreach (Transform child in tempNodeIconsParent) {
+				Destroy(child.gameObject);
+			}
+		}
+
+
+		private List<Vector2> FindPointsAlongChain(int noteCount) {
+
+			if (!activeChain) return null;
+
+			//If we need to draw a new amount of notes or something else
+			//if (noteCount == prevDrawPointsAmt) return null;
+
+			prevDrawPointsAmt = noteCount;
+
+			var lr = activeChain.GetComponent<LineRenderer>();
+			int pCount = lr.positionCount;
+			
+			double indexDist = pCount / noteCount;
+
+
+			List<Vector2> points = new List<Vector2>();
+
+			for (double i = indexDist; i < pCount; i += indexDist) {
+				//Get the previous index
+				Vector3 pos1 = lr.GetPosition((int)Math.Floor(i));
+				Vector3 pos2 = lr.GetPosition((int)Math.Ceiling(i));
+
+				//4.3 -> 0.3
+				double firstOffsetFromIndex = i - Math.Floor(i);
+				//4.3 -> 0.7
+				double secondOffsetFromIndex = Math.Ceiling(i) - i;
+
+				if (firstOffsetFromIndex == 0) firstOffsetFromIndex = 1;
+
+				Vector2 avg1 = pos1 * (float)firstOffsetFromIndex;
+				Vector2 avg2 = pos2 * (float)secondOffsetFromIndex;
+
+				Vector2 final = avg1 + avg2;
+				points.Add(final);
+			}
+
+			var thing = points.Count;
+
+			return points;
+		}
 
 		private Transform FindLinePointUnderMouse() {
 			RaycastHit hit;
