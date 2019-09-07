@@ -99,10 +99,10 @@ namespace NotReaper.Targets {
             foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true)) {
                 switch (handType) {
                     case TargetHandType.Left:
-                        r.material.SetColor("_Tint", UserPrefsManager.leftColor);
+                        r.material.SetColor("_Tint", NRSettings.config.leftColor);
                         break;
                     case TargetHandType.Right:
-                        r.material.SetColor("_Tint", UserPrefsManager.rightColor);
+                        r.material.SetColor("_Tint", NRSettings.config.rightColor);
                         break;
                     case TargetHandType.Either:
                         r.material.SetColor("_Tint", UserPrefsManager.bothColor);
@@ -115,13 +115,13 @@ namespace NotReaper.Targets {
             foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
                 switch (handType) {
                     case TargetHandType.Left:
-                        l.startColor = UserPrefsManager.leftColor;
-                        l.endColor = UserPrefsManager.leftColor;
+                        l.startColor = NRSettings.config.leftColor;
+                        l.endColor = NRSettings.config.leftColor;
                         sustainDirection = 0.6f;
                         break;
                     case TargetHandType.Right:
-                        l.startColor = UserPrefsManager.rightColor;
-                        l.endColor = UserPrefsManager.rightColor;
+                        l.startColor = NRSettings.config.rightColor;
+                        l.endColor = NRSettings.config.rightColor;
                         sustainDirection = -0.6f;
                         break;
                     case TargetHandType.Either:

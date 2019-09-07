@@ -6818,10 +6818,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8541870369256553294}
     m_Modifications:
-    - target: {fileID: 1117105563069256, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
-      propertyPath: m_Name
-      value: HoldDecrease
-      objectReference: {fileID: 0}
     - target: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6927,6 +6923,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1117105563069256, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
+      propertyPath: m_Name
+      value: HoldDecrease
+      objectReference: {fileID: 0}
     - target: {fileID: 114992288907508480, guid: 8103067a880c7b7409a24decfafc5617,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -6984,10 +6984,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8541870369256553294}
     m_Modifications:
-    - target: {fileID: 1117105563069256, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
-      propertyPath: m_Name
-      value: HoldIncrease
-      objectReference: {fileID: 0}
     - target: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7092,6 +7088,10 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1117105563069256, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
+      propertyPath: m_Name
+      value: HoldIncrease
       objectReference: {fileID: 0}
     - target: {fileID: 114992288907508480, guid: 8103067a880c7b7409a24decfafc5617,
         type: 3}

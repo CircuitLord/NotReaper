@@ -8,8 +8,8 @@ namespace NotReaper.Grid {
 
 	public static class NotePosCalc {
 
-		private static float xSize = 1.3f;
-		private static float ySize = 0.9f;
+		public static float xSize = 1.1f;
+		public static float ySize = 0.9f;
 
 
 		//Gets the cue status based on a grid target.

@@ -10,9 +10,12 @@ namespace NotReaper.Tools.ChainBuilder {
 		[HideInInspector] public Color gizmoColor = new Color(1, 0, 0, 0.5f);
 
 		[HideInInspector] public bool isChainStart = false;
+		[HideInInspector] public bool isHovered = false;
 
 		public GameObject chainStartIcon;
 		public GameObject chainNodeIcon;
+
+		public Animation chainNodeHoverAnim;
 
 		public void MakeChainStart() {
 			isChainStart = true;

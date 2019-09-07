@@ -1,0 +1,15 @@
+{
+    "userLeftColor": {
+        "r": 1,
+        "g": 0.4,
+        "b": 0.67
+    },
+    "userRightColor" : {
+        "r": 0,
+        "g": 0.67,
+        "b": 0.87
+    },
+    "mainVol" : 0.4,
+    "noteVol" : 0.5,
+    "sustainVol" : 0.5
+}

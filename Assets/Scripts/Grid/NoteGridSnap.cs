@@ -89,11 +89,11 @@ namespace NotReaper.Grid {
 
             //pos -= gridOffset; //Enable if grid is actually offset.
             pos.y += 0.45f;
-            int x = Mathf.FloorToInt(pos.x / xSize);
-            int y = Mathf.FloorToInt(pos.y / ySize);
+            int x = Mathf.FloorToInt(pos.x / NotePosCalc.xSize);
+            int y = Mathf.FloorToInt(pos.y / NotePosCalc.ySize);
 
-            Vector2 result = new Vector2((float) x * xSize, (float) y * ySize);
-            result.x += 0.65f;
+            Vector2 result = new Vector2((float) x * NotePosCalc.xSize, (float) y * NotePosCalc.ySize);
+            result.x += NotePosCalc.xSize / 2; //0.65f; //from 1.3 / 2
 
             //result += gridOffset; //Enable if grid is actually offset.
 
@@ -105,7 +105,7 @@ namespace NotReaper.Grid {
                 case SnappingMode.Grid:
                     return GetNearestPointOnGrid(pos);
                 case SnappingMode.Melee:
-                    return new Vector3(Mathf.Sign(pos.x * xSize) * 2, Mathf.Sign(pos.y * ySize), pos.z + 5);
+                    return new Vector3(Mathf.Sign(pos.x * NotePosCalc.xSize) * 2, Mathf.Sign(pos.y * NotePosCalc.ySize), pos.z + 5);
             }
             return new Vector3(pos.x, pos.y, pos.z + 5);
         }

@@ -82,6 +82,7 @@ namespace NotReaper.Tools.ChainBuilder {
 
 			AddPointToActive(pos2, false);
 			
+			tempNodeIconsParent = activeChain.transform.Find("TempNodeIcons");
 
 
 		}
@@ -102,6 +103,9 @@ namespace NotReaper.Tools.ChainBuilder {
 		private void Update() {
 
 			if (!activated) return;
+
+
+
 
 			if (Input.GetMouseButtonDown(0) && EditorInput.isOverGrid) {
 				Transform point = FindLinePointUnderMouse();
@@ -127,6 +131,11 @@ namespace NotReaper.Tools.ChainBuilder {
 			if (isDragging) {
 				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 				draggingPoint.position = new Vector3(mousePos.x, mousePos.y, 0);
+
+				//Draw updated chain lines:
+				List<Vector2> points = FindPointsAlongChain(10);
+				if (points != null) DrawPointsAlongChain(points);
+				
 			}
 
 			if (!Input.GetMouseButton(0)) isDragging = false;
@@ -139,6 +148,7 @@ namespace NotReaper.Tools.ChainBuilder {
 
 			//Draw points along active chain
 			//List<Vector2> points = FindPointsAlongChain(10);
+
 			//if (points != null) DrawPointsAlongChain(points);
 
 
@@ -148,8 +158,6 @@ namespace NotReaper.Tools.ChainBuilder {
 
 
 		private void DrawPointsAlongChain(List<Vector2> points) {
-
-			tempNodeIconsParent = activeChain.transform.Find("TempNodeIcons");
 
 			RemoveTempPointsAlongChain();
 
@@ -176,6 +184,9 @@ namespace NotReaper.Tools.ChainBuilder {
 
 			var lr = activeChain.GetComponent<LineRenderer>();
 			int pCount = lr.positionCount;
+
+			//If the amount of points on the line is lower than the positions we want to get, return to prevent crash.
+			if (pCount < noteCount) return null;
 			
 			double indexDist = pCount / noteCount;
 

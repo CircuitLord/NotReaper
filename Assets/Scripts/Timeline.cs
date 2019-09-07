@@ -118,7 +118,18 @@ namespace NotReaper {
 		//Tools
 		[SerializeField] public EditorToolkit Tools;
 
+		[SerializeField] private MiniTimeline miniTimeline;
+
 		private void Start() {
+
+			//Load the config file
+			NRSettings.LoadSettingsJson();
+
+
+
+
+
+
 			notes = new List<Target>();
 			orderedNotes = new List<Target>();
 			//notesTimeline = new List<TimelineTarget>();
@@ -132,16 +143,12 @@ namespace NotReaper {
 			TimelineStatic = this;
 
 			//Modify the note colors
-			leftColor = UserPrefsManager.leftColor;
-			rightColor = UserPrefsManager.rightColor;
+			leftColor = NRSettings.config.leftColor;
+			rightColor = NRSettings.config.rightColor;
 			bothColor = UserPrefsManager.bothColor;
 			neitherColor = UserPrefsManager.neitherColor;
 
-			//SetSnapWithSliderAction = new UnityAction(SetSnapWithSlider(value));
 
-			///beatSnapSelector.onValueChanged.AddListener(SetSnapWithSlider());
-			//beatSnapSelector.onValueChanged.
-			//beatSnapSelector.
 		}
 
 		void OnApplicationQuit() {
@@ -308,6 +315,9 @@ namespace NotReaper {
 				Tools.undoRedoManager.AddAction(action, userAdded);
 
 			}
+
+			//We have to load the mini timeline after the audio clips load.
+			//miniTimeline.AddNote(beatTime / aud.clip.length, handType);
 
 			//UpdateTrail();
 			//UpdateChainConnectors();
@@ -647,6 +657,7 @@ namespace NotReaper {
 				songLoaded = true;
 			} else {
 				Debug.Log("cues not found");
+				
 			}
 
 		}
@@ -986,12 +997,19 @@ namespace NotReaper {
 					aud.clip = myClip;
 					previewAud.clip = myClip;
 
-					//TODO:
+					
 					SetBPM((float) audicaFile.desc.tempo);
 					SetScale(20);
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 
 					spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
+
+					//Add mini targets to miniTimeline
+					//foreach (Target target in notes) {
+						//miniTimeline.AddNote(target.gridTargetIcon.transform.position.z / aud.clip.length, target.handType);
+
+					//}
+
 				}
 			}
 		}
@@ -1236,7 +1254,19 @@ namespace NotReaper {
 			SetCurrentTime();
 			SetCurrentTick();
 
-			bottomTimelineSlider.SetValueWithoutNotify(GetPercentagePlayed());
+			//bottomTimelineSlider.SetValueWithoutNotify(GetPercentagePlayed());
+			
+			miniTimeline.SetPercentagePlayed(GetPercentagePlayed());
+		}
+
+
+		public void JumpToPercent(float percent) {
+
+			time = SnapTime(aud.clip.length * percent);
+
+			SafeSetTime();
+			SetCurrentTime();
+			SetCurrentTick();
 		}
 
 
