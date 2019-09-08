@@ -12,6 +12,7 @@ namespace NotReaper.Grid {
         private void OnTriggerEnter(Collider other) {
             TargetIcon targetIcon = other.GetComponent<TargetIcon>();
             if (targetIcon) {
+                Debug.Log("Note entered: " + targetIcon);
                 //Timeline.AddLoadedNote(target);
                 targetIcon.IconEnterLoadedNotes();
 

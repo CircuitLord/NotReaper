@@ -17,6 +17,8 @@ public class Ticker : MonoBehaviour {
     public AudioSource chainNode;
     public AudioSource melee;
 
+    public AudioClip kicktest;
+
     public Slider volumeSlider;
 
     private float volume;
@@ -35,9 +37,10 @@ public class Ticker : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         if (layermask == (layermask | (1 << other.gameObject.layer))) {
             if (other.transform.position.z > -1) {
-                switch (other.GetComponentInChildren<TargetIcon>().velocity) {
+                switch (other.GetComponent<TargetIcon>().velocity) {
                     case TargetVelocity.Standard:
-                        {
+                        {   
+                            kick.Stop();
                             kick.time = 0;
                             kick.volume = volume;
                             kick.Play();

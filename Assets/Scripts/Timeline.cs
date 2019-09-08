@@ -1206,6 +1206,19 @@ namespace NotReaper {
 			}
 			*/
 
+			//Failed attempt at optimizing:
+
+			float test = BeatTime();
+			foreach (Target note in loadedNotes) {
+
+
+				//if (note.gridTargetIcon.transform.position.z > -5 && note.gridTargetIcon.transform.position.z < 5) {
+				//	note.gridTargetIcon.sphereCollider.enabled = true;
+				//} else {
+				//	note.gridTargetIcon.sphereCollider.enabled = false;
+				//}
+			}
+
 			UpdateChords();
 
 			if (SustainParticles)

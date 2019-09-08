@@ -29,6 +29,8 @@ namespace NotReaper.Targets {
         public SpriteRenderer chainOutline;
         public SpriteRenderer meleeOutline;
 
+        public SphereCollider sphereCollider;
+
 
         public TargetVelocity velocity = TargetVelocity.Standard;
 
