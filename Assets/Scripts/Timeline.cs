@@ -287,6 +287,8 @@ namespace NotReaper {
 				target.SetBeatLength(0.25f);
 			}
 
+			//target.gridTargetIcon.GetComponentInChildren<Canvas>().worldCamera = Camera.main;
+
 			//Now that all inital dependencies are met, we can init the target. (Loads sustain controller)
 			target.Init();
 
