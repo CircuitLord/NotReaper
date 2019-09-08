@@ -144,6 +144,9 @@ namespace NotReaper {
 			neitherColor = UserPrefsManager.neitherColor;
 
 
+			StartCoroutine(CalculateNoteCollidersEnabled());
+
+
 		}
 
 		void OnApplicationQuit() {
@@ -1174,11 +1177,55 @@ namespace NotReaper {
 		}
 
 		IEnumerator CalculateNoteCollidersEnabled() {
-			for (int i = 0; i < orderedNotes.Count; i++) {
 
+			if (orderedNotes.Count <= 0) {
 
-				yield return 0;
+				
 			}
+
+			int framesToSplitOver = 50;
+
+			int amtToCalc = Mathf.RoundToInt(orderedNotes.Count / framesToSplitOver);
+
+			int j = 0;
+
+			for (int i = 0; i < framesToSplitOver; i++) {
+
+				while(j < orderedNotes.Count) {
+
+					float targetPos = orderedNotes[j].gridTargetIcon.transform.position.z;
+
+					if (targetPos > -20 && targetPos < 20) {
+						orderedNotes[j].gridTargetIcon.sphereCollider.enabled = true;
+					} else {
+						orderedNotes[j].gridTargetIcon.sphereCollider.enabled = false;
+					}
+
+					
+					if (j > amtToCalc * (i + 1)) break;
+
+					j++;
+				}
+
+
+
+				yield return null;
+				
+			}
+
+			while (j < orderedNotes.Count) {
+				float targetPos = orderedNotes[j].gridTargetIcon.transform.position.z;
+
+				if (targetPos > -20 && targetPos < 20) {
+					orderedNotes[j].gridTargetIcon.sphereCollider.enabled = true;
+				} else {
+					orderedNotes[j].gridTargetIcon.sphereCollider.enabled = false;
+				}
+				j++;
+			}
+			//yield return new WaitForSeconds(1);
+			StartCoroutine(CalculateNoteCollidersEnabled());
+
 		}
 
 		public void Update() {
