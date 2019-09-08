@@ -10,10 +10,10 @@ namespace NotReaper.UI {
 
         //bar is 440 pixels long total
 
-        public float songTickLength;
+        public Transform songPreviewIcon;
 
 
-        public float mouseClickAreaLength = 9.4f;
+        public float mouseClickAreaLength = 12.34f;
         public double barLength = 440;
 
         public Transform bar;
@@ -38,7 +38,8 @@ namespace NotReaper.UI {
 
         private void OnMouseDown() {
             var x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
-            x -= transform.position.x;
+            //x -= transform.position.x;
+            Debug.Log(x);
 
             //-4.7 to 4.7
             //9.4 length
@@ -46,12 +47,13 @@ namespace NotReaper.UI {
             float percent = x / mouseClickAreaLength;
 
             timeline.JumpToPercent(percent);
-
-            
-            
+        }
 
 
-
+        public void SetSongPreviewPoint(double percent) {
+            double x = barLength * percent;
+            x -= barLength / 2;
+            songPreviewIcon.localPosition = new Vector3((float)x, 0, 0);
         }
 
         private void OnMouseOver() {
@@ -86,6 +88,7 @@ namespace NotReaper.UI {
             bookmarks[i].GetComponent<Bookmark>().SetIndex(i);
             bookmarks[i].GetComponent<Bookmark>().percentBookmark = percent;
         }
+
 
 
         

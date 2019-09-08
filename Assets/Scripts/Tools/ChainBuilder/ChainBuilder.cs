@@ -124,7 +124,10 @@ namespace NotReaper.Tools.ChainBuilder {
 				Transform point = FindLinePointUnderMouse();
 				if (point && !point.GetComponent<CurvedLinePoint>().isChainStart) {
 					Destroy(point.gameObject);
+
+
 				}
+
 			}
 
 			
@@ -132,28 +135,21 @@ namespace NotReaper.Tools.ChainBuilder {
 				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 				draggingPoint.position = new Vector3(mousePos.x, mousePos.y, 0);
 
-				//Draw updated chain lines:
-				List<Vector2> points = FindPointsAlongChain(10);
-				if (points != null) DrawPointsAlongChain(points);
+				DrawTempChain();
 				
 			}
 
 			if (!Input.GetMouseButton(0)) isDragging = false;
 
-			if (Input.GetKeyDown(KeyCode.U)) {
-				List<Vector2> points = FindPointsAlongChain(40);
-				if (points != null) DrawPointsAlongChain(points);
-			}
-
-
-			//Draw points along active chain
-			//List<Vector2> points = FindPointsAlongChain(10);
-
-			//if (points != null) DrawPointsAlongChain(points);
-
-
 
 		}
+
+
+		public void DrawTempChain() {
+			List<Vector2> points = FindPointsAlongChain(10);
+			if (points != null) DrawPointsAlongChain(points);
+		}
+
 
 
 

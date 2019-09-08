@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: ChainStartNoteFade
   m_Shader: {fileID: 4800000, guid: deec79224f112bf47b25c1711378f7e5, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -25,7 +25,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _ColorMask: 15
+    - _EffectAmount: 1
     - _FadeThreshold: 2
+    - _GrayscaleStrength: 0.7
+    - _IsTimelineNote: 0
     - _Stencil: 0
     - _StencilComp: 8
     - _StencilOp: 0

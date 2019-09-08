@@ -5,6 +5,8 @@
 		_MainTex("Texture", 2D) = "white" {}
 		_FadeThreshold("Fade In Distance", Float) = 2
 		_Tint("Tint", Color) = (1,1,1,1)
+		_GrayscaleStrength("Grayscale Strength", Float) = 0.5
+
 	}
 		SubShader
 		{
@@ -39,6 +41,7 @@
 				float4 _MainTex_ST;
 				float4 _Tint;
 				float _FadeThreshold;
+				float _GrayscaleStrength;
 
 				v2f vert(appdata v)
 				{
@@ -53,8 +56,18 @@
 				{
 					// sample the texture
 					fixed4 col = tex2D(_MainTex, i.uv) * _Tint;
-				float a = clamp((_FadeThreshold - abs(i.worldPos.z) )/ _FadeThreshold, 0, 1);
+
+					//if (_IsTimelineNote == 1f) return col;
+					//if (_IsTimelineNote == 1) return col;
+
+					float a = clamp((_FadeThreshold - abs(i.worldPos.z) )/ _FadeThreshold, 0, 1);
 					col.a *= a;
+
+					
+					if (i.worldPos.z < -0.1) {
+						col.rgb = lerp(col.rgb, dot(col.rgb, float3(0.3, 0.59, 0.11)), _GrayscaleStrength);
+					}
+
 					return col;
 				}
 				ENDCG

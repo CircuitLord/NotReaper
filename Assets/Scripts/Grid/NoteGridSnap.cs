@@ -8,18 +8,16 @@ using NotReaper.UserInput;
 namespace NotReaper.Grid {
 
 
-    public enum SnappingMode { None, Grid, Melee }
+    public enum SnappingMode { None, Grid, Melee, DetailGrid }
 
     public class NoteGridSnap : MonoBehaviour {
-
-
-        [SerializeField] public float xSize;
-        [SerializeField] public float ySize;
 
         private SnappingMode snapMode = SnappingMode.Grid;
 
         public Transform ghost;
         public GameObject standardGrid;
+
+        public GameObject noLinesGrid;
         public GameObject meleeGrid;
 
         
@@ -31,8 +29,8 @@ namespace NotReaper.Grid {
 
         private void Update() {
             if (EditorInput.isOverGrid) {
-                if (EventSystem.current.IsPointerOverGameObject())
-                    return;
+                //if (EventSystem.current.IsPointerOverGameObject())
+                    //return;
 
                 var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -80,8 +78,23 @@ namespace NotReaper.Grid {
 
         public void SetSnappingMode(SnappingMode s) {
             snapMode = s;
-            meleeGrid.SetActive(snapMode == SnappingMode.Melee);
-            standardGrid.SetActive(snapMode == SnappingMode.Grid);
+
+            if (s == SnappingMode.Melee) {
+                noLinesGrid.SetActive(true);
+                meleeGrid.SetActive(true);
+                standardGrid.SetActive(false);
+            } 
+            else if (s == SnappingMode.Grid) {
+                noLinesGrid.SetActive(false);
+                meleeGrid.SetActive(false);
+                standardGrid.SetActive(true);
+            }
+            else if (s == SnappingMode.None) {
+                noLinesGrid.SetActive(true);
+                meleeGrid.SetActive(false);
+                standardGrid.SetActive(false);
+            }
+            
         }
 
 

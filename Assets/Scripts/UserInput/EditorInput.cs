@@ -24,6 +24,7 @@ namespace NotReaper.UserInput {
 		public static DropdownToVelocity selectedVelocity = DropdownToVelocity.Standard;
 		public static bool isOverGrid = false;
 		public static bool inUI = false;
+		public static bool isFocusGrid = false;
 
 		//public PlaceNote toolPlaceNote;
 		[SerializeField] public EditorToolkit Tools;
@@ -38,6 +39,10 @@ namespace NotReaper.UserInput {
 		public Toggle horzToggle;
 		public Toggle vertToggle;
 		public Toggle meleeToggle;
+
+		[SerializeField] private GameObject focusGrid;
+
+
 
 		public TargetIcon hover;
 
@@ -54,6 +59,13 @@ namespace NotReaper.UserInput {
 
 
 		}
+
+		public void FocusGrid(bool focus) {
+			focusGrid.SetActive(focus);
+			
+			isFocusGrid = focus;
+		}
+
 
 		public void SelectHand(TargetHandType type) {
 			selectedHand = type;

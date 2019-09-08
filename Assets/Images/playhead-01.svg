@@ -1,0 +1,16 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-1 {
+        opacity: 0.75;
+      }
+    </style>
+  </defs>
+  <title>playhead</title>
+  <rect class="cls-1" x="265.2" y="6" width="3.59" height="442.72"/>
+  <polygon class="cls-2" points="267 460.93 303.75 497.68 294.37 507.06 267.04 479.72 239.66 507.1 230.25 497.68 267 460.93"/>
+</svg>

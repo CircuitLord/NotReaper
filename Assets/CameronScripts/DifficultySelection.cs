@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class DifficultySelection : MonoBehaviour {
+public class DifficultySelectionDisabled : MonoBehaviour {
     public Dropdown selection;
 
     public Timeline timeline;
@@ -32,6 +32,7 @@ public class DifficultySelection : MonoBehaviour {
     }
 
     public void Update() {
+
         if (System.IO.Directory.Exists(Application.persistentDataPath + "\\temp\\")) {
             bool expertFile = false;
             bool advancedFile = false;

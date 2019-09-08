@@ -31,7 +31,6 @@ namespace NotReaper {
 		public bool SustainParticles = true;
 		public DropdownToVelocity CurrentSound;
 		public static Timeline TimelineStatic;
-		public DifficultySelection DifficultySelection_s;
 		public float playbackSpeed = 1f;
 
 		[SerializeField] private Renderer timelineBG;
@@ -217,10 +216,10 @@ namespace NotReaper {
 			//Calculate the note offset for visual purpose on the timeline.
 			if (handType == TargetHandType.Left) {
 				yOffset = 0.1f;
-				zOffset = -0.2f;
+				zOffset = 0.1f;
 			} else if (handType == TargetHandType.Right) {
 				yOffset = -0.1f;
-				zOffset = -0.1f;
+				zOffset = 0.2f;
 			}
 
 			Target target = new Target();
@@ -326,8 +325,9 @@ namespace NotReaper {
 
 
 		private void UpdateSustains() {
+			
 
-			foreach (var note in notes) {
+			foreach (var note in loadedNotes) {
 				if (note.behavior == TargetBehavior.Hold) {
 					if ((note.gridTargetIcon.transform.position.z < 0) && (note.gridTargetIcon.transform.position.z + note.beatLength / 480f > 0)) {
 
@@ -618,27 +618,27 @@ namespace NotReaper {
 		}
 
 		public void ChangeDifficulty() {
-			Debug.Log("ChangeDifficulty");
-			string dirpath = Application.persistentDataPath;
+			// Debug.Log("ChangeDifficulty");
+			// string dirpath = Application.persistentDataPath;
 
-			string[] cuePath = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
-			if (cuePath.Length > 0) {
-				DeleteAllTargets();
+			// //string[] cuePath = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
+			// if (cuePath.Length > 0) {
+			// 	DeleteAllTargets();
 
-				//load cues from temp
-				string json = File.ReadAllText(cuePath[0]);
-				json = json.Replace("cues", "Items");
-				Cue[] cues = new Cue[2]; //JsonUtility.FromJson<Cue>(json);
-				foreach (Cue cue in cues) {
-					AddTarget(cue);
-				}
-			} else {
-				DeleteAllTargets();
-			}
+			// 	//load cues from temp
+			// 	string json = File.ReadAllText(cuePath[0]);
+			// 	json = json.Replace("cues", "Items");
+			// 	Cue[] cues = new Cue[2]; //JsonUtility.FromJson<Cue>(json);
+			// 	foreach (Cue cue in cues) {
+			// 		AddTarget(cue);
+			// 	}
+			// } else {
+			// 	DeleteAllTargets();
+			// }
 
-			foreach (GridTarget obj in notes) {
-				Debug.Log(obj);
-			}
+			// foreach (GridTarget obj in notes) {
+			// 	Debug.Log(obj);
+			// }
 		}
 
 		public void Import() {
@@ -674,7 +674,7 @@ namespace NotReaper {
 			string dirpath = Application.persistentDataPath;
 
 			if (notes.Count > 0)
-				File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
+				//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 
 			json = JsonUtility.ToJson(songDesc, true);
 			File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
@@ -741,8 +741,8 @@ namespace NotReaper {
 
 			string dirpath = Application.persistentDataPath;
 
-			if (notes.Count > 0)
-				File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
+			//if (notes.Count > 0)
+				//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 		}
 
 		public void Compress(List<FileInfo> files, string destination) {
@@ -934,8 +934,8 @@ namespace NotReaper {
 					}
 
 					if (isDifficultyNamed) {
-						DifficultySelection_s.Value = difficulty;
-						DifficultySelection_s.selection.value = (int) DifficultySelection.Options.Parse(typeof(DifficultySelection.Options), difficulty);
+						//DifficultySelection_s.Value = difficulty;
+						//DifficultySelection_s.selection.value = (int) DifficultySelection.Options.Parse(typeof(DifficultySelection.Options), difficulty);
 
 						//load .cues (delete first because changing difficulty creates targets)
 						DeleteAllTargets();
@@ -999,16 +999,11 @@ namespace NotReaper {
 
 					
 					SetBPM((float) audicaFile.desc.tempo);
-					SetScale(20);
+					//SetScale(20);
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 
 					spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
 
-					//Add mini targets to miniTimeline
-					//foreach (Target target in notes) {
-						//miniTimeline.AddNote(target.gridTargetIcon.transform.position.z / aud.clip.length, target.handType);
-
-					//}
 
 				}
 			}

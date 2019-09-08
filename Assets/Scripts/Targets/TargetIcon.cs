@@ -97,6 +97,9 @@ namespace NotReaper.Targets {
 
         public void SetHandType(TargetHandType handType) {
             foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true)) {
+
+                if (r.name == "WhiteRing") continue;
+
                 switch (handType) {
                     case TargetHandType.Left:
                         r.material.SetColor("_Tint", NRSettings.config.leftColor);
