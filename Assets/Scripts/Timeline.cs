@@ -125,10 +125,6 @@ namespace NotReaper {
 			NRSettings.LoadSettingsJson();
 
 
-
-
-
-
 			notes = new List<Target>();
 			orderedNotes = new List<Target>();
 			//notesTimeline = new List<TimelineTarget>();
@@ -327,7 +323,7 @@ namespace NotReaper {
 
 
 		private void UpdateSustains() {
-			
+
 
 			foreach (var note in loadedNotes) {
 				if (note.behavior == TargetBehavior.Hold) {
@@ -544,7 +540,7 @@ namespace NotReaper {
 				NRAction action = new NRAction();
 				action.affectedTargets.Add(target);
 				action.type = ActionType.RemoveNote;
-				
+
 				Tools.undoRedoManager.AddAction(action, clearRedoActions);
 			}
 
@@ -659,7 +655,7 @@ namespace NotReaper {
 				songLoaded = true;
 			} else {
 				Debug.Log("cues not found");
-				
+
 			}
 
 		}
@@ -678,7 +674,7 @@ namespace NotReaper {
 			if (notes.Count > 0)
 				//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 
-			json = JsonUtility.ToJson(songDesc, true);
+				json = JsonUtility.ToJson(songDesc, true);
 			File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
 			FileInfo descFile = new FileInfo(Path.Combine(dirpath + "\\temp\\", "song.desc"));
 
@@ -744,7 +740,7 @@ namespace NotReaper {
 			string dirpath = Application.persistentDataPath;
 
 			//if (notes.Count > 0)
-				//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
+			//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 		}
 
 		public void Compress(List<FileInfo> files, string destination) {
@@ -999,7 +995,7 @@ namespace NotReaper {
 					aud.clip = myClip;
 					previewAud.clip = myClip;
 
-					
+
 					SetBPM((float) audicaFile.desc.tempo);
 					//SetScale(20);
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
@@ -1177,6 +1173,14 @@ namespace NotReaper {
 			liner.SetPositions(positions);
 		}
 
+		IEnumerator CalculateNoteCollidersEnabled() {
+			for (int i = 0; i < orderedNotes.Count; i++) {
+
+
+				yield return 0;
+			}
+		}
+
 		public void Update() {
 			//TODO: Ordrerd
 			/*
@@ -1208,8 +1212,8 @@ namespace NotReaper {
 
 			//Failed attempt at optimizing:
 
-			float test = BeatTime();
-			foreach (Target note in loadedNotes) {
+			//float test = BeatTime();
+			//foreach (Target note in loadedNotes) {
 
 
 				//if (note.gridTargetIcon.transform.position.z > -5 && note.gridTargetIcon.transform.position.z < 5) {
@@ -1217,7 +1221,7 @@ namespace NotReaper {
 				//} else {
 				//	note.gridTargetIcon.sphereCollider.enabled = false;
 				//}
-			}
+			//}
 
 			UpdateChords();
 
@@ -1265,7 +1269,7 @@ namespace NotReaper {
 			SetCurrentTick();
 
 			//bottomTimelineSlider.SetValueWithoutNotify(GetPercentagePlayed());
-			
+
 			miniTimeline.SetPercentagePlayed(GetPercentagePlayed());
 		}
 
