@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using SFB;
 using NotReaper.UserInput;
 using TMPro;
 using UnityEngine;
@@ -34,8 +35,12 @@ namespace NotReaper.UI {
         }
 
         public void NewAudica() {
-            Deactivate();
-            songDescModal.NewSongDesc();
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("OGG File", Application.dataPath, "ogg", false);
+            string oggPath = paths.Length > 0 ? paths[0] : "";
+            if (oggPath != "") {
+                Deactivate();
+                songDescModal.NewSongDesc(oggPath);
+            }
         }
 
         public void LoadRecentAudica() {
