@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NotReaper.UserInput;
 using TMPro;
 using UnityEngine;
 using NotReaper.IO;
-using SFB;
 
 namespace NotReaper.UI {
 
@@ -42,10 +41,7 @@ namespace NotReaper.UI {
 
         }
 
-        public void NewSongDesc() {
-
-            string[] paths = StandaloneFileBrowser.OpenFilePanel("OGG File", Application.dataPath, "ogg", false);
-            oggPath = paths[0];
+        public void NewSongDesc(string oggPath) {
 
             isNewSong = true;
             songID.text = "";
