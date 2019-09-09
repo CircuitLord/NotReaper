@@ -14,7 +14,7 @@ namespace NotReaper.UI {
 
 
         public float mouseClickAreaLength = 12.34f;
-        public double barLength = 440;
+        public double barLength;
 
         public Transform bar;
 

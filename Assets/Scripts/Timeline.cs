@@ -70,7 +70,6 @@ namespace NotReaper {
 
 		public static List<Target> loadedNotes;
 		//List<TargetIcon> notesTimeline;
-		SongDescyay songDesc;
 
 
 		public TargetIcon timelineTargetIconPrefab;
@@ -677,7 +676,7 @@ namespace NotReaper {
 			if (notes.Count > 0)
 				//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 
-				json = JsonUtility.ToJson(songDesc, true);
+				//json = JsonUtility.ToJson(songDesc, true);
 			File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
 			FileInfo descFile = new FileInfo(Path.Combine(dirpath + "\\temp\\", "song.desc"));
 
@@ -784,7 +783,7 @@ namespace NotReaper {
 			string dirpath = Application.persistentDataPath;
 
 			//create the new song desc
-			songDesc = new SongDescyay();
+			//songDesc = new SongDescyay();
 
 			//locate and copy ogg file to temp folder (used to save the project later)
 			var audioFiles = StandaloneFileBrowser.OpenFilePanel("Import .ogg file", System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyMusic), "ogg", false);
@@ -897,18 +896,18 @@ namespace NotReaper {
 				var descFiles = Directory.GetFiles(dirpath + "\\temp\\", "song.desc");
 				if (descFiles.Length > 0) {
 					string json = File.ReadAllText(dirpath + "\\temp\\song.desc");
-					songDesc = JsonUtility.FromJson<SongDescyay>(json);
-					SetOffset(songDesc.offset);
-					SetSongID(songDesc.songID);
-					SetSongTitle(songDesc.title);
-					SetSongArtist(songDesc.artist);
-					SetSongEndEvent(songDesc.songEndEvent.Replace("event:/song_end/song_end_", string.Empty));
-					SetSongPreRoll(songDesc.prerollSeconds);
-					SetSongAuthor(songDesc.author);
+					//songDesc = JsonUtility.FromJson<SongDescyay>(json);
+					//SetOffset(songDesc.offset);
+					//SetSongID(songDesc.songID);
+					//SetSongTitle(songDesc.title);
+					//SetSongArtist(songDesc.artist);
+					//SetSongEndEvent(songDesc.songEndEvent.Replace("event:/song_end/song_end_", string.Empty));
+					//SetSongPreRoll(songDesc.prerollSeconds);
+					//SetSongAuthor(songDesc.author);
 
 				} else {
 					Debug.Log("desc not found");
-					songDesc = new SongDescyay();
+					//songDesc = new SongDescyay();
 				}
 
 				//load cues from temp
@@ -1177,11 +1176,6 @@ namespace NotReaper {
 		}
 
 		IEnumerator CalculateNoteCollidersEnabled() {
-
-			if (orderedNotes.Count <= 0) {
-
-				
-			}
 
 			int framesToSplitOver = 50;
 

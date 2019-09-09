@@ -709,6 +709,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7959903879276782685}
     m_Modifications:
+    - target: {fileID: 6610239312882491298, guid: 25723848f86b550448d0ec5065ea330e,
+        type: 3}
+      propertyPath: m_Name
+      value: NoLinesGrid
+      objectReference: {fileID: 0}
+    - target: {fileID: 6610239312882491298, guid: 25723848f86b550448d0ec5065ea330e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -4459809763987022759, guid: 25723848f86b550448d0ec5065ea330e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -774,16 +784,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 0.88
       objectReference: {fileID: 0}
-    - target: {fileID: 6610239312882491298, guid: 25723848f86b550448d0ec5065ea330e,
-        type: 3}
-      propertyPath: m_Name
-      value: NoLinesGrid
-      objectReference: {fileID: 0}
-    - target: {fileID: 6610239312882491298, guid: 25723848f86b550448d0ec5065ea330e,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: -5368368465845703480, guid: 25723848f86b550448d0ec5065ea330e,
         type: 3}
       propertyPath: m_SortingOrder
@@ -811,6 +811,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7959903879276782685}
     m_Modifications:
+    - target: {fileID: 1155046927378772, guid: 961cf48f92539cd41817b6d3620f32bc, type: 3}
+      propertyPath: m_Name
+      value: HoverTarget
+      objectReference: {fileID: 0}
     - target: {fileID: 4705229069936184, guid: 961cf48f92539cd41817b6d3620f32bc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -854,10 +858,6 @@ PrefabInstance:
     - target: {fileID: 4705229069936184, guid: 961cf48f92539cd41817b6d3620f32bc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1155046927378772, guid: 961cf48f92539cd41817b6d3620f32bc, type: 3}
-      propertyPath: m_Name
-      value: HoverTarget
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 961cf48f92539cd41817b6d3620f32bc, type: 3}

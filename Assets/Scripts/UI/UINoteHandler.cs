@@ -2,7 +2,6 @@ using NotReaper.Grid;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.UI;
-using NotReaper.Notifications;
 using NotReaper.Targets;
 using NotReaper.UserInput;
 

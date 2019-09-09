@@ -11,6 +11,8 @@ namespace NotReaper {
 
         public static NRJsonSettings config = new NRJsonSettings();
 
+        public static bool isLoaded = false;
+
         private static string configFilePath = Path.Combine(Application.persistentDataPath, "NRConfig.json");
 
         public static void LoadSettingsJson(bool regenConfig = false) {
@@ -27,6 +29,9 @@ namespace NotReaper {
             } catch(Exception e) {
                 Debug.LogError(e);
             }
+
+
+            isLoaded = true;
 
             
 
@@ -81,6 +86,8 @@ namespace NotReaper {
         public double mainVol = 0.5f;
         public double noteVol = 0.5f;
         public double sustainVol = 0.5f;
+
+        public double UIFadeDuration = 1.0f;
     }
 
 }

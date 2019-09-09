@@ -71,6 +71,7 @@ namespace NotReaper.Targets {
             IconExitLoadedNotesEvent();
         }
 
+        public event Action TrySelectEvent;
 
 
 
@@ -82,6 +83,8 @@ namespace NotReaper.Targets {
             chainStartOutline.enabled = (behavior == TargetBehavior.ChainStart);
             chainOutline.enabled = (behavior == TargetBehavior.Chain);
             meleeOutline.enabled = (behavior == TargetBehavior.Melee);
+
+            TrySelectEvent();
 
         }
 

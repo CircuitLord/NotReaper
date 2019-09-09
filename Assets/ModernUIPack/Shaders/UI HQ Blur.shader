@@ -6,7 +6,7 @@ Shader "Custom/UIBlur"
 {
     Properties
     {
-        _Radius("Radius", Range(1, 30)) = 1
+        _Radius("Radius", Range(0, 30)) = 1
 		[HideInInspector]_Stencil("ST", 2D) = "white" {}
 		[HideInInspector]_StencilOp("ST OP", 2D) = "white" {}
 		[HideInInspector]_StencilComp("ST COMP", 2D) = "white" {}
