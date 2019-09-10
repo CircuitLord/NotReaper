@@ -23,6 +23,8 @@ namespace NotReaper.UserInput {
 		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
 		public static TargetBehavior selectedBehavior = TargetBehavior.Standard;
 		public static DropdownToVelocity selectedVelocity = DropdownToVelocity.Standard;
+
+		public static EditorMode selectedMode = EditorMode.Compose;
 		public static bool isOverGrid = false;
 		public static bool inUI = false;
 		public static bool isFocusGrid = false;
@@ -45,6 +47,8 @@ namespace NotReaper.UserInput {
 
 		public NotificationShower notificationShower;
 
+		public UIModeSelect editorMode;
+
 		bool isCTRLDown;
 		bool isShiftDown;
 
@@ -62,6 +66,7 @@ namespace NotReaper.UserInput {
 				yield return new WaitForSeconds(0.5f);
 			}
 
+			SelectMode(EditorMode.Compose);
 			SelectTool(EditorTool.Standard);
 			SelectHand(TargetHandType.Left);
 
@@ -138,6 +143,13 @@ namespace NotReaper.UserInput {
 
 			selectedVelocity = velocity;
 
+		}
+
+		public void SelectMode(EditorMode mode) {
+
+			editorMode.UpdateUI(mode);
+
+			selectedMode = mode;
 		}
 
 		public void SelectTool(EditorTool tool) {

@@ -84,8 +84,6 @@ namespace NotReaper.Targets {
             chainOutline.enabled = (behavior == TargetBehavior.Chain);
             meleeOutline.enabled = (behavior == TargetBehavior.Melee);
 
-            TrySelectEvent();
-
         }
 
         public void DisableSelected() {

@@ -18,6 +18,8 @@ namespace NotReaper.Managers {
 
 		public ChainBuilder chainBuilder;
 
+		public DragSelect dragSelect;
+
 
 
 	}

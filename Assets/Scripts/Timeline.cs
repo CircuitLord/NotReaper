@@ -50,10 +50,8 @@ namespace NotReaper {
 
 		[SerializeField] private TextMeshProUGUI songTimestamp;
 		[SerializeField] private TextMeshProUGUI curTick;
-		[SerializeField] private Slider bottomTimelineSlider;
 
 		[SerializeField] private HorizontalSelector beatSnapSelector;
-		private UnityAction SetSnapWithSliderAction;
 
 		private Color leftColor;
 		private Color rightColor;
@@ -68,6 +66,8 @@ namespace NotReaper {
 		//Contains the notes that the player can actually see.
 		public static List<Target> selectableNotes;
 
+		public List<Target> selectedNotes;
+
 		public static List<Target> loadedNotes;
 		//List<TargetIcon> notesTimeline;
 
@@ -81,7 +81,7 @@ namespace NotReaper {
 		public static float time { get; private set; }
 
 		private int beatSnap = 4;
-		private int scale = 20;
+		public int scale = 20;
 		private float targetScale = 0.7f;
 		private float scaleOffset = 0;
 		private static float bpm = 60;
@@ -104,7 +104,7 @@ namespace NotReaper {
 
 		private float timelineMaterialOffset;
 
-		private bool hover = false;
+		public bool hover = false;
 		private bool paused = true;
 		public bool projectStarted = false;
 
@@ -1162,6 +1162,7 @@ namespace NotReaper {
 				note.localScale = targetScale * Vector3.one;
 			}
 			scale = newScale;
+			//Debug.Log("New scale: " + scale);
 		}
 
 		public void UpdateTrail() {
@@ -1222,6 +1223,49 @@ namespace NotReaper {
 
 		}
 
+
+		public IEnumerator SelectNotesInTimelineBox(float min, float max) {
+			int framesToSplitOver = 10;
+
+			int amtToCalc = Mathf.RoundToInt(orderedNotes.Count / framesToSplitOver);
+
+			//TODO: Clear previously selected.
+			selectedNotes = new List<Target>();
+
+
+			int j = 0;
+
+			for (int i = 0; i < framesToSplitOver; i++) {
+
+				while(j < orderedNotes.Count) {
+					Target target = orderedNotes[j];
+
+					float targetPos = target.timelineTargetIcon.transform.localPosition.x;
+
+					if (targetPos >= min && targetPos <= max) {
+						selectedNotes.Add(target);
+						target.timelineTargetIcon.EnableSelected(target.behavior);
+						target.gridTargetIcon.EnableSelected(target.behavior);
+					} else {
+						target.timelineTargetIcon.DisableSelected();
+						target.gridTargetIcon.DisableSelected();
+						
+					}
+
+					
+					if (j > amtToCalc * (i + 1)) break;
+
+					j++;
+				}
+
+
+
+				yield return null;
+				
+			}
+
+		}
+
 		public void Update() {
 			//TODO: Ordrerd
 			/*
@@ -1271,6 +1315,8 @@ namespace NotReaper {
 
 			if (!paused) time += Time.deltaTime * playbackSpeed;
 
+			bool isShiftDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
 			if (hover) {
 				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
 					if (Input.mouseScrollDelta.y > 0.1f) {
@@ -1282,13 +1328,13 @@ namespace NotReaper {
 			}
 			//if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
 
-			if (Input.mouseScrollDelta.y < -0.1f) {
+			if (!isShiftDown && Input.mouseScrollDelta.y < -0.1f) {
 				time += BeatsToDuration(4f / beatSnap);
 				time = SnapTime(time);
 
 				SafeSetTime();
 				if (paused) previewAud.Play();
-			} else if (Input.mouseScrollDelta.y > 0.1f) {
+			} else if (!isShiftDown && Input.mouseScrollDelta.y > 0.1f) {
 				time -= BeatsToDuration(4f / beatSnap);
 				time = SnapTime(time);
 				SafeSetTime();
@@ -1415,7 +1461,6 @@ namespace NotReaper {
 			string seconds = ((int) time % 60).ToString("00");
 
 			songTimestamp.text = minutes + ":" + seconds;
-			//curSeconds.text = seconds;
 		}
 
 		private void SetCurrentTick() {
