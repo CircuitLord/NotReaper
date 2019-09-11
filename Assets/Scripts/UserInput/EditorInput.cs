@@ -35,17 +35,20 @@ namespace NotReaper.UserInput {
 
 		[SerializeField] private Dropdown soundDropdown;
 
-		[SerializeField] private UIToolSelect noteToolbar;
+		[SerializeField] private UIToolSelect uiToolSelect;
 		[SerializeField] private HandTypeSelect handTypeSelect;
 
 		[SerializeField] private GameObject focusGrid;
 
 
-		public TargetIcon hover;
+		public HoverTarget hover;
 
-		public NoteGridSnap noteGrid;
 
-		public NotificationShower notificationShower;
+		public GameObject normalGrid;
+		public GameObject noGrid;
+		public GameObject meleeGrid;
+
+
 
 		public UIModeSelect editorMode;
 
@@ -56,6 +59,7 @@ namespace NotReaper.UserInput {
 			InputManager.LoadHotkeys();
 
 
+
 			StartCoroutine(WaitForUserColors());
 
 
@@ -63,14 +67,14 @@ namespace NotReaper.UserInput {
 
 		IEnumerator WaitForUserColors() {
 			while (!NRSettings.isLoaded) {
-				yield return new WaitForSeconds(0.5f);
+				yield return new WaitForSeconds(0.2f);
 			}
 
 			SelectMode(EditorMode.Compose);
 			SelectTool(EditorTool.Standard);
 			SelectHand(TargetHandType.Left);
 
-			NotificationShower.AddNotifToQueue(new NRNotification("Welcome to NotReaper!", 10f));
+			NotificationShower.AddNotifToQueue(new NRNotification("Welcome to NotReaper!", 8f));
 		}
 
 		public static Color GetSelectedColor() {
@@ -96,14 +100,39 @@ namespace NotReaper.UserInput {
 			isFocusGrid = focus;
 		}
 
+		public void SelectSnappingMode(SnappingMode mode) {
+			selectedSnappingMode = mode;
+
+			switch (mode) {
+				case SnappingMode.Grid:
+					normalGrid.SetActive(true);
+					noGrid.SetActive(false);
+					meleeGrid.SetActive(false);
+					break;
+				case SnappingMode.None:
+					normalGrid.SetActive(false);
+					noGrid.SetActive(true);
+					meleeGrid.SetActive(false);
+					break;
+				case SnappingMode.Melee:
+					normalGrid.SetActive(false);
+					noGrid.SetActive(true);
+					meleeGrid.SetActive(true);
+					break;
+
+			}
+
+
+
+		}
+
 
 		public void SelectHand(TargetHandType type) {
 			selectedHand = type;
 
-			hover.SetHandType(type);
-
-			noteToolbar.UpdateUINoteSelected(selectedTool);
+			uiToolSelect.UpdateUINoteSelected(selectedTool);
 			handTypeSelect.UpdateUI(type);
+			hover.UpdateUIHandColor(GetSelectedColor());
 
 
 		}
@@ -154,84 +183,96 @@ namespace NotReaper.UserInput {
 
 		public void SelectTool(EditorTool tool) {
 
+			uiToolSelect.UpdateUINoteSelected(tool);
+
+			hover.UpdateUITool(tool);
+
+			selectedTool = tool;
+
 			//Update the UI based on the tool:
 			switch (tool) {
 				case EditorTool.Standard:
 					selectedBehavior = TargetBehavior.Standard;
-					hover.SetBehavior(TargetBehavior.Standard);
 					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
-					noteToolbar.UpdateUINoteSelected(EditorTool.Standard);
+					SelectSnappingMode(SnappingMode.Grid);
 
 					break;
 
 				case EditorTool.Hold:
 					selectedBehavior = TargetBehavior.Hold;
-					hover.SetBehavior(TargetBehavior.Hold);
 					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
-					noteToolbar.UpdateUINoteSelected(EditorTool.Hold);
+					//noteGrid.SetSnappingMode(SnappingMode.Grid);
+					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Horizontal:
 					selectedBehavior = TargetBehavior.Horizontal;
-					hover.SetBehavior(TargetBehavior.Horizontal);
 					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
-					noteToolbar.UpdateUINoteSelected(EditorTool.Horizontal);
+					//noteGrid.SetSnappingMode(SnappingMode.Grid);
+					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Vertical:
 					selectedBehavior = TargetBehavior.Vertical;
-					hover.SetBehavior(TargetBehavior.Vertical);
 					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
-					noteToolbar.UpdateUINoteSelected(EditorTool.Vertical);
+					//noteGrid.SetSnappingMode(SnappingMode.Grid);
+					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.ChainStart:
 					selectedBehavior = TargetBehavior.ChainStart;
-					hover.SetBehavior(TargetBehavior.ChainStart);
 					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.ChainStart);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
-					noteToolbar.UpdateUINoteSelected(EditorTool.ChainStart);
+					//noteGrid.SetSnappingMode(SnappingMode.Grid);
+					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.ChainNode:
 					selectedBehavior = TargetBehavior.Chain;
-					hover.SetBehavior(TargetBehavior.Chain);
 					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Chain);
-					noteGrid.SetSnappingMode(SnappingMode.None);
-					noteToolbar.UpdateUINoteSelected(EditorTool.ChainNode);
+					//noteGrid.SetSnappingMode(SnappingMode.None);
+					SelectSnappingMode(SnappingMode.None);
 					break;
 
 				case EditorTool.Melee:
 					selectedBehavior = TargetBehavior.Melee;
-					hover.SetBehavior(TargetBehavior.Melee);
 					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Melee);
-					noteGrid.SetSnappingMode(SnappingMode.Melee);
+					//noteGrid.SetSnappingMode(SnappingMode.Melee);
+					SelectSnappingMode(SnappingMode.Melee);
 					SelectHand(TargetHandType.Either);
-					noteToolbar.UpdateUINoteSelected(EditorTool.Melee);
+					break;
+
+				case EditorTool.DragSelect:
+					selectedBehavior = TargetBehavior.None;
+
+
+
+					Tools.dragSelect.Activate(true);
+					Tools.chainBuilder.Activate(false);
 					break;
 
 				case EditorTool.ChainBuilder:
 					selectedBehavior = TargetBehavior.None;
 
-					hover.SetBehavior(TargetBehavior.None);
-
+					Tools.dragSelect.Activate(false);
 					Tools.chainBuilder.Activate(true);
 					break;
+
 
 				default:
 					break;
 			}
 
-			selectedTool = tool;
 
 		}
 
 
 		private void Update() {
+
+			if (Timeline.inTimingMode && inUI) {
+				if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
+					timeline.TogglePlayback();
+			}
+			}
 
 			if (inUI) return;
 
@@ -315,7 +356,6 @@ namespace NotReaper.UserInput {
 			}
 			if (Input.GetKeyDown(InputManager.selectVert)) {
 				SelectTool(EditorTool.Vertical);
-				NotificationShower.AddNotifToQueue(new NRNotification("Vertical note selected!"));
 			}
 			if (Input.GetKeyDown(InputManager.selectChainStart)) {
 				SelectTool(EditorTool.ChainStart);
@@ -327,6 +367,21 @@ namespace NotReaper.UserInput {
 				SelectTool(EditorTool.Melee);
 
 			}
+
+			if (Input.GetKeyDown(KeyCode.F)) {
+				SelectTool(EditorTool.DragSelect);
+			}
+
+			if (Input.GetKeyDown(KeyCode.G)) {
+				SelectSnappingMode(SnappingMode.Grid);
+			}
+			if (Input.GetKeyDown(KeyCode.N)) {
+				SelectSnappingMode(SnappingMode.None);
+			}
+			if (Input.GetKeyDown(KeyCode.M)) {
+				SelectSnappingMode(SnappingMode.Melee);
+			}
+
 
 			if (Input.GetKeyDown(InputManager.toggleColor)) {
 

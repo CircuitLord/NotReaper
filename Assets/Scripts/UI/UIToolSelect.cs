@@ -25,6 +25,11 @@ namespace NotReaper.UI {
         [SerializeField] private SpriteRenderer srchainnode;
         [SerializeField] private SpriteRenderer srmelee;
 
+        [SerializeField] private Image imgDragSelect;
+        [SerializeField] private Image imgChainBuilder;
+
+
+
 
         [Header("Extras")]
         [SerializeField] private GameObject selectedSlider;
@@ -67,11 +72,11 @@ namespace NotReaper.UI {
                     break;
 
 
-                case "chainbuilder":
-                    editorInput.SelectTool(EditorTool.ChainBuilder);
-                    break;
                 case "dragselect":
                     editorInput.SelectTool(EditorTool.DragSelect);
+                    break;
+                case "chainbuilder":
+                    editorInput.SelectTool(EditorTool.ChainBuilder);
                     break;
             }         
         }
@@ -83,7 +88,8 @@ namespace NotReaper.UI {
 
             switch (type) {
                 case EditorTool.Standard:
-                    DOSliderToNote(0, Color.blue);
+                    DOSliderToNote(0);
+                    //selectedSlider.GetComponent<Image>().DOFade(1f, fadeDuration);
 
                     srstandard.DOFade(1, fadeDuration);
                     srstandard.DOColor(color, fadeDuration);
@@ -102,12 +108,14 @@ namespace NotReaper.UI {
                     srchainnode.DOFade(fadeAmount, fadeDuration);
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
-
+                    imgChainBuilder.DOFade(fadeAmount, fadeDuration);
+                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
                 
                     break;
 
                 case EditorTool.Hold:
-                    DOSliderToNote(1, Color.red);
+                    DOSliderToNote(1);
+                    //selectedSlider.GetComponent<Image>().DOFade(1f, fadeDuration);
 
                     srhold.DOFade(1, fadeDuration);
                     srhold.DOColor(color, fadeDuration);
@@ -126,10 +134,14 @@ namespace NotReaper.UI {
                     srchainnode.DOFade(fadeAmount, fadeDuration);
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
+                    imgChainBuilder.DOFade(fadeAmount, fadeDuration);
+                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+
                     break;
 
                 case EditorTool.Horizontal:
-                    DOSliderToNote(2, Color.green);
+                    DOSliderToNote(2);
+                    //selectedSlider.GetComponent<Image>().DOFade(1f, fadeDuration);
 
                     srhorizontal.DOFade(1, fadeDuration);
                     srhorizontal.DOColor(color, fadeDuration);
@@ -148,10 +160,14 @@ namespace NotReaper.UI {
                     srchainnode.DOFade(fadeAmount, fadeDuration);
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
+                    imgChainBuilder.DOFade(fadeAmount, fadeDuration);
+                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+
                     break;
 
                 case EditorTool.Vertical:
-                    DOSliderToNote(3, Color.magenta);
+                    DOSliderToNote(3);
+                    //selectedSlider.GetComponent<Image>().DOFade(1f, fadeDuration);
 
                     srvertical.DOFade(1, fadeDuration);
                     srvertical.DOColor(color, fadeDuration);
@@ -170,9 +186,13 @@ namespace NotReaper.UI {
                     srchainnode.DOFade(fadeAmount, fadeDuration);
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
+                    imgChainBuilder.DOFade(fadeAmount, fadeDuration);
+                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+
                     break;
                 case EditorTool.ChainStart:
-                    DOSliderToNote(4, Color.cyan);
+                    DOSliderToNote(4);
+                    //selectedSlider.GetComponent<Image>().DOFade(1f, fadeDuration);
 
                     srchainstart.DOFade(1, fadeDuration);
                     srchainstart.DOColor(color, fadeDuration);
@@ -191,9 +211,13 @@ namespace NotReaper.UI {
                     srchainnode.DOFade(fadeAmount, fadeDuration);
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
+                    imgChainBuilder.DOFade(fadeAmount, fadeDuration);
+                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+
                     break;
                 case EditorTool.ChainNode:
-                    DOSliderToNote(5, Color.yellow);
+                    DOSliderToNote(5);
+                    //selectedSlider.GetComponent<Image>().DOFade(1f, fadeDuration);
 
                     srchainnode.DOFade(1, fadeDuration);
                     srchainnode.DOColor(color, fadeDuration);
@@ -212,9 +236,15 @@ namespace NotReaper.UI {
                     srchainstart.DOFade(fadeAmount, fadeDuration);
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
+                    imgChainBuilder.DOFade(fadeAmount, fadeDuration);
+                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+
                     break;
                 case EditorTool.Melee:
-                    DOSliderToNote(6, Color.white);
+
+                    DOSliderToNote(6);
+                    //selectedSlider.GetComponent<Image>().DOFade(1f, fadeDuration);
+                    
 
                     srmelee.DOFade(1, fadeDuration);
                     srmelee.DOColor(color, fadeDuration);
@@ -233,7 +263,82 @@ namespace NotReaper.UI {
                     srchainstart.DOFade(fadeAmount, fadeDuration);
                     srchainnode.DOFade(fadeAmount, fadeDuration);
 
+                    imgChainBuilder.DOFade(fadeAmount, fadeDuration);
+                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+
                     break;
+
+
+                    //The other editor tools that aren't on the sidebar
+                case EditorTool.DragSelect:
+                    //DOSliderToNote(6, Color.white);
+
+                    //Fade in the button
+                    imgDragSelect.DOFade(1f, fadeDuration);
+
+
+                    //Fade out the slider
+                    selectedSlider.GetComponent<Image>().DOFade(0f, fadeDuration);
+
+                    //Reset all note toolbar colors
+                    srstandard.DOColor(Color.white, fadeDuration);
+                    srhold.DOColor(Color.white, fadeDuration);
+                    srhorizontal.DOColor(Color.white, fadeDuration);
+                    srvertical.DOColor(Color.white, fadeDuration);
+                    srchainstart.DOColor(Color.white, fadeDuration);
+                    srchainnode.DOColor(Color.white, fadeDuration);
+                    srmelee.DOColor(Color.white, fadeDuration);
+                    
+                    //Fade them out
+                    srstandard.DOFade(fadeAmount, fadeDuration);
+                    srhold.DOFade(fadeAmount, fadeDuration);
+                    srhorizontal.DOFade(fadeAmount, fadeDuration);
+                    srvertical.DOFade(fadeAmount, fadeDuration);
+                    srchainstart.DOFade(fadeAmount, fadeDuration);
+                    srchainnode.DOFade(fadeAmount, fadeDuration);
+                    srmelee.DOFade(fadeAmount, fadeDuration);
+
+                    imgChainBuilder.DOFade(fadeAmount, fadeDuration);
+
+                    
+
+                    break;
+
+                
+                case EditorTool.ChainBuilder:
+                    //DOSliderToNote(6, Color.white);
+
+                    //Fade in the button
+                    imgChainBuilder.DOFade(1f, fadeDuration);
+
+
+                    //Fade out the slider
+                    selectedSlider.GetComponent<Image>().DOFade(0f, fadeDuration);
+
+                    //Reset all note toolbar colors
+                    srstandard.DOColor(Color.white, fadeDuration);
+                    srhold.DOColor(Color.white, fadeDuration);
+                    srhorizontal.DOColor(Color.white, fadeDuration);
+                    srvertical.DOColor(Color.white, fadeDuration);
+                    srchainstart.DOColor(Color.white, fadeDuration);
+                    srchainnode.DOColor(Color.white, fadeDuration);
+                    srmelee.DOColor(Color.white, fadeDuration);
+                    
+                    //Fade them out
+                    srstandard.DOFade(fadeAmount, fadeDuration);
+                    srhold.DOFade(fadeAmount, fadeDuration);
+                    srhorizontal.DOFade(fadeAmount, fadeDuration);
+                    srvertical.DOFade(fadeAmount, fadeDuration);
+                    srchainstart.DOFade(fadeAmount, fadeDuration);
+                    srchainnode.DOFade(fadeAmount, fadeDuration);
+                    srmelee.DOFade(fadeAmount, fadeDuration);
+
+                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+
+                    
+
+                    break;
+
             }
             
         }
@@ -241,13 +346,13 @@ namespace NotReaper.UI {
 
 
 
-        private void DOSliderToNote(int index, Color colorChange) {
+        private void DOSliderToNote(int index) {
             float finalY = yOffset - (index * indexOffset);
 
            //selectedSlider.transform.(new Vector3(0f, finalY, 0f), 1f).SetEase(Ease.InOutCubic);
            DOTween.To(SetSelectedSliderPosY, sliderRTrans.anchoredPosition.y, finalY, 0.3f).SetEase(Ease.InOutCubic);
 
-           selectedSlider.GetComponent<Image>().DOColor(EditorInput.GetOppositeSelectedColor(), 1f);
+           selectedSlider.GetComponent<Image>().DOColor(EditorInput.GetSelectedColor(), 1f);
             
         }
 

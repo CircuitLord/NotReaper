@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using NotReaper.Timing;
 using NotReaper.UserInput;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 namespace NotReaper.UI {
 
 
-    public enum EditorMode { Compose, Metadata, Settings };
+    public enum EditorMode { Compose, Metadata, Settings, Timing };
     public class UIModeSelect : MonoBehaviour {
 
         public EditorInput editorInput;
@@ -16,7 +17,8 @@ namespace NotReaper.UI {
         public RectTransform sliderRTrans;
 
         public UIMetadata uIMetadata;
-        public float startOffset = 37f;
+        public UITiming uITiming;
+        public float startOffset = 51.08f;
         public float indexOffset = 66.6f;
 
     
@@ -31,6 +33,10 @@ namespace NotReaper.UI {
                 case "settings":
                     editorInput.SelectMode(EditorMode.Settings);
                     break;
+                case "timing":
+                    editorInput.SelectMode(EditorMode.Timing);
+                    break;
+                
             }
 
         }
@@ -49,6 +55,9 @@ namespace NotReaper.UI {
                     uIMetadata.StopAllCoroutines();
                     StartCoroutine(uIMetadata.FadeOut());
 
+                    uITiming.StopAllCoroutines();
+                    StartCoroutine(uITiming.FadeOut());
+
                     break;
 
                 case EditorMode.Metadata:
@@ -57,6 +66,9 @@ namespace NotReaper.UI {
 
                     uIMetadata.StopAllCoroutines();
                     StartCoroutine(uIMetadata.FadeIn());
+
+                    uITiming.StopAllCoroutines();
+                    StartCoroutine(uITiming.FadeOut());
                     
                     EditorInput.inUI = true;
 
@@ -64,15 +76,33 @@ namespace NotReaper.UI {
 
 
                     break;
+                
+                case EditorMode.Timing:
+                    uITiming.gameObject.SetActive(true);
+
+                    DOSliderToButton(2, NRSettings.config.leftColor);
+
+                    EditorInput.inUI = true;
+
+                    uITiming.StopAllCoroutines();
+                    StartCoroutine(uITiming.FadeIn());
+
+                    uIMetadata.StopAllCoroutines();
+                    StartCoroutine(uIMetadata.FadeOut());
+
+                    break;
 
                 case EditorMode.Settings:
 
-                    DOSliderToButton(2, Color.white);
+                    DOSliderToButton(3, Color.white);
 
                     EditorInput.inUI = true;
 
                     uIMetadata.StopAllCoroutines();
                     StartCoroutine(uIMetadata.FadeOut());
+
+                    uITiming.StopAllCoroutines();
+                    StartCoroutine(uITiming.FadeOut());
 
                     break;
 

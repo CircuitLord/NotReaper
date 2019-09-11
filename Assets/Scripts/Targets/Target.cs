@@ -36,6 +36,15 @@ namespace NotReaper.Targets {
 			TargetExitLoadedNotesEvent(this);
 		}
 
+		public event Action<Target> TargetSelectEvent;
+		public void MakeTimelineSelectTarget() {
+			TargetSelectEvent(this);
+		}
+		public event Action<Target, bool> TargetDeselectEvent;
+		public void MakeTimelineDeselectTarget() {
+			TargetDeselectEvent(this, false);
+		}
+
 		//I'm so good at naming stuff.
 		public event Action<Target, bool> MakeTimelineUpdateSustainLengthEvent;
 		public void MakeTimelineUpdateSustainLength(bool increase) {
@@ -51,6 +60,14 @@ namespace NotReaper.Targets {
 			gridTargetIcon.IconEnterLoadedNotesEvent += TargetEnterLoadedNotes;
 			gridTargetIcon.IconExitLoadedNotesEvent += TargetExitLoadedNotes;
 
+			timelineTargetIcon.TrySelectEvent += MakeTimelineSelectTarget;
+			gridTargetIcon.TrySelectEvent += MakeTimelineSelectTarget;
+
+			timelineTargetIcon.TryDeselectEvent += MakeTimelineDeselectTarget;
+			gridTargetIcon.TryDeselectEvent += MakeTimelineDeselectTarget;
+
+			SetOutlineColor(NRSettings.config.selectedHighlightColor);
+
 			if (behavior == TargetBehavior.Hold) {
 				var gridHoldTargetManager = gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
 
@@ -63,6 +80,11 @@ namespace NotReaper.Targets {
 		
 			gridTargetPos = gridTargetIcon.transform.localPosition;
 
+		}
+
+		public void SetOutlineColor(Color color) {
+			timelineTargetIcon.SetOutlineColor(color);
+			gridTargetIcon.SetOutlineColor(color);
 		}
 
 		//Wrapper function for setting the hand types of both targets.

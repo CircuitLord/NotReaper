@@ -19,9 +19,9 @@ namespace NotReaper.Tools {
 
 
 		public void TryPlaceNote() {
-			if (!EditorInput.isOverGrid) return;
+			if (!EditorInput.isOverGrid || EditorInput.inUI) return;
 
-			foreach (Target target in Timeline.selectableNotes) {
+			foreach (Target target in Timeline.loadedNotes) {
 				if ((target.gridTargetIcon.transform.position.z == ghost.position.z) && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 

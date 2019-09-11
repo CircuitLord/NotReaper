@@ -72,41 +72,7 @@ public class OptionsMenu : MonoBehaviour {
         timeline.SetPlaybackSpeed(speed);
         playSpeedText.text = "Speed " + Mathf.FloorToInt(speed * 100) + "%";
     }
-    // .Desc menu
-    public void SongIDWasChanged() {
-        string newSongID = songID.text;
-        timeline.SetSongID(newSongID);
-    }
 
-    public void SongTitleWasChanged() {
-        string newSongTitle = songTitle.text;
-        timeline.SetSongTitle(newSongTitle);
-    }
-
-    public void SongArtistWasChanged() {
-        string newSongArtist = songArtist.text;
-        timeline.SetSongArtist(newSongArtist);
-    }
-
-    public void SongEndEventWasChanged() {
-        string newSongEndEvent = songEndEvent.text;
-        timeline.SetSongEndEvent(newSongEndEvent);
-    }
-
-    public void SongPreRollWasChanged() {
-        float newSongPreRoll = float.Parse(songPreRoll.text);
-        timeline.SetSongPreRoll(newSongPreRoll);
-    }
-
-    public void SongAuthorWasChanged() {
-        string newSongAuthor = songAuthor.text;
-        timeline.SetSongAuthor(newSongAuthor);
-    }
-
-    // public void MoggWasChanged() {
-    //     string newMog = Moggsong.text;
-    //     timeline.SetMogg(newMog);
-    // }
 
    
 

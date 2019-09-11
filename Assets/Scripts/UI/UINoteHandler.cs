@@ -27,7 +27,7 @@ namespace NotReaper.UI {
 
 
         public void SoundWasChanged(Dropdown dpd) {
-            timeline.CurrentSound = (DropdownToVelocity) dpd.value;
+            //timeline.CurrentSound = (DropdownToVelocity) dpd.value;
 
             editorInput.SelectVelocity((DropdownToVelocity) dpd.value);
         }

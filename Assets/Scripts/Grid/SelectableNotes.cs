@@ -10,8 +10,7 @@ namespace NotReaper.Grid {
     public class SelectableNotes : MonoBehaviour {
 
         private void OnTriggerEnter(Collider other) {
-            //GridTarget target = other.GetComponentInChildren<GridTarget>();
-            //FIXME: Selectable notes loading
+
             //if (target) {
             //    Timeline.AddSelectableNote(target);
             //}
