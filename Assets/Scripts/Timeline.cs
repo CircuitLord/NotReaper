@@ -845,10 +845,10 @@ namespace NotReaper {
 		}
 
 
-		public void SetTimingModeStats(int newBPM, int tickOffset) {
+		public void SetTimingModeStats(double newBPM, int tickOffset) {
 			//bpm = newBPM;
 			DeleteAllTargets();
-			SetBPM(newBPM);
+			SetBPM((float)newBPM);
 			//SetOffset(tickOffset);
 
 			Cue cue = new Cue();
@@ -859,6 +859,9 @@ namespace NotReaper {
 				cue.tick = (480 * i) + tickOffset;
 				AddTarget(cue);
 			}
+
+			time = 0;
+            SafeSetTime();
 		}
 
 
@@ -1352,6 +1355,8 @@ namespace NotReaper {
 
 
 		public void TogglePlayback() {
+			//TODO: Add check for if song is loaded.
+
 			if (paused) {
 				aud.Play();
 				//metro.StartMetronome();
@@ -1381,6 +1386,8 @@ namespace NotReaper {
 
 		public void SafeSetTime() {
 			if (time < 0) time = 0;
+
+			//TODO: Check if song is loaded
 
 			if (time > aud.clip.length) {
 				time = aud.clip.length;

@@ -32,8 +32,16 @@ namespace NotReaper.Timing {
         public Timeline timeline;
 
 
+        public int offset = 0;
+        public double bpm = 120;
+        public string loadedSong;
+
+
+        TrimAudio trimAudio = new TrimAudio();
+
+
         IEnumerator GetAudioClip(string uri) {
-			using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.)) {
+			using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
 				yield return www.SendWebRequest();
 
 				if (www.isNetworkError) {
@@ -41,9 +49,7 @@ namespace NotReaper.Timing {
 				} else {
 					audioFile = DownloadHandlerAudioClip.GetContent(www);
 
-                    int bpm = 120;
-
-                    Int32.TryParse(bpmInput.text, out bpm);
+                    Double.TryParse(bpmInput.text, out bpm);
 
                     timeline.LoadTimingMode(audioFile);
 
@@ -55,16 +61,10 @@ namespace NotReaper.Timing {
 			}
 		}
 
-        //Tick to MS ["tick"] / 480 * tempo / 1000000
-        //ms to tick is = MS * (1920 / (60000 / BPM * 4))
+        
 
-        private void Start() {
 
-        }
 
-        public void ExportOGG() {
-
-        }
 
 
         public void SelectAudioFile() {
@@ -74,6 +74,7 @@ namespace NotReaper.Timing {
 
             StartCoroutine(GetAudioClip($"file://" + paths[0]));
             name.text = paths[0];
+            loadedSong = paths[0];
         }
 
 
@@ -84,18 +85,15 @@ namespace NotReaper.Timing {
                 timeline.TogglePlayback();
             }
 
-            int bpm = 120;
-
-            Int32.TryParse(bpmInput.text, out bpm);
-            if (bpm == 0) bpm = 120;
-
-            int offset = 0;
+            Double.TryParse(bpmInput.text, out bpm);
             Int32.TryParse(offsetInput.text, out offset);
 
             timeline.SetTimingModeStats(bpm, offset);
 
-            Timeline.time = 0;
-            timeline.SafeSetTime();
+        }
+
+        public void GenerateOgg() {
+            trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output2.ogg") , offset, bpm);
         }
 
         public void UpdateUIValues() {

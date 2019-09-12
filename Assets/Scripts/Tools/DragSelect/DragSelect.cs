@@ -102,11 +102,11 @@ namespace NotReaper.Tools {
 		private TargetIcon IconUnderMouse() {
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -5f);
+			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -4f);
 			ray.direction = Vector3.forward;
 			Debug.DrawRay(ray.origin, ray.direction);
 			//TODO: Tweakable selection distance for raycast
-			if (Physics.Raycast(ray, out hit, 10f, notesLayer)) {
+			if (Physics.Raycast(ray, out hit, 8f, notesLayer)) {
 				Transform objectHit = hit.transform;
 
 				TargetIcon targetIcon = objectHit.GetComponent<TargetIcon>();
