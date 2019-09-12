@@ -37,7 +37,7 @@ namespace NotReaper.Timing {
                 double ms = Math.Abs(TicksToMS(offset, tempo));
                 string newStartTime = new TimeSpan(0, 0, 0, 0, (int)ms).ToString();
 
-                ffmpeg.StartInfo.Arguments = String.Format("-loglevel panic -y -i {0} -ss {1} {2}", path, newStartTime, output);
+                ffmpeg.StartInfo.Arguments = String.Format("-loglevel panic -y -map 0:a -i {0} -ss {1} {2}", path, newStartTime, output);
 
                 ffmpeg.Start();
 
@@ -49,9 +49,9 @@ namespace NotReaper.Timing {
                 
                 double ms = Math.Abs(TicksToMS(offset, tempo));
 
-                string test = String.Format("-y -i {0} -af \"adelay={1}|{1}\" {2}", path, ms, output);
+                string test = String.Format("-y -i {0} -af {3}adelay={1}|{1}{3} {2}", path, (int)ms, output, "\"");
 
-                ffmpeg.StartInfo.Arguments = String.Format("-y -i {0} -af adelay={1}|{1} {2}", path, (int)ms, output);
+                ffmpeg.StartInfo.Arguments = String.Format("-y -i {0} -af \"adelay={1}|{1}\" {2}", path, (int)ms, output);
 
                 ffmpeg.Start();
 

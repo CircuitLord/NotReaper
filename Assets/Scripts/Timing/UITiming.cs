@@ -93,6 +93,7 @@ namespace NotReaper.Timing {
         }
 
         public void GenerateOgg() {
+            if (loadedSong == null) return;
             trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output2.ogg") , offset, bpm);
         }
 

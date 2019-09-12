@@ -32,6 +32,8 @@ namespace NotReaper.UI {
         
         public void UpdateUIValues() {
 
+            if (!Timeline.audicaLoaded) return;
+
             if (Timeline.audicaFile.desc.title != null) titleField.text = Timeline.audicaFile.desc.title;
             if (Timeline.audicaFile.desc.artist != null) artistField.text = Timeline.audicaFile.desc.artist;
             if (Timeline.audicaFile.desc.mapper != null) mapperField.text = Timeline.audicaFile.desc.mapper;
@@ -45,7 +47,7 @@ namespace NotReaper.UI {
         public IEnumerator FadeIn() {
             
 
-            
+            if (!Timeline.audicaLoaded) yield break;
 
             float fadeDuration = (float)NRSettings.config.UIFadeDuration;
 

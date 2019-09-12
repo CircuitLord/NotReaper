@@ -41,11 +41,6 @@ namespace NotReaper {
             if (layermask == (layermask | (1 << other.gameObject.layer))) {
                 if (other.transform.position.z > -1) {
 
-                    if (Timeline.inTimingMode) {
-                        metronomeTick.Play();
-                        return;
-                    }
-
                     switch (other.GetComponent<TargetIcon>().velocity) {
                         case TargetVelocity.Standard:
                             {
@@ -90,6 +85,13 @@ namespace NotReaper {
                                 melee.time = 0;
                                 melee.volume = volume;
                                 melee.Play();
+                                break;
+                            }
+                        case TargetVelocity.Metronome:
+                            {
+                                metronomeTick.time = 0;
+                                //metronomeTick.volume = volume;
+                                metronomeTick.Play();
                                 break;
                             }
 

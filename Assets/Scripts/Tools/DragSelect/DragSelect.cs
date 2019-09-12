@@ -102,11 +102,12 @@ namespace NotReaper.Tools {
 		private TargetIcon IconUnderMouse() {
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -4f);
+			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1.7f);
 			ray.direction = Vector3.forward;
 			Debug.DrawRay(ray.origin, ray.direction);
 			//TODO: Tweakable selection distance for raycast
-			if (Physics.Raycast(ray, out hit, 8f, notesLayer)) {
+			//Box collider size currently 2.2
+			if (Physics.Raycast(ray, out hit, 3.4f, notesLayer)) {
 				Transform objectHit = hit.transform;
 
 				TargetIcon targetIcon = objectHit.GetComponent<TargetIcon>();
@@ -120,6 +121,10 @@ namespace NotReaper.Tools {
 		void Update() {
 
 			if (!activated) return;
+
+			//TODO: Delete selected notes
+
+			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
 
 			//TODO: Moving notes on timeline
 			if (Input.GetMouseButtonDown(0) && !timeline.hover) {

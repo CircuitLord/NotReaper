@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using NotReaper.Models;
 using NotReaper.Targets;
 using NotReaper.UserInput;
@@ -44,7 +45,7 @@ namespace NotReaper.Grid {
 
         }
 
-
+        Vector3 lastPos = new Vector3();
         private void Update() {
             
             if (!iconEnabled) return;
@@ -60,7 +61,13 @@ namespace NotReaper.Grid {
                     break;
 
                 default:
-                    transform.position = NoteGridSnap.SnapToGrid(new Vector3(mousePos.x, mousePos.y, -1f), EditorInput.selectedSnappingMode);
+                    Vector3 newPos = NoteGridSnap.SnapToGrid(new Vector3(mousePos.x, mousePos.y, -1f), EditorInput.selectedSnappingMode);
+                    if (newPos == lastPos) {
+                        return;
+                    }
+                    lastPos = newPos;
+                    transform.position = newPos;
+                    //transform.position = Vector3.SmoothDamp(transform.position, newPos, ref velocity, 0.3f);
                     break;
             }
 
