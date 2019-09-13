@@ -18,8 +18,8 @@ namespace NotReaper.UserInput {
 
 	public class EditorInput : MonoBehaviour {
 
-
 		public static EditorTool selectedTool = EditorTool.Standard;
+        public static EditorTool previousTool = EditorTool.Standard;
 		public static TargetHandType selectedHand = TargetHandType.Left;
 		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
 		public static TargetBehavior selectedBehavior = TargetBehavior.Standard;
@@ -188,7 +188,7 @@ namespace NotReaper.UserInput {
 		public void SelectMode(EditorMode mode) {
 
 			editorMode.UpdateUI(mode);
-			selectedMode = mode;
+            selectedMode = mode;
 
 			FigureOutIsInUI();
 		}
@@ -199,6 +199,7 @@ namespace NotReaper.UserInput {
 
 			hover.UpdateUITool(tool);
 
+            previousTool = selectedTool;
 			selectedTool = tool;
 
 			//Update the UI based on the tool:
@@ -277,8 +278,12 @@ namespace NotReaper.UserInput {
 
 		}
 
+        public void RevertTool() {
+            SelectTool(previousTool);
+            previousTool = selectedTool;
+        }
 
-		public void FigureOutIsInUI() {
+        public void FigureOutIsInUI() {
 
 			if (pauseMenu.isOpened) {
 				inUI = true;
@@ -297,14 +302,9 @@ namespace NotReaper.UserInput {
 					break;
 				
 			}
-
-			
-
-
 		}
 
-
-		private void Update() {
+        private void Update() {
 
 			if (Timeline.inTimingMode && inUI) {
 				if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
@@ -325,10 +325,17 @@ namespace NotReaper.UserInput {
 
 			if (inUI) return;
 
-			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
+            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {
+                this.SelectTool(EditorTool.DragSelect);
+            }
+            if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
+                this.RevertTool();
+            }
+
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
 				isCTRLDown = true;
 			} else {
-				isCTRLDown = true;
+				isCTRLDown = false;
 			}
 
 			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
