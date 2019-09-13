@@ -878,13 +878,13 @@ namespace NotReaper {
 
 		}
 
-		public void LoadAudicaFile(bool loadRecent = false, string filePath = null) {
+		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
 			DeleteAllTargets();
 
 			if (loadRecent) {
 				audicaFile = AudicaHandler.LoadAudicaFile(PlayerPrefs.GetString("recentFile", null));
-				if (audicaFile == null) return;
+				if (audicaFile == null) return false;
 
 			} else if (filePath != null) {
 				audicaFile = AudicaHandler.LoadAudicaFile(filePath);
@@ -893,11 +893,12 @@ namespace NotReaper {
 
 				string[] paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Path.Combine(Application.persistentDataPath), "audica", false);
 
+				if (paths.Length == 0) return false;
 				audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
 				PlayerPrefs.SetString("recentFile", paths[0]);
 			}
 
-			//SetOffset(audicaFile.desc.offset);
+			//SetOffset(0);
 
 
 			//Loads all the sounds.
@@ -909,6 +910,8 @@ namespace NotReaper {
 				AddTarget(cue);
 			}
 			//LoadTimingMode();
+
+			return true;
 
 		
 			
@@ -929,6 +932,8 @@ namespace NotReaper {
 
 
 					SetBPM((float) audicaFile.desc.tempo);
+					audioLoaded = true;
+					audicaLoaded = true;
 					//SetScale(20);
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 

@@ -23,8 +23,6 @@ namespace NotReaper.UI {
         public TMP_InputField titleField;
         public TMP_InputField artistField;
         public TMP_InputField mapperField;
-        public TMP_InputField bpmField;
-        public TMP_InputField offsetField;
 
 
 
@@ -37,8 +35,6 @@ namespace NotReaper.UI {
             if (Timeline.audicaFile.desc.title != null) titleField.text = Timeline.audicaFile.desc.title;
             if (Timeline.audicaFile.desc.artist != null) artistField.text = Timeline.audicaFile.desc.artist;
             if (Timeline.audicaFile.desc.mapper != null) mapperField.text = Timeline.audicaFile.desc.mapper;
-            if (Timeline.audicaFile.desc.offset != 0) offsetField.text = Timeline.audicaFile.desc.offset.ToString();
-            if (Timeline.audicaFile.desc.tempo != 0) bpmField.text = Timeline.audicaFile.desc.tempo.ToString();
         }
         
 

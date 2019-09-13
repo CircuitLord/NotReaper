@@ -31,6 +31,8 @@ namespace NotReaper.UserInput {
 
 		//public PlaceNote toolPlaceNote;
 		[SerializeField] public EditorToolkit Tools;
+
+		public PauseMenu pauseMenu;
 		[SerializeField] private Timeline timeline;
 
 		[SerializeField] private Dropdown soundDropdown;
@@ -75,6 +77,13 @@ namespace NotReaper.UserInput {
 			SelectHand(TargetHandType.Left);
 
 			NotificationShower.AddNotifToQueue(new NRNotification("Welcome to NotReaper!", 8f));
+
+			pauseMenu.LoadUIColors();
+			pauseMenu.OpenPauseMenu();
+
+			FigureOutIsInUI();
+
+
 		}
 
 		public static Color GetSelectedColor() {
@@ -121,9 +130,6 @@ namespace NotReaper.UserInput {
 					break;
 
 			}
-
-
-
 		}
 
 
@@ -177,8 +183,9 @@ namespace NotReaper.UserInput {
 		public void SelectMode(EditorMode mode) {
 
 			editorMode.UpdateUI(mode);
-
 			selectedMode = mode;
+
+			FigureOutIsInUI();
 		}
 
 		public void SelectTool(EditorTool tool) {
@@ -266,12 +273,49 @@ namespace NotReaper.UserInput {
 		}
 
 
+		public void FigureOutIsInUI() {
+
+			if (pauseMenu.isOpened) {
+				inUI = true;
+				return;
+			}
+
+			switch (selectedMode) {
+				case EditorMode.Compose:
+					inUI = false;
+					break;
+
+				case EditorMode.Metadata:
+				case EditorMode.Timing:
+				case EditorMode.Settings:
+					inUI = true;
+					break;
+				
+			}
+
+			
+
+
+		}
+
+
 		private void Update() {
 
 			if (Timeline.inTimingMode && inUI) {
 				if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
 					timeline.TogglePlayback();
+				}
 			}
+
+			if (Input.GetKeyDown(KeyCode.Escape)) {
+				if (pauseMenu.isOpened) {
+					if (!Timeline.audioLoaded) return;
+					pauseMenu.ClosePauseMenu();
+					FigureOutIsInUI();
+				} else {
+					pauseMenu.OpenPauseMenu();
+					FigureOutIsInUI();
+				}
 			}
 
 			if (inUI) return;

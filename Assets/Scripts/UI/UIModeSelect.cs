@@ -50,8 +50,6 @@ namespace NotReaper.UI {
 
                     DOSliderToButton(0, NRSettings.config.leftColor);
 
-                    EditorInput.inUI = false;
-
                     uIMetadata.StopAllCoroutines();
                     StartCoroutine(uIMetadata.FadeOut());
 
@@ -70,7 +68,6 @@ namespace NotReaper.UI {
                     uITiming.StopAllCoroutines();
                     StartCoroutine(uITiming.FadeOut());
                     
-                    EditorInput.inUI = true;
 
 
 
@@ -81,8 +78,6 @@ namespace NotReaper.UI {
                     uITiming.gameObject.SetActive(true);
 
                     DOSliderToButton(2, NRSettings.config.leftColor);
-
-                    EditorInput.inUI = true;
 
                     uITiming.StopAllCoroutines();
                     StartCoroutine(uITiming.FadeIn());
@@ -95,8 +90,6 @@ namespace NotReaper.UI {
                 case EditorMode.Settings:
 
                     DOSliderToButton(3, Color.white);
-
-                    EditorInput.inUI = true;
 
                     uIMetadata.StopAllCoroutines();
                     StartCoroutine(uIMetadata.FadeOut());

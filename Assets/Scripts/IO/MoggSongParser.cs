@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace NotReaper.IO {
 	public static class MoggSongParser {
 
-		static string METADATA_START = "0xd000";
+		//static string METADATA_START = "0xd000";
 
 		//Extracts the DTA as raw text from the CONfile specified in "filepath"
 		//Like everything else in this script, it's probably a terrible way of

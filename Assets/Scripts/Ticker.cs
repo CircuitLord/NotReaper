@@ -28,13 +28,14 @@ namespace NotReaper {
 
         private void Start() {
             aud = GetComponent<AudioSource>();
-            volume = PlayerPrefs.GetFloat("TickVol");
-            volumeSlider.value = volume;
+            //volume = PlayerPrefs.GetFloat("TickVol");
+            //volumeSlider.value = volume;
+            volume = volumeSlider.value;
         }
 
         public void VolumeChange(Slider vol) {
             volume = vol.value;
-            PlayerPrefs.SetFloat("TickVol", volume);
+            //PlayerPrefs.SetFloat("TickVol", volume);
         }
 
         private void OnTriggerEnter(Collider other) {
