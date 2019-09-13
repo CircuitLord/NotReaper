@@ -19,6 +19,7 @@ namespace NotReaper.Tools {
 		bool isDraggingGrid = false;
 		bool isDraggingNotes = false;
         bool isSelectionDown = false;
+		bool hasMovedOutOfClickBounds = false;
 
 		Vector3 startDragMovePos;
         Vector2 startClickDetectPos;
@@ -106,12 +107,22 @@ namespace NotReaper.Tools {
 			isDraggingGrid = false;
 		}
 
-        private void StartSelection() {
+		private void StartDragAction(TargetIcon icon) {
+			isDraggingNotes = true;
+			startDragMovePos = icon.transform.position;
+		}
+
+		private void EndDragAction() {
+			isDraggingNotes = false;
+		}
+
+		private void StartSelectionAction() {
             isSelectionDown = true;
-            startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+			hasMovedOutOfClickBounds = false;
+			startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
-        private void EndSelection() {
+        private void EndSelectionAction() {
             isSelectionDown = false;
         }
 
@@ -159,6 +170,15 @@ namespace NotReaper.Tools {
 
 			if (!activated) return;
 
+			TargetIcon iconUnderMouse = IconUnderMouse();
+
+			if (isSelectionDown && !hasMovedOutOfClickBounds) {
+				// Check for a tiny amount of mouse movement to ensure this was meant to be a click
+				float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
+				if (movement > 2) {
+					hasMovedOutOfClickBounds = true;
+				}
+			}
 
 			if (Input.GetKeyDown(KeyCode.Delete)) {
 				if (timeline.selectedNotes.Count > 0) {
@@ -205,18 +225,15 @@ namespace NotReaper.Tools {
 			if (EditorInput.selectedTool == EditorTool.DragSelect) {
 				//TODO: Moving notes on timeline
 				if (Input.GetMouseButtonDown(0) && !timeline.hover) {
-					TargetIcon icon = IconUnderMouse();
 
-					if (!icon.isSelected) return;
-
-					if (icon) {
-						isDraggingNotes = true;
-						startDragMovePos = icon.transform.position;
+					if (iconUnderMouse) {
+						if (!iconUnderMouse.isSelected) return;
+						StartDragAction(iconUnderMouse);
 					}
 				}
 
 				if (Input.GetMouseButtonUp(0)) {
-					isDraggingNotes = false;
+					EndDragAction();
 
 					foreach (Target target in timeline.selectedNotes) {
 						//TODO: does changing target in one list change it in another? no i don't think so
@@ -226,14 +243,14 @@ namespace NotReaper.Tools {
 				}
 
 
-				if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(0)) {
+				if (Input.GetMouseButton(0)) {
 
 					//If we're not already dragging
 					if (
 						!isDraggingTimeline &&
 						!isDraggingGrid &&
 						!isDraggingNotes &&
-						!IconUnderMouse()
+						!iconUnderMouse
 					) {
 						if (timeline.hover) {
 							StartTimelineDrag();
@@ -255,8 +272,13 @@ namespace NotReaper.Tools {
 						dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
 					}
 
-					else if (IconUnderMouse() && !isSelectionDown) {
-						StartSelection();
+					else if (iconUnderMouse && !isSelectionDown) {
+						StartSelectionAction();
+					}
+
+					else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBounds) {
+						iconUnderMouse.TrySelect();
+						StartDragAction(iconUnderMouse);
 					}
 
 				}
@@ -267,13 +289,9 @@ namespace NotReaper.Tools {
 				}
 
 				if (Input.GetMouseButtonUp(0)) {
-					EndSelection();
+					EndSelectionAction();
 
-					// Check for a tiny amount of mouse movement to ensure this was meant to be a click
-					float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
-					if (movement < 5) {
-						TryToggleSelection();
-					}
+					if (!hasMovedOutOfClickBounds) TryToggleSelection();
 				}
 
 				if (isDraggingNotes) {
