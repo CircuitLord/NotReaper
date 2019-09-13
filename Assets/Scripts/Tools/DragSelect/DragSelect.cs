@@ -107,23 +107,23 @@ namespace NotReaper.Tools {
 			isDraggingGrid = false;
 		}
 
-		private void StartDragAction(TargetIcon icon) {
-			isDraggingNotes = true;
-			startDragMovePos = icon.transform.position;
+		private void StartDragAction(TargetIcon icon) {
+			isDraggingNotes = true;
+			startDragMovePos = icon.transform.position;
 		}
 
-		private void EndDragAction() {
-			isDraggingNotes = false;
-		}
-
-		private void StartSelectionAction() {
-            isSelectionDown = true;
-			hasMovedOutOfClickBounds = false;
-			startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+		private void EndDragAction() {
+			isDraggingNotes = false;
+		}
+
+		private void StartSelectionAction() {
+            isSelectionDown = true;
+			hasMovedOutOfClickBounds = false;
+			startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
-        private void EndSelectionAction() {
-            isSelectionDown = false;
+        private void EndSelectionAction() {
+            isSelectionDown = false;
         }
 
         private void TryToggleSelection() {
@@ -171,13 +171,13 @@ namespace NotReaper.Tools {
 			if (!activated) return;
 
 			TargetIcon iconUnderMouse = IconUnderMouse();
-
-			if (isSelectionDown && !hasMovedOutOfClickBounds) {
-				// Check for a tiny amount of mouse movement to ensure this was meant to be a click
-				float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
-				if (movement > 2) {
-					hasMovedOutOfClickBounds = true;
-				}
+
+			if (isSelectionDown && !hasMovedOutOfClickBounds) {
+				// Check for a tiny amount of mouse movement to ensure this was meant to be a click
+				float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
+				if (movement > 2) {
+					hasMovedOutOfClickBounds = true;
+				}
 			}
 
 			if (Input.GetKeyDown(KeyCode.Delete)) {
@@ -216,100 +216,103 @@ namespace NotReaper.Tools {
 					
 				}
 
+				clipboardBeatTime = Timeline.BeatTime();
+
+				
 
 				timeline.AddTargets(clipboardNotes, true, true);
-			}
-
-			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
-
-			if (EditorInput.selectedTool == EditorTool.DragSelect) {
-				//TODO: Moving notes on timeline
-				if (Input.GetMouseButtonDown(0) && !timeline.hover) {
-
-					if (iconUnderMouse) {
-						if (!iconUnderMouse.isSelected) return;
-						StartDragAction(iconUnderMouse);
-					}
-				}
-
-				if (Input.GetMouseButtonUp(0)) {
-					EndDragAction();
-
-					foreach (Target target in timeline.selectedNotes) {
-						//TODO: does changing target in one list change it in another? no i don't think so
-						target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-					}
-
-				}
-
-
-				if (Input.GetMouseButton(0)) {
-
-					//If we're not already dragging
-					if (
-						!isDraggingTimeline &&
-						!isDraggingGrid &&
-						!isDraggingNotes &&
-						!iconUnderMouse
-					) {
-						if (timeline.hover) {
-							StartTimelineDrag();
-						}
-						else {
-							StartGridDrag();
-						}
-					}
-
-					else if (isDraggingTimeline) {
-						float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
-						float timelineScaleMulti = timeline.scale / 20f;
-						dragSelectTimeline.localScale = new Vector3(diff * timelineScaleMulti, 1.1f * (timeline.scale / 20f), 1);
-					}
-
-					else if (isDraggingGrid) {
-
-						Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - dragSelectGrid.transform.position;
-						dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
-					}
-
-					else if (iconUnderMouse && !isSelectionDown) {
-						StartSelectionAction();
-					}
-
-					else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBounds) {
-						iconUnderMouse.TrySelect();
-						StartDragAction(iconUnderMouse);
-					}
-
-				}
-				else {
-
-					if (isDraggingTimeline) EndTimelineDrag();
-					else if (isDraggingGrid) EndGridDrag();
-				}
-
-				if (Input.GetMouseButtonUp(0)) {
-					EndSelectionAction();
-
-					if (!hasMovedOutOfClickBounds) TryToggleSelection();
-				}
-
-				if (isDraggingNotes) {
-
-					foreach (Target target in timeline.selectedNotes) {
-
-						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-						var offsetFromDragPoint = target.gridTargetPos - startDragMovePos;
-
-						Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
-
-						newPos += offsetFromDragPoint;
-
-						target.gridTargetIcon.transform.localPosition = new Vector3(newPos.x, newPos.y, target.gridTargetPos.z);
-
-						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-					}
+			}
+
+			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
+
+			if (EditorInput.selectedTool == EditorTool.DragSelect) {
+				//TODO: Moving notes on timeline
+				if (Input.GetMouseButtonDown(0) && !timeline.hover) {
+
+					if (iconUnderMouse) {
+						if (!iconUnderMouse.isSelected) return;
+						StartDragAction(iconUnderMouse);
+					}
+				}
+
+				if (Input.GetMouseButtonUp(0)) {
+					EndDragAction();
+
+					foreach (Target target in timeline.selectedNotes) {
+						//TODO: does changing target in one list change it in another? no i don't think so
+						target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+					}
+
+				}
+
+
+				if (Input.GetMouseButton(0)) {
+
+					//If we're not already dragging
+					if (
+						!isDraggingTimeline &&
+						!isDraggingGrid &&
+						!isDraggingNotes &&
+						!iconUnderMouse
+					) {
+						if (timeline.hover) {
+							StartTimelineDrag();
+						}
+						else {
+							StartGridDrag();
+						}
+					}
+
+					else if (isDraggingTimeline) {
+						float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
+						float timelineScaleMulti = timeline.scale / 20f;
+						dragSelectTimeline.localScale = new Vector3(diff * timelineScaleMulti, 1.1f * (timeline.scale / 20f), 1);
+					}
+
+					else if (isDraggingGrid) {
+
+						Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - dragSelectGrid.transform.position;
+						dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
+					}
+
+					else if (iconUnderMouse && !isSelectionDown) {
+						StartSelectionAction();
+					}
+
+					else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBounds) {
+						iconUnderMouse.TrySelect();
+						StartDragAction(iconUnderMouse);
+					}
+
+				}
+				else {
+
+					if (isDraggingTimeline) EndTimelineDrag();
+					else if (isDraggingGrid) EndGridDrag();
+				}
+
+				if (Input.GetMouseButtonUp(0)) {
+					EndSelectionAction();
+
+					if (!hasMovedOutOfClickBounds) TryToggleSelection();
+				}
+
+				if (isDraggingNotes) {
+
+					foreach (Target target in timeline.selectedNotes) {
+
+						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+						var offsetFromDragPoint = target.gridTargetPos - startDragMovePos;
+
+						Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+
+						newPos += offsetFromDragPoint;
+
+						target.gridTargetIcon.transform.localPosition = new Vector3(newPos.x, newPos.y, target.gridTargetPos.z);
+
+						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+					}
 				}
 			}
 		}
