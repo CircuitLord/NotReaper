@@ -17,10 +17,11 @@ namespace NotReaper.Tools {
 		public bool activated = false;
 		bool isDraggingTimeline = false;
 		bool isDraggingGrid = false;
-
 		bool isDraggingNotes = false;
+        bool isSelectionDown = false;
 
 		Vector3 startDragMovePos;
+        Vector2 startClickDetectPos;
 
 
 
@@ -104,6 +105,24 @@ namespace NotReaper.Tools {
 			dragSelectGrid.SetActive(false);
 			isDraggingGrid = false;
 		}
+
+        private void StartSelection() {
+            isSelectionDown = true;
+            startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        }
+
+        private void EndSelection() {
+            isSelectionDown = false;
+        }
+
+        private void TryToggleSelection() {
+            TargetIcon underMouse = IconUnderMouse();
+            if (underMouse && underMouse.isSelected) {
+                underMouse.TryDeselect();
+            } else if (underMouse && !underMouse.isSelected) {
+                underMouse.TrySelect();
+            }
+        }
 
 		private TargetIcon IconUnderMouse() {
 			RaycastHit hit;
@@ -233,21 +252,27 @@ namespace NotReaper.Tools {
 
 					Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - dragSelectGrid.transform.position;
 					dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
+                }
 
-
-				}
-
-
+                else if (IconUnderMouse() && !isSelectionDown) {
+                    StartSelection();
+                }
 
 			} else {
 
 				if (isDraggingTimeline) EndTimelineDrag();
 				else if (isDraggingGrid) EndGridDrag();
-
-
 			}
 
+            if (Input.GetMouseButtonUp(0)) {
+                EndSelection();
 
+                // Check for a tiny amount of mouse movement to ensure this was meant to be a click
+                float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
+                if (movement < 5) {
+                    TryToggleSelection();
+                }
+            }
 
 			if (isDraggingNotes) {
 
