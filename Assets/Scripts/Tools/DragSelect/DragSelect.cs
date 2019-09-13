@@ -181,8 +181,6 @@ namespace NotReaper.Tools {
 				timeline.AddTargets(clipboardNotes, true, true);
 			}
 
-			//TODO: Delete selected notes
-
 			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
 
 			//TODO: Moving notes on timeline
@@ -194,11 +192,6 @@ namespace NotReaper.Tools {
 
 					isDraggingNotes = true;
 					startDragMovePos = icon.transform.position;
-
-					
-					
-
-
 				}
 			}
 
@@ -215,17 +208,19 @@ namespace NotReaper.Tools {
 
 			if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(0)) {
 
-				//If we're not already dragging
-				if (!isDraggingTimeline && !isDraggingGrid) {
-
-					if (timeline.hover) {
+                //If we're not already dragging
+                if (
+                    !isDraggingTimeline &&
+                    !isDraggingGrid &&
+                    !isDraggingNotes &&
+                    !IconUnderMouse()
+                ) {
+                    if (timeline.hover) {
 						StartTimelineDrag();
 					}
 					else {
 						StartGridDrag();
 					}
-
-
 				}
 
 				else if (isDraggingTimeline) {
