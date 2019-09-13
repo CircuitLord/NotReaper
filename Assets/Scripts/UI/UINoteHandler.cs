@@ -2,15 +2,14 @@ using NotReaper.Grid;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.UI;
-using NotReaper.Notifications;
 using NotReaper.Targets;
 using NotReaper.UserInput;
 
 namespace NotReaper.UI {
 
-    public enum DropdownToVelocity {
-        Standard = 0, Snare = 1, Percussion = 2, ChainStart = 3, Chain = 4, Melee = 5
-    }
+   // public enum TargetVelocity {
+   //     Standard = 0, Snare = 1, Percussion = 2, ChainStart = 3, Chain = 4, Melee = 5, Metronome = 6
+    //}
 
 
     public class UINoteHandler : MonoBehaviour {
@@ -28,9 +27,9 @@ namespace NotReaper.UI {
 
 
         public void SoundWasChanged(Dropdown dpd) {
-            timeline.CurrentSound = (DropdownToVelocity) dpd.value;
+            //timeline.CurrentSound = (DropdownToVelocity) dpd.value;
 
-            editorInput.SelectVelocity((DropdownToVelocity) dpd.value);
+            //editorInput.SelectVelocity((DropdownToVelocity) dpd.value);
         }
 
 

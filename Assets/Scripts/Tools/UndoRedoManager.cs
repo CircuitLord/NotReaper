@@ -33,7 +33,7 @@ namespace NotReaper.Tools {
 			if (actions.Count <= 0) return;
 
 			NRAction action = actions.Last();
-			Debug.Log("Undoing action:" + action.type.ToString());
+			Debug.Log("Undoing action:" + action.ToString());
 
 			InvertAction(action);
 			try {
@@ -56,7 +56,7 @@ namespace NotReaper.Tools {
 
 			NRAction action = redoActions.Last();
 
-			Debug.Log("Redoing action:" + action.type.ToString());
+			Debug.Log("Redoing action:" + action.ToString());
 
 				RunAction(action);
 			try {
@@ -71,29 +71,29 @@ namespace NotReaper.Tools {
 
 		}
 
-		//Use for undo (DON'T generate undo actions from these)
+		//Use for undo (DON'T generate undo actions from these) and also DON'T generate redo actions (this is handled by the wrapper function for undoing)
 		public void InvertAction(NRAction action) {
 
-			switch (action.type) {
+			switch (action) {
 				
-				case ActionType.AddNote:
+				case NRActionAddNote a:
 					//Might crash if it tries to delete non-loaded note in loadednotes list
-					timeline.DeleteTarget(action.affectedTarget, false);
+					timeline.DeleteTarget(a.affectedTarget, false);
 					break;
 
-				case ActionType.MultiAddNote:
-					timeline.DeleteTargets(action.affectedTargets, false);
+				case NRActionMultiAddNote a:
+					timeline.DeleteTargets(a.affectedTargets, false);
 					break;
 
-				case ActionType.RemoveNote:
+				case NRActionRemoveNote a:
 					//Re-add the target based on all the previous stats from the target;
-					Target tar = action.affectedTarget;
+					Target tar = a.affectedTarget;
 					timeline.AddTarget(tar.gridTargetPos.x, tar.gridTargetPos.y, tar.gridTargetPos.z, false, false, tar.beatLength, tar.velocity, tar.handType, tar.behavior);
 					break;
 
-				case ActionType.MultiRemoveNote:
+				case NRActionMultiRemoveNote a:
 				
-					timeline.AddTargets(action.affectedTargets, false);
+					timeline.AddTargets(a.affectedTargets, false);
 
 					break;
 				
@@ -108,24 +108,24 @@ namespace NotReaper.Tools {
 		}
 
 
-		//Use for redo, DO generate undo actions, and don't clear redo actions
+		//Use for redo, DO generate undo actions, and DON'T clear redo actions
 		public void RunAction(NRAction action) {
-			switch (action.type) {
-				case ActionType.AddNote:
-					timeline.AddTarget(action.affectedTarget, true);
+			switch (action) {
+				case NRActionAddNote a:
+					timeline.AddTarget(a.affectedTarget, true);
 					break;
 
-				case ActionType.MultiAddNote:
-					timeline.AddTargets(action.affectedTargets, true);
+				case NRActionMultiAddNote a:
+					timeline.AddTargets(a.affectedTargets, true);
 					break;
 
-				case ActionType.RemoveNote:
+				case NRActionRemoveNote a:
 					//Might crash if it tries to delete non-loaded note in loadednotes list
-					timeline.DeleteTarget(action.affectedTarget, true, false);
+					timeline.DeleteTarget(a.affectedTarget, true, false);
 					break;
 
-				case ActionType.MultiRemoveNote:
-					timeline.DeleteTargets(action.affectedTargets, true, false);
+				case NRActionMultiRemoveNote a:
+					timeline.DeleteTargets(a.affectedTargets, true, false);
 					break;
 
 
@@ -149,6 +149,9 @@ namespace NotReaper.Tools {
 
 			if (clearRedoActions) redoActions = new List<NRAction>();
 
+			//NRActionAddNote test = new NRActionAddNote();
+			//redoActions.Add(test);
+
 
 
 		}
@@ -162,28 +165,28 @@ namespace NotReaper.Tools {
 	}
 
 
-	public enum ActionType {
-		AddNote = 0,
-		MultiAddNote = 1,
-		RemoveNote = 2,
-		MultiRemoveNote = 3,
-		SelectNote = 4,
-		MultiSelectNote = 5,
-		DeselectNote = 6,
-		MultiDeselectNote = 7,
-		MoveNote = 8,
-		MultiMoveNote = 9
+	// public enum ActionType {
+	// 	AddNote = 0,
+	// 	MultiAddNote = 1,
+	// 	RemoveNote = 2,
+	// 	MultiRemoveNote = 3,
+	// 	SelectNote = 4,
+	// 	MultiSelectNote = 5,
+	// 	DeselectNote = 6,
+	// 	MultiDeselectNote = 7,
+	// 	MoveNote = 8,
+	// 	MultiMoveNote = 9
 		
-	}
+	// }
 
 	public class NRAction {
-		public ActionType type;
-		public List<Target> affectedTargets = new List<Target>();
-		public Target affectedTarget {
-			get {
-				return affectedTargets.First();
-			}
-		}
+		//public ActionType type;
+		//public List<Target> affectedTargets = new List<Target>();
+		//public Target affectedTarget {
+		//	get {
+		//		return affectedTargets.First();
+		//	}
+		//}
 
 		//public Vector2 redoTargetPos;
 
@@ -191,6 +194,28 @@ namespace NotReaper.Tools {
 
 		
 
+	}
+
+	public class NRActionAddNote : NRAction {
+		public Target affectedTarget;
+
+
+
+	}
+
+	public class NRActionMultiAddNote : NRAction {
+		public List<Target> affectedTargets = new List<Target>();
+
+
+
+	}
+
+	public class NRActionRemoveNote : NRAction {
+		public Target affectedTarget;
+	}
+	
+	public class NRActionMultiRemoveNote : NRAction {
+		public List<Target> affectedTargets = new List<Target>();
 	}
 
 

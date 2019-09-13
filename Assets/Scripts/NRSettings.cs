@@ -11,6 +11,8 @@ namespace NotReaper {
 
         public static NRJsonSettings config = new NRJsonSettings();
 
+        public static bool isLoaded = false;
+
         private static string configFilePath = Path.Combine(Application.persistentDataPath, "NRConfig.json");
 
         public static void LoadSettingsJson(bool regenConfig = false) {
@@ -27,6 +29,9 @@ namespace NotReaper {
             } catch(Exception e) {
                 Debug.LogError(e);
             }
+
+
+            isLoaded = true;
 
             
 
@@ -59,7 +64,11 @@ namespace NotReaper {
 
     [System.Serializable]
     public class NRJsonSettings {
-        public UserColor userLeftColor = new UserColor();
+        public UserColor userLeftColor = new UserColor() {
+            r = 0.05,
+            g = 0.6,
+            b = 0.8
+        };
 
         public Color leftColor {
             get {
@@ -69,7 +78,11 @@ namespace NotReaper {
                 return;
             }
         }
-        public UserColor userRightColor = new UserColor();
+        public UserColor userRightColor = new UserColor() {
+            r = 0.9,
+            g = 0.5,
+            b = 0.05
+        };
         public Color rightColor {
             get {
                 return new Color((float)userRightColor.r, (float)userRightColor.g, (float)userRightColor.b);
@@ -78,9 +91,27 @@ namespace NotReaper {
                 return;
             }
         }
+
+        private UserColor userSelectedHighlightColor = new UserColor() {
+            r = 1.0,
+            g = 0.5,
+            b = 0.0
+
+        };
+        public Color selectedHighlightColor {
+            get {
+                return new Color((float)userSelectedHighlightColor.r, (float)userSelectedHighlightColor.g, (float)userSelectedHighlightColor.b);
+            }
+            set {
+                return;
+            }
+        }
+
         public double mainVol = 0.5f;
         public double noteVol = 0.5f;
         public double sustainVol = 0.5f;
+
+        public double UIFadeDuration = 1.0f;
     }
 
 }

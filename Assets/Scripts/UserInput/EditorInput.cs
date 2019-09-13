@@ -1,9 +1,11 @@
+using System.Collections;
 using NotReaper.Grid;
 using NotReaper.Managers;
 using NotReaper.Models;
 using NotReaper.Targets;
 using NotReaper.Tools;
 using NotReaper.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,7 +13,7 @@ using UnityEngine.UI;
 namespace NotReaper.UserInput {
 
 
-	public enum EditorTool { Standard, Hold, Horizontal, Vertical, ChainStart, ChainNode, Melee, DragSelect, ChainBuilder }
+	public enum EditorTool { Standard, Hold, Horizontal, Vertical, ChainStart, ChainNode, Melee, DragSelect, ChainBuilder, None }
 
 
 	public class EditorInput : MonoBehaviour {
@@ -21,32 +23,38 @@ namespace NotReaper.UserInput {
 		public static TargetHandType selectedHand = TargetHandType.Left;
 		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
 		public static TargetBehavior selectedBehavior = TargetBehavior.Standard;
-		public static DropdownToVelocity selectedVelocity = DropdownToVelocity.Standard;
+		public static UITargetVelocity selectedVelocity = UITargetVelocity.Standard;
+
+		public static EditorMode selectedMode = EditorMode.Compose;
 		public static bool isOverGrid = false;
 		public static bool inUI = false;
 		public static bool isFocusGrid = false;
 
 		//public PlaceNote toolPlaceNote;
 		[SerializeField] public EditorToolkit Tools;
+
+		public PauseMenu pauseMenu;
+		public SoundSelect soundSelect;
 		[SerializeField] private Timeline timeline;
 
-		[SerializeField] private Dropdown soundDropdown;
+		[SerializeField] private TMP_Dropdown soundDropdown;
 
-		public Toggle standardToggle;
-		public Toggle holdToggle;
-		public Toggle chainStartToggle;
-		public Toggle chainNodeToggle;
-		public Toggle horzToggle;
-		public Toggle vertToggle;
-		public Toggle meleeToggle;
+		[SerializeField] private UIToolSelect uiToolSelect;
+		[SerializeField] private HandTypeSelect handTypeSelect;
 
 		[SerializeField] private GameObject focusGrid;
 
 
+		public HoverTarget hover;
 
-		public TargetIcon hover;
 
-        public NoteGridSnap noteGrid;
+		public GameObject normalGrid;
+		public GameObject noGrid;
+		public GameObject meleeGrid;
+
+
+
+		public UIModeSelect editorMode;
 
 		bool isCTRLDown;
 		bool isShiftDown;
@@ -54,140 +62,266 @@ namespace NotReaper.UserInput {
 		private void Start() {
 			InputManager.LoadHotkeys();
 
-			SelectTool(EditorTool.Standard);
-			SelectHand(TargetHandType.Left);
+
+
+			StartCoroutine(WaitForUserColors());
 
 
 		}
 
+		IEnumerator WaitForUserColors() {
+			while (!NRSettings.isLoaded) {
+				yield return new WaitForSeconds(0.1f);
+			}
+
+			SelectMode(EditorMode.Compose);
+			SelectTool(EditorTool.Standard);
+			SelectHand(TargetHandType.Left);
+			SelectVelocity(UITargetVelocity.Standard);
+
+			NotificationShower.AddNotifToQueue(new NRNotification("Welcome to NotReaper!", 8f));
+
+			pauseMenu.LoadUIColors();
+			pauseMenu.OpenPauseMenu();
+
+			soundSelect.LoadUIColors();
+
+			FigureOutIsInUI();
+
+
+		}
+
+		public static Color GetSelectedColor() {
+			if (selectedHand == TargetHandType.Left) {
+				return NRSettings.config.leftColor;
+			} else if (selectedHand == TargetHandType.Right) {
+				return NRSettings.config.rightColor;
+			}
+			return Color.gray;
+		}
+		public static Color GetOppositeSelectedColor() {
+			if (selectedHand == TargetHandType.Left) {
+				return NRSettings.config.rightColor;
+			} else if (selectedHand == TargetHandType.Right) {
+				return NRSettings.config.leftColor;
+			}
+			return Color.gray;
+		}
+
 		public void FocusGrid(bool focus) {
 			focusGrid.SetActive(focus);
-			
+
 			isFocusGrid = focus;
+		}
+
+		public void SelectSnappingMode(SnappingMode mode) {
+			selectedSnappingMode = mode;
+
+			switch (mode) {
+				case SnappingMode.Grid:
+					normalGrid.SetActive(true);
+					noGrid.SetActive(false);
+					meleeGrid.SetActive(false);
+					break;
+				case SnappingMode.None:
+					normalGrid.SetActive(false);
+					noGrid.SetActive(true);
+					meleeGrid.SetActive(false);
+					break;
+				case SnappingMode.Melee:
+					normalGrid.SetActive(false);
+					noGrid.SetActive(true);
+					meleeGrid.SetActive(true);
+					break;
+
+			}
 		}
 
 
 		public void SelectHand(TargetHandType type) {
 			selectedHand = type;
-			hover.SetHandType(type);
+
+			uiToolSelect.UpdateUINoteSelected(selectedTool);
+			handTypeSelect.UpdateUI(type);
+			hover.UpdateUIHandColor(GetSelectedColor());
+
+
 		}
-		
+
 		/// <summary>
 		/// Select a sound for the current tool.
 		/// </summary>
 		/// <param name="velocity">The "sound" type to play.</param>
-		public void SelectVelocity(DropdownToVelocity velocity) {
-			
+		public void SelectVelocity(UITargetVelocity velocity) {
+
 			switch (velocity) {
-				case DropdownToVelocity.Standard:
-					soundDropdown.SetValueWithoutNotify((int)DropdownToVelocity.Standard);
+				case UITargetVelocity.Standard:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Standard);
 					break;
-				case DropdownToVelocity.Snare:
-					soundDropdown.SetValueWithoutNotify((int)DropdownToVelocity.Snare);
-					break;
-
-				case DropdownToVelocity.Percussion:
-					soundDropdown.SetValueWithoutNotify((int)DropdownToVelocity.Percussion);
+				case UITargetVelocity.Snare:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Snare);
 					break;
 
-				case DropdownToVelocity.ChainStart:
-					soundDropdown.SetValueWithoutNotify((int)DropdownToVelocity.ChainStart);
+				case UITargetVelocity.Percussion:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Percussion);
 					break;
 
-				case DropdownToVelocity.Chain:
-					soundDropdown.SetValueWithoutNotify((int)DropdownToVelocity.Chain);
+				case UITargetVelocity.ChainStart:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.ChainStart);
 					break;
 
-				case DropdownToVelocity.Melee:
-					soundDropdown.SetValueWithoutNotify((int)DropdownToVelocity.Melee);
+				case UITargetVelocity.Chain:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Chain);
 					break;
-				
-				
+
+				case UITargetVelocity.Melee:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
+					break;
+
+
 			}
 
 			selectedVelocity = velocity;
-			
+
+		}
+
+		public void SelectMode(EditorMode mode) {
+
+			editorMode.UpdateUI(mode);
+			selectedMode = mode;
+
+			FigureOutIsInUI();
 		}
 
 		public void SelectTool(EditorTool tool) {
+
+			uiToolSelect.UpdateUINoteSelected(tool);
+
+			hover.UpdateUITool(tool);
+
+			selectedTool = tool;
 
 			//Update the UI based on the tool:
 			switch (tool) {
 				case EditorTool.Standard:
 					selectedBehavior = TargetBehavior.Standard;
-					standardToggle.SetIsOnWithoutNotify(true);
-					hover.SetBehavior(TargetBehavior.Standard);
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
+					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					SelectSnappingMode(SnappingMode.Grid);
+
 					break;
 
 				case EditorTool.Hold:
 					selectedBehavior = TargetBehavior.Hold;
-					holdToggle.SetIsOnWithoutNotify(true);
-					hover.SetBehavior(TargetBehavior.Hold);
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
+					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					//noteGrid.SetSnappingMode(SnappingMode.Grid);
+					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Horizontal:
 					selectedBehavior = TargetBehavior.Horizontal;
-					horzToggle.SetIsOnWithoutNotify(true);
-					hover.SetBehavior(TargetBehavior.Horizontal);
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
+					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					//noteGrid.SetSnappingMode(SnappingMode.Grid);
+					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Vertical:
 					selectedBehavior = TargetBehavior.Vertical;
-					vertToggle.SetIsOnWithoutNotify(true);
-					hover.SetBehavior(TargetBehavior.Vertical);
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
+					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					//noteGrid.SetSnappingMode(SnappingMode.Grid);
+					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.ChainStart:
 					selectedBehavior = TargetBehavior.ChainStart;
-					chainStartToggle.SetIsOnWithoutNotify(true);
-					hover.SetBehavior(TargetBehavior.ChainStart);
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.ChainStart);
-					noteGrid.SetSnappingMode(SnappingMode.Grid);
+					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.ChainStart);
+					//noteGrid.SetSnappingMode(SnappingMode.Grid);
+					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.ChainNode:
 					selectedBehavior = TargetBehavior.Chain;
-					chainNodeToggle.SetIsOnWithoutNotify(true);
-					hover.SetBehavior(TargetBehavior.Chain);
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Chain);
-					noteGrid.SetSnappingMode(SnappingMode.None);
+					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Chain);
+					//noteGrid.SetSnappingMode(SnappingMode.None);
+					SelectSnappingMode(SnappingMode.None);
 					break;
 
 				case EditorTool.Melee:
 					selectedBehavior = TargetBehavior.Melee;
-					meleeToggle.SetIsOnWithoutNotify(true);
-					hover.SetBehavior(TargetBehavior.Melee);
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Melee);
-					noteGrid.SetSnappingMode(SnappingMode.Melee);
+					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Melee);
+					//noteGrid.SetSnappingMode(SnappingMode.Melee);
+					SelectSnappingMode(SnappingMode.Melee);
 					SelectHand(TargetHandType.Either);
+					break;
+
+				case EditorTool.DragSelect:
+					selectedBehavior = TargetBehavior.None;
+
+
+
+					Tools.dragSelect.Activate(true);
+					Tools.chainBuilder.Activate(false);
 					break;
 
 				case EditorTool.ChainBuilder:
 					selectedBehavior = TargetBehavior.None;
-					
-					hover.SetBehavior(TargetBehavior.None);
 
+					Tools.dragSelect.Activate(false);
 					Tools.chainBuilder.Activate(true);
 					break;
+
 
 				default:
 					break;
 			}
 
-			selectedTool = tool;
+
+		}
+
+
+		public void FigureOutIsInUI() {
+
+			if (pauseMenu.isOpened) {
+				inUI = true;
+				return;
+			}
+
+			switch (selectedMode) {
+				case EditorMode.Compose:
+					inUI = false;
+					break;
+
+				case EditorMode.Metadata:
+				case EditorMode.Timing:
+				case EditorMode.Settings:
+					inUI = true;
+					break;
+				
+			}
+
+			
+
 
 		}
 
 
 		private void Update() {
+
+			if (Timeline.inTimingMode && inUI) {
+				if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
+					timeline.TogglePlayback();
+				}
+			}
+
+			if (Input.GetKeyDown(KeyCode.Escape)) {
+				if (pauseMenu.isOpened) {
+					if (!Timeline.audioLoaded) return;
+					pauseMenu.ClosePauseMenu();
+					FigureOutIsInUI();
+				} else {
+					pauseMenu.OpenPauseMenu();
+					FigureOutIsInUI();
+				}
+			}
 
 			if (inUI) return;
 
@@ -205,11 +339,9 @@ namespace NotReaper.UserInput {
 
 
 			if (Input.GetKeyDown(KeyCode.T)) {
-				Tools.chainBuilder.NewChain(new Vector2(0, 0));
+				//Tools.chainBuilder.NewChain(new Vector2(0, 0));
 			}
 
-
-			
 
 			if (Input.GetMouseButtonDown(0)) {
 
@@ -260,7 +392,6 @@ namespace NotReaper.UserInput {
 			}
 
 
-
 			if (Input.GetKeyDown(InputManager.selectStandard)) {
 
 				SelectTool(EditorTool.Standard);
@@ -286,17 +417,28 @@ namespace NotReaper.UserInput {
 
 			}
 
+			if (Input.GetKeyDown(KeyCode.F)) {
+				SelectTool(EditorTool.DragSelect);
+			}
+
+			if (Input.GetKeyDown(KeyCode.G)) {
+				SelectSnappingMode(SnappingMode.Grid);
+			}
+			if (Input.GetKeyDown(KeyCode.N)) {
+				SelectSnappingMode(SnappingMode.None);
+			}
+			if (Input.GetKeyDown(KeyCode.M)) {
+				SelectSnappingMode(SnappingMode.Melee);
+			}
+
+
 			if (Input.GetKeyDown(InputManager.toggleColor)) {
 
 				if (selectedHand == TargetHandType.Left) {
 					SelectHand(TargetHandType.Right);
-				}
-
-				else if (selectedHand == TargetHandType.Right) {
+				} else if (selectedHand == TargetHandType.Right) {
 					SelectHand(TargetHandType.Left);
-				} 
-				
-				else {
+				} else {
 					SelectHand(TargetHandType.Left);
 				}
 
@@ -304,20 +446,15 @@ namespace NotReaper.UserInput {
 
 			if (Input.GetKeyDown(InputManager.selectSoundKick)) {
 				soundDropdown.value = 0;
-			}
-			else if (Input.GetKeyDown(InputManager.selectSoundSnare)) {
+			} else if (Input.GetKeyDown(InputManager.selectSoundSnare)) {
 				soundDropdown.value = 1;
-			}
-			else if (Input.GetKeyDown(InputManager.selectSoundPercussion)) {
+			} else if (Input.GetKeyDown(InputManager.selectSoundPercussion)) {
 				soundDropdown.value = 2;
-			}
-			else if (Input.GetKeyDown(InputManager.selectSoundChainStart)) {
+			} else if (Input.GetKeyDown(InputManager.selectSoundChainStart)) {
 				soundDropdown.value = 3;
-			}
-			else if (Input.GetKeyDown(InputManager.selectSoundChainNode)) {
+			} else if (Input.GetKeyDown(InputManager.selectSoundChainNode)) {
 				soundDropdown.value = 4;
-			}
-			else if (Input.GetKeyDown(InputManager.selectSoundMelee)) {
+			} else if (Input.GetKeyDown(InputManager.selectSoundMelee)) {
 				soundDropdown.value = 5;
 			}
 

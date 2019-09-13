@@ -12,9 +12,8 @@ namespace NotReaper.Grid {
 		public static float ySize = 0.9f;
 
 
-		//Gets the cue status based on a grid target.
-		//TODO: New grid target
-		public static Cue ToCue(GridTarget target, int offset, bool includeGridOffset) {
+		//Gets the cue status based on a target.
+		public static Cue ToCue(Target target, int offset, bool includeGridOffset) {
 
 			int pitch = 0;
 			Vector2 tempPos = new Vector2();

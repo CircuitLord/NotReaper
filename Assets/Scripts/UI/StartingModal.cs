@@ -21,6 +21,8 @@ namespace NotReaper.UI {
             EditorInput.inUI = true;
             recentText.text = "OPEN RECENT: " + PlayerPrefs.GetString("recentFile", "none");
             startingModal.SetActive(true);
+            Deactivate();
+            
         }
 
         public void Deactivate() {

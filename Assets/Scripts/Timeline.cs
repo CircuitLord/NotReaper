@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -26,20 +27,15 @@ namespace NotReaper {
 
 	public class Timeline : MonoBehaviour {
 
-		public static AudicaFile audicaFile;
+		//Hidden public values
+		[HideInInspector] public static AudicaFile audicaFile;
 
-		public bool SustainParticles = true;
-		public DropdownToVelocity CurrentSound;
-		public static Timeline TimelineStatic;
-		public float playbackSpeed = 1f;
+		[HideInInspector] public static SongDesc desc;
 
-		[SerializeField] private Renderer timelineBG;
 
-		public static Transform gridNotesStatic;
-		public static Transform timelineNotesStatic;
 
-		[SerializeField] private Transform timelineTransformParent;
-		[SerializeField] private Transform gridTransformParent;
+
+		[Header("Audio Stuff")]
 
 		[SerializeField] private AudioSource aud;
 		[SerializeField] private AudioSource previewAud;
@@ -47,77 +43,80 @@ namespace NotReaper {
 		[SerializeField] private AudioSource rightSustainAud;
 		[SerializeField] private Transform spectrogram;
 
-
+		
+		[Header("UI Elements")]
+		[SerializeField] private MiniTimeline miniTimeline;
 		[SerializeField] private TextMeshProUGUI songTimestamp;
 		[SerializeField] private TextMeshProUGUI curTick;
-		[SerializeField] private Slider bottomTimelineSlider;
-
 		[SerializeField] private HorizontalSelector beatSnapSelector;
-		private UnityAction SetSnapWithSliderAction;
+
+		[Header("Prefabs")]
+		public TargetIcon timelineTargetIconPrefab;
+		public TargetIcon gridTargetIconPrefab;
+
+
+		[Header("Extras")]
+		[SerializeField] public EditorToolkit Tools;
+		[SerializeField] private Transform timelineTransformParent;
+		[SerializeField] private Transform gridTransformParent;
+		public static Transform gridNotesStatic;
+		public static Transform timelineNotesStatic;
+		[SerializeField] private Renderer timelineBG;
+
+
+		[Header("Configuration")]
+		public float playbackSpeed = 1f;
+		public float sustainVolume = 0.5f;
+		public float previewDuration = 0.1f;
+
+
+
+		//Target Lists
+		public List<Target> notes;
+		public static List<Target> orderedNotes;
+		public List<Target> selectedNotes;
+		public static List<Target> loadedNotes;
+
+
+		public static bool inTimingMode = false;
+		public static bool audioLoaded = false;
+		public static bool audicaLoaded = false;
+
+
+
+
+
+
 
 		private Color leftColor;
 		private Color rightColor;
 		private Color bothColor;
 		private Color neitherColor;
 
-		public float sustainVolume;
-
-		public List<Target> notes;
-		public static List<Target> orderedNotes;
-
-		//Contains the notes that the player can actually see.
-		public static List<Target> selectableNotes;
-
-		public static List<Target> loadedNotes;
-		//List<TargetIcon> notesTimeline;
-		SongDescyay songDesc;
 
 
-		public TargetIcon timelineTargetIconPrefab;
-		public TargetIcon gridTargetIconPrefab;
 
 
-		public float previewDuration = 0.1f;
 
-		public static float time { get; private set; }
+
+
+		public static float time { get; set; }
 
 		private int beatSnap = 4;
-		private int scale = 20;
+		[HideInInspector] public int scale = 20;
 		private float targetScale = 0.7f;
 		private float scaleOffset = 0;
 		private static float bpm = 60;
 		private static int offset = 0;
-		// .Desc menu
-		// private string songid = "";
-		// private string songtitle = "";
-		// private string songartist = "";
-		// private string songendevent = "";
-		// private float songpreroll = 0.0f;
-		// private string songauthor = "";
-		// private string mogg = "";
 
-		private int seconds;
-		public bool songLoaded = false;
 
-		private TargetHandType selectedHandType = TargetHandType.Right;
-		private TargetBehavior selectedBehaviour = TargetBehavior.Standard;
-		private TargetVelocity selectedVelocity = TargetVelocity.Standard;
 
-		private float timelineMaterialOffset;
-
-		private bool hover = false;
-		private bool paused = true;
-		public bool projectStarted = false;
-
-		//private DirectorySecurity securityRules = new DirectorySecurity();
-
-		public Metronome metro;
+		[HideInInspector] public bool hover = false;
+		public bool paused = true;
 
 
 		//Tools
-		[SerializeField] public EditorToolkit Tools;
-
-		[SerializeField] private MiniTimeline miniTimeline;
+		
 
 		private void Start() {
 
@@ -127,15 +126,13 @@ namespace NotReaper {
 
 			notes = new List<Target>();
 			orderedNotes = new List<Target>();
-			//notesTimeline = new List<TimelineTarget>();
-			selectableNotes = new List<Target>();
 			loadedNotes = new List<Target>();
+			selectedNotes = new List<Target>();
 
 			//securityRules.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
 
 			gridNotesStatic = gridTransformParent;
 			timelineNotesStatic = timelineTransformParent;
-			TimelineStatic = this;
 
 			//Modify the note colors
 			leftColor = NRSettings.config.leftColor;
@@ -177,20 +174,26 @@ namespace NotReaper {
 		}
 
 		//When adding many notes at once from things such as copy paste.
-		public void AddTargets(List<Target> targets, bool genUndoAction = true) {
+		public void AddTargets(List<Target> targets, bool genUndoAction = true, bool autoSelectNewNotes = false) {
+
+			List<Target> undoTargets = new List<Target>();
 
 			//We need to generate a custom undo action (if requested), so we set the default undo generation to false.
-
 			foreach (Target target in targets) {
 				AddTarget(target.gridTargetPos.x, target.gridTargetPos.y, target.gridTargetPos.z, false, false, target.beatLength, target.velocity, target.handType, target.behavior);
+
+				if (autoSelectNewNotes) SelectTarget(notes.Last());
+				if (genUndoAction) undoTargets.Add(notes.Last());
+			
 			}
 
 			if (genUndoAction) {
-				NRAction action = new NRAction();
-				action.type = ActionType.MultiAddNote;
-				action.affectedTargets = targets;
+				var action = new NRActionMultiAddNote();
+				action.affectedTargets = undoTargets;
 				Tools.undoRedoManager.AddAction(action, true);
 			}
+
+
 
 		}
 
@@ -211,20 +214,31 @@ namespace NotReaper {
 
 			float yOffset = 0;
 			float zOffset = 0;
+			if (userAdded) {
+				//Calculate the note offset for visual purpose on the timeline.
+				if (EditorInput.selectedHand == TargetHandType.Left) {
+					yOffset = 0.1f;
+					zOffset = 0.1f;
+				} else if (EditorInput.selectedHand == TargetHandType.Right) {
+					yOffset = -0.1f;
+					zOffset = 0.2f;
+				}
 
-			//Calculate the note offset for visual purpose on the timeline.
-			if (handType == TargetHandType.Left) {
-				yOffset = 0.1f;
-				zOffset = 0.1f;
-			} else if (handType == TargetHandType.Right) {
-				yOffset = -0.1f;
-				zOffset = 0.2f;
+			} else {
+				if (handType == TargetHandType.Left) {
+					yOffset = 0.1f;
+					zOffset = 0.1f;
+				} else if (handType == TargetHandType.Right) {
+					yOffset = -0.1f;
+					zOffset = 0.2f;
+				}
 			}
 
 			Target target = new Target();
 
 			target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
 			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
+			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
@@ -237,28 +251,28 @@ namespace NotReaper {
 
 				target.SetBehavior(EditorInput.selectedBehavior);
 
-				switch (CurrentSound) {
-					case DropdownToVelocity.Standard:
+				switch (EditorInput.selectedVelocity) {
+					case UITargetVelocity.Standard:
 						target.SetVelocity(TargetVelocity.Standard);
 						break;
 
-					case DropdownToVelocity.Snare:
+					case UITargetVelocity.Snare:
 						target.SetVelocity(TargetVelocity.Snare);
 						break;
 
-					case DropdownToVelocity.Percussion:
+					case UITargetVelocity.Percussion:
 						target.SetVelocity(TargetVelocity.Percussion);
 						break;
 
-					case DropdownToVelocity.ChainStart:
+					case UITargetVelocity.ChainStart:
 						target.SetVelocity(TargetVelocity.ChainStart);
 						break;
 
-					case DropdownToVelocity.Chain:
+					case UITargetVelocity.Chain:
 						target.SetVelocity(TargetVelocity.Chain);
 						break;
 
-					case DropdownToVelocity.Melee:
+					case UITargetVelocity.Melee:
 						target.SetVelocity(TargetVelocity.Melee);
 						break;
 
@@ -271,7 +285,6 @@ namespace NotReaper {
 
 			//If userAdded false, we use the supplied inputs to generate the note.
 			else {
-
 				target.SetHandType(handType);
 
 				target.SetBehavior(behavior);
@@ -286,9 +299,8 @@ namespace NotReaper {
 				target.SetBeatLength(0.25f);
 			}
 
-			//target.gridTargetIcon.GetComponentInChildren<Canvas>().worldCamera = Camera.main;
 
-			//Now that all inital dependencies are met, we can init the target. (Loads sustain controller)
+			//Now that all initial dependencies are met, we can init the target. (Loads sustain controller and outline color)
 			target.Init();
 
 			notes.Add(target);
@@ -302,25 +314,28 @@ namespace NotReaper {
 			target.TargetEnterLoadedNotesEvent += AddLoadedNote;
 			target.TargetExitLoadedNotesEvent += RemoveLoadedNote;
 
+			target.TargetSelectEvent += SelectTarget;
+			target.TargetDeselectEvent += DeselectTarget;
+
 			target.MakeTimelineUpdateSustainLengthEvent += UpdateSustainLength;
 
 
 			if (genUndoAction) {
 				//Add to undo redo manager if requested.
-				NRAction action = new NRAction();
-				action.type = ActionType.AddNote;
-				action.affectedTargets.Add(notes.Last());
+				var action = new NRActionAddNote();
+				action.affectedTarget = notes.Last();
 
 				//If the user added the note, we clear the redo actions. If the manager added it, we don't clear redo actions.
 				Tools.undoRedoManager.AddAction(action, userAdded);
 
 			}
 
-			//We have to load the mini timeline after the audio clips load.
-			//miniTimeline.AddNote(beatTime / aud.clip.length, handType);
+
 
 			//UpdateTrail();
 			//UpdateChainConnectors();
+
+			
 
 		}
 
@@ -460,7 +475,7 @@ namespace NotReaper {
 
 						note.chainedNotes = chainLinks;
 
-						//aply lines to chain links
+						//apply lines to chain links
 						if (chainLinks.Count > 0) {
 							var positionList = new List<Vector3>();
 							positionList.Add(new Vector3(note.transform.position.x, note.transform.position.y, 0));
@@ -487,14 +502,6 @@ namespace NotReaper {
 		}
 
 
-		public static void AddSelectableNote(Target target) {
-			selectableNotes.Add(target);
-		}
-
-		public static void RemoveSelectableNote(Target target) {
-			selectableNotes.Remove(target);
-		}
-
 		public static void AddLoadedNote(Target target) {
 			loadedNotes.Add(target);
 		}
@@ -502,6 +509,35 @@ namespace NotReaper {
 		public static void RemoveLoadedNote(Target target) {
 			loadedNotes.Remove(target);
 		}
+
+
+		public void SelectTarget(Target target) {
+			if (!selectedNotes.Contains(target)) {
+				selectedNotes.Add(target);
+				target.Select();
+			}
+
+		}
+
+
+		public void DeselectTarget(Target target, bool resettingAll = false) {
+			if (selectedNotes.Contains(target)) {
+
+				target.Deselect();
+
+				if (!resettingAll) {
+					selectedNotes.Remove(target);
+				}
+			}
+
+		}
+		public void DeselectAllTargets() {
+			foreach (Target target in selectedNotes) {
+				DeselectTarget(target, true);
+			}
+			selectedNotes = new List<Target>();
+		}
+
 
 		/// <summary>
 		/// Updates a sustain length from the buttons next to sustains.
@@ -540,16 +576,14 @@ namespace NotReaper {
 			if (target == null) return;
 
 			if (genUndoAction) {
-				NRAction action = new NRAction();
-				action.affectedTargets.Add(target);
-				action.type = ActionType.RemoveNote;
+				var action = new NRActionRemoveNote();
+				action.affectedTarget = target;
 
 				Tools.undoRedoManager.AddAction(action, clearRedoActions);
 			}
 
 			notes.Remove(target);
 			orderedNotes.Remove(target);
-			selectableNotes.Remove(target);
 			loadedNotes.Remove(target);
 
 			if (target.gridTargetIcon)
@@ -574,8 +608,7 @@ namespace NotReaper {
 			}
 
 			if (genUndoAction) {
-				NRAction action = new NRAction();
-				action.type = ActionType.MultiRemoveNote;
+				var action = new NRActionMultiRemoveNote();
 				action.affectedTargets = targets;
 				Tools.undoRedoManager.AddAction(action, clearRedoActions);
 			}
@@ -586,16 +619,16 @@ namespace NotReaper {
 		private void DeleteAllTargets() {
 			foreach (Target target in notes) {
 				//if (obj)
-				Destroy(target.gridTargetIcon);
-				Destroy(target.timelineTargetIcon);
+				Destroy(target.gridTargetIcon.gameObject);
+				Destroy(target.timelineTargetIcon.gameObject);
 			}
 
 			//Second check through ordered notes to make sure they're all gone.
 			foreach (Target obj in orderedNotes) {
 				if (obj.gridTargetIcon)
-					Destroy(obj.gridTargetIcon);
+					Destroy(obj.gridTargetIcon.gameObject);
 				if (obj.timelineTargetIcon)
-					Destroy(obj.timelineTargetIcon);
+					Destroy(obj.timelineTargetIcon.gameObject);
 			}
 
 			//foreach (TimelineTarget obj in notesTimeline) {
@@ -605,17 +638,16 @@ namespace NotReaper {
 
 			notes = new List<Target>();
 			orderedNotes = new List<Target>();
-			//notesTimeline = new List<Target>();
-			selectableNotes = new List<Target>();
 			loadedNotes = new List<Target>();
+			selectedNotes = new List<Target>();
 
-			var liner = gridTransformParent.gameObject.GetComponentInChildren<LineRenderer>();
-			if (liner) {
-				liner.SetPositions(new Vector3[0]);
-				liner.positionCount = 0;
-			}
+			//var liner = gridTransformParent.gameObject.GetComponentInChildren<LineRenderer>();
+			//if (liner) {
+			//	liner.SetPositions(new Vector3[0]);
+			//	liner.positionCount = 0;
+			//}
 
-			time = 0;
+			//time = 0;
 		}
 
 		public void ChangeDifficulty() {
@@ -655,7 +687,7 @@ namespace NotReaper {
 					AddTarget(cue);
 				}
 
-				songLoaded = true;
+				//isSongLoaded = true;
 			} else {
 				Debug.Log("cues not found");
 
@@ -677,7 +709,7 @@ namespace NotReaper {
 			if (notes.Count > 0)
 				//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 
-				json = JsonUtility.ToJson(songDesc, true);
+				//json = JsonUtility.ToJson(songDesc, true);
 			File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
 			FileInfo descFile = new FileInfo(Path.Combine(dirpath + "\\temp\\", "song.desc"));
 
@@ -784,7 +816,7 @@ namespace NotReaper {
 			string dirpath = Application.persistentDataPath;
 
 			//create the new song desc
-			songDesc = new SongDescyay();
+			//songDesc = new SongDescyay();
 
 			//locate and copy ogg file to temp folder (used to save the project later)
 			var audioFiles = StandaloneFileBrowser.OpenFilePanel("Import .ogg file", System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyMusic), "ogg", false);
@@ -812,15 +844,55 @@ namespace NotReaper {
 
 		}
 
-		public void LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
-			//if (audicaFile != null) return;
+		public void LoadTimingMode(AudioClip clip) {
+
+			if (audicaLoaded) {
+				return;
+			}
+
+			inTimingMode = true;
+
+			aud.clip = clip;
+			audioLoaded = true;
+		}
+
+
+		public void SetTimingModeStats(double newBPM, int tickOffset) {
+			DeleteAllTargets();
+			SetBPM((float)newBPM);
+
+			Cue cue = new Cue();
+			cue.pitch = 40;
+			cue.tickLength = 1;
+			cue.behavior = TargetBehavior.Metronome;
+			cue.velocity = TargetVelocity.Metronome;
+			cue.handType = TargetHandType.Either;
+
+			for (int i = 0; i < 100; i++) {
+				cue.tick = (480 * i) + tickOffset;
+				AddTarget(cue);
+			}
+
+			//time = 0;
+            SafeSetTime();
+		}
+
+
+		public void ExitTimingMode() {
+
+			inTimingMode = false;
+			DeleteAllTargets();
+
+		}
+
+		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
 			DeleteAllTargets();
 
 			if (loadRecent) {
 				audicaFile = AudicaHandler.LoadAudicaFile(PlayerPrefs.GetString("recentFile", null));
-				if (audicaFile == null) return;
+				if (audicaFile == null) return false;
 
 			} else if (filePath != null) {
 				audicaFile = AudicaHandler.LoadAudicaFile(filePath);
@@ -829,11 +901,12 @@ namespace NotReaper {
 
 				string[] paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Path.Combine(Application.persistentDataPath), "audica", false);
 
+				if (paths.Length == 0) return false;
 				audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
 				PlayerPrefs.SetString("recentFile", paths[0]);
 			}
 
-			SetOffset(audicaFile.desc.offset);
+			//SetOffset(0);
 
 
 			//Loads all the sounds.
@@ -844,148 +917,15 @@ namespace NotReaper {
 			foreach (Cue cue in audicaFile.diffs.expert.cues) {
 				AddTarget(cue);
 			}
+			//LoadTimingMode();
 
-			if (orderedNotes.Count > 0) {
-				/*
+			return true;
 
-				foreach (var note in orderedNotes) {
-
-					if (note.behavior == TargetBehavior.ChainStart && note) {
-						if (note.chainedNotes.Count > 0) {
-							if ((note.transform.position.z < 0 && 0 > note.chainedNotes.Last().transform.position.z) || (note.transform.position.z > 0 && 0 < note.chainedNotes.Last().transform.position.z)) {
-								note.GetComponentsInChildren<LineRenderer>() [1].enabled = false;
-							} else {
-								note.GetComponentsInChildren<LineRenderer>() [1].enabled = true;
-							}
-						}
-					}
-
-					if (note.behavior == TargetBehavior.Hold && note) {
-						var length = Mathf.Ceil(note.GetComponentInChildren<HoldTargetManager>().sustainLength);
-						if (note.gridTarget.beatLength != length) {
-
-							note.gridTarget.SetBeatLength(length);
-						}
-					}
-				}
-				*/
-			}
+		
+			
 
 		}
 
-		public void LoadFromFile(string edicaSave) {
-			DeleteAllTargets();
-
-			if (edicaSave.Length > 0) {
-				PlayerPrefs.SetString("previousSave", edicaSave);
-
-				//move zip to temp folder
-				string dirpath = Application.persistentDataPath;
-				if (!System.IO.Directory.Exists(dirpath + "\\temp\\")) {
-					//System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
-				} else {
-					DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
-					direct.Delete(true);
-
-					//System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
-				}
-
-				//unzip save into temp
-				ZipFile.ExtractToDirectory(edicaSave, dirpath + "\\temp\\");
-
-				//load desc from temp
-				var descFiles = Directory.GetFiles(dirpath + "\\temp\\", "song.desc");
-				if (descFiles.Length > 0) {
-					string json = File.ReadAllText(dirpath + "\\temp\\song.desc");
-					songDesc = JsonUtility.FromJson<SongDescyay>(json);
-					SetOffset(songDesc.offset);
-					SetSongID(songDesc.songID);
-					SetSongTitle(songDesc.title);
-					SetSongArtist(songDesc.artist);
-					SetSongEndEvent(songDesc.songEndEvent.Replace("event:/song_end/song_end_", string.Empty));
-					SetSongPreRoll(songDesc.prerollSeconds);
-					SetSongAuthor(songDesc.author);
-
-				} else {
-					Debug.Log("desc not found");
-					songDesc = new SongDescyay();
-				}
-
-				//load cues from temp
-				//var cueFile = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
-				var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
-				if (cueFiles.Length > 0) {
-					//figure out if it has difficulties (new edica file)
-					bool isDifficultyNamed = false;
-					string difficulty = "";
-					foreach (var file in cueFiles) {
-						if (file.Contains("expert.cues")) {
-							isDifficultyNamed = true;
-							difficulty = "expert";
-						} else if (file.Contains("advanced.cues")) {
-							isDifficultyNamed = true;
-							difficulty = "advanced";
-						} else if (file.Contains("moderate.cues")) {
-							isDifficultyNamed = true;
-							difficulty = "moderate";
-						} else if (file.Contains("beginner.cues")) {
-							isDifficultyNamed = true;
-							difficulty = "beginner";
-						}
-					}
-
-					if (isDifficultyNamed) {
-						//DifficultySelection_s.Value = difficulty;
-						//DifficultySelection_s.selection.value = (int) DifficultySelection.Options.Parse(typeof(DifficultySelection.Options), difficulty);
-
-						//load .cues (delete first because changing difficulty creates targets)
-						DeleteAllTargets();
-						var cueFile = Directory.GetFiles(dirpath + "\\temp\\", difficulty + ".cues");
-						string json = File.ReadAllText(cueFile[0]);
-						//json = json.Replace("cues", "Items");
-						CueFile cues = JsonUtility.FromJson<CueFile>(json);
-						foreach (Cue cue in cues.cues) {
-							AddTarget(cue);
-						}
-					} else //old edica format. Shove it into expert
-					{
-						string json = File.ReadAllText(cueFiles[0]);
-						json = json.Replace("cues", "Items");
-						CueFile cues = JsonUtility.FromJson<CueFile>(json);
-						foreach (Cue cue in cues.cues) {
-							AddTarget(cue);
-						}
-					}
-
-				} else {
-					Debug.Log("cues not found");
-					NewFile();
-				}
-
-				//load ogg into audio clip
-				var audioFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.ogg");
-				if (audioFiles.Length > 0) {
-					StartCoroutine(GetAudioClip(audioFiles[0]));
-				} else {
-					Debug.Log("ogg not found");
-				}
-			} else {
-				NewFile();
-			}
-		}
-		public void LoadPrevious() {
-			string edicaSave = PlayerPrefs.GetString("previousSave");;
-			LoadFromFile(edicaSave);
-		}
-
-		public void Load() {
-			//open save
-			string[] edicaSave = StandaloneFileBrowser.OpenFilePanel("Edica save file", Application.persistentDataPath, "edica", false);
-			if (edicaSave.Length > 0)
-				LoadFromFile(edicaSave[0]);
-			else
-				NewFile();
-		}
 
 		IEnumerator GetAudioClip(string uri) {
 			using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
@@ -1000,10 +940,12 @@ namespace NotReaper {
 
 
 					SetBPM((float) audicaFile.desc.tempo);
+					audioLoaded = true;
+					audicaLoaded = true;
 					//SetScale(20);
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 
-					spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
+					//spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
 
 
 				}
@@ -1021,7 +963,6 @@ namespace NotReaper {
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
 					leftSustainAud.clip = myClip;
 					leftSustainAud.volume = 0f;
-					Debug.Log("Left sustain loaded.");
 				}
 			}
 		}
@@ -1053,35 +994,28 @@ namespace NotReaper {
 		}
 
 
-		public void SetBehavior(TargetBehavior behavior) {
-			selectedBehaviour = behavior;
-		}
-
-		public void SetVelocity(TargetVelocity velocity) {
-			selectedVelocity = velocity;
-		}
 
 		public void SetPlaybackSpeed(float speed) {
+			if (!audioLoaded) return;
+
 			playbackSpeed = speed;
 			aud.pitch = speed;
 			previewAud.pitch = speed;
-		}
-
-		public void SetHandType(TargetHandType handType) {
-			selectedHandType = handType;
+			leftSustainAud.pitch = speed;
+			rightSustainAud.pitch = speed;
 		}
 
 		public void SetBPM(float newBpm) {
 			bpm = newBpm;
 			//TODO:
-			audicaFile.desc.tempo = newBpm;
+			//audicaFile.desc.tempo = newBpm;
 			SetScale(scale);
 		}
 
 		public void SetOffset(int newOffset) {
 			offset = newOffset;
 			//songDesc.offset = newOffset;
-			audicaFile.desc.offset = newOffset;
+			//audicaFile.desc.offset = newOffset;
 		}
 
 		public void SetSnap(int newSnap) {
@@ -1145,7 +1079,7 @@ namespace NotReaper {
 			timelineBG.material.SetTextureOffset("_MainTex", new Vector2(((t * bpm / 60 - offset / 480f) / 4f + scaleOffset), 1));
 
 			timelineTransformParent.transform.localPosition = Vector3.left * (t * bpm / 60 - offset / 480f) / (scale / 20f);
-			spectrogram.localPosition = Vector3.left * (t * bpm / 60) / (scale / 20f);
+			//spectrogram.localPosition = Vector3.left * (t * bpm / 60) / (scale / 20f);
 
 			gridTransformParent.transform.localPosition = Vector3.back * (t * bpm / 60 - offset / 480f);
 		}
@@ -1154,7 +1088,7 @@ namespace NotReaper {
 			timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
 			scaleOffset = -newScale % 8 / 8f;
 
-			spectrogram.localScale = new Vector3(aud.clip.length / 2 * bpm / 60 / (newScale / 20f), 1, 1);
+			//spectrogram.localScale = new Vector3(aud.clip.length / 2 * bpm / 60 / (newScale / 20f), 1, 1);
 
 			timelineTransformParent.transform.localScale *= (float) scale / newScale;
 			targetScale *= (float) newScale / scale;
@@ -1177,11 +1111,6 @@ namespace NotReaper {
 		}
 
 		IEnumerator CalculateNoteCollidersEnabled() {
-
-			if (orderedNotes.Count <= 0) {
-
-				
-			}
 
 			int framesToSplitOver = 50;
 
@@ -1223,10 +1152,13 @@ namespace NotReaper {
 				}
 				j++;
 			}
-			//yield return new WaitForSeconds(1);
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
 		}
+
+
+
+		
 
 		public void Update() {
 			//TODO: Ordrerd
@@ -1272,10 +1204,11 @@ namespace NotReaper {
 
 			UpdateChords();
 
-			if (SustainParticles)
-				UpdateSustains();
+			UpdateSustains();
 
 			if (!paused) time += Time.deltaTime * playbackSpeed;
+
+			bool isShiftDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
 			if (hover) {
 				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
@@ -1288,21 +1221,19 @@ namespace NotReaper {
 			}
 			//if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
 
-			if (Input.mouseScrollDelta.y < -0.1f) {
+			if (!isShiftDown && Input.mouseScrollDelta.y < -0.1f) {
+				if (!audioLoaded) return;
 				time += BeatsToDuration(4f / beatSnap);
 				time = SnapTime(time);
 
 				SafeSetTime();
 				if (paused) previewAud.Play();
-			} else if (Input.mouseScrollDelta.y > 0.1f) {
+			} else if (!isShiftDown && Input.mouseScrollDelta.y > 0.1f) {
+				if (!audioLoaded) return;
 				time -= BeatsToDuration(4f / beatSnap);
 				time = SnapTime(time);
 				SafeSetTime();
 				if (paused) previewAud.Play();
-			}
-
-			if (Input.GetKeyDown(KeyCode.Space)) {
-
 			}
 
 			SetBeatTime(time);
@@ -1322,6 +1253,7 @@ namespace NotReaper {
 
 
 		public void JumpToPercent(float percent) {
+			if (!audioLoaded) return;
 
 			time = SnapTime(aud.clip.length * percent);
 
@@ -1332,13 +1264,15 @@ namespace NotReaper {
 
 
 		public void TogglePlayback() {
+			if (!audioLoaded) return;
+
 			if (paused) {
 				aud.Play();
 				//metro.StartMetronome();
 
 				previewAud.Pause();
 
-				if (time < leftSustainAud.clip.length) {
+				if (leftSustainAud.clip && time < leftSustainAud.clip.length) {
 					leftSustainAud.Play();
 					rightSustainAud.Play();
 
@@ -1359,8 +1293,11 @@ namespace NotReaper {
 			}
 		}
 
-		private void SafeSetTime() {
+		public void SafeSetTime() {
 			if (time < 0) time = 0;
+			if (!audioLoaded) return;
+
+			//TODO: Check if song is loaded
 
 			if (time > aud.clip.length) {
 				time = aud.clip.length;
@@ -1369,12 +1306,12 @@ namespace NotReaper {
 			previewAud.time = time;
 
 			float tempTime = time;
-			if (time > leftSustainAud.clip.length) {
+			if (leftSustainAud.clip && time > leftSustainAud.clip.length) {
 				tempTime = leftSustainAud.clip.length;
 			}
 			leftSustainAud.time = tempTime;
 
-			if (time > rightSustainAud.clip.length) {
+			if (rightSustainAud.clip && time > rightSustainAud.clip.length) {
 				tempTime = rightSustainAud.clip.length;
 			}
 			rightSustainAud.time = tempTime;
@@ -1421,7 +1358,6 @@ namespace NotReaper {
 			string seconds = ((int) time % 60).ToString("00");
 
 			songTimestamp.text = minutes + ":" + seconds;
-			//curSeconds.text = seconds;
 		}
 
 		private void SetCurrentTick() {
@@ -1430,19 +1366,5 @@ namespace NotReaper {
 			curTick.text = currentTick;
 		}
 
-		public void SustainParticlesToggle(Toggle tog) {
-			SustainParticles = tog.isOn;
-
-			if (!SustainParticles) {
-				foreach (var note in orderedNotes) {
-					if (note.behavior == TargetBehavior.Hold) {
-						//var particles = note.GetComponentInChildren<ParticleSystem>();
-						//if (particles.isEmitting) {
-						//    particles.Stop();
-						//}
-					}
-				}
-			}
-		}
 	}
 }

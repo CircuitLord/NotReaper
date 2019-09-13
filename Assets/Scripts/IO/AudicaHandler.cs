@@ -41,24 +41,26 @@ namespace NotReaper.IO {
 				}
 
 				//Extract the cues files.
-				else if (entry.FileName == $"{CuesDifficulty.expert}.cues") {
+				else if (entry.FileName == "expert.cues") {
 					entry.Extract($"{appPath}/.cache");
 					expert = true;
 
-				} else if (entry.FileName == $"{CuesDifficulty.advanced}.cues") {
+				} else if (entry.FileName == "advanced.cues") {
 					entry.Extract($"{appPath}/.cache");
 					advanced = true;
 
-				} else if (entry.FileName == $"{CuesDifficulty.standard}.cues") {
+				} else if (entry.FileName == "standard.cues") {
 					entry.Extract($"{appPath}/.cache");
 					standard = true;
 
-				} else if (entry.FileName == $"{CuesDifficulty.easy}.cues") {
+				} else if (entry.FileName == "easy.cues") {
 					entry.Extract($"{appPath}/.cache");
 					easy = true;
 				}
 
 			}
+
+			
 
 			//Now we fill the audicaFile var with all the things it needs.
 			//Remember, all props in audicaFile.desc refer to either moggsong or the name of the mogg.
@@ -67,16 +69,16 @@ namespace NotReaper.IO {
 
 			//Load the cues files.
 			if (expert) {
-				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.expert}.cues"));
+				audicaFile.diffs.expert = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/expert.cues"));
 			}
 			if (advanced) {
-				audicaFile.diffs.advanced = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.advanced}.cues"));
+				audicaFile.diffs.advanced = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/advanced.cues"));
 			}
 			if (standard) {
-				audicaFile.diffs.standard = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.standard}.cues"));
+				audicaFile.diffs.standard = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/standard.cues"));
 			}
 			if (easy) {
-				audicaFile.diffs.easy = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/{CuesDifficulty.easy}.cues"));
+				audicaFile.diffs.easy = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/easy.cues"));
 			}
 
 			MemoryStream temp = new MemoryStream();

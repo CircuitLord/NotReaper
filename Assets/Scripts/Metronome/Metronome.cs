@@ -4,7 +4,7 @@ using UnityEngine;
 namespace NotReaper {
 
 
-	public class Metronome : MonoBehaviour {
+	public class MetronomeOld : MonoBehaviour {
 
 		public int Base;
 		public int Step;
@@ -17,15 +17,19 @@ namespace NotReaper {
 
 		public AudioSource aud;
 
+		private void Start() {
+			StartMetronome();
+		}
+
 
 		public void StartMetronome() {
-			StopCoroutine("DoTick");
+			StopCoroutine(DoTick());
 			CurrentStep = 1;
 			var multiplier = Base / 4f;
 			var tmpInterval = 60f / BPM;
 			interval = tmpInterval / multiplier;
 			nextTime = Time.time; // set the relative time to now
-			//StartCoroutine("DoTick");
+			StartCoroutine("DoTick");
 		}
 
 		IEnumerator DoTick() // yield methods return IEnumerator

@@ -14,7 +14,7 @@ namespace NotReaper.UI {
 
 
         public float mouseClickAreaLength = 12.34f;
-        public double barLength = 440;
+        public double barLength;
 
         public Transform bar;
 
@@ -39,7 +39,6 @@ namespace NotReaper.UI {
         private void OnMouseDown() {
             var x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
             //x -= transform.position.x;
-            Debug.Log(x);
 
             //-4.7 to 4.7
             //9.4 length
@@ -66,6 +65,7 @@ namespace NotReaper.UI {
 
 
         public void JumpToBookmark(int i) {
+            if (bookmarks[i] = null) return;
             timeline.JumpToPercent((float)bookmarks[i].GetComponent<Bookmark>().percentBookmark);
 
         }
@@ -103,7 +103,7 @@ namespace NotReaper.UI {
                 isCtrlDown = true;
             } else {
                 //TODO: Change ctrl outside of editor
-                isCtrlDown = true;
+                isCtrlDown = false;
             }
 
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {

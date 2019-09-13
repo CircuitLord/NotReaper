@@ -48,5 +48,11 @@
         "temp/": true,
         "Temp/": true
     },
-    "discord.enabled": true
+    "discord.enabled": true,
+    "cSpell.words": [
+        "Behaviour",
+        "Notif",
+        "UGUI",
+        "audica"
+    ]
 }
