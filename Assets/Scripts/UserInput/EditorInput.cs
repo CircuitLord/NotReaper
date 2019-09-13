@@ -5,6 +5,7 @@ using NotReaper.Models;
 using NotReaper.Targets;
 using NotReaper.Tools;
 using NotReaper.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -22,7 +23,7 @@ namespace NotReaper.UserInput {
 		public static TargetHandType selectedHand = TargetHandType.Left;
 		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
 		public static TargetBehavior selectedBehavior = TargetBehavior.Standard;
-		public static DropdownToVelocity selectedVelocity = DropdownToVelocity.Standard;
+		public static UITargetVelocity selectedVelocity = UITargetVelocity.Standard;
 
 		public static EditorMode selectedMode = EditorMode.Compose;
 		public static bool isOverGrid = false;
@@ -33,9 +34,10 @@ namespace NotReaper.UserInput {
 		[SerializeField] public EditorToolkit Tools;
 
 		public PauseMenu pauseMenu;
+		public SoundSelect soundSelect;
 		[SerializeField] private Timeline timeline;
 
-		[SerializeField] private Dropdown soundDropdown;
+		[SerializeField] private TMP_Dropdown soundDropdown;
 
 		[SerializeField] private UIToolSelect uiToolSelect;
 		[SerializeField] private HandTypeSelect handTypeSelect;
@@ -69,17 +71,20 @@ namespace NotReaper.UserInput {
 
 		IEnumerator WaitForUserColors() {
 			while (!NRSettings.isLoaded) {
-				yield return new WaitForSeconds(0.2f);
+				yield return new WaitForSeconds(0.1f);
 			}
 
 			SelectMode(EditorMode.Compose);
 			SelectTool(EditorTool.Standard);
 			SelectHand(TargetHandType.Left);
+			SelectVelocity(UITargetVelocity.Standard);
 
 			NotificationShower.AddNotifToQueue(new NRNotification("Welcome to NotReaper!", 8f));
 
 			pauseMenu.LoadUIColors();
 			pauseMenu.OpenPauseMenu();
+
+			soundSelect.LoadUIColors();
 
 			FigureOutIsInUI();
 
@@ -147,30 +152,30 @@ namespace NotReaper.UserInput {
 		/// Select a sound for the current tool.
 		/// </summary>
 		/// <param name="velocity">The "sound" type to play.</param>
-		public void SelectVelocity(DropdownToVelocity velocity) {
+		public void SelectVelocity(UITargetVelocity velocity) {
 
 			switch (velocity) {
-				case DropdownToVelocity.Standard:
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+				case UITargetVelocity.Standard:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Standard);
 					break;
-				case DropdownToVelocity.Snare:
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Snare);
-					break;
-
-				case DropdownToVelocity.Percussion:
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Percussion);
+				case UITargetVelocity.Snare:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Snare);
 					break;
 
-				case DropdownToVelocity.ChainStart:
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.ChainStart);
+				case UITargetVelocity.Percussion:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Percussion);
 					break;
 
-				case DropdownToVelocity.Chain:
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Chain);
+				case UITargetVelocity.ChainStart:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.ChainStart);
 					break;
 
-				case DropdownToVelocity.Melee:
-					soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Melee);
+				case UITargetVelocity.Chain:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Chain);
+					break;
+
+				case UITargetVelocity.Melee:
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
 					break;
 
 
@@ -334,7 +339,7 @@ namespace NotReaper.UserInput {
 
 
 			if (Input.GetKeyDown(KeyCode.T)) {
-				Tools.chainBuilder.NewChain(new Vector2(0, 0));
+				//Tools.chainBuilder.NewChain(new Vector2(0, 0));
 			}
 
 

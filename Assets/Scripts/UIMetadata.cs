@@ -7,7 +7,6 @@ using DG.Tweening;
 
 namespace NotReaper.UI {
 
-
     public class UIMetadata : MonoBehaviour {
 
         public Image BG;

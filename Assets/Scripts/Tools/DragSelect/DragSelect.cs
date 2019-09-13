@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Grid;
@@ -30,6 +31,11 @@ namespace NotReaper.Tools {
 
 
 		public LayerMask notesLayer;
+
+
+
+		public List<Target> clipboardNotes = new List<Target>();
+		public float clipboardBeatTime = 0f;
 
 
 		//INFO: Code for selecting targets is on the drag select timline thing itself
@@ -118,9 +124,62 @@ namespace NotReaper.Tools {
 		}
 
 
+		public Vector3 CalcAvgNotePos(List<Target> targets) {
+
+			Vector3 avgPos = new Vector3(0, 0, 0);
+
+			foreach (Target target in targets) {
+				avgPos += target.gridTargetPos;
+				
+			}
+			return avgPos / targets.Count;
+		}
+
+
 		void Update() {
 
 			if (!activated) return;
+
+
+			if (Input.GetKeyDown(KeyCode.Delete)) {
+				if (timeline.selectedNotes.Count > 0) {
+					timeline.DeleteTargets(timeline.selectedNotes, true, true);
+				}
+			}
+
+			if (Input.GetKeyDown(KeyCode.C)) {
+				clipboardNotes = new List<Target>();
+				clipboardNotes = timeline.selectedNotes;
+
+				if (clipboardNotes.Count < 1) return;
+
+				clipboardBeatTime = Mathf.Infinity;
+				
+				//Find the soonest target in the selection
+				foreach (Target target in clipboardNotes) {
+					float pos = target.gridTargetIcon.transform.localPosition.z;
+					if (pos < clipboardBeatTime) {
+						clipboardBeatTime = pos;
+					}
+				}
+			}
+
+			if (Input.GetKeyDown(KeyCode.V)) {
+				timeline.DeselectAllTargets();
+
+				List<Target> pasteNotes = new List<Target>();
+
+				float diff = Timeline.BeatTime() - clipboardBeatTime;
+
+				foreach (Target target in clipboardNotes) {
+					target.gridTargetPos.z += diff;
+					pasteNotes.Add(target);
+					
+				}
+
+
+				timeline.AddTargets(clipboardNotes, true, true);
+			}
 
 			//TODO: Delete selected notes
 
@@ -147,13 +206,14 @@ namespace NotReaper.Tools {
 				isDraggingNotes = false;
 
 				foreach (Target target in timeline.selectedNotes) {
+					//TODO: does changing target in one list change it in another? no i don't think so
 					target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 				}
 
 			}
 
 
-			if (Input.GetKey(KeyCode.F)) {
+			if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(0)) {
 
 				//If we're not already dragging
 				if (!isDraggingTimeline && !isDraggingGrid) {

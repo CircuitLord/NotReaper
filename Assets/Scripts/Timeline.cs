@@ -174,18 +174,26 @@ namespace NotReaper {
 		}
 
 		//When adding many notes at once from things such as copy paste.
-		public void AddTargets(List<Target> targets, bool genUndoAction = true) {
+		public void AddTargets(List<Target> targets, bool genUndoAction = true, bool autoSelectNewNotes = false) {
+
+			List<Target> undoTargets = new List<Target>();
 
 			//We need to generate a custom undo action (if requested), so we set the default undo generation to false.
 			foreach (Target target in targets) {
 				AddTarget(target.gridTargetPos.x, target.gridTargetPos.y, target.gridTargetPos.z, false, false, target.beatLength, target.velocity, target.handType, target.behavior);
+
+				if (autoSelectNewNotes) SelectTarget(notes.Last());
+				if (genUndoAction) undoTargets.Add(notes.Last());
+			
 			}
 
 			if (genUndoAction) {
 				var action = new NRActionMultiAddNote();
-				action.affectedTargets = targets;
+				action.affectedTargets = undoTargets;
 				Tools.undoRedoManager.AddAction(action, true);
 			}
+
+
 
 		}
 
@@ -243,28 +251,28 @@ namespace NotReaper {
 
 				target.SetBehavior(EditorInput.selectedBehavior);
 
-				switch (DropdownToVelocity.Standard) {
-					case DropdownToVelocity.Standard:
+				switch (EditorInput.selectedVelocity) {
+					case UITargetVelocity.Standard:
 						target.SetVelocity(TargetVelocity.Standard);
 						break;
 
-					case DropdownToVelocity.Snare:
+					case UITargetVelocity.Snare:
 						target.SetVelocity(TargetVelocity.Snare);
 						break;
 
-					case DropdownToVelocity.Percussion:
+					case UITargetVelocity.Percussion:
 						target.SetVelocity(TargetVelocity.Percussion);
 						break;
 
-					case DropdownToVelocity.ChainStart:
+					case UITargetVelocity.ChainStart:
 						target.SetVelocity(TargetVelocity.ChainStart);
 						break;
 
-					case DropdownToVelocity.Chain:
+					case UITargetVelocity.Chain:
 						target.SetVelocity(TargetVelocity.Chain);
 						break;
 
-					case DropdownToVelocity.Melee:
+					case UITargetVelocity.Melee:
 						target.SetVelocity(TargetVelocity.Melee);
 						break;
 
