@@ -907,6 +907,7 @@ namespace NotReaper {
 			}
 
 			//SetOffset(0);
+			desc = audicaFile.desc;
 
 
 			//Loads all the sounds.
@@ -919,6 +920,7 @@ namespace NotReaper {
 			}
 			//LoadTimingMode();
 
+			//Loaded successfully
 			return true;
 
 		
