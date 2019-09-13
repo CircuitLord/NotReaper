@@ -196,6 +196,9 @@ namespace NotReaper.Tools {
 					
 				}
 
+				clipboardBeatTime = Timeline.BeatTime();
+
+				
 
 				timeline.AddTargets(clipboardNotes, true, true);
 			}
