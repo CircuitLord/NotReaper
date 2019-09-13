@@ -17,10 +17,11 @@ namespace NotReaper.Tools {
 		public bool activated = false;
 		bool isDraggingTimeline = false;
 		bool isDraggingGrid = false;
-
 		bool isDraggingNotes = false;
+        bool isSelectionDown = false;
 
 		Vector3 startDragMovePos;
+        Vector2 startClickDetectPos;
 
 
 
@@ -105,6 +106,24 @@ namespace NotReaper.Tools {
 			isDraggingGrid = false;
 		}
 
+        private void StartSelection() {
+            isSelectionDown = true;
+            startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        }
+
+        private void EndSelection() {
+            isSelectionDown = false;
+        }
+
+        private void TryToggleSelection() {
+            TargetIcon underMouse = IconUnderMouse();
+            if (underMouse && underMouse.isSelected) {
+                underMouse.TryDeselect();
+            } else if (underMouse && !underMouse.isSelected) {
+                underMouse.TrySelect();
+            }
+        }
+
 		private TargetIcon IconUnderMouse() {
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -181,8 +200,6 @@ namespace NotReaper.Tools {
 				timeline.AddTargets(clipboardNotes, true, true);
 			}
 
-			//TODO: Delete selected notes
-
 			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
 
 			//TODO: Moving notes on timeline
@@ -194,11 +211,6 @@ namespace NotReaper.Tools {
 
 					isDraggingNotes = true;
 					startDragMovePos = icon.transform.position;
-
-					
-					
-
-
 				}
 			}
 
@@ -215,17 +227,19 @@ namespace NotReaper.Tools {
 
 			if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(0)) {
 
-				//If we're not already dragging
-				if (!isDraggingTimeline && !isDraggingGrid) {
-
-					if (timeline.hover) {
+                //If we're not already dragging
+                if (
+                    !isDraggingTimeline &&
+                    !isDraggingGrid &&
+                    !isDraggingNotes &&
+                    !IconUnderMouse()
+                ) {
+                    if (timeline.hover) {
 						StartTimelineDrag();
 					}
 					else {
 						StartGridDrag();
 					}
-
-
 				}
 
 				else if (isDraggingTimeline) {
@@ -238,21 +252,27 @@ namespace NotReaper.Tools {
 
 					Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - dragSelectGrid.transform.position;
 					dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
+                }
 
-
-				}
-
-
+                else if (IconUnderMouse() && !isSelectionDown) {
+                    StartSelection();
+                }
 
 			} else {
 
 				if (isDraggingTimeline) EndTimelineDrag();
 				else if (isDraggingGrid) EndGridDrag();
-
-
 			}
 
+            if (Input.GetMouseButtonUp(0)) {
+                EndSelection();
 
+                // Check for a tiny amount of mouse movement to ensure this was meant to be a click
+                float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
+                if (movement < 5) {
+                    TryToggleSelection();
+                }
+            }
 
 			if (isDraggingNotes) {
 
