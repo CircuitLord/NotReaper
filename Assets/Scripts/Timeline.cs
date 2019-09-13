@@ -743,7 +743,7 @@ namespace NotReaper {
 			CueFile export = new CueFile();
 			export.cues = new List<Cue>();
 
-			foreach (GridTarget target in orderedNotes) {
+			foreach (Target target in orderedNotes) {
 				export.cues.Add(NotePosCalc.ToCue(target, offset, false));
 			}
 
