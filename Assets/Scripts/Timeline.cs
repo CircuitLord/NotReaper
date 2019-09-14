@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -214,24 +214,21 @@ namespace NotReaper {
 
 			float yOffset = 0;
 			float zOffset = 0;
-			if (userAdded) {
-				//Calculate the note offset for visual purpose on the timeline.
-				if (EditorInput.selectedHand == TargetHandType.Left) {
-					yOffset = 0.1f;
-					zOffset = 0.1f;
-				} else if (EditorInput.selectedHand == TargetHandType.Right) {
-					yOffset = -0.1f;
-					zOffset = 0.2f;
-				}
 
-			} else {
-				if (handType == TargetHandType.Left) {
+			TargetHandType type = userAdded ? EditorInput.selectedHand : handType;
+
+			//Calculate the note offset for visual purpose on the timeline.
+			
+			switch (type) {
+				case TargetHandType.Left: {
 					yOffset = 0.1f;
 					zOffset = 0.1f;
-				} else if (handType == TargetHandType.Right) {
+						
+				} break;
+				case TargetHandType.Right: {
 					yOffset = -0.1f;
 					zOffset = 0.2f;
-				}
+				} break;
 			}
 
 			Target target = new Target();
