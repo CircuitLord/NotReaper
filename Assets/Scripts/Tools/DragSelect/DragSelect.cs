@@ -33,6 +33,8 @@ namespace NotReaper.Tools {
 		public List<Target> clipboardNotes = new List<Target>();
 		public float clipboardBeatTime = 0f;
 
+		private List<TargetMoveIntent> gridTargetMoveIntents = new List<TargetMoveIntent>();
+
 
 		//INFO: Code for selecting targets is on the drag select timline thing itself
 
@@ -100,22 +102,35 @@ namespace NotReaper.Tools {
 		private void StartDragAction(TargetIcon icon) {
 			isDraggingNotes = true;
 			startDragMovePos = icon.transform.position;
+
+			gridTargetMoveIntents = new List<TargetMoveIntent>();
+			timeline.selectedNotes.ForEach(target => {
+				var intent = new TargetMoveIntent();
+				var pos = target.gridTargetIcon.transform.localPosition;
+
+				intent.target = target;
+				intent.startingPosition = new Vector3(pos.x, pos.y, pos.z);
+				
+				gridTargetMoveIntents.Add(intent);
+			});
 		}
 
 		private void EndDragAction() {
 			isDraggingNotes = false;
+			if (gridTargetMoveIntents.Count > 0) {
+				timeline.MoveGridTargets(gridTargetMoveIntents);
+				gridTargetMoveIntents = new List<TargetMoveIntent>();
+			}
 		}
+
 		private void StartSelectionAction() {
 			isSelectionDown = true;
 			hasMovedOutOfClickBounds = false;
 			startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-
 		}
 
 		private void EndSelectionAction() {
-
 			isSelectionDown = false;
-
 		}
 
 		private void TryToggleSelection() {
@@ -338,16 +353,17 @@ namespace NotReaper.Tools {
 
 				if (isDraggingNotes) {
 
-
-					foreach (Target target in timeline.selectedNotes) {
+					// TODO: this should really be handled by intermediary semi-transparent objects rather than updating "real" state as we go ...
+					foreach (TargetMoveIntent intent in gridTargetMoveIntents) {
 
 						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-						var offsetFromDragPoint = target.gridTargetPos - startDragMovePos;
+						var offsetFromDragPoint = intent.target.gridTargetPos - startDragMovePos;
 						Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
 						newPos += offsetFromDragPoint;
-						target.gridTargetIcon.transform.localPosition = new Vector3(newPos.x, newPos.y, target.gridTargetPos.z);
+						intent.target.gridTargetIcon.transform.localPosition = new Vector3(newPos.x, newPos.y, intent.target.gridTargetPos.z);
 						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 
+						intent.intendedPosition = new Vector3(newPos.x, newPos.y, intent.target.gridTargetPos.z);
 					}
 				}
 			}
