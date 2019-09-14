@@ -100,7 +100,15 @@ namespace NotReaper.Tools {
 					break;
 
 				case NRActionGridMoveNotes a:
-					// TODO
+					var intents = new List<TargetMoveIntent>();
+					a.targetGridMoveIntents.ForEach(intent => {
+						var undoIntent = new TargetMoveIntent();
+						undoIntent.target = intent.target;
+						undoIntent.intendedPosition = intent.startingPosition;
+						undoIntent.startingPosition = intent.intendedPosition;
+						intents.Add(undoIntent);
+					});
+					timeline.MoveGridTargets(intents, false);
 					break;
 
 				case NRActionSwapNoteColors a:
@@ -146,7 +154,7 @@ namespace NotReaper.Tools {
 					break;
 
 				case NRActionGridMoveNotes a:
-					// TODO
+					timeline.MoveGridTargets(a.targetGridMoveIntents, true, false);
 					break;
 
 				case NRActionSwapNoteColors a:
@@ -246,8 +254,7 @@ namespace NotReaper.Tools {
 	}
 
 	public class NRActionGridMoveNotes : NRAction {
-		public List<Vector2> orderedPreviousPositions = new List<Vector2>();
-		public List<Target> affectedTargets = new List<Target>();
+		public List<TargetMoveIntent> targetGridMoveIntents = new List<TargetMoveIntent>();
 	}
 
 	public class NRActionSwapNoteColors : NRAction {

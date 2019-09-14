@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -405,6 +405,24 @@ namespace NotReaper {
 			} else {
 				target.UpdateSustainBeatLength(Mathf.Max(target.beatLength -= (480 / beatSnap) * 4f, 0));
 			}
+		}
+
+		public void MoveGridTargets(List<TargetMoveIntent> intents, bool genUndoAction = true, bool clearRedoActions = true) {
+
+			if (genUndoAction) {
+				var action = new NRActionGridMoveNotes();
+				action.targetGridMoveIntents = intents;
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
+			intents.ForEach(intent => {
+				var newPos = intent.intendedPosition;
+				intent.target.gridTargetIcon.transform.localPosition = new Vector3(
+					newPos.x,
+					newPos.y,
+					newPos.z
+				);
+			});
 		}
 
 		// Invert the selected targets' colour
