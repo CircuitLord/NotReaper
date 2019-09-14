@@ -37,11 +37,13 @@ namespace NotReaper.Grid {
 
 				//Offset it to all be positive.
 				x = Mathf.RoundToInt(tempPos.x + 5.5f);
-				y = Mathf.RoundToInt(tempPos.y + 3);
+				y = Mathf.RoundToInt(tempPos.y + 2.7f);
 
 				pitch = x + 12 * y;
 
-				offsetX = (tempPos.x + 5.5f - x);
+				//Used to be 5.5f
+				offsetX = (tempPos.x + 6.1f - x);
+
 				offsetY = (tempPos.y + 3 - y);
 
 			}
