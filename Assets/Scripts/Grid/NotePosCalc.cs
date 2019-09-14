@@ -36,7 +36,7 @@ namespace NotReaper.Grid {
 				tempPos.y = target.gridTargetIcon.transform.position.y / ySize;
 
 				//Offset it to all be positive.
-				x = Mathf.RoundToInt(tempPos.x + 5.5f);
+				x = Mathf.RoundToInt(tempPos.x + 6.1f);
 				y = Mathf.RoundToInt(tempPos.y + 2.7f);
 
 				pitch = x + 12 * y;
@@ -44,7 +44,7 @@ namespace NotReaper.Grid {
 				//Used to be 5.5f
 				offsetX = (tempPos.x + 6.1f - x);
 
-				offsetY = (tempPos.y + 3 - y);
+				offsetY = (tempPos.y + 2.7f - y);
 
 			}
 
@@ -88,9 +88,9 @@ namespace NotReaper.Grid {
 
 				}
 			} else {
-				x = (cue.pitch % 12) + (float) (cue.gridOffset.x * xSize) - 5.5f;
+				x = (cue.pitch % 12) + (float) (cue.gridOffset.x * xSize) - 6.1f;
 				x = x * xSize;
-				y = cue.pitch / 12 + (float) (cue.gridOffset.y * ySize) - 3f;
+				y = cue.pitch / 12 + (float) (cue.gridOffset.y * ySize) - 2.7f;
 				y = y * ySize;
 			}
 
