@@ -136,25 +136,20 @@ namespace NotReaper {
 		}
 
 		//When loading from cues, use this.
-		public void AddTarget(Cue cue) {
+		public Target AddTarget(Cue cue) {
 			Vector2 pos = NotePosCalc.PitchToPos(cue);
-
-			if (cue.tickLength / 480 >= 1)
-				//AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, cue.tickLength, cue.velocity, cue.handType, cue.behavior, false);
-				AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, false, false, cue.tickLength, cue.velocity, cue.handType, cue.behavior);
-			else
-				AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, false, false, cue.tickLength, cue.velocity, cue.handType, cue.behavior);
+			return AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, false, false, cue.tickLength, cue.velocity, cue.handType, cue.behavior);
 		}
 
 
 		//Use when adding a singular target to the project (from the user)
-		public void AddTarget(float x, float y) {
-			AddTarget(x, y, BeatTime(), true, true);
+		public Target AddTarget(float x, float y) {
+			return AddTarget(x, y, BeatTime(), true, true);
 		}
 
 		//Use for adding a target from redo/undo
-		public void AddTarget(Target target, bool genUndoAction = true) {
-			AddTarget(target.gridTargetPos.x, target.gridTargetPos.y, target.gridTargetPos.z, false, genUndoAction, target.beatLength, target.velocity, target.handType, target.behavior);
+		public Target AddTarget(Target target, bool genUndoAction = true) {
+			return AddTarget(target.gridTargetPos.x, target.gridTargetPos.y, target.gridTargetPos.z, false, genUndoAction, target.beatLength, target.velocity, target.handType, target.behavior);
 		}
 
 		//When adding many notes at once from things such as copy paste.
@@ -168,7 +163,6 @@ namespace NotReaper {
 
 				if (autoSelectNewNotes) SelectTarget(notes.Last());
 				if (genUndoAction) undoTargets.Add(notes.Last());
-
 			}
 
 			if (genUndoAction) {
@@ -190,7 +184,7 @@ namespace NotReaper {
 		/// <param name="velocity"></param>
 		/// <param name="handType"></param>
 		/// <param name="behavior"></param>
-		public void AddTarget(float x, float y, float beatTime, bool userAdded = true, bool genUndoAction = true, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
+		public Target AddTarget(float x, float y, float beatTime, bool userAdded = true, bool genUndoAction = true, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
 
 			//TargetHandType type = 
 
@@ -293,6 +287,7 @@ namespace NotReaper {
 			}
 
 			//EnableNearSustainButtons();
+			return target;
 		}
 
 
@@ -437,6 +432,52 @@ namespace NotReaper {
 			});
 		}
 
+		public void PasteCues(List<Cue> cues, float pasteBeatTime, bool genUndoAction = true, bool clearRedoActions = true) {
+
+			// paste new targets in the original locations
+			var newTargets = new List<Target>();
+			cues.ForEach(cue => {
+				newTargets.Add(AddTarget(cue));
+			});
+
+			// find the soonest target in the selection
+			float earliestTargetBeatTime = Mathf.Infinity;
+			foreach (Target target in newTargets) {
+				float pos = target.gridTargetIcon.transform.localPosition.z;
+				if (pos < earliestTargetBeatTime) {
+					earliestTargetBeatTime = pos;
+				}
+			}
+
+			// shift all by the amount needed to move the earliest note to now
+			float diff = pasteBeatTime - earliestTargetBeatTime;
+			foreach (Target target in newTargets) {
+				var gridPos = target.gridTargetIcon.transform.localPosition;
+				var timelinePos = target.timelineTargetIcon.transform.localPosition;
+
+				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, gridPos.z + diff);
+				target.gridTargetPos = new Vector3(gridPos.x, gridPos.y, gridPos.z + diff);
+
+				target.timelineTargetIcon.transform.localPosition = new Vector3(timelinePos.x + diff, 0, 0);
+				UpdateTimelineOffset(target);
+			}
+
+			if (genUndoAction) {
+				var action = new NRActionPasteNotes();
+				action.newCues = cues;
+				action.pastedTargets = newTargets;
+				action.pasteBeatTime = pasteBeatTime;
+
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
+			// initiated by user, let's pre-select the targets
+			if (clearRedoActions) {
+				DeselectAllTargets();
+				newTargets.ForEach(target => target.gridTargetIcon.TrySelect());
+			}
+		}
+
 		// Invert the selected targets' colour
 		public void SwapTargets(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
 			if (genUndoAction) {
@@ -447,9 +488,9 @@ namespace NotReaper {
 			}
 
 			targets.ForEach((Target target) => {
-				switch(target.handType) {
-					case TargetHandType.Left:  target.SetHandType(TargetHandType.Right); break;
-					case TargetHandType.Right: target.SetHandType(TargetHandType.Left);  break;
+				switch (target.handType) {
+					case TargetHandType.Left: target.SetHandType(TargetHandType.Right); break;
+					case TargetHandType.Right: target.SetHandType(TargetHandType.Left); break;
 				}
 				UpdateTimelineOffset(target);
 			});
@@ -847,10 +888,6 @@ namespace NotReaper {
 
 			//Loaded successfully
 			return true;
-
-		
-			
-
 		}
 
 
