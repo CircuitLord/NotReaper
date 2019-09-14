@@ -66,7 +66,7 @@ namespace NotReaper.Grid {
                         //return;
                     //}
                     //lastPos = newPos;
-                    Debug.Log(newPos);
+                    //Debug.Log(newPos);
                     transform.position = newPos;
                     //transform.position = Vector3.SmoothDamp(transform.position, newPos, ref velocity, 0.3f);
                     break;
