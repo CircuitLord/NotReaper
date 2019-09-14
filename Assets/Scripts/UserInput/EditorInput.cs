@@ -424,7 +424,7 @@ namespace NotReaper.UserInput {
 
 			}
 
-			if (Input.GetKeyDown(KeyCode.F)) {
+			if (Input.GetKeyDown(KeyCode.V)) {
 				SelectTool(EditorTool.DragSelect);
 			}
 
