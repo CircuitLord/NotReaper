@@ -49,11 +49,11 @@ namespace NotReaper.Timing {
                 
                 double ms = Math.Abs(TicksToMS(offset, tempo));
 
-                string test = String.Format("-y -i {0} -af {3}adelay={1}|{1}{3} {2}", path, (int)ms, output, "\"");
-
-                ffmpeg.StartInfo.Arguments = String.Format("-y -i {0} -af \"adelay={1}|{1}\" {2}", path, (int)ms, output);
+                ffmpeg.StartInfo.Arguments = String.Format("-y -i {0} -af \"adelay={1}|{1}\" -map 0:a {2}", path, (int)ms, output);
 
                 ffmpeg.Start();
+
+                ffmpeg.WaitForExit();
 
             }
 

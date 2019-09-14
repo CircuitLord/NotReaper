@@ -16,80 +16,67 @@ namespace NotReaper.IO {
 
 		public static string Generate(string oggPath, string songID, string songName, string artist, double bpm, string songEndEvent, string mapper, int offset) {
 
-			var streamAssets = Application.streamingAssetsPath;
-			var ogg2AudicaFolder = Path.Combine(streamAssets, "Ogg2Audica");
 
-			/*
-			var audicaTemplate = Path.Combine(streamAssets, ".AudicaTemplate/");
+			var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
+
+			
+			string audicaTemplate = Path.Combine(workFolder, ".AudicaTemplate/");
 
 			Encoding encoding = Encoding.GetEncoding("UTF-8");
 
 
 			//We need to modify the BPM of the song.mid contained in the template audica to match whatever this is.
-			File.Delete(Path.Combine(streamAssets, "song.mid"));
-			MidiFile songMidi = MidiFile.Read(Path.Combine(streamAssets, "songtemplate.mid"));
+			File.Delete(Path.Combine(workFolder, "song.mid"));
+			MidiFile songMidi = MidiFile.Read(Path.Combine(workFolder, "songtemplate.mid"));
 
-			songMidi.ReplaceTempoMap(TempoMap.Create(Tempo.FromBeatsPerMinute(bpm)));
-			songMidi.Write(Path.Combine(streamAssets, "song.mid"), true, MidiFileFormat.MultiTrack);
+			//TODO: Only supports int BPM :(
+			songMidi.ReplaceTempoMap(TempoMap.Create(Tempo.FromBeatsPerMinute((int)bpm)));
+			songMidi.Write(Path.Combine(workFolder, "song.mid"), true, MidiFileFormat.MultiTrack);
 
 
 			//Generates the mogg into song.mogg, which is moved to the .AudicaTemplate
-			File.Delete(Path.Combine(streamAssets, "song.mogg"));
+			File.Delete(Path.Combine(workFolder, "song.mogg"));
 
-			System.Diagnostics.Process myProcess = new System.Diagnostics.Process();
+			Process ogg2mogg = new Process();
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
-			startInfo.FileName = Path.Combine(streamAssets, "ogg2mogg.exe");
-			string args = $"\"{oggPath}\" \"{streamAssets}/song.mogg\"";
+			startInfo.FileName = Path.Combine(workFolder, "ogg2mogg.exe");
+			
+			string args = $"\"{oggPath}\" \"{workFolder}/song.mogg\"";
 			startInfo.Arguments = args;
 			startInfo.UseShellExecute = false;
 
-			myProcess.StartInfo = startInfo;
-			myProcess.Start();
+			ogg2mogg.StartInfo = startInfo;
+			ogg2mogg.Start();
 
-			myProcess.WaitForExit();
+			ogg2mogg.WaitForExit();
 
 
 			//Make the song.desc file;
-			File.Delete(Path.Combine(streamAssets, "song.desc"));
-			SongDesc songDesc = JsonUtility.FromJson<SongDesc>(File.ReadAllText(Path.Combine(streamAssets, "songtemplate.desc")));
+			File.Delete(Path.Combine(workFolder, "song.desc"));
+			SongDesc songDesc = JsonUtility.FromJson<SongDesc>(File.ReadAllText(Path.Combine(workFolder, "songtemplate.desc")));
 			songDesc.songID = songID;
 			songDesc.title = songName;
 			songDesc.artist = artist;
-			songDesc.tempo = bpm;
+			songDesc.tempo = (float)bpm;
 			songDesc.songEndEvent = songEndEvent;
 			songDesc.mapper = mapper;
 			songDesc.offset = offset;
-			File.WriteAllText(Path.Combine(streamAssets, "song.desc"), JsonUtility.ToJson(songDesc, true));
-
+			File.WriteAllText(Path.Combine(workFolder, "song.desc"), JsonUtility.ToJson(songDesc, true));
 
 			
-
-			/*
-			ZipArchive zip = ZipArchive.Open(Path.Combine(streamAssets, "AudicaTemplate.zip"));
-
-			zip.AddAllFromDirectory(audicaTemplate);
-			zip.AddEntry("song.desc", Path.Combine(streamAssets, "song.desc"));
-			zip.AddEntry("song.mid", Path.Combine(streamAssets, "song.mid"));
-			zip.AddEntry("song.mogg", Path.Combine(streamAssets, "song.mogg"));
-
-			zip.SaveTo(Path.Combine(Application.persistentDataPath, "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
-			
-			zip.Dispose();
-			
-
-	
-
+			//Create the actual audica file and save it to the /saves/ folder
 			using(ZipArchive archive = ZipArchive.Create()) {
 				archive.AddAllFromDirectory(audicaTemplate);
-				archive.AddEntry("song.desc", Path.Combine(streamAssets, "song.desc"));
-				archive.AddEntry("song.mid", Path.Combine(streamAssets, "song.mid"));
-				archive.AddEntry("song.mogg", Path.Combine(streamAssets, "song.mogg"));
-				archive.SaveTo(Path.Combine(Application.persistentDataPath, "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
+				archive.AddEntry("song.desc", Path.Combine(workFolder, "song.desc"));
+				archive.AddEntry("song.mid", Path.Combine(workFolder, "song.mid"));
+				archive.AddEntry("song.mogg", Path.Combine(workFolder, "song.mogg"));
+				archive.SaveTo(Path.Combine(Application.dataPath, "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
 			}
 
-			*/
-		
+			return Path.Combine(Application.dataPath, "saves", songID + ".audica");
+			
+		/*
 		
 			HandleCache.CheckSaveFolderValid();
 
@@ -112,6 +99,7 @@ namespace NotReaper.IO {
 
 
 			return Path.Combine(Application.dataPath, "saves", songID + ".audica");
+			*/
 
 
 		}

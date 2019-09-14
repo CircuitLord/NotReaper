@@ -95,6 +95,7 @@ namespace NotReaper.Timing {
 
         public void GenerateOgg() {
             if (loadedSong == null) return;
+            Debug.Log(loadedSong);
             trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg") , offset, bpm);
             AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), "tempsongid-yay", "yourawesomesong", "circuitlord", bpm, "songendevent", "you", 0);
         }

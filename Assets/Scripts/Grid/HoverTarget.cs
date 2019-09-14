@@ -62,10 +62,10 @@ namespace NotReaper.Grid {
 
                 default:
                     Vector3 newPos = NoteGridSnap.SnapToGrid(new Vector3(mousePos.x, mousePos.y, -1f), EditorInput.selectedSnappingMode);
-                    if (newPos == lastPos) {
-                        return;
-                    }
-                    lastPos = newPos;
+                    //if (newPos == lastPos) {
+                        //return;
+                    //}
+                    //lastPos = newPos;
                     transform.position = newPos;
                     //transform.position = Vector3.SmoothDamp(transform.position, newPos, ref velocity, 0.3f);
                     break;
