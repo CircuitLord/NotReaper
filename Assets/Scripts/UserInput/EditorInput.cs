@@ -206,49 +206,49 @@ namespace NotReaper.UserInput {
 			switch (tool) {
 				case EditorTool.Standard:
 					selectedBehavior = TargetBehavior.Standard;
-					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Standard);
 					SelectSnappingMode(SnappingMode.Grid);
 
 					break;
 
 				case EditorTool.Hold:
 					selectedBehavior = TargetBehavior.Hold;
-					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Standard);
 					//noteGrid.SetSnappingMode(SnappingMode.Grid);
 					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Horizontal:
 					selectedBehavior = TargetBehavior.Horizontal;
-					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Standard);
 					//noteGrid.SetSnappingMode(SnappingMode.Grid);
 					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.Vertical:
 					selectedBehavior = TargetBehavior.Vertical;
-					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Standard);
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Standard);
 					//noteGrid.SetSnappingMode(SnappingMode.Grid);
 					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.ChainStart:
 					selectedBehavior = TargetBehavior.ChainStart;
-					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.ChainStart);
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.ChainStart);
 					//noteGrid.SetSnappingMode(SnappingMode.Grid);
 					SelectSnappingMode(SnappingMode.Grid);
 					break;
 
 				case EditorTool.ChainNode:
 					selectedBehavior = TargetBehavior.Chain;
-					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Chain);
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Chain);
 					//noteGrid.SetSnappingMode(SnappingMode.None);
 					SelectSnappingMode(SnappingMode.None);
 					break;
 
 				case EditorTool.Melee:
 					selectedBehavior = TargetBehavior.Melee;
-					//soundDropdown.SetValueWithoutNotify((int) DropdownToVelocity.Melee);
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
 					//noteGrid.SetSnappingMode(SnappingMode.Melee);
 					SelectSnappingMode(SnappingMode.Melee);
 					SelectHand(TargetHandType.Either);

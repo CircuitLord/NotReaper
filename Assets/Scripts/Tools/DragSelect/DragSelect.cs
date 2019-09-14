@@ -259,8 +259,8 @@ namespace NotReaper.Tools {
 					}
 					else if (isDraggingTimeline) {
 						float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
-						float timelineScaleMulti = timeline.scale / 20f;
-						dragSelectTimeline.localScale = new Vector3(diff * timelineScaleMulti, 1.1f * (timeline.scale / 20f), 1);
+						float timelineScaleMulti = Timeline.scale / 20f;
+						dragSelectTimeline.localScale = new Vector3(diff * timelineScaleMulti, 1.1f * (Timeline.scale / 20f), 1);
 					}
 					else if (isDraggingGrid) {
 

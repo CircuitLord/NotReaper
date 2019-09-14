@@ -15,11 +15,23 @@ namespace NotReaper.Targets {
         private GameObject endMarker;
         private GameObject endMarkerTl;
 
+        public GameObject sustainButtons;
+
         private float PlacementBeatTime = 0;
 
         private TargetIcon parentIcon;
 
         public float sustainLength = 480;
+
+
+        public void EnableSustainButtons() {
+            sustainButtons.SetActive(true);
+        }
+
+        public void DisableSustainButtons() {
+            sustainButtons.SetActive(false);
+
+        }
 
 
         public void LoadSustainController() {
@@ -33,6 +45,11 @@ namespace NotReaper.Targets {
 
             endMarker.SetActive(true);
             endMarkerTl.SetActive(true);
+        }
+
+
+        public void ApplyNewLineScale() {
+
         }
 
 

@@ -48,7 +48,7 @@ namespace NotReaper.Grid {
 
 			Cue cue = new Cue() {
 				tick = Mathf.RoundToInt(target.gridTargetIcon.transform.localPosition.z * 480f) + offset,
-					tickLength = Mathf.RoundToInt(target.beatLength * 480f),
+					tickLength = Mathf.RoundToInt(target.beatLength),//Mathf.RoundToInt(target.beatLength * 480f),
 					pitch = pitch,
 					velocity = target.velocity,
 					gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 2), y = (float) Math.Round(offsetY, 2) },
