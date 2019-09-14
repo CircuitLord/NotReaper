@@ -32,9 +32,6 @@ namespace NotReaper {
 
 		[HideInInspector] public static SongDesc desc;
 
-
-
-
 		[Header("Audio Stuff")]
 
 		[SerializeField] private AudioSource aud;
@@ -43,7 +40,6 @@ namespace NotReaper {
 		[SerializeField] private AudioSource rightSustainAud;
 		[SerializeField] private Transform spectrogram;
 
-		
 		[Header("UI Elements")]
 		[SerializeField] private MiniTimeline miniTimeline;
 		[SerializeField] private TextMeshProUGUI songTimestamp;
@@ -57,7 +53,6 @@ namespace NotReaper {
 		public TargetIcon timelineTargetIconPrefab;
 		public TargetIcon gridTargetIconPrefab;
 
-
 		[Header("Extras")]
 		[SerializeField] public EditorToolkit Tools;
 		[SerializeField] private Transform timelineTransformParent;
@@ -66,13 +61,10 @@ namespace NotReaper {
 		public static Transform timelineNotesStatic;
 		[SerializeField] private Renderer timelineBG;
 
-
 		[Header("Configuration")]
 		public float playbackSpeed = 1f;
 		public float sustainVolume = 0.5f;
 		public float previewDuration = 0.1f;
-
-
 
 		//Target Lists
 		public List<Target> notes;
@@ -80,28 +72,14 @@ namespace NotReaper {
 		public List<Target> selectedNotes;
 		public static List<Target> loadedNotes;
 
-
 		public static bool inTimingMode = false;
 		public static bool audioLoaded = false;
 		public static bool audicaLoaded = false;
-
-
-
-
-
-
 
 		private Color leftColor;
 		private Color rightColor;
 		private Color bothColor;
 		private Color neitherColor;
-
-
-
-
-
-
-
 
 		public static float time { get; set; }
 
@@ -112,15 +90,10 @@ namespace NotReaper {
 		private static float bpm = 60;
 		private static int offset = 0;
 
-
-
 		[HideInInspector] public bool hover = false;
 		public bool paused = true;
 
-
 		//Tools
-		
-
 		private void Start() {
 
 			//Load the config file
@@ -148,7 +121,6 @@ namespace NotReaper {
 
 
 			StartCoroutine(CalculateNoteCollidersEnabled());
-
 
 		}
 
@@ -195,7 +167,7 @@ namespace NotReaper {
 
 				if (autoSelectNewNotes) SelectTarget(notes.Last());
 				if (genUndoAction) undoTargets.Add(notes.Last());
-			
+
 			}
 
 			if (genUndoAction) {
@@ -203,9 +175,6 @@ namespace NotReaper {
 				action.affectedTargets = undoTargets;
 				Tools.undoRedoManager.AddAction(action, true);
 			}
-
-
-
 		}
 
 
@@ -222,34 +191,15 @@ namespace NotReaper {
 		/// <param name="behavior"></param>
 		public void AddTarget(float x, float y, float beatTime, bool userAdded = true, bool genUndoAction = true, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
 
-
-			float yOffset = 0;
-			float zOffset = 0;
-			if (userAdded) {
-				//Calculate the note offset for visual purpose on the timeline.
-				if (EditorInput.selectedHand == TargetHandType.Left) {
-					yOffset = 0.1f;
-					zOffset = 0.1f;
-				} else if (EditorInput.selectedHand == TargetHandType.Right) {
-					yOffset = -0.1f;
-					zOffset = 0.2f;
-				}
-
-			} else {
-				if (handType == TargetHandType.Left) {
-					yOffset = 0.1f;
-					zOffset = 0.1f;
-				} else if (handType == TargetHandType.Right) {
-					yOffset = -0.1f;
-					zOffset = 0.2f;
-				}
-			}
+			//TargetHandType type = 
 
 			Target target = new Target();
+			target.handType = userAdded ? EditorInput.selectedHand : handType;
 
 			target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
-			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
+			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, 0, 0);
 			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
+			UpdateTimelineOffset(target);
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
@@ -342,8 +292,6 @@ namespace NotReaper {
 			}
 
 			//EnableNearSustainButtons();
-			
-
 		}
 
 
@@ -358,7 +306,7 @@ namespace NotReaper {
 						if (!particles.isEmitting) {
 							particles.Play();
 
-							float panPos = (float) (note.gridTargetIcon.transform.position.x / 7.15);
+							float panPos = (float)(note.gridTargetIcon.transform.position.x / 7.15);
 							if (note.handType == TargetHandType.Left) {
 								leftSustainAud.volume = sustainVolume;
 								leftSustainAud.panStereo = panPos;
@@ -395,7 +343,26 @@ namespace NotReaper {
 					}
 				}
 			}
+		}
 
+		//Calculate the note offset for visual purpose on the timeline.
+		private void UpdateTimelineOffset(Target target) {
+			float xOffset = target.timelineTargetIcon.transform.localPosition.x;
+			float yOffset = 0;
+			float zOffset = 0;
+
+			switch (target.handType) {
+				case TargetHandType.Left:
+					yOffset = 0.1f;
+					zOffset = 0.1f;
+					break;
+				case TargetHandType.Right:
+					yOffset = -0.1f;
+					zOffset = 0.2f;
+					break;
+			}
+
+			target.timelineTargetIcon.transform.localPosition = new Vector3(xOffset, yOffset, zOffset);
 		}
 
 
@@ -451,21 +418,61 @@ namespace NotReaper {
 			}
 		}
 
-		//public void DeleteTarget(Target target, bool genUndoAction) {
-		//if (target.gridTargetIcon != null) {
-		//TODO: Add undo back later
-		//target.gridTarget.oldRedoPosition = target.gridTarget.transform.localPosition;
-		//}
-		//DeleteTarget(target);
+		// Invert the selected targets' colour
+		public void SwapTargets(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
+			if (genUndoAction) {
+				var action = new NRActionSwapNoteColors();
+				action.affectedTargets = targets;
 
-		// if (genUndoAction) {
-		//    Action action = new Action();
-		//    action.affectedTargets.Add(target.gridTarget);
-		//    action.type = ActionType.RemoveNote;
-		//    Tools.undoRedoManager.AddAction(action);
-		// }
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
 
-		//}
+			targets.ForEach((Target target) => {
+				switch(target.handType) {
+					case TargetHandType.Left:  target.SetHandType(TargetHandType.Right); break;
+					case TargetHandType.Right: target.SetHandType(TargetHandType.Left);  break;
+				}
+				UpdateTimelineOffset(target);
+			});
+		}
+
+		// Flip the selected targets on the grid about the X
+		public void FlipTargetsHorizontal(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
+			if (genUndoAction) {
+				var action = new NRActionHFlipNotes();
+				action.affectedTargets = targets;
+
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
+			targets.ForEach(target => {
+				var pos = target.gridTargetIcon.transform.localPosition;
+				target.gridTargetIcon.transform.localPosition = new Vector3(
+					pos.x * -1,
+					pos.y,
+					pos.z
+				);
+			});
+		}
+
+		// Flip the selected targets on the grid about the Y
+		public void FlipTargetsVertical(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
+			if (genUndoAction) {
+				var action = new NRActionVFlipNotes();
+				action.affectedTargets = targets;
+
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
+			targets.ForEach(target => {
+				var pos = target.gridTargetIcon.transform.localPosition;
+				target.gridTargetIcon.transform.localPosition = new Vector3(
+					pos.x,
+					pos.y * -1,
+					pos.z
+				);
+			});
+		}
 
 
 		public void DeleteTarget(Target target, bool genUndoAction = true, bool clearRedoActions = true) {
