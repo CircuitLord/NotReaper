@@ -31,10 +31,7 @@ namespace NotReaper {
 		[HideInInspector] public static AudicaFile audicaFile;
 
 		[HideInInspector] public static SongDesc desc;
-
-
-
-
+		
 		[Header("Audio Stuff")]
 
 		[SerializeField] private AudioSource aud;
@@ -42,7 +39,6 @@ namespace NotReaper {
 		[SerializeField] private AudioSource leftSustainAud;
 		[SerializeField] private AudioSource rightSustainAud;
 		[SerializeField] private Transform spectrogram;
-
 		
 		[Header("UI Elements")]
 		[SerializeField] private MiniTimeline miniTimeline;
@@ -53,8 +49,7 @@ namespace NotReaper {
 		[Header("Prefabs")]
 		public TargetIcon timelineTargetIconPrefab;
 		public TargetIcon gridTargetIconPrefab;
-
-
+		
 		[Header("Extras")]
 		[SerializeField] public EditorToolkit Tools;
 		[SerializeField] private Transform timelineTransformParent;
@@ -63,13 +58,10 @@ namespace NotReaper {
 		public static Transform timelineNotesStatic;
 		[SerializeField] private Renderer timelineBG;
 
-
 		[Header("Configuration")]
 		public float playbackSpeed = 1f;
 		public float sustainVolume = 0.5f;
 		public float previewDuration = 0.1f;
-
-
 
 		//Target Lists
 		public List<Target> notes;
@@ -77,29 +69,15 @@ namespace NotReaper {
 		public List<Target> selectedNotes;
 		public static List<Target> loadedNotes;
 
-
 		public static bool inTimingMode = false;
 		public static bool audioLoaded = false;
 		public static bool audicaLoaded = false;
-
-
-
-
-
-
 
 		private Color leftColor;
 		private Color rightColor;
 		private Color bothColor;
 		private Color neitherColor;
-
-
-
-
-
-
-
-
+		
 		public static float time { get; set; }
 
 		private int beatSnap = 4;
@@ -109,15 +87,10 @@ namespace NotReaper {
 		private static float bpm = 60;
 		private static int offset = 0;
 
-
-
 		[HideInInspector] public bool hover = false;
 		public bool paused = true;
-
-
-		//Tools
 		
-
+		//Tools
 		private void Start() {
 
 			//Load the config file
@@ -142,8 +115,7 @@ namespace NotReaper {
 
 
 			StartCoroutine(CalculateNoteCollidersEnabled());
-
-
+			
 		}
 
 		void OnApplicationQuit() {
@@ -192,9 +164,6 @@ namespace NotReaper {
 				action.affectedTargets = undoTargets;
 				Tools.undoRedoManager.AddAction(action, true);
 			}
-
-
-
 		}
 
 
@@ -328,8 +297,6 @@ namespace NotReaper {
 			}
 
 			//EnableNearSustainButtons();
-			
-
 		}
 
 
@@ -381,7 +348,6 @@ namespace NotReaper {
 					}
 				}
 			}
-
 		}
 
 
