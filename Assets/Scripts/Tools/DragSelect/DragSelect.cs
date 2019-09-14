@@ -175,13 +175,15 @@ namespace NotReaper.Tools {
 				}
 			}
 
-			if (Input.GetKeyDown(KeyCode.Delete)) {
+			// cut copy paste delete
+			// TODO: Move these into timeline to record sane undo actions!
+			Action delete = () => {
 				if (timeline.selectedNotes.Count > 0) {
 					timeline.DeleteTargets(timeline.selectedNotes, true, true);
 				}
-			}
+			};
 
-			if (Input.GetKeyDown(KeyCode.C)) {
+			Action copy = () => {
 				clipboardNotes = new List<Target>();
 				clipboardNotes = timeline.selectedNotes;
 
@@ -196,9 +198,9 @@ namespace NotReaper.Tools {
 						clipboardBeatTime = pos;
 					}
 				}
-			}
+			};
 
-			if (Input.GetKeyDown(KeyCode.V)) {
+			Action paste = () => {
 				timeline.DeselectAllTargets();
 
 				List<Target> pasteNotes = new List<Target>();
@@ -213,6 +215,30 @@ namespace NotReaper.Tools {
 
 				clipboardBeatTime = Timeline.BeatTime();
 				timeline.AddTargets(clipboardNotes, true, true);
+			};
+
+			if (Input.GetKeyDown(KeyCode.Delete)) {
+				delete();
+			}
+
+			bool dev = true;
+			bool modifierHeld = dev ?
+				Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) :
+				Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+
+			if (modifierHeld) {
+				if (Input.GetKeyDown(KeyCode.X)) {
+					copy();
+					delete();
+				}
+
+				if (Input.GetKeyDown(KeyCode.C)) {
+					copy();
+				}
+
+				if (Input.GetKeyDown(KeyCode.V)) {
+					paste();
+				}
 			}
 
 			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
