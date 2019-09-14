@@ -407,25 +407,8 @@ namespace NotReaper {
 			}
 		}
 
-		//public void DeleteTarget(Target target, bool genUndoAction) {
-		//if (target.gridTargetIcon != null) {
-		//TODO: Add undo back later
-		//target.gridTarget.oldRedoPosition = target.gridTarget.transform.localPosition;
-		//}
-		//DeleteTarget(target);
-
-		// if (genUndoAction) {
-		//    Action action = new Action();
-		//    action.affectedTargets.Add(target.gridTarget);
-		//    action.type = ActionType.RemoveNote;
-		//    Tools.undoRedoManager.AddAction(action);
-		// }
-
-		//}
-
 		// Invert the selected targets' colour
 		public void SwapTargets(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
-			// TODO: UNDO!
 			if (genUndoAction) {
 				var action = new NRActionSwapNoteColors();
 				action.affectedTargets = targets;
@@ -434,8 +417,6 @@ namespace NotReaper {
 			}
 
 			targets.ForEach((Target target) => {
-				Debug.Log("invert!");
-				Debug.Log(target.handType);
 				switch(target.handType) {
 					case TargetHandType.Left:  target.SetHandType(TargetHandType.Right); break;
 					case TargetHandType.Right: target.SetHandType(TargetHandType.Left);  break;
@@ -445,10 +426,42 @@ namespace NotReaper {
 		}
 
 		// Flip the selected targets on the grid about the X
-		public void FlipTargetsHorizontal(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) { }
+		public void FlipTargetsHorizontal(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
+			if (genUndoAction) {
+				var action = new NRActionHFlipNotes();
+				action.affectedTargets = targets;
+
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
+			targets.ForEach(target => {
+				var pos = target.gridTargetIcon.transform.localPosition;
+				target.gridTargetIcon.transform.localPosition = new Vector3(
+					pos.x * -1,
+					pos.y,
+					pos.z
+				);
+			});
+		}
 
 		// Flip the selected targets on the grid about the Y
-		public void FlipTargetsVertical(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) { }
+		public void FlipTargetsVertical(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
+			if (genUndoAction) {
+				var action = new NRActionVFlipNotes();
+				action.affectedTargets = targets;
+
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
+			targets.ForEach(target => {
+				var pos = target.gridTargetIcon.transform.localPosition;
+				target.gridTargetIcon.transform.localPosition = new Vector3(
+					pos.x,
+					pos.y * -1,
+					pos.z
+				);
+			});
+		}
 
 
 		public void DeleteTarget(Target target, bool genUndoAction = true, bool clearRedoActions = true) {
