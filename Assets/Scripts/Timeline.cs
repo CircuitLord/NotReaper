@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -455,6 +455,25 @@ namespace NotReaper {
 		// }
 
 		//}
+
+		// Invert the selected targets' colour
+		public void SwapTargets(List<Target> targets) {
+			// TODO: UNDO!
+			targets.ForEach((Target target) => {
+				Debug.Log("invert!");
+				Debug.Log(target.handType);
+				switch(target.handType) {
+					case TargetHandType.Left:  target.SetHandType(TargetHandType.Right); break;
+					case TargetHandType.Right: target.SetHandType(TargetHandType.Left);  break;
+				}
+			});
+		}
+
+		// Flip the selected targets on the grid about the X
+		public void FlipTargetsHorizontal(List<Target> targets) { }
+
+		// Flip the selected targets on the grid about the Y
+		public void FlipTargetsVertical(List<Target> targets) { }
 
 
 		public void DeleteTarget(Target target, bool genUndoAction = true, bool clearRedoActions = true) {

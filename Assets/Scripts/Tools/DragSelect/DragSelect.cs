@@ -162,9 +162,9 @@ namespace NotReaper.Tools {
 		void Update() {
 
 			if (!activated) return;
-
 			TargetIcon iconUnderMouse = IconUnderMouse();
 
+			/** Click Detection **/
 			if (isSelectionDown && !hasMovedOutOfClickBounds) {
 
 				// Check for a tiny amount of mouse movement to ensure this was meant to be a click
@@ -175,8 +175,8 @@ namespace NotReaper.Tools {
 				}
 			}
 
-			// cut copy paste delete
-			// TODO: Move these into timeline to record sane undo actions!
+			/** Cut Copy Paste Delete **/
+			// TODO: Move these actions into timeline to record sane undo actions!
 			Action delete = () => {
 				if (timeline.selectedNotes.Count > 0) {
 					timeline.DeleteTargets(timeline.selectedNotes, true, true);
@@ -241,6 +241,26 @@ namespace NotReaper.Tools {
 				}
 			}
 
+			/** Note flipping **/
+			if (Input.GetKeyDown(KeyCode.F)) {
+
+				// flip horizontal
+				if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {
+
+				}
+
+				// flip vertical
+				else if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) {
+
+				}
+
+				// invert
+				else {
+					timeline.SwapTargets(timeline.selectedNotes);
+				}
+			}
+
+			/** Click + Drag Handling **/
 			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
 
 			if (EditorInput.selectedTool == EditorTool.DragSelect) {
