@@ -30,8 +30,7 @@ namespace NotReaper.Tools {
 
 		public LayerMask notesLayer;
 
-		public List<Target> clipboardNotes = new List<Target>();
-		public float clipboardBeatTime = 0f;
+		public List<Cue> clipboardNotes = new List<Cue>();
 
 		private List<TargetMoveIntent> gridTargetMoveIntents = new List<TargetMoveIntent>();
 
@@ -200,37 +199,13 @@ namespace NotReaper.Tools {
 			};
 
 			Action copy = () => {
-				clipboardNotes = new List<Target>();
-				clipboardNotes = timeline.selectedNotes;
-
-				if (clipboardNotes.Count < 1) return;
-
-				clipboardBeatTime = Mathf.Infinity;
-
-				//Find the soonest target in the selection
-				foreach (Target target in clipboardNotes) {
-					float pos = target.gridTargetIcon.transform.localPosition.z;
-					if (pos < clipboardBeatTime) {
-						clipboardBeatTime = pos;
-					}
-				}
+				clipboardNotes = new List<Cue>();
+				timeline.selectedNotes.ForEach(note => clipboardNotes.Add(NotePosCalc.ToCue(note, 0, false)));
 			};
 
 			Action paste = () => {
 				timeline.DeselectAllTargets();
-
-				List<Target> pasteNotes = new List<Target>();
-
-				float diff = Timeline.BeatTime() - clipboardBeatTime;
-
-				foreach (Target target in clipboardNotes) {
-					target.gridTargetPos.z += diff;
-					pasteNotes.Add(target);
-
-				}
-
-				clipboardBeatTime = Timeline.BeatTime();
-				timeline.AddTargets(clipboardNotes, true, true);
+				timeline.PasteCues(clipboardNotes, Timeline.BeatTime());
 			};
 
 			if (Input.GetKeyDown(KeyCode.Delete)) {
