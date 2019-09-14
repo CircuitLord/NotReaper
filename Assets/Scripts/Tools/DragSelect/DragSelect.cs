@@ -221,7 +221,7 @@ namespace NotReaper.Tools {
 				delete();
 			}
 
-			bool dev = true;
+			bool dev = false;
 			bool modifierHeld = dev ?
 				Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) :
 				Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
