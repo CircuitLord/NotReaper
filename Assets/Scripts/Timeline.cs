@@ -433,6 +433,26 @@ namespace NotReaper {
 			});
 		}
 
+		public void MoveTimelineTargets(List<TargetMoveIntent> intents, bool genUndoAction = true, bool clearRedoActions = true) {
+
+			if (genUndoAction) {
+				var action = new NRActionTimelineMoveNotes();
+				action.targetTimelineMoveIntents = intents;
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
+			intents.ForEach(intent => {
+				var newPos = intent.intendedPosition;
+				var gridPos = intent.target.gridTargetIcon.transform.localPosition;
+				intent.target.timelineTargetIcon.transform.localPosition = new Vector3(
+					newPos.x,
+					newPos.y,
+					newPos.z
+				);
+				intent.target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
+			});
+		}
+
 		public void PasteCues(List<Cue> cues, float pasteBeatTime, bool genUndoAction = true, bool clearRedoActions = true) {
 
 			// paste new targets in the original locations

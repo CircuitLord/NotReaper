@@ -34,7 +34,7 @@ namespace NotReaper.Tools {
 		public List<Cue> clipboardNotes = new List<Cue>();
 
 		private List<TargetMoveIntent> gridTargetMoveIntents = new List<TargetMoveIntent>();
-
+		private List<TargetMoveIntent> timelineTargetMoveIntents = new List<TargetMoveIntent>();
 
 		//INFO: Code for selecting targets is on the drag select timline thing itself
 
@@ -133,16 +133,30 @@ namespace NotReaper.Tools {
 
 			Debug.Log("Timeline Drag Start");
 
-			// TODO
 			isDraggingNotesOnTimeline = true;
+			startDragMovePos = icon.transform.position;
+
+			timelineTargetMoveIntents = new List<TargetMoveIntent>();
+			timeline.selectedNotes.ForEach(target => {
+				var intent = new TargetMoveIntent();
+				var pos = target.timelineTargetIcon.transform.localPosition;
+
+				intent.target = target;
+				intent.startingPosition = new Vector3(pos.x, pos.y, pos.z);
+
+				timelineTargetMoveIntents.Add(intent);
+			});
 		}
 
 		private void EndDragTimelineTargetAction() {
 
 			Debug.Log("Timeline Drag End");
 
-			// TODO
 			isDraggingNotesOnTimeline = false;
+			if (timelineTargetMoveIntents.Count > 0) {
+				timeline.MoveTimelineTargets(timelineTargetMoveIntents);
+				timelineTargetMoveIntents = new List<TargetMoveIntent>();
+			}
 		}
 
 		private void StartSelectionAction() {
@@ -358,12 +372,32 @@ namespace NotReaper.Tools {
 
 						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 						var offsetFromDragPoint = intent.target.gridTargetPos - startDragMovePos;
-						Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+						Vector3 newPos = mousePos;// NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
 						newPos += offsetFromDragPoint;
 						intent.target.gridTargetIcon.transform.localPosition = new Vector3(newPos.x, newPos.y, intent.target.gridTargetPos.z);
 						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 
 						intent.intendedPosition = new Vector3(newPos.x, newPos.y, intent.target.gridTargetPos.z);
+					}
+				}
+
+				if (isDraggingNotesOnTimeline) {
+					foreach (TargetMoveIntent intent in timelineTargetMoveIntents) {
+
+						var pos = intent.startingPosition;
+						var gridPos = intent.target.gridTargetIcon.transform.localPosition;
+
+						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+						var offsetFromDragPoint = pos - startDragMovePos;
+
+						// Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+						// TODO: Snap!
+
+						mousePos += offsetFromDragPoint;
+						intent.target.timelineTargetIcon.transform.localPosition = new Vector3(mousePos.x, pos.y, pos.z);
+						intent.target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, mousePos.x);
+
+						intent.intendedPosition = new Vector3(mousePos.x, pos.y, pos.z);
 					}
 				}
 			}
