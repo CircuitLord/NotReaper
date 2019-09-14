@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using NotReaper.Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +10,9 @@ using UnityEngine.UI;
 namespace NotReaper.UI {
 
     public class UIMetadata : MonoBehaviour {
+
+
+        public DifficultyManager difficultyManager;
 
         public Image BG;
         public CanvasGroup window;
@@ -25,20 +30,28 @@ namespace NotReaper.UI {
         public GameObject selectDiffWindow;
 
         public Button generateDiff;
+        public Button loadThisDiff;
 
-        public int selectedDiff;
+        private int selectedDiff;
+        private int diffPotentiallyGoingDelete = -1;
 
+        public GameObject warningDeleteWindow;
+
+        public TMP_Dropdown diffDropdown;
 
 
         public void UpdateUIValues() {
 
             if (!Timeline.audicaLoaded) return;
 
-            if (Timeline.audicaFile.desc.title != null) titleField.text = Timeline.audicaFile.desc.title;
-            if (Timeline.audicaFile.desc.artist != null) artistField.text = Timeline.audicaFile.desc.artist;
-            if (Timeline.audicaFile.desc.mapper != null) mapperField.text = Timeline.audicaFile.desc.mapper;
+            if (Timeline.desc.title != null) titleField.text = Timeline.desc.title;
+            if (Timeline.desc.artist != null) artistField.text = Timeline.desc.artist;
+            if (Timeline.desc.mapper != null) mapperField.text = Timeline.desc.mapper;
 
-            ChangeSelectedDifficulty(0);
+            diffDropdown.value = difficultyManager.loadedIndex;
+            ChangeSelectedDifficulty(difficultyManager.loadedIndex);
+
+            
         }
 
 
@@ -64,48 +77,61 @@ namespace NotReaper.UI {
 
             }
         }
-
+        //Called when the value is changed the dropdown box for the difficulties
         public void ChangeSelectedDifficulty(int index) {
+            if (index == -1) return;
 
             selectedDiff = index;
 
-
-            switch (index) {
-                case 0:
-                    if (Timeline.audicaFile.diffs.expert.cues == null) {
-                        generateDiff.interactable = true;
-                    } else {
-                        generateDiff.interactable = false;
-                    }
-                    break;
-
-                case 1:
-                    if (Timeline.audicaFile.diffs.advanced.cues == null) {
-                        generateDiff.interactable = true;
-                    } else {
-                        generateDiff.interactable = false;
-                    }
-                    break;
-
-                case 2:
-                    if (Timeline.audicaFile.diffs.standard.cues == null) {
-                        generateDiff.interactable = true;
-                    } else {
-                        generateDiff.interactable = false;
-                    }
-                    break;
-
-                case 3:
-                    if (Timeline.audicaFile.diffs.easy.cues == null) {
-                        generateDiff.interactable = true;
-                    } else {
-                        generateDiff.interactable = false;
-                    }
-                    break;
-
-
+            if (difficultyManager.loadedIndex == index) {
+                loadThisDiff.interactable = false;
+            } else {
+                loadThisDiff.interactable = true;
             }
 
+            if (difficultyManager.DifficultyExists(index)) {
+                generateDiff.interactable = false;
+            } else {
+                generateDiff.interactable = true;
+                loadThisDiff.interactable = false;
+            }
+
+
+
+
+         
+
+            
+
+        }
+
+        public void TryDeleteDifficulty() {
+            string diffName = "";
+            if (selectedDiff == 0) diffName = "expert";
+            if (selectedDiff == 1) diffName = "advanced";
+            if (selectedDiff == 2) diffName = "standard";
+            if (selectedDiff == 3) diffName = "easy";
+            diffPotentiallyGoingDelete = selectedDiff;
+            warningDeleteWindow.GetComponentInChildren<TextMeshProUGUI>().text = String.Format("WARNING: This will remove ALL cues in {0}. Are you SURE you want to do this?", diffName);
+            warningDeleteWindow.SetActive(true);
+        }
+
+        //After the confirmation message
+        public void ActuallyDeleteDifficulty() {
+            warningDeleteWindow.SetActive(false);
+            difficultyManager.RemoveDifficulty(diffPotentiallyGoingDelete);
+            UpdateUIValues();
+        }
+
+        public void GenerateDifficulty() {
+            difficultyManager.GenerateDifficulty(selectedDiff);
+            difficultyManager.LoadDifficulty(selectedDiff, true);
+            UpdateUIValues();
+        }
+
+        public void LoadThisDiff() {
+            difficultyManager.LoadDifficulty(selectedDiff, true);
+            UpdateUIValues();
         }
 
 
@@ -132,26 +158,30 @@ namespace NotReaper.UI {
 
             UpdateUIValues();
 
-            BG.DOFade(1.0f, fadeDuration / 2f);
+            //BG.DOFade(1.0f, fadeDuration / 12f);
+            BG.gameObject.SetActive(true);
 
-            yield return new WaitForSeconds(fadeDuration / 4f);
+            //yield return new WaitForSeconds(fadeDuration / 10f);
 
-            DOTween.To(x => window.alpha = x, 0.0f, 1.0f, fadeDuration / 2f);
+            //DOTween.To(x => window.alpha = x, 0.0f, 1.0f, fadeDuration / 10f);
+            window.gameObject.SetActive(true);
+            //window.alpha = 1.0f;
 
             yield break;
         }
 
         public IEnumerator FadeOut() {
+            BG.gameObject.SetActive(false);
 
-            float fadeDuration = (float) NRSettings.config.UIFadeDuration;
+            //float fadeDuration = (float) NRSettings.config.UIFadeDuration;
 
-            DOTween.To(x => window.alpha = x, 1.0f, 0.0f, fadeDuration / 4f);
+            //DOTween.To(x => window.alpha = x, 1.0f, 0.0f, fadeDuration / 4f);
 
-            BG.DOFade(0.0f, fadeDuration / 2f);
+            //BG.DOFade(0.0f, fadeDuration / 2f);
 
-            yield return new WaitForSeconds(fadeDuration / 2f);
+           // yield return new WaitForSeconds(fadeDuration / 2f);
 
-            this.gameObject.SetActive(false);
+            window.gameObject.SetActive(false);
 
             yield break;
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -44,8 +44,7 @@ namespace NotReaper {
 		[SerializeField] private MiniTimeline miniTimeline;
 		[SerializeField] private TextMeshProUGUI songTimestamp;
 		[SerializeField] private TextMeshProUGUI curTick;
-		[SerializeField] private TextMeshProUGUI curSongName;
-		[SerializeField] private TextMeshProUGUI curSongDiff;
+		[SerializeField] private TextMeshProUGUI curDiffText;
 
 		[SerializeField] private HorizontalSelector beatSnapSelector;
 
@@ -54,6 +53,7 @@ namespace NotReaper {
 		public TargetIcon gridTargetIconPrefab;
 
 		[Header("Extras")]
+		[SerializeField] private DifficultyManager difficultyManager;
 		[SerializeField] public EditorToolkit Tools;
 		[SerializeField] private Transform timelineTransformParent;
 		[SerializeField] private Transform gridTransformParent;
@@ -123,7 +123,7 @@ namespace NotReaper {
 
 
 		public void UpdateUIColors() {
-			curSongDiff.color = NRSettings.config.rightColor;
+			curDiffText.color = NRSettings.config.rightColor;
 			leftColor = NRSettings.config.leftColor;
 			rightColor = NRSettings.config.rightColor;
 			bothColor = UserPrefsManager.bothColor;
@@ -286,7 +286,6 @@ namespace NotReaper {
 
 			}
 
-			//EnableNearSustainButtons();
 			return target;
 		}
 
@@ -580,7 +579,7 @@ namespace NotReaper {
 
 		}
 
-		private void DeleteAllTargets() {
+		public void DeleteAllTargets() {
 			foreach (Target target in notes) {
 				//if (obj)
 				Destroy(target.gridTargetIcon.gameObject);
@@ -711,7 +710,22 @@ namespace NotReaper {
 				export.cues.Add(NotePosCalc.ToCue(target, offset, false));
 			}
 
-			audicaFile.diffs.expert = export;
+			switch (difficultyManager.loadedIndex) {
+				case 0:
+					audicaFile.diffs.expert = export;
+					break;
+				case 1:
+					audicaFile.diffs.advanced = export;
+					break;
+				case 2:
+					audicaFile.diffs.standard = export;
+					break;
+				case 3:
+					audicaFile.diffs.easy = export;
+					break;
+			}
+
+			
 
 			AudicaExporter.ExportToAudicaFile(audicaFile);
 
@@ -881,10 +895,11 @@ namespace NotReaper {
 			StartCoroutine(LoadLeftSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg"));
 			StartCoroutine(LoadRightSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg"));
 
-			foreach (Cue cue in audicaFile.diffs.expert.cues) {
-				AddTarget(cue);
-			}
-			//LoadTimingMode();
+			//foreach (Cue cue in audicaFile.diffs.expert.cues) {
+				//AddTarget(cue);
+			//}
+			//Difficulty manager loads stuff now
+			difficultyManager.LoadHighestDifficulty();
 
 			//Loaded successfully
 			return true;
@@ -903,16 +918,16 @@ namespace NotReaper {
 					previewAud.clip = myClip;
 
 
-					SetBPM((float) audicaFile.desc.tempo);
+					SetBPM((float) desc.tempo);
 					audioLoaded = true;
 					audicaLoaded = true;
+
+					//Difficulty manager loads stuff now
+					difficultyManager.LoadHighestDifficulty();
 					//SetScale(20);
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 
 					//spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
-
-					curSongName.text = desc.title;
-					curSongDiff.text = "Expert";
 
 
 				}

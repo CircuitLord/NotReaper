@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using NotReaper.Managers;
 
 namespace NotReaper.UI {
 
 
+
     public class UIDifficulty : MonoBehaviour {
+        public DifficultyManager difficultyManager;
         public Button expert;
         public Button advanced;
         public Button standard;
@@ -15,7 +18,8 @@ namespace NotReaper.UI {
 
         public GameObject warningWindow;
         public TextMeshProUGUI warningText;
-
+        
+        
 
         private string ogDiff = "";
         private string newDiff = "";
@@ -24,6 +28,21 @@ namespace NotReaper.UI {
 
         public void ApplyDifficultyToOther() {
             Debug.Log("Applying " + ogDiff + " cues to " + newDiff);
+
+            int origin = -1;
+            int dest = -1;
+
+            if (ogDiff == "expert") origin = 0;
+            if (ogDiff == "advanced") origin = 1;
+            if (ogDiff == "standard") origin = 2;
+            if (ogDiff == "easy") origin = 3;
+
+            if (newDiff == "expert") dest = 0;
+            if (newDiff == "advanced") dest = 1;
+            if (newDiff == "standard") dest = 2;
+            if (newDiff == "easy") dest = 3;
+
+            difficultyManager.CopyToOtherDifficulty(origin, dest);
         }
 
 
