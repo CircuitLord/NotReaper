@@ -44,6 +44,9 @@ namespace NotReaper {
 		[SerializeField] private MiniTimeline miniTimeline;
 		[SerializeField] private TextMeshProUGUI songTimestamp;
 		[SerializeField] private TextMeshProUGUI curTick;
+		[SerializeField] private TextMeshProUGUI curSongName;
+		[SerializeField] private TextMeshProUGUI curSongDiff;
+
 		[SerializeField] private HorizontalSelector beatSnapSelector;
 
 		[Header("Prefabs")]
@@ -108,14 +111,23 @@ namespace NotReaper {
 			timelineNotesStatic = timelineTransformParent;
 
 			//Modify the note colors
-			leftColor = NRSettings.config.leftColor;
-			rightColor = NRSettings.config.rightColor;
-			bothColor = UserPrefsManager.bothColor;
-			neitherColor = UserPrefsManager.neitherColor;
+
+
+			
+			
 
 
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
+		}
+
+
+		public void UpdateUIColors() {
+			curSongDiff.color = NRSettings.config.rightColor;
+			leftColor = NRSettings.config.leftColor;
+			rightColor = NRSettings.config.rightColor;
+			bothColor = UserPrefsManager.bothColor;
+			neitherColor = UserPrefsManager.neitherColor;
 		}
 
 		void OnApplicationQuit() {
@@ -662,6 +674,8 @@ namespace NotReaper {
 
 			AudicaExporter.ExportToAudicaFile(audicaFile);
 
+			NotificationShower.AddNotifToQueue(new NRNotification("Map saved successfully!"));
+
 
 		}
 
@@ -859,6 +873,9 @@ namespace NotReaper {
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 
 					//spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
+
+					curSongName.text = desc.title;
+					curSongDiff.text = "Expert";
 
 
 				}
