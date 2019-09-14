@@ -31,7 +31,7 @@ namespace NotReaper {
 		[HideInInspector] public static AudicaFile audicaFile;
 
 		[HideInInspector] public static SongDesc desc;
-		
+
 		[Header("Audio Stuff")]
 
 		[SerializeField] private AudioSource aud;
@@ -39,7 +39,7 @@ namespace NotReaper {
 		[SerializeField] private AudioSource leftSustainAud;
 		[SerializeField] private AudioSource rightSustainAud;
 		[SerializeField] private Transform spectrogram;
-		
+
 		[Header("UI Elements")]
 		[SerializeField] private MiniTimeline miniTimeline;
 		[SerializeField] private TextMeshProUGUI songTimestamp;
@@ -49,7 +49,7 @@ namespace NotReaper {
 		[Header("Prefabs")]
 		public TargetIcon timelineTargetIconPrefab;
 		public TargetIcon gridTargetIconPrefab;
-		
+
 		[Header("Extras")]
 		[SerializeField] public EditorToolkit Tools;
 		[SerializeField] private Transform timelineTransformParent;
@@ -77,7 +77,7 @@ namespace NotReaper {
 		private Color rightColor;
 		private Color bothColor;
 		private Color neitherColor;
-		
+
 		public static float time { get; set; }
 
 		private int beatSnap = 4;
@@ -89,7 +89,7 @@ namespace NotReaper {
 
 		[HideInInspector] public bool hover = false;
 		public bool paused = true;
-		
+
 		//Tools
 		private void Start() {
 
@@ -115,7 +115,7 @@ namespace NotReaper {
 
 
 			StartCoroutine(CalculateNoteCollidersEnabled());
-			
+
 		}
 
 		void OnApplicationQuit() {
@@ -156,7 +156,7 @@ namespace NotReaper {
 
 				if (autoSelectNewNotes) SelectTarget(notes.Last());
 				if (genUndoAction) undoTargets.Add(notes.Last());
-			
+
 			}
 
 			if (genUndoAction) {
@@ -180,31 +180,15 @@ namespace NotReaper {
 		/// <param name="behavior"></param>
 		public void AddTarget(float x, float y, float beatTime, bool userAdded = true, bool genUndoAction = true, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
 
-
-			float yOffset = 0;
-			float zOffset = 0;
-
-			TargetHandType type = userAdded ? EditorInput.selectedHand : handType;
-
-			//Calculate the note offset for visual purpose on the timeline.
-			
-			switch (type) {
-				case TargetHandType.Left: {
-					yOffset = 0.1f;
-					zOffset = 0.1f;
-						
-				} break;
-				case TargetHandType.Right: {
-					yOffset = -0.1f;
-					zOffset = 0.2f;
-				} break;
-			}
+			//TargetHandType type = 
 
 			Target target = new Target();
+			target.handType = userAdded ? EditorInput.selectedHand : handType;
 
 			target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
-			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, yOffset, zOffset);
+			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, 0, 0);
 			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
+			UpdateTimelineOffset(target);
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
@@ -311,7 +295,7 @@ namespace NotReaper {
 						if (!particles.isEmitting) {
 							particles.Play();
 
-							float panPos = (float) (note.gridTargetIcon.transform.position.x / 7.15);
+							float panPos = (float)(note.gridTargetIcon.transform.position.x / 7.15);
 							if (note.handType == TargetHandType.Left) {
 								leftSustainAud.volume = sustainVolume;
 								leftSustainAud.panStereo = panPos;
@@ -348,6 +332,29 @@ namespace NotReaper {
 					}
 				}
 			}
+		}
+
+		//Calculate the note offset for visual purpose on the timeline.
+		private void UpdateTimelineOffset(Target target) {
+			float xOffset = target.timelineTargetIcon.transform.localPosition.x;
+			float yOffset = 0;
+			float zOffset = 0;
+
+			switch (target.handType) {
+				case TargetHandType.Left: {
+						yOffset = 0.1f;
+						zOffset = 0.1f;
+
+					}
+					break;
+				case TargetHandType.Right: {
+						yOffset = -0.1f;
+						zOffset = 0.2f;
+					}
+					break;
+			}
+
+			target.timelineTargetIcon.transform.localPosition = new Vector3(xOffset, yOffset, zOffset);
 		}
 
 
@@ -429,6 +436,7 @@ namespace NotReaper {
 					case TargetHandType.Left:  target.SetHandType(TargetHandType.Right); break;
 					case TargetHandType.Right: target.SetHandType(TargetHandType.Left);  break;
 				}
+				UpdateTimelineOffset(target);
 			});
 		}
 
