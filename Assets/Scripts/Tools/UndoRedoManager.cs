@@ -101,15 +101,27 @@ namespace NotReaper.Tools {
 					break;
 
 				case NRActionGridMoveNotes a:
-					var intents = new List<TargetMoveIntent>();
+					var gridMoveIntents = new List<TargetMoveIntent>();
 					a.targetGridMoveIntents.ForEach(intent => {
 						var undoIntent = new TargetMoveIntent();
 						undoIntent.target = intent.target;
 						undoIntent.intendedPosition = intent.startingPosition;
 						undoIntent.startingPosition = intent.intendedPosition;
-						intents.Add(undoIntent);
+						gridMoveIntents.Add(undoIntent);
 					});
-					timeline.MoveGridTargets(intents, false);
+					timeline.MoveGridTargets(gridMoveIntents, false);
+					break;
+
+				case NRActionTimelineMoveNotes a:
+					var timelineMoveIntents = new List<TargetMoveIntent>();
+					a.targetTimelineMoveIntents.ForEach(intent => {
+						var undoIntent = new TargetMoveIntent();
+						undoIntent.target = intent.target;
+						undoIntent.intendedPosition = intent.startingPosition;
+						undoIntent.startingPosition = intent.intendedPosition;
+						timelineMoveIntents.Add(undoIntent);
+					});
+					timeline.MoveTimelineTargets(timelineMoveIntents, false);
 					break;
 
 				case NRActionSwapNoteColors a:
@@ -156,6 +168,10 @@ namespace NotReaper.Tools {
 
 				case NRActionGridMoveNotes a:
 					timeline.MoveGridTargets(a.targetGridMoveIntents, true, false);
+					break;
+
+				case NRActionTimelineMoveNotes a:
+					timeline.MoveTimelineTargets(a.targetTimelineMoveIntents, true, false);
 					break;
 
 				case NRActionSwapNoteColors a:
@@ -258,6 +274,10 @@ namespace NotReaper.Tools {
 
 	public class NRActionGridMoveNotes : NRAction {
 		public List<TargetMoveIntent> targetGridMoveIntents = new List<TargetMoveIntent>();
+	}
+
+	public class NRActionTimelineMoveNotes : NRAction {
+		public List<TargetMoveIntent> targetTimelineMoveIntents = new List<TargetMoveIntent>();
 	}
 
 	public class NRActionSwapNoteColors : NRAction {

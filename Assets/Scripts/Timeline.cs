@@ -192,13 +192,14 @@ namespace NotReaper {
 			target.handType = userAdded ? EditorInput.selectedHand : handType;
 
 			target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
+			target.timelineTargetIcon.location = TargetIconLocation.Timeline;
 			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, 0, 0);
 			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
 			UpdateTimelineOffset(target);
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
-
+			target.gridTargetIcon.location = TargetIconLocation.Grid;
 
 			//Use when the rest of the inputs aren't supplied, get them from the EditorInput script.
 			if (userAdded) {
@@ -428,6 +429,26 @@ namespace NotReaper {
 					newPos.y,
 					newPos.z
 				);
+			});
+		}
+
+		public void MoveTimelineTargets(List<TargetMoveIntent> intents, bool genUndoAction = true, bool clearRedoActions = true) {
+
+			if (genUndoAction) {
+				var action = new NRActionTimelineMoveNotes();
+				action.targetTimelineMoveIntents = intents;
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
+			intents.ForEach(intent => {
+				var newPos = intent.intendedPosition;
+				var gridPos = intent.target.gridTargetIcon.transform.localPosition;
+				intent.target.timelineTargetIcon.transform.localPosition = new Vector3(
+					newPos.x,
+					newPos.y,
+					newPos.z
+				);
+				intent.target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
 			});
 		}
 
