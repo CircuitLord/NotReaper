@@ -372,7 +372,7 @@ namespace NotReaper.Tools {
 
 						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 						var offsetFromDragPoint = intent.target.gridTargetPos - startDragMovePos;
-						Vector3 newPos = mousePos;// NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+						Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
 						newPos += offsetFromDragPoint;
 						intent.target.gridTargetIcon.transform.localPosition = new Vector3(newPos.x, newPos.y, intent.target.gridTargetPos.z);
 						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
