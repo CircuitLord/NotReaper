@@ -111,10 +111,7 @@ namespace NotReaper {
 			timelineNotesStatic = timelineTransformParent;
 
 			//Modify the note colors
-			//leftColor = NRSettings.config.leftColor;
-			//rightColor = NRSettings.config.rightColor;
-			//bothColor = UserPrefsManager.bothColor;
-			//neitherColor = UserPrefsManager.neitherColor;
+
 
 			
 			
@@ -127,6 +124,10 @@ namespace NotReaper {
 
 		public void UpdateUIColors() {
 			curSongDiff.color = NRSettings.config.rightColor;
+			leftColor = NRSettings.config.leftColor;
+			rightColor = NRSettings.config.rightColor;
+			bothColor = UserPrefsManager.bothColor;
+			neitherColor = UserPrefsManager.neitherColor;
 		}
 
 		void OnApplicationQuit() {

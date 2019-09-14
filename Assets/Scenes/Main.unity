@@ -26285,6 +26285,8 @@ MonoBehaviour:
   miniTimeline: {fileID: 1450236233}
   songTimestamp: {fileID: 942452378}
   curTick: {fileID: 1904177394}
+  curSongName: {fileID: 1407266733}
+  curSongDiff: {fileID: 1902778857}
   beatSnapSelector: {fileID: 1848388490}
   timelineTargetIconPrefab: {fileID: 9190679311828121994, guid: cc3a0d1268cd93baea91ce44c99571e4,
     type: 3}
@@ -26761,7 +26763,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000011444, y: 11.192}
+  m_AnchoredPosition: {x: -0.0000076293945, y: 11.192}
   m_SizeDelta: {x: 221.88, y: 22.39}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1407266733
@@ -36281,8 +36283,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -55.47, y: -11.198}
-  m_SizeDelta: {x: 110.95, y: 22.39}
+  m_AnchoredPosition: {x: -55.475, y: -3}
+  m_SizeDelta: {x: 110.95, y: 13.48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1902778857
 MonoBehaviour:
