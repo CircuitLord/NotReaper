@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -83,7 +83,8 @@ namespace NotReaper {
 
 		public static float time { get; set; }
 
-		private int beatSnap = 4;
+		public int beatSnap { get; private set; } = 4;
+
 		[HideInInspector] public static int scale = 20;
 		private float targetScale = 0.7f;
 		private float scaleOffset = 0;

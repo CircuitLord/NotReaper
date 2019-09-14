@@ -390,17 +390,26 @@ namespace NotReaper.Tools {
 						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 						var offsetFromDragPoint = pos - startDragMovePos;
 
-						// Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+						Vector3 newPos = SnapToBeat(mousePos);
 						// TODO: Snap!
 
-						mousePos += offsetFromDragPoint;
-						intent.target.timelineTargetIcon.transform.localPosition = new Vector3(mousePos.x, pos.y, pos.z);
-						intent.target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, mousePos.x);
+						newPos += offsetFromDragPoint;
+						intent.target.timelineTargetIcon.transform.localPosition = new Vector3(newPos.x, pos.y, pos.z);
+						intent.target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
 
-						intent.intendedPosition = new Vector3(mousePos.x, pos.y, pos.z);
+						intent.intendedPosition = new Vector3(newPos.x, pos.y, pos.z);
 					}
 				}
 			}
+		}
+
+		private Vector3 SnapToBeat(Vector3 position) {
+			var increments = ((480 / timeline.beatSnap) * 4f) / 480;        // what even is life
+			return new Vector3(
+				Mathf.Round(position.x / increments) * increments,
+				position.y,
+				position.z
+			);
 		}
 	}
 }
