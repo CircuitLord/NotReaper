@@ -86,6 +86,8 @@ namespace NotReaper.UserInput {
 
 			soundSelect.LoadUIColors();
 
+			timeline.UpdateUIColors();
+
 			FigureOutIsInUI();
 
 
