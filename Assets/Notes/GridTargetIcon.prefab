@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8541870369256553294}
   - component: {fileID: 7467499943864292524}
   - component: {fileID: 5396381272619629812}
+  - component: {fileID: 5244297703267542519}
   m_Layer: 9
   m_Name: HoldModifyUI
   m_TagString: Untagged
@@ -29,8 +30,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.01, y: 0.01, z: 1}
   m_Children:
-  - {fileID: 3303589124168388398}
-  - {fileID: 6002654664244032583}
+  - {fileID: 3369610169783005056}
+  - {fileID: 5788885614053577961}
   m_Father: {fileID: 8968295075570785497}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -58,7 +59,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 9
   m_TargetDisplay: 0
 --- !u!114 &5396381272619629812
 MonoBehaviour:
@@ -82,6 +83,23 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &5244297703267542519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 355477074140369082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &926506881763246807
 GameObject:
   m_ObjectHideFlags: 0
@@ -1428,7 +1446,9 @@ MonoBehaviour:
   meleeOutline: {fileID: 5586345778017159694}
   sphereCollider: {fileID: 4976088772993325799}
   velocity: 20
+  behavior: 0
   sustainDirection: 0.6
+  isSelected: 0
 --- !u!135 &4976088772993325799
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2464,6 +2484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timelineNotes: {fileID: 0}
   endMarkerPrefab: {fileID: 4440669226093902584}
+  sustainButtons: {fileID: 355477074140369082}
   sustainLength: 480
 --- !u!199 &8994708956538940186
 ParticleSystemRenderer:
@@ -7988,7 +8009,7 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
---- !u!224 &3303589124168388398 stripped
+--- !u!224 &3369610169783005056 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
     type: 3}
@@ -8154,7 +8175,7 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
---- !u!224 &6002654664244032583 stripped
+--- !u!224 &5788885614053577961 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
     type: 3}

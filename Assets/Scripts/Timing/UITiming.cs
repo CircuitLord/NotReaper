@@ -9,6 +9,7 @@ using TMPro;
 using NotReaper.Metronome;
 using SFB;
 using System.IO;
+using NotReaper.IO;
 
 namespace NotReaper.Timing {
 
@@ -94,7 +95,8 @@ namespace NotReaper.Timing {
 
         public void GenerateOgg() {
             if (loadedSong == null) return;
-            trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output2.ogg") , offset, bpm);
+            trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg") , offset, bpm);
+            AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), "tempsongid-yay", "yourawesomesong", "circuitlord", bpm, "songendevent", "you", 0);
         }
 
         public void UpdateUIValues() {

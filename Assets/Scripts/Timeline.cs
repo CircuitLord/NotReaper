@@ -103,7 +103,7 @@ namespace NotReaper {
 		public static float time { get; set; }
 
 		private int beatSnap = 4;
-		[HideInInspector] public int scale = 20;
+		[HideInInspector] public static int scale = 20;
 		private float targetScale = 0.7f;
 		private float scaleOffset = 0;
 		private static float bpm = 60;
@@ -330,11 +330,7 @@ namespace NotReaper {
 
 			}
 
-
-
-			//UpdateTrail();
-			//UpdateChainConnectors();
-
+			//EnableNearSustainButtons();
 			
 
 		}
@@ -388,116 +384,6 @@ namespace NotReaper {
 					}
 				}
 			}
-
-		}
-
-		private void UpdateChords() {
-			/*
-			//TODO: ORDERED
-			if (loadedNotes.Count > 0)
-				foreach (var note in loadedNotes) {
-					if (note && (Mathf.Round(note.transform.position.z) == 0 && note.behavior != TargetBehavior.ChainStart && note.behavior != TargetBehavior.Chain && note.behavior != TargetBehavior.HoldEnd)) {
-						LineRenderer lr = note.GetComponent<LineRenderer>();
-
-						List<Material> mats = new List<Material>();
-						lr.GetMaterials(mats);
-						Color activeColor = (note.handType == TargetHandType.Left) ? leftColor : rightColor;
-						mats[0].SetColor("_EmissionColor", new Color(activeColor.r, activeColor.g, activeColor.b, activeColor.a / 2));
-
-						var positionList = new List<Vector3>();
-						lr.SetPositions(positionList.ToArray());
-						lr.positionCount = 0;
-						//TODO: Ordered
-						foreach (var note2 in loadedNotes) {
-							if (note.transform.position.z == note2.transform.position.z && note != note2) {
-								var positionList2 = new List<Vector3>();
-
-								var offset = (note.handType == TargetHandType.Left) ? 0.01f : -0.01f;
-								positionList2.Add(note.transform.position + new Vector3(0, offset, 0));
-								positionList2.Add(note2.transform.position + new Vector3(0, offset, 0));
-								lr.positionCount = 2;
-
-								positionList2.Remove(new Vector3(0, 0, 1));
-
-								lr.SetPositions(positionList2.ToArray());
-
-							}
-
-						}
-
-					} else {
-						LineRenderer lr = note.GetComponent<LineRenderer>();
-
-						if (lr.positionCount != 0) {
-							var positionList = new List<Vector3>();
-							lr.SetPositions(positionList.ToArray());
-							lr.positionCount = 0;
-						}
-					}
-				}
-			*/
-		}
-
-		private void UpdateChainConnectors() {
-
-			/*
-			if (orderedNotes.Count > 0)
-				foreach (var note in orderedNotes) {
-					if (note.behavior == TargetBehavior.ChainStart) {
-						LineRenderer lr = note.GetComponentsInChildren<LineRenderer>() [1];
-
-						List<Material> mats = new List<Material>();
-						lr.GetMaterials(mats);
-						Color activeColor = note.handType == TargetHandType.Left ? leftColor : rightColor;
-						mats[0].SetColor("_Color", activeColor);
-						mats[0].SetColor("_EmissionColor", activeColor);
-
-						//clear pos list
-						lr.SetPositions(new Vector3[2]);
-						lr.positionCount = 2;
-
-						//set start pos
-						lr.SetPosition(0, note.transform.position);
-						lr.SetPosition(1, note.transform.position);
-
-						//add links in chain
-						List<GridTarget> chainLinks = new List<GridTarget>();
-						foreach (var note2 in orderedNotes) {
-							//if new start end old chain
-							if ((note.handType == note2.handType) && (note2.transform.position.z > note.transform.position.z) && (note2.behavior == TargetBehavior.ChainStart) && (note2 != note))
-								break;
-
-							if ((note.handType == note2.handType) && note2.transform.position.z > note.transform.position.z && note2.behavior == TargetBehavior.Chain) {
-								chainLinks.Add(note2);
-							}
-
-						}
-
-						note.chainedNotes = chainLinks;
-
-						//apply lines to chain links
-						if (chainLinks.Count > 0) {
-							var positionList = new List<Vector3>();
-							positionList.Add(new Vector3(note.transform.position.x, note.transform.position.y, 0));
-							foreach (var link in chainLinks) {
-								//add new
-								if (!positionList.Contains(link.transform.position)) {
-									positionList.Add(new Vector3(link.transform.position.x, link.transform.position.y, link.transform.position.z - note.transform.position.z));
-								}
-							}
-							lr.positionCount = positionList.Count;
-							positionList = positionList.OrderByDescending(v => v.z - note.transform.position.z).ToList();
-
-							for (int i = 0; i < positionList.Count; ++i) {
-								positionList[i] = new Vector3(positionList[i].x, positionList[i].y, 0);
-							}
-
-							var finalPositions = positionList.ToArray();
-							lr.SetPositions(finalPositions);
-						}
-					}
-				}
-				*/
 
 		}
 
@@ -1030,52 +916,6 @@ namespace NotReaper {
 			beatSnap = snap;
 		}
 
-		// .desc menu
-		public void SetSongID(string newSongID) {
-			//songid = newSongID;
-			//songDesc.songID = newSongID;
-			audicaFile.desc.songID = newSongID;
-		}
-
-		public void SetSongTitle(string newSongTitle) {
-			//songtitle = newSongTitle;
-			//songDesc.title = newSongTitle;
-			audicaFile.desc.title = newSongTitle;
-		}
-
-		public void SetSongArtist(string newSongArtist) {
-			//songartist = newSongArtist;
-			//songDesc.artist = newSongArtist;
-			audicaFile.desc.artist = newSongArtist;
-		}
-
-		public void SetSongEndEvent(string newSongEndEvent) {
-			//songendevent = newSongEndEvent;
-			//songDesc.songEndEvent = string.Concat("event:/song_end/song_end_", newSongEndEvent.ToUpper());
-			audicaFile.desc.songEndEvent = string.Concat("event:/song_end/song_end_", newSongEndEvent.ToUpper());
-		}
-
-		public void SetSongPreRoll(float newSongPreRoll) {
-			//songpreroll = newSongPreRoll;
-			//songDesc.prerollSeconds = newSongPreRoll;
-			audicaFile.desc.prerollSeconds = newSongPreRoll;
-		}
-
-		public void SetSongAuthor(string newSongAuthor) {
-			//songauthor = newSongAuthor;
-			//songDesc.author = newSongAuthor;
-			audicaFile.desc.mapper = newSongAuthor;
-		}
-
-		// public void SetMogg(string newmogg) {
-		//     if (!mogg.Contains(".mogg")) {
-		//         newmogg += ".mogg";
-		//     }
-
-		//     mogg = newmogg;
-		//     songDesc.moggSong = mogg;
-
-		// }
 
 		public void SetBeatTime(float t) {
 			timelineBG.material.SetTextureOffset("_MainTex", new Vector2(((t * bpm / 60 - offset / 480f) / 4f + scaleOffset), 1));
@@ -1087,6 +927,7 @@ namespace NotReaper {
 		}
 
 		public void SetScale(int newScale) {
+			if (newScale < 10 || newScale > 35) return;
 			timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
 			scaleOffset = -newScale % 8 / 8f;
 
@@ -1098,7 +939,16 @@ namespace NotReaper {
 			foreach (Transform note in timelineTransformParent.transform) {
 				note.localScale = targetScale * Vector3.one;
 			}
+
+
 			scale = newScale;
+
+			foreach (Target target in orderedNotes) {
+				if (target.behavior == TargetBehavior.Hold) {
+					//TODO: Fix sustain line scaling when scaling timeline
+					//target.timelineTargetIcon.SetSustainLength(target.beatLength);
+				}
+			}
 		}
 
 		public void UpdateTrail() {
@@ -1159,52 +1009,21 @@ namespace NotReaper {
 		}
 
 
-
-		
-
-		public void Update() {
-			//TODO: Ordrerd
-			/*
-			if (orderedNotes.Count > 0) {
-				foreach (var note in orderedNotes) {
-
-					if (note.behavior == TargetBehavior.ChainStart && note) {
-						if (note.chainedNotes.Count > 0) {
-							if ((note.transform.position.z < 0 && 0 > note.chainedNotes.Last().transform.position.z) || (note.transform.position.z > 0 && 0 < note.chainedNotes.Last().transform.position.z)) {
-								note.GetComponentsInChildren<LineRenderer>() [1].enabled = false;
-							} else {
-								note.GetComponentsInChildren<LineRenderer>() [1].enabled = true;
-							}
-						}
-					}
-
-					if (note.behavior == TargetBehavior.Hold && note) {
-						float temp = 480;
-						float.TryParse(note.GetComponentInChildren<HoldController>().length.text, out temp);
-						var length = Mathf.Ceil(temp) / 480;
-						if (note.gridTarget.beatLength != length) {
-							//note.gridTarget.SetBeatLength(length);
-							//Debug.Log(note.beatLength);
-						}
-					}
+		public void EnableNearSustainButtons() {
+			foreach (Target target in loadedNotes) {
+				if (target.behavior !=  TargetBehavior.Hold) continue;
+				if (paused && EditorInput.selectedTool == EditorTool.DragSelect && target.gridTargetIcon.transform.position.z < 2 && target.gridTargetIcon.transform.position.z > -2) {
+					target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>().EnableSustainButtons();
+				} else {
+					target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>().DisableSustainButtons();
 				}
 			}
-			*/
-
-			//Failed attempt at optimizing:
-
-			//float test = BeatTime();
-			//foreach (Target note in loadedNotes) {
+		}
 
 
-				//if (note.gridTargetIcon.transform.position.z > -5 && note.gridTargetIcon.transform.position.z < 5) {
-				//	note.gridTargetIcon.sphereCollider.enabled = true;
-				//} else {
-				//	note.gridTargetIcon.sphereCollider.enabled = false;
-				//}
-			//}
-
-			UpdateChords();
+		
+		bool checkForNearSustainsOnThisFrame = false;
+		public void Update() {			
 
 			UpdateSustains();
 
@@ -1229,13 +1048,22 @@ namespace NotReaper {
 				time = SnapTime(time);
 
 				SafeSetTime();
-				if (paused) previewAud.Play();
+				if (paused) {
+					previewAud.Play();
+					checkForNearSustainsOnThisFrame = true;
+				}
+
+
 			} else if (!isShiftDown && Input.mouseScrollDelta.y > 0.1f) {
 				if (!audioLoaded) return;
 				time -= BeatsToDuration(4f / beatSnap);
 				time = SnapTime(time);
 				SafeSetTime();
-				if (paused) previewAud.Play();
+				if (paused) {
+					previewAud.Play();
+					checkForNearSustainsOnThisFrame = true;
+				}
+				
 			}
 
 			SetBeatTime(time);
@@ -1248,9 +1076,11 @@ namespace NotReaper {
 			SetCurrentTime();
 			SetCurrentTick();
 
-			//bottomTimelineSlider.SetValueWithoutNotify(GetPercentagePlayed());
-
 			miniTimeline.SetPercentagePlayed(GetPercentagePlayed());
+
+
+			EnableNearSustainButtons();
+
 		}
 
 
@@ -1355,17 +1185,25 @@ namespace NotReaper {
 			return BeatsToDuration(Snap(DurationToBeats(t) - offset / 480f) + offset / 480f);
 		}
 
+		string prevTimeText;
 		private void SetCurrentTime() {
 			string minutes = Mathf.Floor((int) time / 60).ToString("00");
 			string seconds = ((int) time % 60).ToString("00");
+			if (seconds != prevTimeText) {
+				prevTimeText = seconds;
+				songTimestamp.text = minutes + ":" + seconds;
+			}
 
-			songTimestamp.text = minutes + ":" + seconds;
 		}
 
+		string prevTickText;
 		private void SetCurrentTick() {
 			string currentTick = Mathf.Floor((int) BeatTime() * 480f).ToString();
+			if (currentTick != prevTickText) {
+				prevTickText = currentTick;
+				curTick.text = currentTick;
+			}
 
-			curTick.text = currentTick;
 		}
 
 	}
