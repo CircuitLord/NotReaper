@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -533,6 +533,7 @@ namespace NotReaper {
 					pos.y,
 					pos.z
 				);
+				target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 			});
 		}
 
@@ -552,6 +553,7 @@ namespace NotReaper {
 					pos.y * -1,
 					pos.z
 				);
+				target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 			});
 		}
 
