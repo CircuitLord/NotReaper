@@ -133,7 +133,7 @@ namespace NotReaper.UI {
         public string content = "";
         public float duration;
 
-        public NRNotification(string c, float dur = 4.0f) {
+        public NRNotification(string c, float dur = 3.0f) {
             content = c;
             duration = dur;
         }

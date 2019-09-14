@@ -892,7 +892,13 @@ namespace NotReaper {
 
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
+			if (audicaLoaded) {
+				Export();
+			}
+
 			DeleteAllTargets();
+
+			audicaFile = null;
 
 			if (loadRecent) {
 				audicaFile = AudicaHandler.LoadAudicaFile(PlayerPrefs.GetString("recentFile", null));
@@ -923,7 +929,7 @@ namespace NotReaper {
 				//AddTarget(cue);
 			//}
 			//Difficulty manager loads stuff now
-			difficultyManager.LoadHighestDifficulty();
+			//difficultyManager.LoadHighestDifficulty();
 
 			//Loaded successfully
 			return true;
@@ -947,7 +953,7 @@ namespace NotReaper {
 					audicaLoaded = true;
 
 					//Difficulty manager loads stuff now
-					difficultyManager.LoadHighestDifficulty();
+					difficultyManager.LoadHighestDifficulty(false);
 					//SetScale(20);
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 

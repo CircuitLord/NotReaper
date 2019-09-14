@@ -25,28 +25,28 @@ namespace NotReaper.Managers {
         public Timeline timeline;
 
         //Use this when starting up, load highest diff in audica file
-        public int LoadHighestDifficulty() {
+        public int LoadHighestDifficulty(bool save = false) {
 
             if (!Timeline.audicaLoaded) return -1;
 
             if (Timeline.audicaFile.diffs.expert.cues != null) {
-                LoadDifficulty(0);
+                LoadDifficulty(0, save);
                 
                 return 0;  
             }
 
             else if (Timeline.audicaFile.diffs.advanced.cues != null) {
-                LoadDifficulty(1);
+                LoadDifficulty(1, save);
                 return 1;  
             }
 
             else if (Timeline.audicaFile.diffs.standard.cues != null) {
-                LoadDifficulty(2);
+                LoadDifficulty(2, save);
                 return 2;  
             }
 
             else if (Timeline.audicaFile.diffs.easy.cues != null) {
-                LoadDifficulty(3);
+                LoadDifficulty(3, save);
                 return 3;  
             }
 
