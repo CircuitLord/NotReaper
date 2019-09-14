@@ -421,10 +421,9 @@ namespace NotReaper.UserInput {
 			}
 			if (Input.GetKeyDown(InputManager.selectMelee)) {
 				SelectTool(EditorTool.Melee);
-
 			}
 
-			if (Input.GetKeyDown(KeyCode.F)) {
+			if (Input.GetKeyDown(KeyCode.V) && !isCTRLDown) {
 				SelectTool(EditorTool.DragSelect);
 			}
 

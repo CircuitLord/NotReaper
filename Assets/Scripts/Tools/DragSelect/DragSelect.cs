@@ -162,9 +162,9 @@ namespace NotReaper.Tools {
 		void Update() {
 
 			if (!activated) return;
-
 			TargetIcon iconUnderMouse = IconUnderMouse();
 
+			/** Click Detection **/
 			if (isSelectionDown && !hasMovedOutOfClickBounds) {
 
 				// Check for a tiny amount of mouse movement to ensure this was meant to be a click
@@ -175,13 +175,16 @@ namespace NotReaper.Tools {
 				}
 			}
 
-			if (Input.GetKeyDown(KeyCode.Delete)) {
+			/** Cut Copy Paste Delete **/
+			// TODO: Move these actions into timeline to record sane undo actions!
+			Action delete = () => {
 				if (timeline.selectedNotes.Count > 0) {
 					timeline.DeleteTargets(timeline.selectedNotes, true, true);
 				}
-			}
+				timeline.selectedNotes = new List<Target>();
+			};
 
-			if (Input.GetKeyDown(KeyCode.C)) {
+			Action copy = () => {
 				clipboardNotes = new List<Target>();
 				clipboardNotes = timeline.selectedNotes;
 
@@ -196,9 +199,9 @@ namespace NotReaper.Tools {
 						clipboardBeatTime = pos;
 					}
 				}
-			}
+			};
 
-			if (Input.GetKeyDown(KeyCode.V)) {
+			Action paste = () => {
 				timeline.DeselectAllTargets();
 
 				List<Target> pasteNotes = new List<Target>();
@@ -213,8 +216,55 @@ namespace NotReaper.Tools {
 
 				clipboardBeatTime = Timeline.BeatTime();
 				timeline.AddTargets(clipboardNotes, true, true);
+			};
+
+			if (Input.GetKeyDown(KeyCode.Delete)) {
+				delete();
 			}
 
+			bool dev = false;
+			bool modifierHeld = dev ?
+				Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) :
+				Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+
+			if (modifierHeld) {
+				if (Input.GetKeyDown(KeyCode.X)) {
+					copy();
+					delete();
+				}
+
+				if (Input.GetKeyDown(KeyCode.C)) {
+					copy();
+				}
+
+				if (Input.GetKeyDown(KeyCode.V)) {
+					paste();
+				}
+			}
+
+			/** Note flipping **/
+			if (Input.GetKeyDown(KeyCode.F)) {
+
+				var ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+				var shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+				// flip horizontal
+				if (ctrlHeld && !shiftHeld) {
+					timeline.FlipTargetsHorizontal(timeline.selectedNotes);
+				}
+
+				// flip vertical
+				else if (shiftHeld) {
+					timeline.FlipTargetsVertical(timeline.selectedNotes);
+				}
+
+				// invert
+				else {
+					timeline.SwapTargets(timeline.selectedNotes);
+				}
+			}
+
+			/** Click + Drag Handling **/
 			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
 
 			if (EditorInput.selectedTool == EditorTool.DragSelect) {
