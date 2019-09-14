@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NotReaper.Grid;
 using NotReaper.Targets;
 using NotReaper.UserInput;
+using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -96,7 +97,7 @@ namespace NotReaper.Tools {
 					break;
 
 				case NRActionPasteNotes a:
-					// TODO
+					timeline.DeleteTargets(a.pastedTargets, false);
 					break;
 
 				case NRActionGridMoveNotes a:
@@ -150,7 +151,7 @@ namespace NotReaper.Tools {
 					break;
 
 				case NRActionPasteNotes a:
-					// TODO
+					timeline.PasteCues(a.newCues, a.pasteBeatTime, true, false);
 					break;
 
 				case NRActionGridMoveNotes a:
@@ -250,7 +251,9 @@ namespace NotReaper.Tools {
 	}
 
 	public class NRActionPasteNotes : NRAction {
-		public List<Target> affectedTargets = new List<Target>();
+		public List<Cue> newCues = new List<Cue>();
+		public List<Target> pastedTargets = new List<Target>();
+		public float pasteBeatTime;
 	}
 
 	public class NRActionGridMoveNotes : NRAction {
