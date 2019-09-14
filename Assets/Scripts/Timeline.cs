@@ -192,13 +192,14 @@ namespace NotReaper {
 			target.handType = userAdded ? EditorInput.selectedHand : handType;
 
 			target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
+			target.timelineTargetIcon.location = TargetIconLocation.Timeline;
 			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, 0, 0);
 			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
 			UpdateTimelineOffset(target);
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
-
+			target.gridTargetIcon.location = TargetIconLocation.Grid;
 
 			//Use when the rest of the inputs aren't supplied, get them from the EditorInput script.
 			if (userAdded) {

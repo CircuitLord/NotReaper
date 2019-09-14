@@ -7,6 +7,10 @@ using UnityEngine.UI;
 
 namespace NotReaper.Targets {
 
+	public enum TargetIconLocation {
+		Timeline,
+		Grid
+	}
 
     public class TargetIcon : MonoBehaviour {
 
@@ -19,8 +23,6 @@ namespace NotReaper.Targets {
         public GameObject melee;
         public GameObject line;
 
-
-
         public SpriteRenderer standardOutline;
         public SpriteRenderer holdOutline;
         public SpriteRenderer horzOutline;
@@ -28,21 +30,13 @@ namespace NotReaper.Targets {
         public SpriteRenderer chainStartOutline;
         public SpriteRenderer chainOutline;
         public SpriteRenderer meleeOutline;
-
         public SphereCollider sphereCollider;
 
-
         public TargetVelocity velocity = TargetVelocity.Standard;
-
         public TargetBehavior behavior = TargetBehavior.Standard;
-
         public float sustainDirection = 0.6f;
-
         public bool isSelected = false;
-
-        //public float beatLength = 0.25f;
-
-
+		public TargetIconLocation location;
 
         /// <summary>
         /// For when the note is right clicked on. Bool is for if it should gen an undo action

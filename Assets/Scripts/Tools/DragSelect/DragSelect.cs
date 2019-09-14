@@ -16,7 +16,8 @@ namespace NotReaper.Tools {
 		public bool activated = false;
 		bool isDraggingTimeline = false;
 		bool isDraggingGrid = false;
-		bool isDraggingNotes = false;
+		bool isDraggingNotesOnGrid = false;
+		bool isDraggingNotesOnTimeline = false;
 		bool isSelectionDown = false;
 		bool hasMovedOutOfClickBounds = false;
 
@@ -98,8 +99,11 @@ namespace NotReaper.Tools {
 			isDraggingGrid = false;
 		}
 
-		private void StartDragAction(TargetIcon icon) {
-			isDraggingNotes = true;
+		private void StartDragGridTargetAction(TargetIcon icon) {
+
+			Debug.Log("Grid Drag Start");
+
+			isDraggingNotesOnGrid = true;
 			startDragMovePos = icon.transform.position;
 
 			gridTargetMoveIntents = new List<TargetMoveIntent>();
@@ -114,12 +118,31 @@ namespace NotReaper.Tools {
 			});
 		}
 
-		private void EndDragAction() {
-			isDraggingNotes = false;
+		private void EndDragGridTargetAction() {
+
+			Debug.Log("Grid Drag End");
+
+			isDraggingNotesOnGrid = false;
 			if (gridTargetMoveIntents.Count > 0) {
 				timeline.MoveGridTargets(gridTargetMoveIntents);
 				gridTargetMoveIntents = new List<TargetMoveIntent>();
 			}
+		}
+
+		private void StartDragTimelineTargetAction(TargetIcon icon) {
+
+			Debug.Log("Timeline Drag Start");
+
+			// TODO
+			isDraggingNotesOnTimeline = true;
+		}
+
+		private void EndDragTimelineTargetAction() {
+
+			Debug.Log("Timeline Drag End");
+
+			// TODO
+			isDraggingNotesOnTimeline = false;
 		}
 
 		private void StartSelectionAction() {
@@ -259,18 +282,18 @@ namespace NotReaper.Tools {
 
 			if (EditorInput.selectedTool == EditorTool.DragSelect) {
 
-				//TODO: Moving notes on timeline
-
-				if (Input.GetMouseButtonDown(0) && !timeline.hover) {
+				if (Input.GetMouseButtonDown(0)) {
 
 					if (iconUnderMouse) {
 						if (!iconUnderMouse.isSelected) return;
-						StartDragAction(iconUnderMouse);
+						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
+						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
 					}
 				}
 
 				if (Input.GetMouseButtonUp(0)) {
-					EndDragAction();
+					if (isDraggingNotesOnGrid) EndDragGridTargetAction();
+					if (isDraggingNotesOnTimeline) EndDragTimelineTargetAction();
 
 					foreach (Target target in timeline.selectedNotes) {
 
@@ -287,7 +310,8 @@ namespace NotReaper.Tools {
 					if (
 						!isDraggingTimeline &&
 						!isDraggingGrid &&
-						!isDraggingNotes &&
+						!isDraggingNotesOnGrid &&
+						!isDraggingNotesOnTimeline &&
 						!iconUnderMouse
 					) {
 						if (timeline.hover) {
@@ -314,7 +338,8 @@ namespace NotReaper.Tools {
 					}
 					else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBounds) {
 						iconUnderMouse.TrySelect();
-						StartDragAction(iconUnderMouse);
+						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
+						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
 					}
 				}
 				else {
@@ -326,7 +351,7 @@ namespace NotReaper.Tools {
 					if (!hasMovedOutOfClickBounds) TryToggleSelection();
 				}
 
-				if (isDraggingNotes) {
+				if (isDraggingNotesOnGrid) {
 
 					// TODO: this should really be handled by intermediary semi-transparent objects rather than updating "real" state as we go ...
 					foreach (TargetMoveIntent intent in gridTargetMoveIntents) {
