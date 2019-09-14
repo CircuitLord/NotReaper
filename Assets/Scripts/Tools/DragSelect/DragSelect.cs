@@ -245,14 +245,17 @@ namespace NotReaper.Tools {
 			/** Note flipping **/
 			if (Input.GetKeyDown(KeyCode.F)) {
 
-				// flip horizontal
-				if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {
+				var ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+				var shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
+				// flip horizontal
+				if (ctrlHeld && !shiftHeld) {
+					timeline.FlipTargetsHorizontal(timeline.selectedNotes);
 				}
 
 				// flip vertical
-				else if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) {
-
+				else if (shiftHeld) {
+					timeline.FlipTargetsVertical(timeline.selectedNotes);
 				}
 
 				// invert
