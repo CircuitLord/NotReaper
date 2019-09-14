@@ -54,3 +54,11 @@ sdfsd
 event:/song_end/song_end_A
 asd
 0
+C:/Files/Programming/UnityProjects/NotReaper/Assets/StreamingAssets\FFMPEG\output.ogg
+tempsongid-yay
+yourawesomesong
+circuitlord
+175
+songendevent
+you
+0

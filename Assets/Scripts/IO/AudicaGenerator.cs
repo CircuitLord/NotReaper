@@ -14,7 +14,7 @@ namespace NotReaper.IO {
 
 	public class AudicaGenerator {
 
-		public static string Generate(string oggPath, string songID, string songName, string artist, int bpm, string songEndEvent, string mapper, int offset) {
+		public static string Generate(string oggPath, string songID, string songName, string artist, double bpm, string songEndEvent, string mapper, int offset) {
 
 			var streamAssets = Application.streamingAssetsPath;
 			var ogg2AudicaFolder = Path.Combine(streamAssets, "Ogg2Audica");
