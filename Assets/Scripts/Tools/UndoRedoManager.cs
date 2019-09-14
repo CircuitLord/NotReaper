@@ -92,19 +92,32 @@ namespace NotReaper.Tools {
 					break;
 
 				case NRActionMultiRemoveNote a:
-				
 					timeline.AddTargets(a.affectedTargets, false);
-
 					break;
-				
+
+				case NRActionPasteNotes a:
+					// TODO
+					break;
+
+				case NRActionGridMoveNotes a:
+					// TODO
+					break;
+
+				case NRActionSwapNoteColors a:
+					timeline.SwapTargets(a.affectedTargets, false);
+					break;
+
+				case NRActionHFlipNotes a:
+					timeline.FlipTargetsHorizontal(a.affectedTargets, false);
+					break;
+
+				case NRActionVFlipNotes a:
+					timeline.FlipTargetsVertical(a.affectedTargets, false);
+					break;
 
 				default:
 					break;
-				
-
 			}
-
-
 		}
 
 
@@ -128,9 +141,25 @@ namespace NotReaper.Tools {
 					timeline.DeleteTargets(a.affectedTargets, true, false);
 					break;
 
+				case NRActionPasteNotes a:
+					// TODO
+					break;
 
+				case NRActionGridMoveNotes a:
+					// TODO
+					break;
 
+				case NRActionSwapNoteColors a:
+					timeline.SwapTargets(a.affectedTargets, true, false);
+					break;
 
+				case NRActionHFlipNotes a:
+					timeline.FlipTargetsHorizontal(a.affectedTargets, true, false);
+					break;
+
+				case NRActionVFlipNotes a:
+					timeline.FlipTargetsVertical(a.affectedTargets, true, false);
+					break;
 			}
 		}
 
@@ -198,16 +227,10 @@ namespace NotReaper.Tools {
 
 	public class NRActionAddNote : NRAction {
 		public Target affectedTarget;
-
-
-
 	}
 
 	public class NRActionMultiAddNote : NRAction {
 		public List<Target> affectedTargets = new List<Target>();
-
-
-
 	}
 
 	public class NRActionRemoveNote : NRAction {
@@ -218,5 +241,24 @@ namespace NotReaper.Tools {
 		public List<Target> affectedTargets = new List<Target>();
 	}
 
+	public class NRActionPasteNotes : NRAction {
+		public List<Target> affectedTargets = new List<Target>();
+	}
 
+	public class NRActionGridMoveNotes : NRAction {
+		public List<Vector2> orderedPreviousPositions = new List<Vector2>();
+		public List<Target> affectedTargets = new List<Target>();
+	}
+
+	public class NRActionSwapNoteColors : NRAction {
+		public List<Target> affectedTargets = new List<Target>();
+	}
+
+	public class NRActionHFlipNotes : NRAction {
+		public List<Target> affectedTargets = new List<Target>();
+	}
+
+	public class NRActionVFlipNotes : NRAction {
+		public List<Target> affectedTargets = new List<Target>();
+	}
 }

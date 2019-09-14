@@ -341,16 +341,13 @@ namespace NotReaper {
 			float zOffset = 0;
 
 			switch (target.handType) {
-				case TargetHandType.Left: {
-						yOffset = 0.1f;
-						zOffset = 0.1f;
-
-					}
+				case TargetHandType.Left:
+					yOffset = 0.1f;
+					zOffset = 0.1f;
 					break;
-				case TargetHandType.Right: {
-						yOffset = -0.1f;
-						zOffset = 0.2f;
-					}
+				case TargetHandType.Right:
+					yOffset = -0.1f;
+					zOffset = 0.2f;
 					break;
 			}
 
@@ -427,8 +424,15 @@ namespace NotReaper {
 		//}
 
 		// Invert the selected targets' colour
-		public void SwapTargets(List<Target> targets) {
+		public void SwapTargets(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
 			// TODO: UNDO!
+			if (genUndoAction) {
+				var action = new NRActionSwapNoteColors();
+				action.affectedTargets = targets;
+
+				Tools.undoRedoManager.AddAction(action, clearRedoActions);
+			}
+
 			targets.ForEach((Target target) => {
 				Debug.Log("invert!");
 				Debug.Log(target.handType);
@@ -441,10 +445,10 @@ namespace NotReaper {
 		}
 
 		// Flip the selected targets on the grid about the X
-		public void FlipTargetsHorizontal(List<Target> targets) { }
+		public void FlipTargetsHorizontal(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) { }
 
 		// Flip the selected targets on the grid about the Y
-		public void FlipTargetsVertical(List<Target> targets) { }
+		public void FlipTargetsVertical(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) { }
 
 
 		public void DeleteTarget(Target target, bool genUndoAction = true, bool clearRedoActions = true) {
