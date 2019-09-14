@@ -181,6 +181,7 @@ namespace NotReaper.Tools {
 				if (timeline.selectedNotes.Count > 0) {
 					timeline.DeleteTargets(timeline.selectedNotes, true, true);
 				}
+				timeline.selectedNotes = new List<Target>();
 			};
 
 			Action copy = () => {
