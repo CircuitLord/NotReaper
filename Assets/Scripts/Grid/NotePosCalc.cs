@@ -53,7 +53,7 @@ namespace NotReaper.Grid {
 					tickLength = Mathf.RoundToInt(target.beatLength),//Mathf.RoundToInt(target.beatLength * 480f),
 					pitch = pitch,
 					velocity = target.velocity,
-					gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 2), y = (float) Math.Round(offsetY, 2) },
+					gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 5), y = (float) Math.Round(offsetY, 5) },
 					handType = target.handType,
 					behavior = target.behavior
 			};
@@ -87,10 +87,10 @@ namespace NotReaper.Grid {
 						break;
 
 				}
-			} else {
-				x = (cue.pitch % 12) + (float) (cue.gridOffset.x * xSize) - 6.1f;
+			} else {			
+				x = (cue.pitch % 12) + (float) (cue.gridOffset.x * 1f) - 6.1f;
 				x = x * xSize;
-				y = cue.pitch / 12 + (float) (cue.gridOffset.y * ySize) - 2.7f;
+				y = cue.pitch / 12 + (float) (cue.gridOffset.y * 1f) - 2.7f;
 				y = y * ySize;
 			}
 
