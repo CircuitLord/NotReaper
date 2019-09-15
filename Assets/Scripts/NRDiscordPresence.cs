@@ -10,21 +10,6 @@ namespace NotReaper {
 
     public class NRDiscordPresence : MonoBehaviour {
 
-        /*
-        [Header("Details")]
-        public InputField inputDetails, inputState;
-
-        [Header("Time")]
-        public Toggle inputStartTime;
-        public InputField inputEndTime;
-
-        [Header("Images")]
-        public InputField inputLargeKey;
-        public InputField inputLargeTooltip;
-        public InputField inputSmallKey;
-        public InputField inputSmallTooltip;
-        */
-
         public DifficultyManager difficultyManager;
 
         public bool showTime;

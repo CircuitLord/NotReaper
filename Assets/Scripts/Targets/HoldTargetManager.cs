@@ -39,12 +39,8 @@ namespace NotReaper.Targets {
 
             endMarker = Instantiate(endMarkerPrefab, gameObject.transform.position + new Vector3(0, 0, sustainLength / 480f), Quaternion.identity, Timeline.gridNotesStatic);
 
-            endMarkerTl = Instantiate(endMarkerPrefab, new Vector3(0, 0, 0), Quaternion.identity, Timeline.timelineNotesStatic);
-            endMarkerTl.transform.localScale = new Vector3(.3f, .3f, .3f);
-            endMarkerTl.transform.localPosition = new Vector3(0, 0, 0);
-
             endMarker.SetActive(true);
-            endMarkerTl.SetActive(true);
+
         }
 
 

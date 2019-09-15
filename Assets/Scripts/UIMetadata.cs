@@ -58,7 +58,7 @@ namespace NotReaper.UI {
         public void TryCopyCuesToOther() {
             selectDiffWindow.SetActive(true);
 
-            switch (selectedDiff) {
+            switch (difficultyManager.loadedIndex) {
                 case 0:
                     selectDiffWindow.GetComponent<UIDifficulty>().DifficultyComingFrom("expert");
                     break;

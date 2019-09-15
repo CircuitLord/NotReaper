@@ -859,6 +859,10 @@ namespace NotReaper {
 			inTimingMode = true;
 
 			aud.clip = clip;
+			previewAud.clip = null;
+			leftSustainAud.clip = null;
+			rightSustainAud = null;
+
 			audioLoaded = true;
 		}
 
@@ -936,6 +940,9 @@ namespace NotReaper {
 			//difficultyManager.LoadHighestDifficulty();
 
 			//Loaded successfully
+
+			NotificationShower.AddNotifToQueue(new NRNotification("Map loaded successfully!"));
+
 			return true;
 		}
 
