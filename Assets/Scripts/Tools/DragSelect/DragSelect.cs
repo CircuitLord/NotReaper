@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Grid;
@@ -101,8 +102,6 @@ namespace NotReaper.Tools {
 
 		private void StartDragGridTargetAction(TargetIcon icon) {
 
-			Debug.Log("Grid Drag Start");
-
 			isDraggingNotesOnGrid = true;
 			startDragMovePos = icon.transform.position;
 
@@ -120,8 +119,6 @@ namespace NotReaper.Tools {
 
 		private void EndDragGridTargetAction() {
 
-			Debug.Log("Grid Drag End");
-
 			isDraggingNotesOnGrid = false;
 			if (gridTargetMoveIntents.Count > 0) {
 				timeline.MoveGridTargets(gridTargetMoveIntents);
@@ -130,8 +127,6 @@ namespace NotReaper.Tools {
 		}
 
 		private void StartDragTimelineTargetAction(TargetIcon icon) {
-
-			Debug.Log("Timeline Drag Start");
 
 			isDraggingNotesOnTimeline = true;
 			startDragMovePos = icon.transform.position;
@@ -149,8 +144,6 @@ namespace NotReaper.Tools {
 		}
 
 		private void EndDragTimelineTargetAction() {
-
-			Debug.Log("Timeline Drag End");
 
 			isDraggingNotesOnTimeline = false;
 			if (timelineTargetMoveIntents.Count > 0) {
@@ -170,33 +163,16 @@ namespace NotReaper.Tools {
 		}
 
 		private void TryToggleSelection() {
-			TargetIcon underMouse = IconUnderMouse();
-			if (underMouse && underMouse.isSelected) {
-				underMouse.TryDeselect();
+			var iconsUnderMouse = MouseUtil.IconsUnderMouse(notesLayer);
+			TargetIcon iconUnderMouse = iconsUnderMouse.Length > 0 ? iconsUnderMouse[0] : null;
+
+			if (iconUnderMouse && iconUnderMouse.isSelected) {
+				iconUnderMouse.TryDeselect();
 			}
-			else if (underMouse && !underMouse.isSelected) {
-				underMouse.TrySelect();
+			else if (iconUnderMouse && !iconUnderMouse.isSelected) {
+				iconUnderMouse.TrySelect();
 			}
 		}
-
-		private TargetIcon IconUnderMouse() {
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1.7f);
-			ray.direction = Vector3.forward;
-			Debug.DrawRay(ray.origin, ray.direction);
-			//TODO: Tweakable selection distance for raycast
-			//Box collider size currently 2.2
-			if (Physics.Raycast(ray, out hit, 3.4f, notesLayer)) {
-				Transform objectHit = hit.transform;
-
-				TargetIcon targetIcon = objectHit.GetComponent<TargetIcon>();
-
-				return targetIcon;
-			}
-			return null;
-		}
-
 
 		public Vector3 CalcAvgNotePos(List<Target> targets) {
 
@@ -213,7 +189,8 @@ namespace NotReaper.Tools {
 		void Update() {
 
 			if (!activated) return;
-			TargetIcon iconUnderMouse = IconUnderMouse();
+			var iconsUnderMouse = MouseUtil.IconsUnderMouse(notesLayer);
+			TargetIcon iconUnderMouse = iconsUnderMouse.Length > 0 ? iconsUnderMouse[0] : null;
 
 			/** Click Detection **/
 			if (isSelectionDown && !hasMovedOutOfClickBounds) {
@@ -299,7 +276,8 @@ namespace NotReaper.Tools {
 				if (Input.GetMouseButtonDown(0)) {
 
 					if (iconUnderMouse) {
-						if (!iconUnderMouse.isSelected) return;
+						var anySelectedIconUnderMouse = iconsUnderMouse.Where(icon => icon.isSelected).ToArray();
+						if (anySelectedIconUnderMouse.Length == 0) return;
 						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
 						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
 					}
@@ -346,7 +324,6 @@ namespace NotReaper.Tools {
 						dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
 
 					}
-
 					else if (iconUnderMouse && !isSelectionDown) {
 						StartSelectionAction();
 					}
