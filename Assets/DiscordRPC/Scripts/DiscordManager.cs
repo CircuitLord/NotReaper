@@ -125,10 +125,10 @@ public class DiscordManager : MonoBehaviour {
 		if (client == null) return;
 
         //Update the client log level
-        client.Logger.Level = logLevel;
+        //client.Logger.Level = logLevel;
 
 		//Invoke the client events
-		client.Invoke();
+		//client.Invoke();
 	}
 
 #endif

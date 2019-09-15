@@ -121,6 +121,8 @@ namespace NotReaper {
 
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
+			Physics.autoSyncTransforms = false;
+
 		}
 
 
@@ -899,6 +901,8 @@ namespace NotReaper {
 
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
+			inTimingMode = false;
+
 			if (audicaLoaded) {
 				Export();
 			}
@@ -913,6 +917,7 @@ namespace NotReaper {
 
 			} else if (filePath != null) {
 				audicaFile = AudicaHandler.LoadAudicaFile(filePath);
+				PlayerPrefs.SetString("recentFile", audicaFile.filepath);
 
 			} else {
 
@@ -1115,8 +1120,11 @@ namespace NotReaper {
 
 					if (targetPos > -20 && targetPos < 20) {
 						orderedNotes[j].gridTargetIcon.sphereCollider.enabled = true;
+						orderedNotes[j].timelineTargetIcon.sphereCollider.enabled = true;
 					} else {
 						orderedNotes[j].gridTargetIcon.sphereCollider.enabled = false;
+						//TODO: This might break stuff if the user zooms out
+						orderedNotes[j].timelineTargetIcon.sphereCollider.enabled = false;
 					}
 
 					

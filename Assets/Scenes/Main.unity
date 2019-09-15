@@ -14699,7 +14699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -26660,6 +26660,7 @@ MonoBehaviour:
   editorInput: {fileID: 1258393251}
   timeline: {fileID: 1395334176}
   saveButton: {fileID: 845033462}
+  newAudicaButton: {fileID: 2059727186}
   lColorLines:
   - {fileID: 2095956619}
   - {fileID: 1754925776}
@@ -41186,6 +41187,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2056082429}
   m_CullTransparentMesh: 0
+--- !u!114 &2059727186 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 426873774572492312, guid: 0266345a2a40306429da66ffd376f3a2,
+    type: 3}
+  m_PrefabInstance: {fileID: 1482425486}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2061436635
 GameObject:
   m_ObjectHideFlags: 0

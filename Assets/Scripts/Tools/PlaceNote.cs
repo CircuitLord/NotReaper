@@ -29,7 +29,6 @@ namespace NotReaper.Tools {
 		}
 
 		public void TryRemoveNote() {
-			if (!EditorInput.isOverGrid || EditorInput.inUI) return;
 			//if (EventSystem.current.IsPointerOverGameObject())
 				//return;
 

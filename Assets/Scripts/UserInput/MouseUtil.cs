@@ -3,7 +3,7 @@ using UnityEngine;
 using NotReaper.Targets;
 
 namespace NotReaper.UserInput {
-	public class MouseUtil : MonoBehaviour {
+	public class MouseUtil {
 		public static TargetIcon[] IconsUnderMouse(LayerMask mask) {
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1.7f);

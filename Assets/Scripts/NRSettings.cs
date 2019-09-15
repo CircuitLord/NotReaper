@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace NotReaper {
 
-    public static class NRSettings {
+    public class NRSettings : MonoBehaviour {
 
         public static NRJsonSettings config = new NRJsonSettings();
 
