@@ -863,7 +863,7 @@ namespace NotReaper {
 			aud.clip = clip;
 			previewAud.clip = null;
 			leftSustainAud.clip = null;
-			rightSustainAud = null;
+			rightSustainAud.clip = null;
 
 			audioLoaded = true;
 		}
@@ -1250,8 +1250,12 @@ namespace NotReaper {
 				paused = false;
 			} else {
 				aud.Pause();
-				leftSustainAud.Pause();
-				rightSustainAud.Pause();
+
+				if (leftSustainAud.clip != null) {
+					leftSustainAud.Pause();
+					rightSustainAud.Pause();
+
+				}
 				paused = true;
 
 				//Uncommented
