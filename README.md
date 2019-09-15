@@ -1,5 +1,16 @@
-# NotReaper
-"It's not reaper."
+
+<p align="center">
+    <img src="https://github.com/CircuitLord/NotReaper/raw/master/Assets/Images/title.png?sanitize=true"
+        height="80">
+</p>
+
+<p align="center">
+    <a href="https://discord.gg/cakQUt5">
+        <img src="https://img.shields.io/discord/308323056592486420?logo=discord"
+            alt="chat on Discord"></a>
+</p>
+
+NotReaper is a mapper for the VR rhythm game Audica.
 
 ## What is it?
 NotReaper is a fork of a fork for the original AudicaEditor by Rolopogo.
