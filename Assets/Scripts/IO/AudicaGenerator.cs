@@ -71,6 +71,8 @@ namespace NotReaper.IO {
 				archive.AddEntry("song.desc", Path.Combine(workFolder, "song.desc"));
 				archive.AddEntry("song.mid", Path.Combine(workFolder, "song.mid"));
 				archive.AddEntry("song.mogg", Path.Combine(workFolder, "song.mogg"));
+				
+				Directory.CreateDirectory(Path.Combine(Application.dataPath, "saves"));
 				archive.SaveTo(Path.Combine(Application.dataPath, "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
 			}
 
