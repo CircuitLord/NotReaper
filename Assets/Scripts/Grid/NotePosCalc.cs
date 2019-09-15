@@ -53,7 +53,7 @@ namespace NotReaper.Grid {
 					tickLength = Mathf.RoundToInt(target.beatLength),//Mathf.RoundToInt(target.beatLength * 480f),
 					pitch = pitch,
 					velocity = target.velocity,
-					gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 5), y = (float) Math.Round(offsetY, 5) },
+					gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 2), y = (float) Math.Round(offsetY, 2) },
 					handType = target.handType,
 					behavior = target.behavior
 			};

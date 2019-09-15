@@ -10,15 +10,13 @@ namespace NotReaper.Managers {
     public class DifficultyManager : MonoBehaviour {
 
 
-        public bool existsExpert;
-        public bool existsAdvanced;
-        public bool existsStandard;
-        public bool existsEasy;
+        [HideInInspector] public int loadedIndex = -1;
 
-        public int loadedIndex = -1;
+        [SerializeField] private NRDiscordPresence nrDiscordPresence;
 
         [SerializeField] private TextMeshProUGUI curSongName;
 		[SerializeField] private TextMeshProUGUI curSongDiff;
+        
 
 
 
@@ -194,6 +192,8 @@ namespace NotReaper.Managers {
                         curSongDiff.text = "Expert";
                         LoadTimelineDiff(diffs.expert.cues, save);
                         loadedIndex = index;
+
+                        nrDiscordPresence.UpdatePresenceDifficulty(0);
                         return true;
                     }
                     break;
@@ -202,6 +202,8 @@ namespace NotReaper.Managers {
                         curSongDiff.text = "Advanced";
                         LoadTimelineDiff(diffs.advanced.cues, save);
                         loadedIndex = index;
+
+                        nrDiscordPresence.UpdatePresenceDifficulty(1);
                         return true;
                     }
                     break;
@@ -210,6 +212,8 @@ namespace NotReaper.Managers {
                         curSongDiff.text = "Standard";
                         LoadTimelineDiff(diffs.standard.cues, save);
                         loadedIndex = index;
+
+                        nrDiscordPresence.UpdatePresenceDifficulty(2);
                         return true;
                     }
                     break;
@@ -218,6 +222,8 @@ namespace NotReaper.Managers {
                         curSongDiff.text = "Easy";
                         LoadTimelineDiff(diffs.easy.cues, save);
                         loadedIndex = index;
+
+                        nrDiscordPresence.UpdatePresenceDifficulty(3);
                         return true;
                     }
                     break;

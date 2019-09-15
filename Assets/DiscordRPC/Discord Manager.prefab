@@ -1,0 +1,151 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1942266060475238
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4247807864041754}
+  - component: {fileID: 114923567298371696}
+  m_Layer: 0
+  m_Name: Discord Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 2800000, guid: 0e82c8e5c734e424d827caf275b12cb9, type: 3}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4247807864041754
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942266060475238}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114923567298371696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942266060475238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c0662f7bb58e7439856b9fa8414d6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applicationID: 424087019149328395
+  steamID: 
+  targetPipe: -1
+  logLevel: 2
+  registerUriScheme: 0
+  active: 1
+  _currentUser:
+    _username: Clyde
+    _discriminator: 1
+    _snowflake: 0
+    _avatarHash: 
+    _avatar: {fileID: 0}
+    _cacheSize: 128
+    _cacheFormat: 0
+    _cdnEndpoint: cdn.discordapp.com
+    e_foldout: 1
+  _currentSubscription: 0
+  _currentPresence:
+    details: Rich Presence Example
+    state: In Example
+    startTime:
+      timestamp: 0
+    endTime:
+      timestamp: 0
+    smallAsset:
+      image: image_large_long_title_that_no_fit
+      tooltip: 
+      snowflake: 0
+    largeAsset:
+      image: 
+      tooltip: 
+      snowflake: 0
+    party:
+      identifer: 
+      size: 0
+      maxSize: 0
+    secrets:
+      joinSecret: 
+      spectateSecret: 
+  events:
+    OnReady:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_MethodName: OnReady
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+ReadyMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnClose:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+CloseMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnError:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+ErrorMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnPresenceUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+PresenceMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnSubscribe:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+SubscribeMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnUnsubscribe:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+UnsubscribeMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnJoin:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+JoinMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnSpectate:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+SpectateMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnJoinRequest:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+JoinRequestMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnConnectionEstablished:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+ConnectionEstablishedMessageEvent,
+        Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    OnConnectionFailed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: DiscordRPC.Unity.DiscordEvents+ConnectionFailedMessageEvent, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null

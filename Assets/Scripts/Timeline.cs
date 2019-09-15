@@ -53,6 +53,7 @@ namespace NotReaper {
 		public TargetIcon gridTargetIconPrefab;
 
 		[Header("Extras")]
+		[SerializeField] private NRDiscordPresence nrDiscordPresence;
 		[SerializeField] private DifficultyManager difficultyManager;
 		[SerializeField] public EditorToolkit Tools;
 		[SerializeField] private Transform timelineTransformParent;
@@ -918,6 +919,9 @@ namespace NotReaper {
 
 			//SetOffset(0);
 			desc = audicaFile.desc;
+
+			//Update our discord presence
+			nrDiscordPresence.UpdatePresenceSongName(desc.title);
 
 
 			//Loads all the sounds.
