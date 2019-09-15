@@ -17,6 +17,8 @@ namespace NotReaper.IO {
 		public static string Generate(string oggPath, string songID, string songName, string artist, double bpm, string songEndEvent, string mapper, int offset) {
 
 
+			HandleCache.CheckSaveFolderValid();
+
 			var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
 
 			
@@ -72,7 +74,7 @@ namespace NotReaper.IO {
 				archive.AddEntry("song.mid", Path.Combine(workFolder, "song.mid"));
 				archive.AddEntry("song.mogg", Path.Combine(workFolder, "song.mogg"));
 				
-				Directory.CreateDirectory(Path.Combine(Application.dataPath, "saves"));
+				
 				archive.SaveTo(Path.Combine(Application.dataPath, "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
 			}
 

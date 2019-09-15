@@ -28,6 +28,7 @@ namespace NotReaper.IO {
 
 
 				HandleCache.CheckCacheFolderValid();
+				HandleCache.CheckSaveFolderValid();
 
 				bool expert = false, advanced = false, standard = false, easy = false;
 				//Write the cues files to disk so we can add them to the audica file.
