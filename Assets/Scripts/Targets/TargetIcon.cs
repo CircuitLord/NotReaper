@@ -38,6 +38,8 @@ namespace NotReaper.Targets {
         public bool isSelected = false;
 		public TargetIconLocation location;
 
+        public bool isGridIcon = true;
+
         /// <summary>
         /// For when the note is right clicked on. Bool is for if it should gen an undo action
         /// </summary>

@@ -23,7 +23,7 @@ namespace NotReaper.UI {
 
             Vector2 bgPos = new Vector2(mousePos.x * -0.3f, mousePos.y * -0.3f);
 
-            bgImage.DOLocalMove(new Vector3(bgPos.x, bgPos.y, 52f), 0.3f).SetEase(Ease.InOutCubic);
+            bgImage.DOMove(new Vector3(bgPos.x, bgPos.y, 52f), 0.3f).SetEase(Ease.InOutCubic);
 
             yield return new WaitForSeconds(0.3f);
             StartCoroutine(MoveBG());

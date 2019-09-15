@@ -714,6 +714,11 @@ PrefabInstance:
       propertyPath: _currentPresence.largeAsset.tooltip
       value: NotReaper v0.3
       objectReference: {fileID: 0}
+    - target: {fileID: 114923567298371696, guid: 727880df403db6f4d849ab9a954a680e,
+        type: 3}
+      propertyPath: logLevel
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 727880df403db6f4d849ab9a954a680e, type: 3}
 --- !u!1 &78925170
@@ -7831,7 +7836,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &477340491
 RectTransform:
   m_ObjectHideFlags: 0
@@ -14694,7 +14699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -26655,6 +26660,7 @@ MonoBehaviour:
   editorInput: {fileID: 1258393251}
   timeline: {fileID: 1395334176}
   saveButton: {fileID: 845033462}
+  newAudicaButton: {fileID: 2059727186}
   lColorLines:
   - {fileID: 2095956619}
   - {fileID: 1754925776}
@@ -29017,8 +29023,8 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 13
-  m_fontSizeBase: 13
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -29055,7 +29061,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 3.2488241, y: 0, z: 0, w: 0}
+  m_margin: {x: 5.6722713, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1407266733}
     characterCount: 21
@@ -38674,7 +38680,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -55.475, y: -3}
+  m_AnchoredPosition: {x: -55.475, y: -4.199999}
   m_SizeDelta: {x: 110.95, y: 13.48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1902778857
@@ -38726,13 +38732,13 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 11
-  m_fontSizeBase: 11
+  m_fontSize: 12
+  m_fontSizeBase: 12
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_textAlignment: 513
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -38743,7 +38749,7 @@ MonoBehaviour:
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
-  m_firstOverflowCharacterIndex: -1
+  m_firstOverflowCharacterIndex: 0
   m_linkedTextComponent: {fileID: 0}
   m_isLinkedTextComponent: 0
   m_isTextTruncated: 0
@@ -38764,7 +38770,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 3.2488241, y: 0, z: 0, w: 0}
+  m_margin: {x: 5.672458, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1902778857}
     characterCount: 10
@@ -41181,6 +41187,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2056082429}
   m_CullTransparentMesh: 0
+--- !u!114 &2059727186 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 426873774572492312, guid: 0266345a2a40306429da66ffd376f3a2,
+    type: 3}
+  m_PrefabInstance: {fileID: 1482425486}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2061436635
 GameObject:
   m_ObjectHideFlags: 0

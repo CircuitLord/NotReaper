@@ -189,6 +189,8 @@ namespace NotReaper.UserInput {
 
 		public void SelectMode(EditorMode mode) {
 
+			if (selectedMode == EditorMode.Timing && Timeline.inTimingMode) return;
+
 			editorMode.UpdateUI(mode);
             selectedMode = mode;
 
@@ -315,6 +317,13 @@ namespace NotReaper.UserInput {
 				}
 			}
 
+			if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.S)) {
+				timeline.Export();
+			}
+			
+
+
+
 			if (Input.GetKeyDown(KeyCode.Escape)) {
 				if (pauseMenu.isOpened) {
 					if (!Timeline.audioLoaded) return;
@@ -329,10 +338,10 @@ namespace NotReaper.UserInput {
 			if (inUI) return;
 
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {
-                this.SelectTool(EditorTool.DragSelect);
+                SelectTool(EditorTool.DragSelect);
             }
             if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
-                this.RevertTool();
+                RevertTool();
             }
 
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {

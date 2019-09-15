@@ -121,6 +121,8 @@ namespace NotReaper {
 
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
+			Physics.autoSyncTransforms = false;
+
 		}
 
 
@@ -197,11 +199,13 @@ namespace NotReaper {
 			target.timelineTargetIcon.location = TargetIconLocation.Timeline;
 			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, 0, 0);
 			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
+			target.timelineTargetIcon.isGridIcon = false;
 			UpdateTimelineOffset(target);
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
 			target.gridTargetIcon.location = TargetIconLocation.Grid;
+			target.gridTargetIcon.isGridIcon = true;
 
 			//Use when the rest of the inputs aren't supplied, get them from the EditorInput script.
 			if (userAdded) {
@@ -861,7 +865,7 @@ namespace NotReaper {
 			aud.clip = clip;
 			previewAud.clip = null;
 			leftSustainAud.clip = null;
-			rightSustainAud = null;
+			rightSustainAud.clip = null;
 
 			audioLoaded = true;
 		}
@@ -897,6 +901,8 @@ namespace NotReaper {
 
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
+			inTimingMode = false;
+
 			if (audicaLoaded) {
 				Export();
 			}
@@ -911,6 +917,7 @@ namespace NotReaper {
 
 			} else if (filePath != null) {
 				audicaFile = AudicaHandler.LoadAudicaFile(filePath);
+				PlayerPrefs.SetString("recentFile", audicaFile.filepath);
 
 			} else {
 
@@ -1113,8 +1120,11 @@ namespace NotReaper {
 
 					if (targetPos > -20 && targetPos < 20) {
 						orderedNotes[j].gridTargetIcon.sphereCollider.enabled = true;
+						orderedNotes[j].timelineTargetIcon.sphereCollider.enabled = true;
 					} else {
 						orderedNotes[j].gridTargetIcon.sphereCollider.enabled = false;
+						//TODO: This might break stuff if the user zooms out
+						orderedNotes[j].timelineTargetIcon.sphereCollider.enabled = false;
 					}
 
 					
@@ -1248,8 +1258,12 @@ namespace NotReaper {
 				paused = false;
 			} else {
 				aud.Pause();
-				leftSustainAud.Pause();
-				rightSustainAud.Pause();
+
+				if (leftSustainAud.clip != null) {
+					leftSustainAud.Pause();
+					rightSustainAud.Pause();
+
+				}
 				paused = true;
 
 				//Uncommented

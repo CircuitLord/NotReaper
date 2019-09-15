@@ -67,9 +67,13 @@ MonoBehaviour:
   chainStartOutline: {fileID: 4584112912700831936}
   chainOutline: {fileID: 2380995200637787765}
   meleeOutline: {fileID: 2060138308536662302}
-  sphereCollider: {fileID: 0}
+  sphereCollider: {fileID: 7134394305720867247}
   velocity: 20
+  behavior: 0
   sustainDirection: 0.6
+  isSelected: 0
+  location: 0
+  isGridIcon: 1
 --- !u!135 &7134394305720867247
 SphereCollider:
   m_ObjectHideFlags: 0

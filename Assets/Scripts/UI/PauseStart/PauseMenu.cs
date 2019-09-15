@@ -13,6 +13,7 @@ namespace NotReaper.UI {
         public EditorInput editorInput;
         public Timeline timeline;
         public Button saveButton;
+        public Button newAudicaButton;
         
         public List<Image> lColorLines = new List<Image>();
         public List<Image> rColorLines = new List<Image>();
@@ -35,6 +36,9 @@ namespace NotReaper.UI {
             ClosePauseMenu();
 
             editorInput.SelectMode(EditorMode.Timing);
+            Timeline.inTimingMode = true;
+
+            newAudicaButton.interactable = false;
             
         }
 

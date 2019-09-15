@@ -188,7 +188,13 @@ namespace NotReaper.Tools {
 
 		void Update() {
 
+			//If the user decides they hate productivity and want to unselect all their notes, so be it.
+			if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D)) {
+				timeline.DeselectAllTargets();
+			} 
+
 			if (!activated) return;
+
 			var iconsUnderMouse = MouseUtil.IconsUnderMouse(notesLayer);
 			TargetIcon iconUnderMouse = iconsUnderMouse.Length > 0 ? iconsUnderMouse[0] : null;
 
@@ -269,7 +275,7 @@ namespace NotReaper.Tools {
 			}
 
 			/** Click + Drag Handling **/
-			//TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
+			//TODOUNDO I think I fixed this? //TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
 
 			if (EditorInput.selectedTool == EditorTool.DragSelect) {
 
@@ -381,7 +387,7 @@ namespace NotReaper.Tools {
 		}
 
 		private Vector3 SnapToBeat(Vector3 position) {
-			var increments = ((480 / timeline.beatSnap) * 4f) / 480;        // what even is life
+			var increments = ((480 / timeline.beatSnap) * 4f) / 480;        // what even is life //42
 			return new Vector3(
 				Mathf.Round(position.x / increments) * increments,
 				position.y,
