@@ -10,6 +10,8 @@ namespace NotReaper.Grid {
 
 		public static float xSize = 1.1f;
 		public static float ySize = 0.9f;
+		public static float xStart = 6.05f;
+		public static float yStart = 2.7f;
 
 
 		//Gets the cue status based on a target.
@@ -36,15 +38,20 @@ namespace NotReaper.Grid {
 				tempPos.y = target.gridTargetIcon.transform.position.y / ySize;
 
 				//Offset it to all be positive.
-				x = Mathf.RoundToInt(tempPos.x + 6.1f);
-				y = Mathf.RoundToInt(tempPos.y + 2.7f);
+				x = Mathf.RoundToInt(tempPos.x + xStart);
+				y = Mathf.RoundToInt(tempPos.y + yStart);
 
 				pitch = x + 12 * y;
 
 				//Used to be 5.5f
-				offsetX = (tempPos.x + 6.1f - x);
+				offsetX = (tempPos.x + xStart - x);
 
-				offsetY = (tempPos.y + 2.7f - y);
+				offsetY = (tempPos.y + yStart - y);
+
+				offsetX += 0.4499f;
+				offsetY += 0.3f;
+
+				
 
 			}
 
@@ -70,28 +77,36 @@ namespace NotReaper.Grid {
 			if (cue.behavior == TargetBehavior.Melee) {
 				switch (cue.pitch) {
 					case 98:
-						x = -2f;
-						y = -1;
+						x = -2f * xSize;
+						y = -1 * ySize;
 						break;
 					case 99:
-						x = 2f;
-						y = -1;
+						x = 2f * xSize;
+						y = -1 * ySize;
 						break;
 					case 100:
-						x = -2f;
-						y = 1;
+						x = -2f * xSize;
+						y = 1 * ySize;
 						break;
 					case 101:
-						x = 2f;
-						y = 1;
+						x = 2f * xSize;
+						y = 1 * ySize;
 						break;
 
 				}
 			} else {			
-				x = (cue.pitch % 12) + (float) (cue.gridOffset.x * 1f) - 6.1f;
-				x = x * xSize;
-				y = cue.pitch / 12 + (float) (cue.gridOffset.y * 1f) - 2.7f;
-				y = y * ySize;
+				//x = (cue.pitch % 12) + (float) (cue.gridOffset.x * 1f) - 6.1f;
+				//x = x * xSize;
+				//y = cue.pitch / 12 + (float) (cue.gridOffset.y * 1f) - 2.7f;
+				//y = y * ySize;
+
+				//x -= 0.3f;
+				//y -= 0.7f;
+
+				int col = cue.pitch % 12;
+                int row = cue.pitch / 12;
+                x = -xStart + (col + (float)cue.gridOffset.x) * xSize;
+                y = -yStart + (row + (float)cue.gridOffset.y) * ySize;
 			}
 
 

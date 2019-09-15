@@ -112,6 +112,9 @@ namespace NotReaper {
         public double sustainVol = 0.5f;
 
         public double UIFadeDuration = 1.0f;
+
+        public bool useDiscordRichPresence = true;
+        public bool showTimeElapsed = true;
     }
 
 }

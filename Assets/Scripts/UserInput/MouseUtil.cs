@@ -18,7 +18,8 @@ namespace NotReaper.UserInput {
 					// sort by the distance from the centre of the timeline (closest = 0)
 					var target = result.transform.GetComponent<TargetIcon>();
 
-					var isTimeline = (result.transform.position.y > 4.18);     // yes, this is how we're determining this. I'm sorry.
+					//var isTimeline = (result.transform.position.y > 4.18);     // yes, this is how we're determining this. I'm sorry.
+					bool isTimeline = !target.isGridIcon;						//It's okay, I fixed it. We can show our faces in public again.
 					var distance = isTimeline ?
 						Mathf.Abs(target.transform.localPosition.x) :
 						Mathf.Abs(target.transform.position.z);
