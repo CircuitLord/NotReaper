@@ -351,16 +351,20 @@ namespace NotReaper.Tools {
 				if (isDraggingNotesOnGrid) {
 
 					// TODO: this should really be handled by intermediary semi-transparent objects rather than updating "real" state as we go ...
+
+					var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+					Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+
 					foreach (TargetMoveIntent intent in gridTargetMoveIntents) {
 
-						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+						//var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 						var offsetFromDragPoint = intent.target.gridTargetPos - startDragMovePos;
-						Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
-						newPos += offsetFromDragPoint;
-						intent.target.gridTargetIcon.transform.localPosition = new Vector3(newPos.x, newPos.y, intent.target.gridTargetPos.z);
+						//Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+						var tempNewPos = newPos + offsetFromDragPoint;
+						intent.target.gridTargetIcon.transform.localPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
 						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 
-						intent.intendedPosition = new Vector3(newPos.x, newPos.y, intent.target.gridTargetPos.z);
+						intent.intendedPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
 					}
 				}
 
