@@ -55,9 +55,12 @@ namespace NotReaper.Grid {
 				offsetX += 0.4499f;
 				offsetY += 0.3f;
 
+				// TODO: Find the root of this off-by-one error!
+				pitch -= 1;
 
-				// out of bounds check (some maps made outside NR use offsets to get around pitch min and max)
+				// vertical of bounds check (some maps made outside NR use offsets to get around pitch min and max)
 				if (pitch > CUE_NOTE_MAX_PITCH) {
+
 					var difference = pitch - CUE_NOTE_MAX_PITCH;
 					int rows = (int)(Math.Ceiling(difference / 12f));
 
@@ -65,11 +68,13 @@ namespace NotReaper.Grid {
 					pitch -= rows * 12;
 
 				} else if (pitch < CUE_NOTE_MIN_PITCH) {
+
 					var difference = CUE_NOTE_MIN_PITCH - pitch;
 					int rows = (int)(Math.Ceiling(difference / 12f));
 
 					offsetY -= rows;
 					pitch += rows * 12;
+
 				}
 
 			}
