@@ -190,8 +190,6 @@ namespace NotReaper {
 		/// <param name="behavior"></param>
 		public Target AddTarget(float x, float y, float beatTime, bool userAdded = true, bool genUndoAction = true, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
 
-			//TargetHandType type = 
-
 			Target target = new Target();
 			target.handType = userAdded ? EditorInput.selectedHand : handType;
 
@@ -292,8 +290,6 @@ namespace NotReaper {
 				Tools.undoRedoManager.AddAction(action, userAdded);
 
 			}
-
-			Debug.Log(target.gridTargetIcon.transform.position);
 
 			return target;
 		}
