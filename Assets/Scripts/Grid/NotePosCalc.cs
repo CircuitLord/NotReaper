@@ -21,7 +21,6 @@ namespace NotReaper.Grid {
 			Vector2 tempPos = new Vector2();
 			int x = 0, y = 0;
 			float offsetX = 0, offsetY = 0;
-			float finalOffsetX = 0, finalOffsetY = 0;
 
 			//If it's a melee note.
 			if (target.behavior == TargetBehavior.Melee) {
@@ -43,14 +42,7 @@ namespace NotReaper.Grid {
             	pitch = x + 12 * y;
 
 				offsetX = (tempPos.x - x);
-				offsetY = (tempPos.y - y);
-
-				Debug.Log("X: " + x + " Y: " + y + " pitch: " + pitch + " offsetx: " + offsetX + " offsety: " + offsetY);
-
-				//offsetX -= 0.4499f;
-				//offsetY += 0.3f;
-
-				
+				offsetY = (tempPos.y - y);			
 
 			}
 
@@ -94,14 +86,6 @@ namespace NotReaper.Grid {
 
 				}
 			} else {			
-				//x = (cue.pitch % 12) + (float) (cue.gridOffset.x * 1f) - 6.1f;
-				//x = x * xSize;
-				//y = cue.pitch / 12 + (float) (cue.gridOffset.y * 1f) - 2.7f;
-				//y = y * ySize;
-
-				//x -= 0.3f;
-				//y -= 0.7f;
-
 				int col = cue.pitch % 12;
                 int row = cue.pitch / 12;
                 x = -xStart + (col + (float)cue.gridOffset.x) * xSize;
