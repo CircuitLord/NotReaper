@@ -14699,7 +14699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -17909,6 +17909,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 906974237}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &940584635 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 426873774572492312, guid: 0266345a2a40306429da66ffd376f3a2,
+    type: 3}
+  m_PrefabInstance: {fileID: 772528501}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &942452376
 GameObject:
   m_ObjectHideFlags: 0
@@ -25423,6 +25435,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1272590828}
   m_CullTransparentMesh: 0
+--- !u!114 &1275965841 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 426873774572492312, guid: 0266345a2a40306429da66ffd376f3a2,
+    type: 3}
+  m_PrefabInstance: {fileID: 1005230742}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1277796434
 GameObject:
   m_ObjectHideFlags: 0
@@ -40088,6 +40112,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   genAudicaButton: {fileID: 774794037}
+  applyButton: {fileID: 1275965841}
+  selectSongButton: {fileID: 940584635}
   bpmInput: {fileID: 2013587188}
   offsetInput: {fileID: 1356770229}
   nameText: {fileID: 758241287}

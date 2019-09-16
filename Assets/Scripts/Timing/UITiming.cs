@@ -21,6 +21,8 @@ namespace NotReaper.Timing {
 
         [Header("UI Elements")]
         public Button genAudicaButton;
+        public Button applyButton;
+        public Button selectSongButton;
         public TMP_InputField bpmInput;
         public TMP_InputField offsetInput;
         public TextMeshProUGUI nameText;
@@ -85,6 +87,11 @@ namespace NotReaper.Timing {
             string path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), (songName + "-" + mapperName), "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
             timeline.LoadAudicaFile(false, path);
             editorInput.SelectMode(EditorMode.Compose);    
+
+            applyButton.interactable = false;
+            genAudicaButton.interactable = false;
+            selectSongButton.interactable = false;
+            
         }
 
         public void CheckAllUIFilled() {

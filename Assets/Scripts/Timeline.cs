@@ -293,6 +293,8 @@ namespace NotReaper {
 
 			}
 
+			Debug.Log(target.gridTargetIcon.transform.position);
+
 			return target;
 		}
 
@@ -736,6 +738,7 @@ namespace NotReaper {
 			export.cues = new List<Cue>();
 
 			foreach (Target target in orderedNotes) {
+				if (target.behavior == TargetBehavior.Metronome) continue;
 				export.cues.Add(NotePosCalc.ToCue(target, offset, false));
 			}
 

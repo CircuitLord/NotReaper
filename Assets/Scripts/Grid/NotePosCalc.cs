@@ -20,7 +20,8 @@ namespace NotReaper.Grid {
 			int pitch = 0;
 			Vector2 tempPos = new Vector2();
 			int x = 0, y = 0;
-			float offsetX, offsetY = 0;
+			float offsetX = 0, offsetY = 0;
+			float finalOffsetX = 0, finalOffsetY = 0;
 
 			//If it's a melee note.
 			if (target.behavior == TargetBehavior.Melee) {
@@ -34,22 +35,20 @@ namespace NotReaper.Grid {
 			} else {
 
 				//We have to divide by the new positions between the grid.
-				tempPos.x = target.gridTargetIcon.transform.position.x / xSize;
-				tempPos.y = target.gridTargetIcon.transform.position.y / ySize;
+				tempPos.x = (target.gridTargetIcon.transform.position.x  + xStart) / xSize;
+				tempPos.y = (target.gridTargetIcon.transform.position.y + yStart) / ySize;
 
-				//Offset it to all be positive.
-				x = Mathf.RoundToInt(tempPos.x + xStart);
-				y = Mathf.RoundToInt(tempPos.y + yStart);
+				x = Mathf.Clamp(Mathf.RoundToInt(tempPos.x), 0, 11);
+            	y = Mathf.Clamp(Mathf.RoundToInt(tempPos.y), 0, 6);
+            	pitch = x + 12 * y;
 
-				pitch = x + 12 * y;
+				offsetX = (tempPos.x - x);
+				offsetY = (tempPos.y - y);
 
-				//Used to be 5.5f
-				offsetX = (tempPos.x + xStart - x);
+				Debug.Log("X: " + x + " Y: " + y + " pitch: " + pitch + " offsetx: " + offsetX + " offsety: " + offsetY);
 
-				offsetY = (tempPos.y + yStart - y);
-
-				offsetX += 0.4499f;
-				offsetY += 0.3f;
+				//offsetX -= 0.4499f;
+				//offsetY += 0.3f;
 
 				
 
