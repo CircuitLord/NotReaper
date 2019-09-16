@@ -362,6 +362,11 @@ namespace NotReaper.Tools {
 						//Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
 						var tempNewPos = newPos + offsetFromDragPoint;
 						intent.target.gridTargetIcon.transform.localPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
+						if (intent.target.behavior == TargetBehavior.Hold) {
+							var holdEnd = intent.target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>().endMarker;
+							if (holdEnd) holdEnd.transform.localPosition = new Vector3 (tempNewPos.x, tempNewPos.y, holdEnd.transform.localPosition.z);
+						}
+
 						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 
 						intent.intendedPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);

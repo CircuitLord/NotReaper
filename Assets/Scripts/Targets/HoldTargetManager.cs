@@ -12,7 +12,7 @@ namespace NotReaper.Targets {
         [SerializeField] private Transform timelineNotes;
         //public InputField length;
         public GameObject endMarkerPrefab;
-        private GameObject endMarker;
+        public GameObject endMarker;
         private GameObject endMarkerTl;
 
         public GameObject sustainButtons;
