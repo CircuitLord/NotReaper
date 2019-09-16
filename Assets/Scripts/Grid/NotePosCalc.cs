@@ -13,6 +13,10 @@ namespace NotReaper.Grid {
 		public static float xStart = 6.05f;
 		public static float yStart = 2.7f;
 
+		public static readonly int CUE_NOTE_MIN_PITCH = 0;
+		public static readonly int CUE_NOTE_MAX_PITCH = 83;
+		public static readonly int CUE_MELEE_MIN_PITCH = 98;
+		public static readonly int CUE_MELEE_MAX_PITCH = 101;
 
 		//Gets the cue status based on a target.
 		public static Cue ToCue(Target target, int offset, bool includeGridOffset) {
@@ -24,7 +28,7 @@ namespace NotReaper.Grid {
 
 			//If it's a melee note.
 			if (target.behavior == TargetBehavior.Melee) {
-				pitch = 98;
+				pitch = CUE_MELEE_MIN_PITCH;
 				if (target.gridTargetIcon.transform.position.x > 0) pitch += 1;
 				if (target.gridTargetIcon.transform.position.y > 0) pitch += 2;
 
@@ -51,7 +55,22 @@ namespace NotReaper.Grid {
 				offsetX += 0.4499f;
 				offsetY += 0.3f;
 
-				
+
+				// out of bounds check (some maps made outside NR use offsets to get around pitch min and max)
+				if (pitch > CUE_NOTE_MAX_PITCH) {
+					var difference = pitch - CUE_NOTE_MAX_PITCH;
+					int rows = (int)(Math.Ceiling(difference / 12f));
+
+					offsetY += rows;
+					pitch -= rows * 12;
+
+				} else if (pitch < CUE_NOTE_MIN_PITCH) {
+					var difference = CUE_NOTE_MIN_PITCH - pitch;
+					int rows = (int)(Math.Ceiling(difference / 12f));
+
+					offsetY -= rows;
+					pitch += rows * 12;
+				}
 
 			}
 
