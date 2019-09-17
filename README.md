@@ -1,4 +1,5 @@
 
+
 <p align="center">
     <img src="https://github.com/CircuitLord/NotReaper/raw/master/Assets/Images/title.png?sanitize=true"
         height="80">
@@ -8,9 +9,36 @@
     <a href="https://discord.gg/cakQUt5">
         <img src="https://img.shields.io/discord/308323056592486420?logo=discord"
             alt="chat on Discord"></a>
+
+
+	
 </p>
 
-NotReaper is a mapper for the VR rhythm game Audica.
+<p align="center">
+NotReaper is a custom song and community mapper for the VR rhythm game Audica.
+
+
+<center><img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="this slowpoke moves" align=middle width=500/>
+
+
+<h2>What can it do?</h2>
+
+NotReaper is equipped with many tools and features to help you make Audica maps exactly how you
+want in an as short amount of time as possible.
+
+Here's some of the highlights.
+
+
+
+
+</center>
+
+</p>
+
+* Direct loading, generating, and exporting of Audica files. No more hassle.
+* A responsive and user friendly interface. Complete with 100% more animations.
+* Drag all the things with Drag Select, your new best friend. Unless you hate productivity, that is.
+
 
 ## What is it?
 NotReaper is a fork of a fork for the original AudicaEditor by Rolopogo.
