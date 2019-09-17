@@ -1036,7 +1036,10 @@ namespace NotReaper {
 
 		public void SetBPM(float newBpm) {
 			bpm = newBpm;
-			desc.tempo = newBpm;
+			if (desc != null) {
+				desc.tempo = newBpm;
+
+			}
 			SetScale(scale);
 		}
 

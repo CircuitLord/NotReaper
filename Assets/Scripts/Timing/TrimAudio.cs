@@ -29,40 +29,31 @@ namespace NotReaper.Timing {
 			ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
 			ffmpeg.StartInfo.FileName = ffmpegPath;
             ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            ffmpeg.StartInfo.UseShellExecute = false;
+            ffmpeg.StartInfo.RedirectStandardOutput = true;
         }
 
         public void SetAudioLength(string path, string output, int offset, double tempo) {
+
+            string log = "";
+
+
+            double offsetInMS = TicksToMS(offset, tempo);
             
-            //If we want to trim off 
-            //if (offset < 0) {
-           // if (false) {
+            double ms = Math.Abs(GettingOffsetThing(offsetInMS, tempo));
 
-             //   double ms = Math.Abs(GettingOffsetThing(offset, tempo));
-              //  string newStartTime = new TimeSpan(0, 0, 0, 0, (int)ms).ToString();
+            ffmpeg.StartInfo.Arguments = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
 
-               // ffmpeg.StartInfo.Arguments = String.Format("-loglevel panic -y -i \"{0}\" -ss {1} -map 0:a \"{2}\"", path, newStartTime, output);
-
-               // ffmpeg.Start();
-
-              //  ffmpeg.WaitForExit();
+            UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output));
 
 
+            ffmpeg.Start();
 
-           // }
+            string logStuff = ffmpeg.StandardOutput.ReadToEnd();  
 
-           // else {  
+            UnityEngine.Debug.Log(logStuff);
 
-                double offsetInMS = TicksToMS(offset, tempo);
-                
-                double ms = Math.Abs(GettingOffsetThing(offsetInMS, tempo));
-
-                ffmpeg.StartInfo.Arguments = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
-
-                ffmpeg.Start();
-
-                ffmpeg.WaitForExit();
-
-           // }
+            ffmpeg.WaitForExit();
 
     
         }
