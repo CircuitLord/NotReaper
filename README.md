@@ -18,17 +18,13 @@
 NotReaper is a custom song and community mapper for the VR rhythm game Audica.
 
 
-<center><img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="this slowpoke moves" align=middle width=500/>
+<center><img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="Main showcase GIF" align=middle width=500/>
 
 
-<h2>What can it do?</h2>
+<h1>What can it do?</h1>
 
 NotReaper is equipped with many tools and features to help you make Audica maps exactly how you
-want in an as short amount of time as possible.
-
-Here's some of the highlights.
-
-
+want in an as short amount of time as possible. Here's some of the highlights.
 
 
 </center>
@@ -38,16 +34,75 @@ Here's some of the highlights.
 * Direct loading, generating, and exporting of Audica files. No more hassle.
 * A responsive and user friendly interface. Complete with 100% more animations.
 * Drag all the things with Drag Select, your new best friend. Unless you hate productivity, that is.
+* Custom-color responsive UI. Want to have teal and gold notes? You got it, chief.
+* Mildly entertaining changelogs.
 
 
-## What is it?
-NotReaper is a fork of a fork for the original AudicaEditor by Rolopogo.
 
-Both previous versions stopped development, so I began work on NotReaper, which is basically a rewrite and rebuild of everything in it.
+<center>
 
-If none of that means anything to you, NotReaper is a custom map and community map builder for the VR ryhthm game, Audica.
+<h1>More Info</h1>
+
+<h2>Drag Selecting</h2>
+<img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR2.gif" alt="Drag Selecting" width=500/>
+
+Make your dreams become a reality with the selector that can be dragged.
+
+</center>
+
+* Drag on the Timeline or the Grid to select a bunch of notes.
+* Drag them around to reposition, or drag them on the timeline to change their beat position.
+* Flip note colors, position horizontally or vertically. It's flipping awesome.
+* When you get bored of holding a bunch of notes hostage, deselect them all with a hotkey.
+    * What? I'm not a monster, okay?
+
+
+<center>
+
+<h2>Customization</h2>
+<img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR3.gif" alt="Customization" width=500/>
+
+Get bored of staring at the same UI over and over? Make NotReaper more like home.
+
+</center>
+
+* Configure what colors you want to use for the Audica targets, and the UI will follow suite.
+* Don't like the background? Me neither. Change it to a picture of kittens for a 20% mapping speed increase. (soon)
+* Custom keybindings! Want to save with Ctrl+C and add notes with L? Be my guest. (soon)
+
+
+<center>
+</center>
+
+<h1>How the heck do I use this thing</h1>
+
+I ask myself that question everyday. For a comprehensive list of the default hotkeys, hit F1 in-game to pull up a neat page with words on it. (soon) Or, if you don't like in-game helpers, check this nonexistant wiki page.
+
+For help with using the tool itself, join the [Audica Modding Discord](https://discord.gg/cakQUt5)!
+
+
+</center>
+<h1>Credits</h1>
+NotReaper is the work of quite a few awesome people.
+
+## NotReaper Team
+[CircuitLord](https://github.com/CircuitLord): Lead developer of the project, and video creation guy.
+
+[Jukibom](https://github.com/jukibom): Developer, organizer of issues and todo list.
+
+[October](https://www.youtube.com/channel/UCEEYUbrnMtNs7XGbOp4Gbdg): Concept artist, graphics designer, and bugtester.
+
+All the awesome people on Audica Modding Discord who've reported bugs and tested it out.
+
+## History
+
+It all began with [Rolopogo](https://github.com/rolopogo), and the [Audica Editor](https://github.com/rolopogo/AudicaEditor). This was also worked on by [CameronBess](https://github.com/CameronBess) and [Wolf](https://github.com/Wolferacing).
+
+Eventually, all development stopped, and the project went dead. CircuitLord took it up and began to rewrite and rebuild the entire project from what had been there originally. Optimizing, organizing, and adding new features.
+
 
 # Controls
+(These'll get moved later)
 
 Notes:  
 `1`: Basic Note  
@@ -56,7 +111,7 @@ Notes:
 `4`: Vertical Note  
 `5`: Chain Start  
 `6`: Chain Node  
-`7` or `M`: Melee Note  
+`7`: Melee Note  
 
 `S`: Toggle color
 
@@ -82,15 +137,8 @@ Sounds:
 `T`: Chain node  
 `Y`: Melee  
 
-# Tutorial:
 
-It's currently still in active development.
-
-[![tutorial](https://img.youtube.com/vi/0Y7vxmYdX-I/0.jpg)](https://www.youtube.com/watch?v=0Y7vxmYdX-I)
-
-
-
-
+# Donating
 
 Finding NotReaper useful? I'm glad! :) If you really want to, you can donate here:
 
