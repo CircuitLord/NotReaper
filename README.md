@@ -126,7 +126,11 @@ Notes:
 Press `V` or hold `Control`: Enter selection mode  
 While in selection mode, you can adjust the length of sustain notes  
 `Control + X,C, or V` after selecting notes to cut, copy, and paste them.  
-`Delete`: Delete selected notes  
+`Delete`: Delete selected notes 
+`F`: Swap color of selected notes.
+`Ctrl + F`: Swap horizontal positon of selected notes.
+`Shift + F`: Swap vertical position of selected notes.
+`Ctrl + D`: Deselect all notes.
 
 `Escape`: Main menu
 
