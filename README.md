@@ -18,7 +18,7 @@
 NotReaper is a custom song and community mapper for the VR rhythm game Audica.
 
 
-<center><img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="Main showcase GIF" align=middle width=500/>
+<center><img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="Main showcase GIF" width=500/>
 
 
 <h1>What can it do?</h1>
