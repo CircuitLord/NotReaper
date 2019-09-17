@@ -103,7 +103,7 @@ All the awesome people on Audica Modding Discord who've reported bugs and tested
 
 It all began with [Rolopogo](https://github.com/rolopogo), and the [Audica Editor](https://github.com/rolopogo/AudicaEditor). This was also worked on by [CameronBess](https://github.com/CameronBess) and [Wolf](https://github.com/Wolferacing).
 
-Eventually, all development stopped, and the project went dead. CircuitLord took it up and began to rewrite and rebuild the entire project from what had been there originally. Optimizing, organizing, and adding new features.
+Eventually, all development stopped, and the project went dead. CircuitLord took it up and began to rewrite and rebuild the entire project from what had been there originally. Optimizing, organizing, and adding new features. At some point it had changed so much, that it was decided to rename the project to NotReaper, imitating the main mapping tool used for Audica (Reaper).
 
 
 # Controls
