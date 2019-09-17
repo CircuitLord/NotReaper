@@ -163,21 +163,14 @@ namespace NotReaper.Targets {
 
         public void SetSustainLength(float beatLength) {
             
-            //float scale = Timeline.scale / 20f;
-            //float diff = 1 - scale;
-            //scale = 1 + diff;
-
-            
-
-
-           // Debug.Log(scale);
+            float scale = 20.0f / Timeline.scale;
 
             foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
                 if (beatLength >= 1) {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
                     beatLength = beatLength / 480;
-                    l.SetPosition(2, new Vector3((beatLength / 0.7f) * 1.0f, sustainDirection, 0.0f));
+                    l.SetPosition(2, new Vector3((beatLength / 0.7f) * scale, sustainDirection, 0.0f));
                 } else {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(1, new Vector3(0.0f, 0.0f, 0.0f));

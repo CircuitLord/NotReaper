@@ -1074,11 +1074,17 @@ namespace NotReaper {
 
 			//spectrogram.localScale = new Vector3(aud.clip.length / 2 * bpm / 60 / (newScale / 20f), 1, 1);
 
-			timelineTransformParent.transform.localScale *= (float) scale / newScale;
+			Vector3 timelineTransformScale = timelineTransformParent.transform.localScale;
+			timelineTransformScale.x *= (float) scale / newScale;
+
+			timelineTransformParent.transform.localScale = timelineTransformScale;
+
 			targetScale *= (float) newScale / scale;
 			// fix scaling on all notes
 			foreach (Transform note in timelineTransformParent.transform) {
-				note.localScale = targetScale * Vector3.one;
+				Vector3 noteScale = note.localScale;
+				noteScale.x = targetScale;
+				note.localScale = noteScale;
 			}
 
 
@@ -1087,7 +1093,7 @@ namespace NotReaper {
 			foreach (Target target in orderedNotes) {
 				if (target.behavior == TargetBehavior.Hold) {
 					//TODO: Fix sustain line scaling when scaling timeline
-					//target.timelineTargetIcon.SetSustainLength(target.beatLength);
+					target.timelineTargetIcon.SetSustainLength(target.beatLength);
 				}
 			}
 		}
