@@ -49,8 +49,8 @@ want in an as short amount of time as possible. Here's some of the highlights.
 
 <p align="center">
 <img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR2.gif" alt="Drag Selecting" width=500/>
-
-
+</p>
+<p align="center">
 Make your dreams become a reality with the selector that can be dragged.
 </p>
 
