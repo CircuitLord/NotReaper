@@ -7,15 +7,18 @@
 
 <p align="center">
     <a href="https://discord.gg/cakQUt5">
-        <img src="https://img.shields.io/discord/308323056592486420?logo=discord"
+        <img src="https://img.shields.io/discord/545342014913380352?style=plastic&logo=discord"
             alt="chat on Discord"></a>
 
-
+</br>
+</br>
 	
 </p>
 
 <p align="center">
 NotReaper is a custom song and community mapper for the VR rhythm game Audica.
+	</br>
+	</br>
 
 
 <img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="Main showcase GIF" width=500/>
@@ -42,7 +45,7 @@ want in an as short amount of time as possible. Here's some of the highlights.
 
 <h1 align="center">More Info</h1>
 
-<h2 align="center">Drag Selecting</h2>
+<h3 align="center">Drag Selecting</h3>
 
 <p align="center">
 <img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR2.gif" alt="Drag Selecting" width=500/>
@@ -61,7 +64,7 @@ Make your dreams become a reality with the selector that can be dragged.
 
 
 
-<h2 align="center">Customization</h2>
+<h3 align="center">Customization</h3>
 <p align="center">
 <img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR3.gif" alt="Customization" width=500/>
 
