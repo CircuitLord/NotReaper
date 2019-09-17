@@ -18,16 +18,17 @@
 NotReaper is a custom song and community mapper for the VR rhythm game Audica.
 
 
-<center><img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="Main showcase GIF" width=500/>
+<img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="Main showcase GIF" width=500/>
+</p>
 
 
-<h1>What can it do?</h1>
+<h1 align="center">What can it do?</h1>
 
+<p align ="center">
 NotReaper is equipped with many tools and features to help you make Audica maps exactly how you
 want in an as short amount of time as possible. Here's some of the highlights.
 
 
-</center>
 
 </p>
 
@@ -39,16 +40,17 @@ want in an as short amount of time as possible. Here's some of the highlights.
 
 
 
-<center>
+<h1 align="center">More Info</h1>
 
-<h1>More Info</h1>
+<h2 align="center">Drag Selecting</h2>
 
-<h2>Drag Selecting</h2>
+<p align="center">
 <img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR2.gif" alt="Drag Selecting" width=500/>
 
-Make your dreams become a reality with the selector that can be dragged.
 
-</center>
+Make your dreams become a reality with the selector that can be dragged.
+</p>
+
 
 * Drag on the Timeline or the Grid to select a bunch of notes.
 * Drag them around to reposition, or drag them on the timeline to change their beat position.
@@ -57,22 +59,23 @@ Make your dreams become a reality with the selector that can be dragged.
     * What? I'm not a monster, okay?
 
 
-<center>
 
-<h2>Customization</h2>
+
+<h2 align="center">Customization</h2>
+<p align="center">
 <img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR3.gif" alt="Customization" width=500/>
 
 Get bored of staring at the same UI over and over? Make NotReaper more like home.
 
-</center>
+</p>
+
+
 
 * Configure what colors you want to use for the Audica targets, and the UI will follow suite.
 * Don't like the background? Me neither. Change it to a picture of kittens for a 20% mapping speed increase. (soon)
 * Custom keybindings! Want to save with Ctrl+C and add notes with L? Be my guest. (soon)
 
 
-<center>
-</center>
 
 <h1>How the heck do I use this thing</h1>
 
@@ -81,7 +84,6 @@ I ask myself that question everyday. For a comprehensive list of the default hot
 For help with using the tool itself, join the [Audica Modding Discord](https://discord.gg/cakQUt5)!
 
 
-</center>
 <h1>Credits</h1>
 NotReaper is the work of quite a few awesome people.
 
@@ -90,7 +92,7 @@ NotReaper is the work of quite a few awesome people.
 
 [Jukibom](https://github.com/jukibom): Developer, organizer of issues and todo list.
 
-[October](https://www.youtube.com/channel/UCEEYUbrnMtNs7XGbOp4Gbdg): Concept artist, graphics designer, and bugtester.
+[october](https://www.youtube.com/channel/UCEEYUbrnMtNs7XGbOp4Gbdg): Concept artist, graphics designer, and bugtester.
 
 All the awesome people on Audica Modding Discord who've reported bugs and tested it out.
 
