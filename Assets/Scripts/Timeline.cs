@@ -21,6 +21,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using DG.Tweening;
 
 namespace NotReaper {
 
@@ -82,6 +83,10 @@ namespace NotReaper {
 		private Color bothColor;
 		private Color neitherColor;
 
+		/// <summary>
+		/// The position on the X axis of the current point in the timeline unity units (I think)
+		/// </summary>
+		/// <value></value>
 		public static float time { get; set; }
 
 		public int beatSnap { get; private set; } = 4;
@@ -1207,6 +1212,10 @@ namespace NotReaper {
 					checkForNearSustainsOnThisFrame = true;
 				}
 
+				SetBeatTime(time);
+
+				StopCoroutine(AnimateSetTime(0));
+
 
 			} else if (!isShiftDown && Input.mouseScrollDelta.y > 0.1f) {
 				if (!audioLoaded) return;
@@ -1218,9 +1227,15 @@ namespace NotReaper {
 					checkForNearSustainsOnThisFrame = true;
 				}
 
+				SetBeatTime(time);
+
+				StopCoroutine(AnimateSetTime(0));
+
 			}
 
-			SetBeatTime(time);
+			if (!paused) {
+				SetBeatTime(time);
+			}
 			if (previewAud.time > time + previewDuration) {
 				previewAud.Pause();
 			}
@@ -1246,6 +1261,19 @@ namespace NotReaper {
 			SafeSetTime();
 			SetCurrentTime();
 			SetCurrentTick();
+
+			SetBeatTime(time);
+		}
+
+		public void JumpToX(float x) {
+			float posX = Math.Abs(timelineTransformParent.position.x) + x;
+			float newX = GetClosestBeatSnapped(posX);
+			float newTime = BeatsToDuration(newX);
+			//time = newTime;
+
+			StartCoroutine(AnimateSetTime(newTime));
+			//SafeSetTime();
+			//SetBeatTime(BeatTime());
 		}
 
 
@@ -1305,12 +1333,58 @@ namespace NotReaper {
 			rightSustainAud.time = tempTime;
 		}
 
+		IEnumerator AnimateSetTime(float timeToAnimate) {
+			if (timeToAnimate < 0) timeToAnimate = 0;
+			if (!audioLoaded) yield break;
+
+			if (timeToAnimate > aud.clip.length) {
+				timeToAnimate = aud.clip.length;
+			}
+			aud.time = timeToAnimate;
+			previewAud.time = timeToAnimate;
+
+			float tempTime = timeToAnimate;
+			if (leftSustainAud.clip && timeToAnimate > leftSustainAud.clip.length) {
+				tempTime = leftSustainAud.clip.length;
+			}
+			leftSustainAud.time = tempTime;
+
+			if (rightSustainAud.clip && timeToAnimate > rightSustainAud.clip.length) {
+				tempTime = rightSustainAud.clip.length;
+			}
+			rightSustainAud.time = tempTime;
+
+			//DOTween.Play
+			DOTween.To(SetBeatTime, time, timeToAnimate, 0.2f).SetEase(Ease.InOutCubic);
+
+			yield return new WaitForSeconds(0.2f);
+
+			time = timeToAnimate;
+
+			SetCurrentTime();
+			SetCurrentTick();
+
+
+
+			yield break;
+
+		}
+
 		void OnMouseOver() {
 			hover = true;
 		}
 
 		void OnMouseExit() {
 			hover = false;
+		}
+
+		public float GetClosestBeatSnapped(float timeToSnap) {
+			float increments = ((480 / beatSnap) * 4f) / 480;
+			return Mathf.Round(timeToSnap / increments) * increments;
+		}
+
+		private void OnMouseDown() {
+			JumpToX(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
 		}
 
 		public float GetPercentagePlayed() {
