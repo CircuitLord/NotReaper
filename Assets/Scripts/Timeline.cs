@@ -115,10 +115,6 @@ namespace NotReaper {
 			//Modify the note colors
 
 
-			
-			
-
-
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
 			Physics.autoSyncTransforms = false;
@@ -212,6 +208,13 @@ namespace NotReaper {
 
 				target.SetBehavior(EditorInput.selectedBehavior);
 
+				//Default sustains length should be more than 0.
+				if (target.behavior == TargetBehavior.Hold) {
+					target.SetBeatLength(480);
+				} else {
+					target.SetBeatLength(0.25f);
+				}
+
 				switch (EditorInput.selectedVelocity) {
 					case UITargetVelocity.Standard:
 						target.SetVelocity(TargetVelocity.Standard);
@@ -251,13 +254,13 @@ namespace NotReaper {
 				target.SetBehavior(behavior);
 
 				target.SetVelocity(velocity);
-			}
 
+				if (target.behavior == TargetBehavior.Hold) {
+					target.SetBeatLength(beatLength);
+				} else {
+					target.SetBeatLength(0.25f);
+				}
 
-			if (target.behavior == TargetBehavior.Hold) {
-				target.SetBeatLength(beatLength);
-			} else {
-				target.SetBeatLength(0.25f);
 			}
 
 
@@ -306,7 +309,7 @@ namespace NotReaper {
 						if (!particles.isEmitting) {
 							particles.Play();
 
-							float panPos = (float)(note.gridTargetIcon.transform.position.x / 7.15);
+							float panPos = (float) (note.gridTargetIcon.transform.position.x / 7.15);
 							if (note.handType == TargetHandType.Left) {
 								leftSustainAud.volume = sustainVolume;
 								leftSustainAud.panStereo = panPos;
@@ -513,8 +516,12 @@ namespace NotReaper {
 
 			targets.ForEach((Target target) => {
 				switch (target.handType) {
-					case TargetHandType.Left: target.SetHandType(TargetHandType.Right); break;
-					case TargetHandType.Right: target.SetHandType(TargetHandType.Left); break;
+					case TargetHandType.Left:
+						target.SetHandType(TargetHandType.Right);
+						break;
+					case TargetHandType.Right:
+						target.SetHandType(TargetHandType.Left);
+						break;
 				}
 				UpdateTimelineOffset(target);
 			});
@@ -700,7 +707,7 @@ namespace NotReaper {
 				//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
 
 				//json = JsonUtility.ToJson(songDesc, true);
-			File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
+				File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
 			FileInfo descFile = new FileInfo(Path.Combine(dirpath + "\\temp\\", "song.desc"));
 
 
@@ -753,7 +760,6 @@ namespace NotReaper {
 					break;
 			}
 
-			
 
 			AudicaExporter.ExportToAudicaFile(audicaFile);
 
@@ -872,7 +878,7 @@ namespace NotReaper {
 
 		public void SetTimingModeStats(double newBPM, int tickOffset) {
 			DeleteAllTargets();
-			SetBPM((float)newBPM);
+			SetBPM((float) newBPM);
 
 			Cue cue = new Cue();
 			cue.pitch = 40;
@@ -887,7 +893,7 @@ namespace NotReaper {
 			}
 
 			//time = 0;
-            SafeSetTime();
+			SafeSetTime();
 		}
 
 
@@ -940,7 +946,7 @@ namespace NotReaper {
 			StartCoroutine(LoadRightSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg"));
 
 			//foreach (Cue cue in audicaFile.diffs.expert.cues) {
-				//AddTarget(cue);
+			//AddTarget(cue);
 			//}
 			//Difficulty manager loads stuff now
 			//difficultyManager.LoadHighestDifficulty();
@@ -1021,7 +1027,6 @@ namespace NotReaper {
 			SetBPM(bpm);
 			//SetOffset(offset);
 		}
-
 
 
 		public void SetPlaybackSpeed(float speed) {
@@ -1120,7 +1125,7 @@ namespace NotReaper {
 
 			for (int i = 0; i < framesToSplitOver; i++) {
 
-				while(j < orderedNotes.Count) {
+				while (j < orderedNotes.Count) {
 
 					float targetPos = orderedNotes[j].gridTargetIcon.transform.position.z;
 
@@ -1133,16 +1138,15 @@ namespace NotReaper {
 						orderedNotes[j].timelineTargetIcon.sphereCollider.enabled = false;
 					}
 
-					
+
 					if (j > amtToCalc * (i + 1)) break;
 
 					j++;
 				}
 
 
-
 				yield return null;
-				
+
 			}
 
 			while (j < orderedNotes.Count) {
@@ -1162,7 +1166,7 @@ namespace NotReaper {
 
 		public void EnableNearSustainButtons() {
 			foreach (Target target in loadedNotes) {
-				if (target.behavior !=  TargetBehavior.Hold) continue;
+				if (target.behavior != TargetBehavior.Hold) continue;
 				if (paused && EditorInput.selectedTool == EditorTool.DragSelect && target.gridTargetIcon.transform.position.z < 2 && target.gridTargetIcon.transform.position.z > -2) {
 					target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>().EnableSustainButtons();
 				} else {
@@ -1172,9 +1176,8 @@ namespace NotReaper {
 		}
 
 
-		
 		bool checkForNearSustainsOnThisFrame = false;
-		public void Update() {			
+		public void Update() {
 
 			UpdateSustains();
 
@@ -1214,7 +1217,7 @@ namespace NotReaper {
 					previewAud.Play();
 					checkForNearSustainsOnThisFrame = true;
 				}
-				
+
 			}
 
 			SetBeatTime(time);
