@@ -417,7 +417,7 @@ namespace NotReaper {
 			if (increase) {
 				target.UpdateSustainBeatLength(target.beatLength += (480 / beatSnap) * 4f);
 			} else {
-				target.UpdateSustainBeatLength(Mathf.Max(target.beatLength -= (480 / beatSnap) * 4f, 0));
+				target.UpdateSustainBeatLength(Mathf.Max(target.beatLength -= (480 / beatSnap) * 4f, 120));
 			}
 		}
 
