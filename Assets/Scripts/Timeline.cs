@@ -1012,14 +1012,14 @@ namespace NotReaper {
 
 
 		public void UpdateSongDesc(string songID, string title, int bpm, string songEndEvent = "C#", string mapper = "", int offset = 0) {
-			audicaFile.desc.songID = songID;
-			audicaFile.desc.title = title;
-			audicaFile.desc.tempo = bpm;
-			audicaFile.desc.songEndEvent = songEndEvent;
-			audicaFile.desc.mapper = mapper;
-			audicaFile.desc.offset = offset;
+			desc.songID = songID;
+			desc.title = title;
+			desc.tempo = bpm;
+			desc.songEndEvent = songEndEvent;
+			desc.mapper = mapper;
+			//desc.offset = offset;
 			SetBPM(bpm);
-			SetOffset(offset);
+			//SetOffset(offset);
 		}
 
 
@@ -1036,8 +1036,7 @@ namespace NotReaper {
 
 		public void SetBPM(float newBpm) {
 			bpm = newBpm;
-			//TODO:
-			//audicaFile.desc.tempo = newBpm;
+			desc.tempo = newBpm;
 			SetScale(scale);
 		}
 
@@ -1092,7 +1091,6 @@ namespace NotReaper {
 
 			foreach (Target target in orderedNotes) {
 				if (target.behavior == TargetBehavior.Hold) {
-					//TODO: Fix sustain line scaling when scaling timeline
 					target.timelineTargetIcon.SetSustainLength(target.beatLength);
 				}
 			}
@@ -1282,8 +1280,6 @@ namespace NotReaper {
 		public void SafeSetTime() {
 			if (time < 0) time = 0;
 			if (!audioLoaded) return;
-
-			//TODO: Check if song is loaded
 
 			if (time > aud.clip.length) {
 				time = aud.clip.length;

@@ -102,7 +102,6 @@ namespace NotReaper.UI {
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
                 isCtrlDown = true;
             } else {
-                //TODO: Change ctrl outside of editor
                 isCtrlDown = false;
             }
 
@@ -148,24 +147,6 @@ namespace NotReaper.UI {
         
 
         }
-
-
-        public void AddNote(double percentIn, TargetHandType handType) {
-            //float x = PosFromPercent(percentIn);
-
-            //var note = Instantiate(miniTimelineIconPrefab, new Vector3(x, 0, 0), Quaternion.identity, miniTimelineNotes);
-            //note.transform.localPosition = new Vector3(x, 0, 0);
-
-            //if (handType == TargetHandType.Left) {
-            //    note.GetComponent<SpriteRenderer>().color = NRSettings.config.leftColor;
-             //   note.transform.localPosition = new Vector3(x, 3, 0);
-            //} else if (handType == TargetHandType.Right) {
-            //    note.GetComponent<SpriteRenderer>().color = NRSettings.config.rightColor;
-            //    note.transform.localPosition = new Vector3(x, -3, 0);
-            //}
-
-        }
-
 
 
 
