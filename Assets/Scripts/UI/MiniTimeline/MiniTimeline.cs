@@ -36,7 +36,7 @@ namespace NotReaper.UI {
             bar.localPosition = new Vector3((float)x, 0, 0);
         }
 
-        private void OnMouseDown() {
+        private void OnMouseDrag() {
             var x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
             //x -= transform.position.x;
 
