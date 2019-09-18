@@ -20,11 +20,8 @@ namespace NotReaper.Tools {
 
 		public void TryPlaceNote() {
 			if (!EditorInput.isOverGrid || EditorInput.inUI) return;
-
-			foreach (Target target in Timeline.loadedNotes) {
-				if (target.gridTargetIcon.transform.position.z > -0.01f && target.gridTargetIcon.transform.position.z < 0.01f  && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
-			}
-
+			
+			//We check if the target is valid in the timeline function instead now.
 			timeline.AddTarget(ghost.position.x, ghost.position.y);
 		}
 

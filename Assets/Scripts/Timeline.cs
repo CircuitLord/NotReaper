@@ -97,6 +97,11 @@ namespace NotReaper {
 		private static float bpm = 60;
 		private static int offset = 0;
 
+		/// <summary>
+		/// If the timeline is currently being moved by an animation.
+		/// </summary>
+		private bool animatingTimeline = false;
+
 		[HideInInspector] public bool hover = false;
 		public bool paused = true;
 
@@ -149,7 +154,14 @@ namespace NotReaper {
 
 		//Use when adding a singular target to the project (from the user)
 		public Target AddTarget(float x, float y) {
-			return AddTarget(x, y, SnapTime(BeatTime()), true, true);
+
+			float tempTime = GetClosestBeatSnapped(DurationToBeats(time));
+
+			foreach (Target target in Timeline.loadedNotes) {
+				if (target.gridTargetPos.z == tempTime && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return null;
+			}
+			
+			return AddTarget(x, y, GetClosestBeatSnapped(DurationToBeats(time)), true, true);
 		}
 
 		//Use for adding a target from redo/undo
@@ -1233,7 +1245,7 @@ namespace NotReaper {
 
 			}
 
-			if (!paused) {
+			if (!paused && !animatingTimeline) {
 				SetBeatTime(time);
 			}
 			if (previewAud.time > time + previewDuration) {
@@ -1343,6 +1355,9 @@ namespace NotReaper {
 		}
 
 		IEnumerator AnimateSetTime(float timeToAnimate) {
+
+			animatingTimeline = true;
+
 			if (timeToAnimate < 0) timeToAnimate = 0;
 			if (!audioLoaded) yield break;
 
@@ -1369,6 +1384,7 @@ namespace NotReaper {
 			yield return new WaitForSeconds(0.2f);
 
 			time = timeToAnimate;
+			animatingTimeline = false;
 
 			SetCurrentTime();
 			SetCurrentTick();
