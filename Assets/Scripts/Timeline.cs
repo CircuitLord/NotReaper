@@ -105,6 +105,41 @@ namespace NotReaper {
 		[HideInInspector] public bool hover = false;
 		public bool paused = true;
 
+		public class TargetData {
+			public float x; 
+			public float y;
+			public float beatTime;
+			public float beatLength = 0.25f;
+			public TargetVelocity velocity = TargetVelocity.Standard;
+			public TargetHandType handType = TargetHandType.Left;
+			public TargetBehavior behavior = TargetBehavior.Standard;
+
+			public TargetData() {
+
+			}
+
+			public TargetData(Target target) {
+				x = target.gridTargetIcon.transform.localPosition.x;
+				y = target.gridTargetIcon.transform.localPosition.y;
+				beatTime = target.gridTargetIcon.transform.localPosition.z;
+				beatLength = target.beatLength;
+				velocity = target.velocity;
+				handType = target.handType;
+				behavior = target.behavior;
+			}
+
+			public TargetData(Cue cue) {
+				Vector2 pos = NotePosCalc.PitchToPos(cue);
+				x = pos.x;
+				y = pos.y;
+				beatTime = (cue.tick - offset) / 480f;
+				beatLength = cue.tickLength;
+				velocity = cue.velocity;
+				handType = cue.handType;
+				behavior = cue.behavior;
+			}
+		};
+
 		//Tools
 		private void Start() {
 
@@ -145,147 +180,118 @@ namespace NotReaper {
 			//dir.Delete(true);
 		}
 
+		public Target FindNote(TargetData data) {
+			foreach(Target t in notes) {
+				if(	t.gridTargetIcon.transform.localPosition.x == data.x && 
+					t.gridTargetIcon.transform.localPosition.y == data.y && 
+					t.gridTargetIcon.transform.localPosition.z == data.beatTime && 
+					t.handType == data.handType) {
+					return t;
+				}
+			}
+
+			return null;
+		}
+
+		public List<Target> FindNotes(List<TargetData> targetDataList) {
+			List<Target> foundNotes = new List<Target>();
+			foreach(TargetData data in targetDataList) {
+				foundNotes.Add(FindNote(data));
+			}
+			return foundNotes;
+		}
+
 		//When loading from cues, use this.
-		public Target AddTarget(Cue cue) {
-			Vector2 pos = NotePosCalc.PitchToPos(cue);
-			return AddTarget(pos.x, pos.y, (cue.tick - offset) / 480f, false, false, cue.tickLength, cue.velocity, cue.handType, cue.behavior);
+		public void AddTarget(Cue cue) {
+			TargetData data = new TargetData(cue);
+			AddTargetFromAction(data);
 		}
 
 
 		//Use when adding a singular target to the project (from the user)
-		public Target AddTarget(float x, float y) {
+		public void AddTarget(float x, float y) {
+			TargetData data = new TargetData();
+			data.x = x;
+			data.y = y;
+			data.handType = EditorInput.selectedHand;
+			data.behavior = EditorInput.selectedBehavior;
 
 			float tempTime = GetClosestBeatSnapped(DurationToBeats(time));
 
 			foreach (Target target in Timeline.loadedNotes) {
 				if (target.gridTargetPos.z == tempTime && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return null;
 			}
-			
-			return AddTarget(x, y, GetClosestBeatSnapped(DurationToBeats(time)), true, true);
-		}
 
-		//Use for adding a target from redo/undo
-		public Target AddTarget(Target target, bool genUndoAction = true) {
-			return AddTarget(target.gridTargetPos.x, target.gridTargetPos.y, target.gridTargetPos.z, false, genUndoAction, target.beatLength, target.velocity, target.handType, target.behavior);
-		}
+			data.beatTime = GetClosestBeatSnapped(DurationToBeats(time));
 
-		//When adding many notes at once from things such as copy paste.
-		public void AddTargets(List<Target> targets, bool genUndoAction = true, bool autoSelectNewNotes = false) {
-
-			List<Target> undoTargets = new List<Target>();
-
-			//We need to generate a custom undo action (if requested), so we set the default undo generation to false.
-			foreach (Target target in targets) {
-				AddTarget(target.gridTargetPos.x, target.gridTargetPos.y, target.gridTargetPos.z, false, false, target.beatLength, target.velocity, target.handType, target.behavior);
-
-				if (autoSelectNewNotes) SelectTarget(notes.Last());
-				if (genUndoAction) undoTargets.Add(notes.Last());
+			//Default sustains length should be more than 0.
+			if (data.behavior == TargetBehavior.Hold) {
+				data.beatLength = 480;
 			}
 
-			if (genUndoAction) {
-				var action = new NRActionMultiAddNote();
-				action.affectedTargets = undoTargets;
-				Tools.undoRedoManager.AddAction(action, true);
+			switch (EditorInput.selectedVelocity) {
+				case UITargetVelocity.Standard:
+					data.velocity = TargetVelocity.Standard;
+					break;
+
+				case UITargetVelocity.Snare:
+					data.velocity = TargetVelocity.Snare;
+					break;
+
+				case UITargetVelocity.Percussion:
+					data.velocity = TargetVelocity.Percussion;
+					break;
+
+				case UITargetVelocity.ChainStart:
+					data.velocity = TargetVelocity.ChainStart;
+					break;
+
+				case UITargetVelocity.Chain:
+					data.velocity = TargetVelocity.Chain;
+					break;
+
+				case UITargetVelocity.Melee:
+					data.velocity = TargetVelocity.Melee;
+					break;
+
+				default:
+					data.velocity = TargetVelocity.Standard;
+					break;
 			}
+
+			var action = new NRActionAddNote();
+			action.targetData = data;
+			Tools.undoRedoManager.AddAction(action);
 		}
 
-
-		/// <summary>
-		/// Adds a target to the timeline.
-		/// </summary>
-		/// <param name="x">x pos</param>
-		/// <param name="y">y pos</param>
-		/// <param name="beatTime">Beat time to add the note to</param>
-		/// <param name="userAdded">If true, fetch values for currently selected note type from EditorInput, if not, use values provided in function.</param>
-		/// <param name="beatLength"></param>
-		/// <param name="velocity"></param>
-		/// <param name="handType"></param>
-		/// <param name="behavior"></param>
-		public Target AddTarget(float x, float y, float beatTime, bool userAdded = true, bool genUndoAction = true, float beatLength = 0.25f, TargetVelocity velocity = TargetVelocity.Standard, TargetHandType handType = TargetHandType.Left, TargetBehavior behavior = TargetBehavior.Standard) {
+		public Target AddTargetFromAction(TargetData targetData) {
 
 			Target target = new Target();
-			target.handType = userAdded ? EditorInput.selectedHand : handType;
-
 			target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
 			target.timelineTargetIcon.location = TargetIconLocation.Timeline;
-			target.timelineTargetIcon.transform.localPosition = new Vector3(beatTime, 0, 0);
+			target.timelineTargetIcon.transform.localPosition = new Vector3(targetData.beatTime, 0, 0);
 			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
 			target.timelineTargetIcon.isGridIcon = false;
 			UpdateTimelineOffset(target);
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
-			target.gridTargetIcon.transform.localPosition = new Vector3(x, y, beatTime);
+			target.gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.beatTime);
 			target.gridTargetIcon.location = TargetIconLocation.Grid;
 			target.gridTargetIcon.isGridIcon = true;
 
-			//Use when the rest of the inputs aren't supplied, get them from the EditorInput script.
-			if (userAdded) {
+			target.SetHandType(targetData.handType);
+			target.SetBehavior(targetData.behavior);
+			target.SetVelocity(targetData.velocity);
 
-				target.SetHandType(EditorInput.selectedHand);
-
-				target.SetBehavior(EditorInput.selectedBehavior);
-
-				//Default sustains length should be more than 0.
-				if (target.behavior == TargetBehavior.Hold) {
-					target.SetBeatLength(480);
-				} else {
-					target.SetBeatLength(0.25f);
-				}
-
-				switch (EditorInput.selectedVelocity) {
-					case UITargetVelocity.Standard:
-						target.SetVelocity(TargetVelocity.Standard);
-						break;
-
-					case UITargetVelocity.Snare:
-						target.SetVelocity(TargetVelocity.Snare);
-						break;
-
-					case UITargetVelocity.Percussion:
-						target.SetVelocity(TargetVelocity.Percussion);
-						break;
-
-					case UITargetVelocity.ChainStart:
-						target.SetVelocity(TargetVelocity.ChainStart);
-						break;
-
-					case UITargetVelocity.Chain:
-						target.SetVelocity(TargetVelocity.Chain);
-						break;
-
-					case UITargetVelocity.Melee:
-						target.SetVelocity(TargetVelocity.Melee);
-						break;
-
-					default:
-						target.SetVelocity(TargetVelocity.Standard);
-						break;
-
-				}
+			if (target.behavior == TargetBehavior.Hold) {
+				target.SetBeatLength(targetData.beatLength);
+			} else {
+				target.SetBeatLength(0.25f);
 			}
-
-			//If userAdded false, we use the supplied inputs to generate the note.
-			else {
-				target.SetHandType(handType);
-
-				target.SetBehavior(behavior);
-
-				target.SetVelocity(velocity);
-
-				if (target.behavior == TargetBehavior.Hold) {
-					target.SetBeatLength(beatLength);
-				} else {
-					target.SetBeatLength(0.25f);
-				}
-
-			}
-
 
 			//Now that all initial dependencies are met, we can init the target. (Loads sustain controller and outline color)
 			target.Init();
-
 			notes.Add(target);
-
 			orderedNotes = notes.OrderBy(v => v.gridTargetIcon.transform.position.z).ToList();
 
 
@@ -299,17 +305,6 @@ namespace NotReaper {
 			target.TargetDeselectEvent += DeselectTarget;
 
 			target.MakeTimelineUpdateSustainLengthEvent += UpdateSustainLength;
-
-
-			if (genUndoAction) {
-				//Add to undo redo manager if requested.
-				var action = new NRActionAddNote();
-				action.affectedTarget = notes.Last();
-
-				//If the user added the note, we clear the redo actions. If the manager added it, we don't clear redo actions.
-				Tools.undoRedoManager.AddAction(action, userAdded);
-
-			}
 
 			return target;
 		}
@@ -366,7 +361,7 @@ namespace NotReaper {
 		}
 
 		//Calculate the note offset for visual purpose on the timeline.
-		private void UpdateTimelineOffset(Target target) {
+		public void UpdateTimelineOffset(Target target) {
 			float xOffset = target.timelineTargetIcon.transform.localPosition.x;
 			float yOffset = 0;
 			float zOffset = 0;
@@ -438,163 +433,77 @@ namespace NotReaper {
 			}
 		}
 
-		public void MoveGridTargets(List<TargetMoveIntent> intents, bool genUndoAction = true, bool clearRedoActions = true) {
-
-			if (genUndoAction) {
-				var action = new NRActionGridMoveNotes();
-				action.targetGridMoveIntents = intents;
-				Tools.undoRedoManager.AddAction(action, clearRedoActions);
-			}
-
-			intents.ForEach(intent => {
-				var newPos = intent.intendedPosition;
-				intent.target.gridTargetIcon.transform.localPosition = new Vector3(
-					newPos.x,
-					newPos.y,
-					newPos.z
-				);
-			});
+		public void MoveGridTargets(List<TargetMoveIntent> intents) {
+			var action = new NRActionGridMoveNotes();
+			action.targetGridMoveIntents = intents.Select(intent => new TargetDataMoveIntent(intent)).ToList();
+			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void MoveTimelineTargets(List<TargetMoveIntent> intents, bool genUndoAction = true, bool clearRedoActions = true) {
-
-			if (genUndoAction) {
-				var action = new NRActionTimelineMoveNotes();
-				action.targetTimelineMoveIntents = intents;
-				Tools.undoRedoManager.AddAction(action, clearRedoActions);
-			}
-
-			intents.ForEach(intent => {
-				var newPos = intent.intendedPosition;
-				var gridPos = intent.target.gridTargetIcon.transform.localPosition;
-				intent.target.timelineTargetIcon.transform.localPosition = new Vector3(
-					newPos.x,
-					newPos.y,
-					newPos.z
-				);
-				intent.target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
-			});
+		public void MoveTimelineTargets(List<TargetMoveIntent> intents) {
+			var action = new NRActionTimelineMoveNotes();
+			action.targetTimelineMoveIntents = intents.Select(intent => new TargetDataMoveIntent(intent)).ToList();
+			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void PasteCues(List<Cue> cues, float pasteBeatTime, bool genUndoAction = true, bool clearRedoActions = true) {
+		public void PasteCues(List<Cue> cues, float pasteBeatTime) {
 
 			// paste new targets in the original locations
-			var newTargets = new List<Target>();
-			cues.ForEach(cue => {
-				newTargets.Add(AddTarget(cue));
-			});
+			var targetDataList = cues.Select(cue => new TargetData(cue)).ToList();
 
 			// find the soonest target in the selection
 			float earliestTargetBeatTime = Mathf.Infinity;
-			foreach (Target target in newTargets) {
-				float pos = target.gridTargetIcon.transform.localPosition.z;
-				if (pos < earliestTargetBeatTime) {
-					earliestTargetBeatTime = pos;
+			foreach (TargetData data in targetDataList) {
+				float time = data.beatTime;
+				if (time < earliestTargetBeatTime) {
+					earliestTargetBeatTime = time;
 				}
 			}
 
 			// shift all by the amount needed to move the earliest note to now
 			float diff = pasteBeatTime - earliestTargetBeatTime;
-			foreach (Target target in newTargets) {
-				var gridPos = target.gridTargetIcon.transform.localPosition;
-				var timelinePos = target.timelineTargetIcon.transform.localPosition;
-
-				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, gridPos.z + diff);
-				target.gridTargetPos = new Vector3(gridPos.x, gridPos.y, gridPos.z + diff);
-
-				target.timelineTargetIcon.transform.localPosition = new Vector3(timelinePos.x + diff, 0, 0);
-				UpdateTimelineOffset(target);
+			foreach (TargetData data in targetDataList) {
+				data.beatTime += diff;
 			}
 
-			if (genUndoAction) {
-				var action = new NRActionPasteNotes();
-				action.newCues = cues;
-				action.pastedTargets = newTargets;
-				action.pasteBeatTime = pasteBeatTime;
+			var action = new NRActionMultiAddNote();
+			action.affectedTargets = targetDataList;
+			Tools.undoRedoManager.AddAction(action);
 
-				Tools.undoRedoManager.AddAction(action, clearRedoActions);
-			}
-
-			// initiated by user, let's pre-select the targets
-			if (clearRedoActions) {
-				DeselectAllTargets();
-				newTargets.ForEach(target => target.gridTargetIcon.TrySelect());
-			}
+			DeselectAllTargets();
+			FindNotes(targetDataList).ForEach(target => target.gridTargetIcon.TrySelect());
 		}
 
 		// Invert the selected targets' colour
-		public void SwapTargets(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
-			if (genUndoAction) {
-				var action = new NRActionSwapNoteColors();
-				action.affectedTargets = targets;
-
-				Tools.undoRedoManager.AddAction(action, clearRedoActions);
-			}
-
-			targets.ForEach((Target target) => {
-				switch (target.handType) {
-					case TargetHandType.Left:
-						target.SetHandType(TargetHandType.Right);
-						break;
-					case TargetHandType.Right:
-						target.SetHandType(TargetHandType.Left);
-						break;
-				}
-				UpdateTimelineOffset(target);
-			});
+		public void SwapTargets(List<Target> targets) {
+			var action = new NRActionSwapNoteColors();
+			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
+			Tools.undoRedoManager.AddAction(action);
 		}
 
 		// Flip the selected targets on the grid about the X
-		public void FlipTargetsHorizontal(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
-			if (genUndoAction) {
-				var action = new NRActionHFlipNotes();
-				action.affectedTargets = targets;
-
-				Tools.undoRedoManager.AddAction(action, clearRedoActions);
-			}
-
-			targets.ForEach(target => {
-				var pos = target.gridTargetIcon.transform.localPosition;
-				target.gridTargetIcon.transform.localPosition = new Vector3(
-					pos.x * -1,
-					pos.y,
-					pos.z
-				);
-				target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-			});
+		public void FlipTargetsHorizontal(List<Target> targets) {
+			var action = new NRActionHFlipNotes();
+			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
+			Tools.undoRedoManager.AddAction(action);
 		}
 
 		// Flip the selected targets on the grid about the Y
-		public void FlipTargetsVertical(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
-			if (genUndoAction) {
-				var action = new NRActionVFlipNotes();
-				action.affectedTargets = targets;
-
-				Tools.undoRedoManager.AddAction(action, clearRedoActions);
-			}
-
-			targets.ForEach(target => {
-				var pos = target.gridTargetIcon.transform.localPosition;
-				target.gridTargetIcon.transform.localPosition = new Vector3(
-					pos.x,
-					pos.y * -1,
-					pos.z
-				);
-				target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-			});
+		public void FlipTargetsVertical(List<Target> targets) {
+			var action = new NRActionVFlipNotes();
+			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
+			Tools.undoRedoManager.AddAction(action);
 		}
 
 
-		public void DeleteTarget(Target target, bool genUndoAction = true, bool clearRedoActions = true) {
+		public void DeleteTarget(Target target) {
+			var action = new NRActionRemoveNote();
+			action.targetData = new TargetData(target);
+			Tools.undoRedoManager.AddAction(action);
+		}
 
+		public void DeleteTargetFromAction(TargetData targetData) {
+			Target target = FindNote(targetData);
 			if (target == null) return;
-
-			if (genUndoAction) {
-				var action = new NRActionRemoveNote();
-				action.affectedTarget = target;
-
-				Tools.undoRedoManager.AddAction(action, clearRedoActions);
-			}
 
 			notes.Remove(target);
 			orderedNotes.Remove(target);
@@ -607,27 +516,12 @@ namespace NotReaper {
 				Destroy(target.timelineTargetIcon.gameObject);
 
 			target = null;
-
-
-			//UpdateChainConnectors();
-			//UpdateChords();
-
 		}
 
-		public void DeleteTargets(List<Target> targets, bool genUndoAction = true, bool clearRedoActions = true) {
-
-			//We need to add a custom undo action, so we skip the default one.
-			foreach (Target target in targets) {
-				DeleteTarget(target, false);
-			}
-
-			if (genUndoAction) {
-				var action = new NRActionMultiRemoveNote();
-				action.affectedTargets = targets;
-				Tools.undoRedoManager.AddAction(action, clearRedoActions);
-			}
-
-
+		public void DeleteTargets(List<Target> targets) {
+			var action = new NRActionMultiRemoveNote();
+			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
+			Tools.undoRedoManager.AddAction(action);
 		}
 
 		public void DeleteAllTargets() {
@@ -742,7 +636,7 @@ namespace NotReaper {
 
 			for (int i = 0; i < 100; i++) {
 				cue.tick = (480 * i) + tickOffset;
-				AddTarget(cue);
+				AddTargetFromAction(new TargetData(cue));
 			}
 
 			//time = 0;

@@ -23,10 +23,6 @@ namespace NotReaper.Tools {
 		public List<NRAction> redoActions = new List<NRAction>();
 
 		public int maxSavedActions = 20;
-		
-
-
-
 
 		public Timeline timeline;
 
@@ -36,14 +32,7 @@ namespace NotReaper.Tools {
 			NRAction action = actions.Last();
 			Debug.Log("Undoing action:" + action.ToString());
 
-			InvertAction(action);
-			try {
-
-
-			} catch {
-				Debug.LogError("There was an error trying to undo.");
-			}
-
+			action.UndoAction(timeline);
 			
 			redoActions.Add(action);
 			actions.RemoveAt(actions.Count - 1);
@@ -59,138 +48,15 @@ namespace NotReaper.Tools {
 
 			Debug.Log("Redoing action:" + action.ToString());
 
-				RunAction(action);
-			try {
-			} catch {
-				Debug.LogError("There was an error trying to redo.");
-			}
+			action.DoAction(timeline);
 
-			//We remove the old action and just add a new one from Timeline.cs since the old one lost the reference to it's GO's
-			//AddAction(action, false);
+			actions.Add(action);
 			redoActions.RemoveAt(redoActions.Count - 1);
-			
-
 		}
 
-		//Use for undo (DON'T generate undo actions from these) and also DON'T generate redo actions (this is handled by the wrapper function for undoing)
-		public void InvertAction(NRAction action) {
+		public void AddAction(NRAction action) {
+			action.DoAction(timeline);
 
-			switch (action) {
-				
-				case NRActionAddNote a:
-					//Might crash if it tries to delete non-loaded note in loadednotes list
-					timeline.DeleteTarget(a.affectedTarget, false);
-					break;
-
-				case NRActionMultiAddNote a:
-					timeline.DeleteTargets(a.affectedTargets, false);
-					break;
-
-				case NRActionRemoveNote a:
-					//Re-add the target based on all the previous stats from the target;
-					Target tar = a.affectedTarget;
-					timeline.AddTarget(tar.gridTargetPos.x, tar.gridTargetPos.y, tar.gridTargetPos.z, false, false, tar.beatLength, tar.velocity, tar.handType, tar.behavior);
-					break;
-
-				case NRActionMultiRemoveNote a:
-					timeline.AddTargets(a.affectedTargets, false);
-					break;
-
-				case NRActionPasteNotes a:
-					timeline.DeleteTargets(a.pastedTargets, false);
-					break;
-
-				case NRActionGridMoveNotes a:
-					var gridMoveIntents = new List<TargetMoveIntent>();
-					a.targetGridMoveIntents.ForEach(intent => {
-						var undoIntent = new TargetMoveIntent();
-						undoIntent.target = intent.target;
-						undoIntent.intendedPosition = intent.startingPosition;
-						undoIntent.startingPosition = intent.intendedPosition;
-						gridMoveIntents.Add(undoIntent);
-					});
-					timeline.MoveGridTargets(gridMoveIntents, false);
-					break;
-
-				case NRActionTimelineMoveNotes a:
-					var timelineMoveIntents = new List<TargetMoveIntent>();
-					a.targetTimelineMoveIntents.ForEach(intent => {
-						var undoIntent = new TargetMoveIntent();
-						undoIntent.target = intent.target;
-						undoIntent.intendedPosition = intent.startingPosition;
-						undoIntent.startingPosition = intent.intendedPosition;
-						timelineMoveIntents.Add(undoIntent);
-					});
-					timeline.MoveTimelineTargets(timelineMoveIntents, false);
-					break;
-
-				case NRActionSwapNoteColors a:
-					timeline.SwapTargets(a.affectedTargets, false);
-					break;
-
-				case NRActionHFlipNotes a:
-					timeline.FlipTargetsHorizontal(a.affectedTargets, false);
-					break;
-
-				case NRActionVFlipNotes a:
-					timeline.FlipTargetsVertical(a.affectedTargets, false);
-					break;
-
-				default:
-					break;
-			}
-		}
-
-
-		//Use for redo, DO generate undo actions, and DON'T clear redo actions
-		public void RunAction(NRAction action) {
-			switch (action) {
-				case NRActionAddNote a:
-					timeline.AddTarget(a.affectedTarget, true);
-					break;
-
-				case NRActionMultiAddNote a:
-					timeline.AddTargets(a.affectedTargets, true);
-					break;
-
-				case NRActionRemoveNote a:
-					//Might crash if it tries to delete non-loaded note in loadednotes list
-					timeline.DeleteTarget(a.affectedTarget, true, false);
-					break;
-
-				case NRActionMultiRemoveNote a:
-					timeline.DeleteTargets(a.affectedTargets, true, false);
-					break;
-
-				case NRActionPasteNotes a:
-					timeline.PasteCues(a.newCues, a.pasteBeatTime, true, false);
-					break;
-
-				case NRActionGridMoveNotes a:
-					timeline.MoveGridTargets(a.targetGridMoveIntents, true, false);
-					break;
-
-				case NRActionTimelineMoveNotes a:
-					timeline.MoveTimelineTargets(a.targetTimelineMoveIntents, true, false);
-					break;
-
-				case NRActionSwapNoteColors a:
-					timeline.SwapTargets(a.affectedTargets, true, false);
-					break;
-
-				case NRActionHFlipNotes a:
-					timeline.FlipTargetsHorizontal(a.affectedTargets, true, false);
-					break;
-
-				case NRActionVFlipNotes a:
-					timeline.FlipTargetsVertical(a.affectedTargets, true, false);
-					break;
-			}
-		}
-
-
-
-		public void AddAction(NRAction action, bool clearRedoActions = true) {
 			if (actions.Count <= maxSavedActions) {
 				actions.Add(action);
 			} else {
@@ -201,94 +67,185 @@ namespace NotReaper.Tools {
 				actions.Add(action);
 			}
 
-			if (clearRedoActions) redoActions = new List<NRAction>();
-
-			//NRActionAddNote test = new NRActionAddNote();
-			//redoActions.Add(test);
-
-
-
+			redoActions = new List<NRAction>();
 		}
-
-
-
-
-
-
-		
 	}
 
-
-	// public enum ActionType {
-	// 	AddNote = 0,
-	// 	MultiAddNote = 1,
-	// 	RemoveNote = 2,
-	// 	MultiRemoveNote = 3,
-	// 	SelectNote = 4,
-	// 	MultiSelectNote = 5,
-	// 	DeselectNote = 6,
-	// 	MultiDeselectNote = 7,
-	// 	MoveNote = 8,
-	// 	MultiMoveNote = 9
-		
-	// }
-
-	public class NRAction {
-		//public ActionType type;
-		//public List<Target> affectedTargets = new List<Target>();
-		//public Target affectedTarget {
-		//	get {
-		//		return affectedTargets.First();
-		//	}
-		//}
-
-		//public Vector2 redoTargetPos;
-
-		//public Vector2 movePreviousPos;
-
-		
-
+	public abstract class NRAction {
+		public abstract void DoAction(Timeline timeline);
+		public abstract void UndoAction(Timeline timeline);
 	}
 
 	public class NRActionAddNote : NRAction {
-		public Target affectedTarget;
+		public Timeline.TargetData targetData;
+
+		public override void DoAction(Timeline timeline) {
+			timeline.AddTargetFromAction(targetData);
+		}
+		public override void UndoAction(Timeline timeline) {
+			timeline.DeleteTargetFromAction(targetData);
+		}
 	}
 
 	public class NRActionMultiAddNote : NRAction {
-		public List<Target> affectedTargets = new List<Target>();
-	}
+		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
 
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => { timeline.AddTargetFromAction(targetData); });
+		}
+		public override void UndoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => { timeline.DeleteTargetFromAction(targetData); });
+		}
+	}
+	
 	public class NRActionRemoveNote : NRAction {
-		public Target affectedTarget;
+		public Timeline.TargetData targetData;
+
+		public override void DoAction(Timeline timeline) {
+			timeline.DeleteTargetFromAction(targetData);
+		}
+		public override void UndoAction(Timeline timeline) {
+			timeline.AddTargetFromAction(targetData);
+		}
 	}
 	
 	public class NRActionMultiRemoveNote : NRAction {
-		public List<Target> affectedTargets = new List<Target>();
+		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => { timeline.DeleteTargetFromAction(targetData); });
+		}
+		public override void UndoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => { timeline.AddTargetFromAction(targetData); });
+		}
 	}
 
-	public class NRActionPasteNotes : NRAction {
-		public List<Cue> newCues = new List<Cue>();
-		public List<Target> pastedTargets = new List<Target>();
-		public float pasteBeatTime;
+	public class TargetDataMoveIntent {
+		public TargetDataMoveIntent() {}
+
+		public TargetDataMoveIntent(TargetMoveIntent intent) {
+			targetData = new Timeline.TargetData(intent.target);
+			startingPosition = intent.startingPosition;
+			intendedPosition = intent.intendedPosition;
+		}
+
+		public Timeline.TargetData targetData;
+		public Vector3 startingPosition;
+		public Vector3 intendedPosition;
 	}
 
 	public class NRActionGridMoveNotes : NRAction {
-		public List<TargetMoveIntent> targetGridMoveIntents = new List<TargetMoveIntent>();
+		public List<TargetDataMoveIntent> targetGridMoveIntents = new List<TargetDataMoveIntent>();
+
+		public override void DoAction(Timeline timeline) {
+			targetGridMoveIntents.ForEach(intent => {
+				Target target = timeline.FindNote(intent.targetData);
+				target.gridTargetIcon.transform.localPosition = intent.intendedPosition;
+				intent.targetData.x = intent.intendedPosition.x;
+				intent.targetData.y = intent.intendedPosition.y;
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			targetGridMoveIntents.ForEach(intent => {
+				Target target = timeline.FindNote(intent.targetData);
+				target.gridTargetIcon.transform.localPosition = intent.startingPosition;
+				intent.targetData.x = intent.startingPosition.x;
+				intent.targetData.y = intent.startingPosition.y;
+			});
+		}
 	}
 
 	public class NRActionTimelineMoveNotes : NRAction {
-		public List<TargetMoveIntent> targetTimelineMoveIntents = new List<TargetMoveIntent>();
+		public List<TargetDataMoveIntent> targetTimelineMoveIntents = new List<TargetDataMoveIntent>();
+
+		public override void DoAction(Timeline timeline) {
+			targetTimelineMoveIntents.ForEach(intent => {
+				Target target = timeline.FindNote(intent.targetData);
+				var newPos = intent.intendedPosition;
+
+				var gridPos = target.gridTargetIcon.transform.localPosition;
+				target.timelineTargetIcon.transform.localPosition = newPos;
+				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
+				intent.targetData.beatTime = newPos.x;
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			targetTimelineMoveIntents.ForEach(intent => {
+				Target target = timeline.FindNote(intent.targetData);
+				var newPos = intent.startingPosition;
+
+				var gridPos = target.gridTargetIcon.transform.localPosition;
+				target.timelineTargetIcon.transform.localPosition = newPos;
+				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
+				intent.targetData.beatTime = newPos.x;
+			});
+		}
 	}
 
 	public class NRActionSwapNoteColors : NRAction {
-		public List<Target> affectedTargets = new List<Target>();
+		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				Target target = timeline.FindNote(targetData);
+				switch (target.handType) {
+					case TargetHandType.Left: 
+						target.SetHandType(TargetHandType.Right); 
+						targetData.handType = TargetHandType.Right;
+					break;
+					
+					case TargetHandType.Right: 
+						target.SetHandType(TargetHandType.Left);
+						targetData.handType = TargetHandType.Left;
+					break;
+				}
+				timeline.UpdateTimelineOffset(target);
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			DoAction(timeline); //Swap is symmetrical
+		}
 	}
 
 	public class NRActionHFlipNotes : NRAction {
-		public List<Target> affectedTargets = new List<Target>();
+		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				Target target = timeline.FindNote(targetData);
+				var pos = target.gridTargetIcon.transform.localPosition;
+				target.gridTargetIcon.transform.localPosition = new Vector3(
+					pos.x * -1,
+					pos.y,
+					pos.z
+				);
+				target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+				targetData.x = target.gridTargetPos.x;
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			DoAction(timeline); //Swap is symmetrical
+		}
 	}
 
 	public class NRActionVFlipNotes : NRAction {
-		public List<Target> affectedTargets = new List<Target>();
+		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				Target target = timeline.FindNote(targetData);
+				var pos = target.gridTargetIcon.transform.localPosition;
+				target.gridTargetIcon.transform.localPosition = new Vector3(
+					pos.x,
+					pos.y * -1,
+					pos.z
+				);
+				target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+				targetData.y = target.gridTargetPos.y;
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			DoAction(timeline); //Swap is symmetrical
+		}
 	}
 }
