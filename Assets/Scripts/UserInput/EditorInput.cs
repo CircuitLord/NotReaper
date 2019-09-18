@@ -343,12 +343,14 @@ namespace NotReaper.UserInput {
             if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
 				if (Tools.dragSelect.isDraggingNotesOnTimeline) {
 					Tools.dragSelect.EndDragTimelineTargetAction();
-					Tools.dragSelect.EndTimelineDrag();
 				}
 				else if (Tools.dragSelect.isDraggingNotesOnGrid) {
 					Tools.dragSelect.EndDragGridTargetAction();
-					Tools.dragSelect.EndGridDrag();
 				}
+
+				Tools.dragSelect.EndTimelineDrag();
+				Tools.dragSelect.EndGridDrag();
+
 				Tools.dragSelect.EndSelectionAction();
 
                 RevertTool();
