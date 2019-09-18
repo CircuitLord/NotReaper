@@ -149,7 +149,7 @@ namespace NotReaper {
 
 		//Use when adding a singular target to the project (from the user)
 		public Target AddTarget(float x, float y) {
-			return AddTarget(x, y, BeatTime(), true, true);
+			return AddTarget(x, y, SnapTime(BeatTime()), true, true);
 		}
 
 		//Use for adding a target from redo/undo
@@ -1303,10 +1303,19 @@ namespace NotReaper {
 				}
 				paused = true;
 
-				//Uncommented
-				//time = SnapTime(time);
+				//Snap to the beat snap when we pause
+				time = SnapTime(time);
 				if (time < 0) time = 0;
 				if (time > aud.clip.length) time = aud.clip.length;
+
+				SetBeatTime(time);
+				SafeSetTime();
+				SetCurrentTick();
+				SetCurrentTime();
+
+				
+
+
 
 			}
 		}
