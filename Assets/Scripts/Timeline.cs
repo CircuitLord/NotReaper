@@ -907,6 +907,7 @@ namespace NotReaper {
 					} else if (Input.mouseScrollDelta.y < -0.1f) {
 						SetScale(scale + 1);
 					}
+					SetBeatTime(time);
 				}
 			}
 			//if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
@@ -1109,6 +1110,8 @@ namespace NotReaper {
 		}
 
 		private void OnMouseDown() {
+			//We don't want to interfere with drag select
+			if (Input.GetKey(KeyCode.LeftControl)) return;
 			JumpToX(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
 		}
 
