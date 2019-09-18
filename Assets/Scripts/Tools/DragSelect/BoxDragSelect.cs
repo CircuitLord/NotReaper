@@ -8,7 +8,6 @@ namespace NotReaper.Tools {
 
     public class BoxDragSelect : MonoBehaviour {
         private void OnTriggerEnter(Collider other) {
-			Debug.Log(other.name);
 			var targetIcon = other.GetComponent<TargetIcon>();
 			if (targetIcon) {
 				targetIcon.TrySelect();

@@ -147,9 +147,10 @@ namespace NotReaper {
 
 		public Target FindNote(TargetData data) {
 			foreach (Target t in notes) {
-				if (t.gridTargetIcon.transform.localPosition.x == data.x &&
-					t.gridTargetIcon.transform.localPosition.y == data.y &&
-					t.gridTargetIcon.transform.localPosition.z == data.beatTime &&
+				Vector3 pos = t.gridTargetIcon.transform.localPosition;
+				if (Mathf.Approximately(t.gridTargetIcon.transform.localPosition.x, data.x) &&
+					Mathf.Approximately(t.gridTargetIcon.transform.localPosition.y, data.y) &&
+					Mathf.Approximately(t.gridTargetIcon.transform.localPosition.z, data.beatTime) &&
 					t.handType == data.handType) {
 					return t;
 				}
@@ -184,7 +185,7 @@ namespace NotReaper {
 			float tempTime = GetClosestBeatSnapped(DurationToBeats(time));
 
 			foreach (Target target in loadedNotes) {
-				if (target.gridTargetPos.z == tempTime && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
+				if (Mathf.Approximately(target.gridTargetPos.z, tempTime) && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 
 			data.beatTime = GetClosestBeatSnapped(DurationToBeats(time));
@@ -225,8 +226,7 @@ namespace NotReaper {
 			}
 
 
-			var action = new NRActionAddNote();
-			action.targetData = data;
+			var action = new NRActionAddNote {targetData = data};
 			Tools.undoRedoManager.AddAction(action);
 		}
 
@@ -235,8 +235,9 @@ namespace NotReaper {
 			Target target = new Target();
 			target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
 			target.timelineTargetIcon.location = TargetIconLocation.Timeline;
-			target.timelineTargetIcon.transform.localPosition = new Vector3(targetData.beatTime, 0, 0);
-			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
+			var transform1 = target.timelineTargetIcon.transform;
+			transform1.localPosition = new Vector3(targetData.beatTime, 0, 0);
+			transform1.localScale = targetScale * Vector3.one;
 			target.timelineTargetIcon.isGridIcon = false;
 
 
@@ -586,12 +587,13 @@ namespace NotReaper {
 			DeleteAllTargets();
 			SetBPM((float) newBPM);
 
-			Cue cue = new Cue();
-			cue.pitch = 40;
-			cue.tickLength = 1;
-			cue.behavior = TargetBehavior.Metronome;
-			cue.velocity = TargetVelocity.Metronome;
-			cue.handType = TargetHandType.Either;
+			var cue = new Cue {
+				pitch = 40,
+				tickLength = 1,
+				behavior = TargetBehavior.Metronome,
+				velocity = TargetVelocity.Metronome,
+				handType = TargetHandType.Either
+			};
 
 			for (int i = 0; i < 100; i++) {
 				cue.tick = (480 * i) + tickOffset;

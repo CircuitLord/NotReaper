@@ -341,7 +341,18 @@ namespace NotReaper.UserInput {
                 SelectTool(EditorTool.DragSelect);
             }
             if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
+				if (Tools.dragSelect.isDraggingNotesOnTimeline) {
+					Tools.dragSelect.EndDragTimelineTargetAction();
+					Tools.dragSelect.EndTimelineDrag();
+				}
+				else if (Tools.dragSelect.isDraggingNotesOnGrid) {
+					Tools.dragSelect.EndDragGridTargetAction();
+					Tools.dragSelect.EndGridDrag();
+				}
+				Tools.dragSelect.EndSelectionAction();
+
                 RevertTool();
+				
             }
 
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {

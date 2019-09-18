@@ -91,7 +91,7 @@ namespace NotReaper.Targets {
         }
 
         public void DisableSelected() {
-            if (standardOutline == null) return;
+            //if (standardOutline == null) return;
             standardOutline.enabled = false;
             holdOutline.enabled = false;
             horzOutline.enabled = false;
@@ -165,7 +165,8 @@ namespace NotReaper.Targets {
             
             float scale = 20.0f / Timeline.scale;
 
-            foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
+            var lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>(true);
+            foreach (LineRenderer l in lineRenderers) {
                 if (beatLength >= 1) {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));

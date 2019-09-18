@@ -15,10 +15,10 @@ namespace NotReaper.Tools {
 		public Timeline timeline;
 
 		public bool activated = false;
-		bool isDraggingTimeline = false;
-		bool isDraggingGrid = false;
-		bool isDraggingNotesOnGrid = false;
-		bool isDraggingNotesOnTimeline = false;
+		public bool isDraggingTimeline = false;
+		public bool isDraggingGrid = false;
+		public bool isDraggingNotesOnGrid = false;
+		public bool isDraggingNotesOnTimeline = false;
 		bool isSelectionDown = false;
 		bool hasMovedOutOfClickBounds = false;
 
@@ -37,7 +37,7 @@ namespace NotReaper.Tools {
 		private List<TargetMoveIntent> gridTargetMoveIntents = new List<TargetMoveIntent>();
 		private List<TargetMoveIntent> timelineTargetMoveIntents = new List<TargetMoveIntent>();
 
-		//INFO: Code for selecting targets is on the drag select timline thing itself
+		//INFO: Code for selecting targets is on the drag select timeline thing itself
 
 		/// <summary>
 		/// Sets if the tool is active or not.
@@ -54,6 +54,8 @@ namespace NotReaper.Tools {
 
 
 		}
+		
+		
 
 		private void StartTimelineDrag() {
 
@@ -70,7 +72,7 @@ namespace NotReaper.Tools {
 			isDraggingTimeline = true;
 		}
 
-		private void EndTimelineDrag() {
+		public void EndTimelineDrag() {
 			isDraggingTimeline = false;
 
 			dragSelectTimeline.gameObject.SetActive(false);
@@ -94,7 +96,7 @@ namespace NotReaper.Tools {
 			isDraggingGrid = true;
 		}
 
-		private void EndGridDrag() {
+		public void EndGridDrag() {
 
 			dragSelectGrid.SetActive(false);
 			isDraggingGrid = false;
@@ -117,7 +119,7 @@ namespace NotReaper.Tools {
 			});
 		}
 
-		private void EndDragGridTargetAction() {
+		public void EndDragGridTargetAction() {
 
 			isDraggingNotesOnGrid = false;
 			if (gridTargetMoveIntents.Count > 0) {
@@ -143,7 +145,7 @@ namespace NotReaper.Tools {
 			});
 		}
 
-		private void EndDragTimelineTargetAction() {
+		public void EndDragTimelineTargetAction() {
 
 			isDraggingNotesOnTimeline = false;
 			if (timelineTargetMoveIntents.Count > 0) {
@@ -158,7 +160,7 @@ namespace NotReaper.Tools {
 			startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 		}
 
-		private void EndSelectionAction() {
+		public void EndSelectionAction() {
 			isSelectionDown = false;
 		}
 
@@ -191,7 +193,9 @@ namespace NotReaper.Tools {
 			//If the user decides they hate productivity and want to unselect all their notes, so be it.
 			if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D)) {
 				timeline.DeselectAllTargets();
-			} 
+			}
+
+			//Applying hitsounds to selected:
 
 			if (!activated) return;
 

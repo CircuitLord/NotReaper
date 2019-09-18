@@ -1,0 +1,354 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Files\Programming\UnityProjects\NotReaper" t="IncludeRecursive">
+      <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
+      <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
+      <e p="Assets" t="Include">
+        <e p="AudioWaveformVisualizer.cs" t="Include" />
+        <e p="BGFPS.cs" t="Include" />
+        <e p="DiscordRPC" t="Include">
+          <e p="Editor" t="Include">
+            <e p="CharacterLimitAttributeDrawer.cs" t="Include" />
+            <e p="DiscordAssetDrawer.cs" t="Include" />
+            <e p="DiscordEventDrawer.cs" t="Include" />
+            <e p="DiscordManagerEditor.cs" t="Include" />
+            <e p="DiscordPartyDrawer.cs" t="Include" />
+            <e p="DiscordSecretsDrawer.cs" t="Include" />
+            <e p="DiscordTimestampDrawer.cs" t="Include" />
+            <e p="DiscordUserDrawer.cs" t="Include" />
+            <e p="NativeDllHandler.cs" t="Include" />
+          </e>
+          <e p="Example" t="Include">
+            <e p="Join Request" t="Include">
+              <e p="Example_JoinRequest.cs" t="Include" />
+            </e>
+            <e p="Rich Presence" t="Include">
+              <e p="Example_ReadyListener.cs" t="Include" />
+              <e p="Example_RichPresence.cs" t="Include" />
+            </e>
+            <e p="Tools" t="Include">
+              <e p="ConstantRotate.cs" t="Include" />
+              <e p="DiscordInviteUI.cs" t="Include" />
+            </e>
+          </e>
+          <e p="NamedPipeClient" t="Include">
+            <e p="IO" t="Include">
+              <e p="Exceptions" t="Include">
+                <e p="NamedPipeConnectionException.cs" t="Include" />
+                <e p="NamedPipeOpenException.cs" t="Include" />
+                <e p="NamedPipeReadException.cs" t="Include" />
+                <e p="NamedPipeWriteException.cs" t="Include" />
+              </e>
+              <e p="NamedPipeClientStream.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Plugins" t="Include">
+            <e p="Newtonsoft.Json.xml" t="Include" />
+          </e>
+          <e p="Scripts" t="Include">
+            <e p="Attributes" t="Include">
+              <e p="CharacterLimitAttribute.cs" t="Include" />
+            </e>
+            <e p="Control" t="Include">
+              <e p="DiscordEvents.cs" t="Include" />
+              <e p="UnityLogger.cs" t="Include" />
+              <e p="UnityNamedPipe.cs" t="Include" />
+            </e>
+            <e p="DiscordManager.cs" t="Include" />
+            <e p="Presence" t="Include">
+              <e p="DiscordAssets.cs" t="Include" />
+              <e p="DiscordAvatar.cs" t="Include" />
+              <e p="DiscordEvent.cs" t="Include" />
+              <e p="DiscordParty.cs" t="Include" />
+              <e p="DiscordPresence.cs" t="Include" />
+              <e p="DiscordSecrets.cs" t="Include" />
+              <e p="DiscordTimestamps.cs" t="Include" />
+              <e p="DiscordUser.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="DOTween" t="Include">
+          <e p="Modules" t="Include">
+            <e p="DOTweenModuleAudio.cs" t="Include" />
+            <e p="DOTweenModulePhysics.cs" t="Include" />
+            <e p="DOTweenModulePhysics2D.cs" t="Include" />
+            <e p="DOTweenModuleSprite.cs" t="Include" />
+            <e p="DOTweenModuleUI.cs" t="Include" />
+            <e p="DOTweenModuleUnityVersion.cs" t="Include" />
+            <e p="DOTweenModuleUtils.cs" t="Include" />
+          </e>
+          <e p="readme.txt" t="Include" />
+        </e>
+        <e p="Editor" t="Include">
+          <e p="AutoSaveOnRunMenuItem.cs" t="Include" />
+          <e p="SceneSwitcherWindow.cs" t="Include" />
+        </e>
+        <e p="Materials" t="Include">
+          <e p="Fisheye.shader" t="Include" />
+          <e p="FlatFresnel.shader" t="Include" />
+        </e>
+        <e p="ModernUIPack" t="Include">
+          <e p="Editor" t="Include">
+            <e p="InitMUIP.cs" t="Include" />
+            <e p="ModernUI.cs" t="Include" />
+          </e>
+          <e p="Read Me.txt" t="Include" />
+          <e p="Scripts" t="Include">
+            <e p="CustomDropdown.cs" t="Include" />
+            <e p="CustomInputField.cs" t="Include" />
+            <e p="DemoHamburgerMenu.cs" t="Include" />
+            <e p="DemoManager.cs" t="Include" />
+            <e p="DemoScrollForMore.cs" t="Include" />
+            <e p="DropdownMultiSelect.cs" t="Include" />
+            <e p="HamburgerMenuManager.cs" t="Include" />
+            <e p="HamburgerPanelButton.cs" t="Include" />
+            <e p="HorizontalSelector.cs" t="Include" />
+            <e p="LaunchURL.cs" t="Include" />
+            <e p="ModalWindowTabs.cs" t="Include" />
+            <e p="NotificationExample.cs" t="Include" />
+            <e p="PBFilled.cs" t="Include" />
+            <e p="ProgressBar.cs" t="Include" />
+            <e p="RadialSlider.cs" t="Include" />
+            <e p="RangeMaxSlider.cs" t="Include" />
+            <e p="RangeMinSlider.cs" t="Include" />
+            <e p="RangeSlider.cs" t="Include" />
+            <e p="SliderManager.cs" t="Include" />
+            <e p="SwitchAnim.cs" t="Include" />
+            <e p="ToggleAnim.cs" t="Include" />
+            <e p="UIElementInFront.cs" t="Include" />
+            <e p="UIGradient.cs" t="Include" />
+          </e>
+          <e p="Shaders" t="Include">
+            <e p="UI Blur.shader" t="Include" />
+            <e p="UI HQ Blur.shader" t="Include" />
+          </e>
+        </e>
+        <e p="Notes" t="Include">
+          <e p="Shader" t="Include">
+            <e p="DistanceFade.shader" t="Include" />
+            <e p="DistanceScale.shader" t="Include" />
+            <e p="TimelineNote.shader" t="Include" />
+          </e>
+        </e>
+        <e p="OptionsMenu.cs" t="Include" />
+        <e p="Scripts" t="Include">
+          <e p="Audio" t="Include">
+            <e p="AudioManager.cs" t="Include" />
+          </e>
+          <e p="Grid" t="Include">
+            <e p="HoverTarget.cs" t="Include" />
+            <e p="IsHoveringGrid.cs" t="Include" />
+            <e p="LoadedNotes.cs" t="Include" />
+            <e p="NoteGridSnap.cs" t="Include" />
+            <e p="NotePosCalc.cs" t="Include" />
+          </e>
+          <e p="IO" t="Include">
+            <e p="AudicaExporter.cs" t="Include" />
+            <e p="AudicaGenerator.cs" t="Include" />
+            <e p="AudicaHandler.cs" t="Include" />
+            <e p="HandleCache.cs" t="Include" />
+            <e p="MoggSongParser.cs" t="Include" />
+            <e p="PathLogic.cs" t="Include" />
+            <e p="SteamFinder.cs" t="Include" />
+          </e>
+          <e p="Managers" t="Include">
+            <e p="DifficultyManager.cs" t="Include" />
+            <e p="EditorToolkit.cs" t="Include" />
+            <e p="UserPrefsManager.cs" t="Include" />
+          </e>
+          <e p="Metronome" t="Include">
+            <e p="Metronome.cs" t="Include" />
+            <e p="UnityMetronome.cs" t="Include" />
+          </e>
+          <e p="Models" t="Include">
+            <e p="AudicaModels.cs" t="Include" />
+          </e>
+          <e p="NRDiscordPresence.cs" t="Include" />
+          <e p="NRSettings.cs" t="Include" />
+          <e p="Settings" t="Include">
+            <e p="ProgramSettings.cs" t="Include" />
+          </e>
+          <e p="Targets" t="Include">
+            <e p="GridTarget.cs" t="Include" />
+            <e p="HoldTargetManager.cs" t="Include" />
+            <e p="Target.cs" t="Include" />
+            <e p="TargetData.cs" t="Include" />
+            <e p="TargetIcon.cs" t="Include" />
+            <e p="TargetMoveIntent.cs" t="Include" />
+            <e p="TargetOld.cs" t="Include" />
+            <e p="TimelineTarget.cs" t="Include" />
+          </e>
+          <e p="Ticker.cs" t="Include" />
+          <e p="Timeline.cs" t="Include" />
+          <e p="Timing" t="Include">
+            <e p="TrimAudio.cs" t="Include" />
+            <e p="UITiming.cs" t="Include" />
+          </e>
+          <e p="Tools" t="Include">
+            <e p="ChainBuilder" t="Include">
+              <e p="ChainBuilder.cs" t="Include" />
+              <e p="CurvedLinePoint.cs" t="Include" />
+              <e p="CurvedLineRenderer.cs" t="Include" />
+              <e p="LineSmoother.cs" t="Include" />
+            </e>
+            <e p="DragSelect" t="Include">
+              <e p="BoxDragSelect.cs" t="Include" />
+              <e p="DragSelect.cs" t="Include" />
+              <e p="GridBoxDragSelect.cs" t="Include" />
+            </e>
+            <e p="PlaceNote.cs" t="Include" />
+            <e p="ToolsActiveArea.cs" t="Include" />
+            <e p="UndoRedoManager.cs" t="Include" />
+          </e>
+          <e p="UI" t="Include">
+            <e p="Colors" t="Include">
+              <e p="NRGradient.cs" t="Include" />
+              <e p="ProgressSliderColors.cs" t="Include" />
+            </e>
+            <e p="Easings.cs" t="Include" />
+            <e p="HandTypeSelect.cs" t="Include" />
+            <e p="MiniTimeline" t="Include">
+              <e p="Bookmark.cs" t="Include" />
+              <e p="MiniTimeline.cs" t="Include" />
+            </e>
+            <e p="NotificationShower.cs" t="Include" />
+            <e p="ParallaxBG.cs" t="Include" />
+            <e p="PauseStart" t="Include">
+              <e p="PauseMenu.cs" t="Include" />
+            </e>
+            <e p="SongDescModal.cs" t="Include" />
+            <e p="SoundSelect" t="Include">
+              <e p="SoundSelect.cs" t="Include" />
+            </e>
+            <e p="StartingModal.cs" t="Include" />
+            <e p="UIDifficulty.cs" t="Include" />
+            <e p="UIModeSelect.cs" t="Include" />
+            <e p="UINoteHandler.cs" t="Include" />
+            <e p="UIToolSelect.cs" t="Include" />
+          </e>
+          <e p="UIMetadata.cs" t="Include" />
+          <e p="UserInput" t="Include">
+            <e p="EditorInput.cs" t="Include" />
+            <e p="InputManager.cs" t="Include" />
+            <e p="KeybindingsSO.cs" t="Include" />
+            <e p="MouseUtil.cs" t="Include" />
+          </e>
+        </e>
+        <e p="StandaloneFileBrowser" t="Include">
+          <e p="IStandaloneFileBrowser.cs" t="Include" />
+          <e p="LICENSE.txt" t="Include" />
+          <e p="StandaloneFileBrowser.cs" t="Include" />
+          <e p="StandaloneFileBrowserEditor.cs" t="Include" />
+          <e p="StandaloneFileBrowserLinux.cs" t="Include" />
+          <e p="StandaloneFileBrowserMac.cs" t="Include" />
+          <e p="StandaloneFileBrowserWindows.cs" t="Include" />
+        </e>
+        <e p="Tayx" t="Include">
+          <e p="Graphy - Ultimate Stats Monitor" t="Include">
+            <e p="Changelog.txt" t="Include" />
+            <e p="Font" t="Include">
+              <e p="Northwest-Bold" t="Include">
+                <e p="ERIC-TIRADO-NORTHWEST-LICENSE.txt" t="Include" />
+              </e>
+              <e p="Roboto" t="Include">
+                <e p="LICENSE.txt" t="Include" />
+              </e>
+            </e>
+            <e p="Scene" t="Include">
+              <e p="Color Picker" t="Include">
+                <e p="G_CUIColorPicker.cs" t="Include" />
+              </e>
+              <e p="Customization Scripts" t="Include">
+                <e p="CustomizeGraphy.cs" t="Include" />
+                <e p="ForceSliderToMultipleOf3.cs" t="Include" />
+                <e p="ForceSliderToPowerOf2.cs" t="Include" />
+                <e p="UpdateTextWithSliderValue.cs" t="Include" />
+              </e>
+            </e>
+            <e p="Scripts" t="Include">
+              <e p="Advanced" t="Include">
+                <e p="G_AdvancedData.cs" t="Include" />
+              </e>
+              <e p="Audio" t="Include">
+                <e p="G_AudioGraph.cs" t="Include" />
+                <e p="G_AudioManager.cs" t="Include" />
+                <e p="G_AudioMonitor.cs" t="Include" />
+                <e p="G_AudioText.cs" t="Include" />
+              </e>
+              <e p="Editor" t="Include">
+                <e p="GraphyDebuggerEditor.cs" t="Include" />
+                <e p="GraphyManagerEditor.cs" t="Include" />
+              </e>
+              <e p="Fps" t="Include">
+                <e p="G_FpsGraph.cs" t="Include" />
+                <e p="G_FpsManager.cs" t="Include" />
+                <e p="G_FpsMonitor.cs" t="Include" />
+                <e p="G_FpsText.cs" t="Include" />
+              </e>
+              <e p="Graph" t="Include">
+                <e p="G_Graph.cs" t="Include" />
+              </e>
+              <e p="GraphyDebugger.cs" t="Include" />
+              <e p="GraphyManager.cs" t="Include" />
+              <e p="Ram" t="Include">
+                <e p="G_RamGraph.cs" t="Include" />
+                <e p="G_RamManager.cs" t="Include" />
+                <e p="G_RamMonitor.cs" t="Include" />
+                <e p="G_RamText.cs" t="Include" />
+              </e>
+              <e p="Shader" t="Include">
+                <e p="G_GraphShader.cs" t="Include" />
+              </e>
+              <e p="UI" t="Include">
+                <e p="IModifiableState.cs" t="Include" />
+                <e p="IMovable.cs" t="Include" />
+              </e>
+              <e p="Util" t="Include">
+                <e p="G_ExtensionMethods.cs" t="Include" />
+                <e p="G_FloatString.cs" t="Include" />
+                <e p="G_Intstring.cs" t="Include" />
+                <e p="G_Singleton.cs" t="Include" />
+              </e>
+            </e>
+            <e p="Shaders" t="Include">
+              <e p="GraphMobile.shader" t="Include" />
+              <e p="GraphStandard.shader" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="TextMesh Pro" t="Include">
+          <e p="Resources" t="Include">
+            <e p="LineBreaking Following Characters.txt" t="Include" />
+            <e p="LineBreaking Leading Characters.txt" t="Include" />
+            <e p="Shaders" t="Include">
+              <e p="TMP_Bitmap-Custom-Atlas.shader" t="Include" />
+              <e p="TMP_Bitmap-Mobile.shader" t="Include" />
+              <e p="TMP_Bitmap.shader" t="Include" />
+              <e p="TMP_SDF Overlay.shader" t="Include" />
+              <e p="TMP_SDF-Mobile Masking.shader" t="Include" />
+              <e p="TMP_SDF-Mobile Overlay.shader" t="Include" />
+              <e p="TMP_SDF-Mobile.shader" t="Include" />
+              <e p="TMP_SDF-Surface-Mobile.shader" t="Include" />
+              <e p="TMP_SDF-Surface.shader" t="Include" />
+              <e p="TMP_SDF.shader" t="Include" />
+              <e p="TMP_Sprite.shader" t="Include" />
+              <e p="TMPro.cginc" t="Include" />
+              <e p="TMPro_Properties.cginc" t="Include" />
+              <e p="TMPro_Surface.cginc" t="Include" />
+            </e>
+          </e>
+          <e p="Sprites" t="Include">
+            <e p="EmojiOne Attribution.txt" t="Include" />
+          </e>
+        </e>
+      </e>
+      <e p="NotReaper.sln" t="IncludeFlat" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Temp\bin" t="ExcludeRecursive" />
+    </e>
+    <e p="C:\Users\circu\.Rider2019.2\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\circu\.Rider2019.2\system\resharper-host\Local\Transient\ReSharperHost\v192\SolutionCaches\_NotReaper.-1185763192.00" t="ExcludeRecursive" />
+  </component>
+</project>
