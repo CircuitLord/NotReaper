@@ -95,6 +95,8 @@ NotReaper is the work of quite a few awesome people.
 
 [Jukibom](https://github.com/jukibom): Developer, organizer of issues and todo list.
 
+[Mettra](https://github.com/Mettra): Developer, fixer of the undo/redo system nightmare.
+
 [october](https://www.youtube.com/channel/UCEEYUbrnMtNs7XGbOp4Gbdg): Concept artist, graphics designer, and bugtester.
 
 All the awesome people on Audica Modding Discord who've reported bugs and tested it out.
