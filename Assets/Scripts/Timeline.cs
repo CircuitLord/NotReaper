@@ -224,6 +224,8 @@ namespace NotReaper {
 					break;
 			}
 
+			
+
 			var action = new NRActionAddNote();
 			action.targetData = data;
 			Tools.undoRedoManager.AddAction(action);
@@ -237,7 +239,7 @@ namespace NotReaper {
 			target.timelineTargetIcon.transform.localPosition = new Vector3(targetData.beatTime, 0, 0);
 			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
 			target.timelineTargetIcon.isGridIcon = false;
-			UpdateTimelineOffset(target);
+			
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			target.gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.beatTime);
@@ -247,6 +249,8 @@ namespace NotReaper {
 			target.SetHandType(targetData.handType);
 			target.SetBehavior(targetData.behavior);
 			target.SetVelocity(targetData.velocity);
+
+			UpdateTimelineOffset(target);
 
 			if (target.behavior == TargetBehavior.Hold) {
 				target.SetBeatLength(targetData.beatLength);
