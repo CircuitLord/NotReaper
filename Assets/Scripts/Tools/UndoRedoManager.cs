@@ -77,7 +77,7 @@ namespace NotReaper.Tools {
 	}
 
 	public class NRActionAddNote : NRAction {
-		public Timeline.TargetData targetData;
+		public TargetData targetData;
 
 		public override void DoAction(Timeline timeline) {
 			timeline.AddTargetFromAction(targetData);
@@ -88,7 +88,7 @@ namespace NotReaper.Tools {
 	}
 
 	public class NRActionMultiAddNote : NRAction {
-		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+		public List<TargetData> affectedTargets = new List<TargetData>();
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => { timeline.AddTargetFromAction(targetData); });
@@ -99,7 +99,7 @@ namespace NotReaper.Tools {
 	}
 	
 	public class NRActionRemoveNote : NRAction {
-		public Timeline.TargetData targetData;
+		public TargetData targetData;
 
 		public override void DoAction(Timeline timeline) {
 			timeline.DeleteTargetFromAction(targetData);
@@ -110,7 +110,7 @@ namespace NotReaper.Tools {
 	}
 	
 	public class NRActionMultiRemoveNote : NRAction {
-		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+		public List<TargetData> affectedTargets = new List<TargetData>();
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => { timeline.DeleteTargetFromAction(targetData); });
@@ -124,12 +124,12 @@ namespace NotReaper.Tools {
 		public TargetDataMoveIntent() {}
 
 		public TargetDataMoveIntent(TargetMoveIntent intent) {
-			targetData = new Timeline.TargetData(intent.target);
+			targetData = new TargetData(intent.target);
 			startingPosition = intent.startingPosition;
 			intendedPosition = intent.intendedPosition;
 		}
 
-		public Timeline.TargetData targetData;
+		public TargetData targetData;
 		public Vector3 startingPosition;
 		public Vector3 intendedPosition;
 	}
@@ -183,7 +183,7 @@ namespace NotReaper.Tools {
 	}
 
 	public class NRActionSwapNoteColors : NRAction {
-		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+		public List<TargetData> affectedTargets = new List<TargetData>();
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
@@ -208,7 +208,7 @@ namespace NotReaper.Tools {
 	}
 
 	public class NRActionHFlipNotes : NRAction {
-		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+		public List<TargetData> affectedTargets = new List<TargetData>();
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
@@ -229,7 +229,7 @@ namespace NotReaper.Tools {
 	}
 
 	public class NRActionVFlipNotes : NRAction {
-		public List<Timeline.TargetData> affectedTargets = new List<Timeline.TargetData>();
+		public List<TargetData> affectedTargets = new List<TargetData>();
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {

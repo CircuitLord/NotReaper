@@ -105,41 +105,6 @@ namespace NotReaper {
 		[HideInInspector] public bool hover = false;
 		public bool paused = true;
 
-		public class TargetData {
-			public float x; 
-			public float y;
-			public float beatTime;
-			public float beatLength = 0.25f;
-			public TargetVelocity velocity = TargetVelocity.Standard;
-			public TargetHandType handType = TargetHandType.Left;
-			public TargetBehavior behavior = TargetBehavior.Standard;
-
-			public TargetData() {
-
-			}
-
-			public TargetData(Target target) {
-				x = target.gridTargetIcon.transform.localPosition.x;
-				y = target.gridTargetIcon.transform.localPosition.y;
-				beatTime = target.gridTargetIcon.transform.localPosition.z;
-				beatLength = target.beatLength;
-				velocity = target.velocity;
-				handType = target.handType;
-				behavior = target.behavior;
-			}
-
-			public TargetData(Cue cue) {
-				Vector2 pos = NotePosCalc.PitchToPos(cue);
-				x = pos.x;
-				y = pos.y;
-				beatTime = (cue.tick - offset) / 480f;
-				beatLength = cue.tickLength;
-				velocity = cue.velocity;
-				handType = cue.handType;
-				behavior = cue.behavior;
-			}
-		};
-
 		//Tools
 		private void Start() {
 
@@ -203,7 +168,7 @@ namespace NotReaper {
 
 		//When loading from cues, use this.
 		public void AddTarget(Cue cue) {
-			TargetData data = new TargetData(cue);
+			TargetData data = new TargetData(cue, offset);
 			AddTargetFromAction(data);
 		}
 
@@ -219,7 +184,7 @@ namespace NotReaper {
 			float tempTime = GetClosestBeatSnapped(DurationToBeats(time));
 
 			foreach (Target target in Timeline.loadedNotes) {
-				if (target.gridTargetPos.z == tempTime && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return null;
+				if (target.gridTargetPos.z == tempTime && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 
 			data.beatTime = GetClosestBeatSnapped(DurationToBeats(time));
@@ -448,7 +413,7 @@ namespace NotReaper {
 		public void PasteCues(List<Cue> cues, float pasteBeatTime) {
 
 			// paste new targets in the original locations
-			var targetDataList = cues.Select(cue => new TargetData(cue)).ToList();
+			var targetDataList = cues.Select(cue => new TargetData(cue, offset)).ToList();
 
 			// find the soonest target in the selection
 			float earliestTargetBeatTime = Mathf.Infinity;
@@ -636,7 +601,7 @@ namespace NotReaper {
 
 			for (int i = 0; i < 100; i++) {
 				cue.tick = (480 * i) + tickOffset;
-				AddTargetFromAction(new TargetData(cue));
+				AddTargetFromAction(new TargetData(cue, offset));
 			}
 
 			//time = 0;
