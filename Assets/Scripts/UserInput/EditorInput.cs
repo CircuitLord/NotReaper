@@ -351,6 +351,13 @@ namespace NotReaper.UserInput {
 				Tools.dragSelect.EndTimelineDrag();
 				Tools.dragSelect.EndGridDrag();
 
+				foreach (Target target in timeline.selectedNotes) {
+
+						//TODO: does changing target in one list change it in another? no i don't think so
+
+						target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+					}
+
 				Tools.dragSelect.EndSelectionAction();
 
                 RevertTool();
