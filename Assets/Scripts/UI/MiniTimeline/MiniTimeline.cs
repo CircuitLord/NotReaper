@@ -36,8 +36,15 @@ namespace NotReaper.UI {
             bar.localPosition = new Vector3((float)x, 0, 0);
         }
 
+        float prevX = 0f;
         private void OnMouseDrag() {
             var x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
+
+            if (x == prevX) {
+                return;
+            } else {
+                prevX = x;
+            }
             //x -= transform.position.x;
 
             //-4.7 to 4.7
@@ -46,6 +53,18 @@ namespace NotReaper.UI {
             float percent = x / mouseClickAreaLength;
 
             timeline.JumpToPercent(percent);
+        }
+
+
+        bool timelineWasPlaying = false;
+        private void OnMouseDown() {
+            if (!timeline.paused) timeline.TogglePlayback();
+            timelineWasPlaying = true;
+        }
+
+        private void OnMouseUp() {
+            timelineWasPlaying = false;
+            if (timelineWasPlaying && timeline.paused) timeline.TogglePlayback();
         }
 
 

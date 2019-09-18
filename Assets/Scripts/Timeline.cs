@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using NotReaper.Grid;
 using NotReaper.IO;
@@ -21,7 +22,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using DG.Tweening;
 
 namespace NotReaper {
 
@@ -72,6 +72,7 @@ namespace NotReaper {
 		public List<Target> notes;
 		public static List<Target> orderedNotes;
 		public List<Target> selectedNotes;
+
 		public static List<Target> loadedNotes;
 
 		public static bool inTimingMode = false;
@@ -111,7 +112,6 @@ namespace NotReaper {
 			//Load the config file
 			NRSettings.LoadSettingsJson();
 
-
 			notes = new List<Target>();
 			orderedNotes = new List<Target>();
 			loadedNotes = new List<Target>();
@@ -146,10 +146,10 @@ namespace NotReaper {
 		}
 
 		public Target FindNote(TargetData data) {
-			foreach(Target t in notes) {
-				if(	t.gridTargetIcon.transform.localPosition.x == data.x && 
-					t.gridTargetIcon.transform.localPosition.y == data.y && 
-					t.gridTargetIcon.transform.localPosition.z == data.beatTime && 
+			foreach (Target t in notes) {
+				if (t.gridTargetIcon.transform.localPosition.x == data.x &&
+					t.gridTargetIcon.transform.localPosition.y == data.y &&
+					t.gridTargetIcon.transform.localPosition.z == data.beatTime &&
 					t.handType == data.handType) {
 					return t;
 				}
@@ -160,7 +160,7 @@ namespace NotReaper {
 
 		public List<Target> FindNotes(List<TargetData> targetDataList) {
 			List<Target> foundNotes = new List<Target>();
-			foreach(TargetData data in targetDataList) {
+			foreach (TargetData data in targetDataList) {
 				foundNotes.Add(FindNote(data));
 			}
 			return foundNotes;
@@ -183,7 +183,7 @@ namespace NotReaper {
 
 			float tempTime = GetClosestBeatSnapped(DurationToBeats(time));
 
-			foreach (Target target in Timeline.loadedNotes) {
+			foreach (Target target in loadedNotes) {
 				if (target.gridTargetPos.z == tempTime && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 
@@ -224,7 +224,6 @@ namespace NotReaper {
 					break;
 			}
 
-			
 
 			var action = new NRActionAddNote();
 			action.targetData = data;
@@ -239,7 +238,7 @@ namespace NotReaper {
 			target.timelineTargetIcon.transform.localPosition = new Vector3(targetData.beatTime, 0, 0);
 			target.timelineTargetIcon.transform.localScale = targetScale * Vector3.one;
 			target.timelineTargetIcon.isGridIcon = false;
-			
+
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			target.gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.beatTime);
@@ -278,10 +277,7 @@ namespace NotReaper {
 			return target;
 		}
 
-
 		private void UpdateSustains() {
-
-
 			foreach (var note in loadedNotes) {
 				if (note.behavior == TargetBehavior.Hold) {
 					if ((note.gridTargetIcon.transform.position.z < 0) && (note.gridTargetIcon.transform.position.z + note.beatLength / 480f > 0)) {
@@ -299,7 +295,6 @@ namespace NotReaper {
 								rightSustainAud.volume = sustainVolume;
 								rightSustainAud.panStereo = panPos;
 							}
-
 
 							var main = particles.main;
 							main.startColor = note.handType == TargetHandType.Left ? new Color(leftColor.r, leftColor.g, leftColor.b, 1) : new Color(rightColor.r, rightColor.g, rightColor.b, 1);
@@ -528,8 +523,6 @@ namespace NotReaper {
 		}
 
 
-
-
 		public void Export() {
 			string dirpath = Application.persistentDataPath;
 
@@ -573,7 +566,6 @@ namespace NotReaper {
 			string newPath = Path.GetFullPath(Path.Combine(songFolder, @"..\..\..\..\"));
 			System.Diagnostics.Process.Start(Path.Combine(newPath, "Audica.exe"));
 		}
-
 
 
 		public void LoadTimingMode(AudioClip clip) {
@@ -982,7 +974,6 @@ namespace NotReaper {
 			float newTime = BeatsToDuration(newX);
 			//time = newTime;
 
-
 			StartCoroutine(AnimateSetTime(newTime * (scale / 20f)));
 		}
 
@@ -1022,9 +1013,6 @@ namespace NotReaper {
 				SafeSetTime();
 				SetCurrentTick();
 				SetCurrentTime();
-
-				
-
 
 
 			}
@@ -1089,7 +1077,6 @@ namespace NotReaper {
 
 			SetCurrentTime();
 			SetCurrentTick();
-
 
 
 			yield break;
