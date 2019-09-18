@@ -664,92 +664,8 @@ namespace NotReaper {
 			//time = 0;
 		}
 
-		public void ChangeDifficulty() {
-			// Debug.Log("ChangeDifficulty");
-			// string dirpath = Application.persistentDataPath;
-
-			// //string[] cuePath = Directory.GetFiles(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues");
-			// if (cuePath.Length > 0) {
-			// 	DeleteAllTargets();
-
-			// 	//load cues from temp
-			// 	string json = File.ReadAllText(cuePath[0]);
-			// 	json = json.Replace("cues", "Items");
-			// 	Cue[] cues = new Cue[2]; //JsonUtility.FromJson<Cue>(json);
-			// 	foreach (Cue cue in cues) {
-			// 		AddTarget(cue);
-			// 	}
-			// } else {
-			// 	DeleteAllTargets();
-			// }
-
-			// foreach (GridTarget obj in notes) {
-			// 	Debug.Log(obj);
-			// }
-		}
-
-		public void Import() {
-			DeleteAllTargets();
-
-			//load cues from temp
-			var cueFiles = StandaloneFileBrowser.OpenFilePanel("Import .cues", Application.persistentDataPath, "cues", false);
-			if (cueFiles.Length > 0) {
-				string json = File.ReadAllText(cueFiles[0]);
-				json = json.Replace("cues", "Items");
-				Cue[] cues = new Cue[2]; //JsonUtility.FromJson<Cue>(json);
-				foreach (Cue cue in cues) {
-					AddTarget(cue);
-				}
-
-				//isSongLoaded = true;
-			} else {
-				Debug.Log("cues not found");
-
-			}
-
-		}
-
-		public void Save() {
-			Cue[] cues = new Cue[notes.Count];
-			for (int i = 0; i < notes.Count; i++) {
-				//cues[i] = orderedNotes[i].ToCue(offset);
-			}
-
-			string json = JsonUtility.ToJson(cues, true);
-			json = json.Replace("Items", "cues");
-
-			string dirpath = Application.persistentDataPath;
-
-			if (notes.Count > 0)
-				//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
-
-				//json = JsonUtility.ToJson(songDesc, true);
-				File.WriteAllText(Path.Combine(dirpath + "\\temp\\", "song.desc"), json);
-			FileInfo descFile = new FileInfo(Path.Combine(dirpath + "\\temp\\", "song.desc"));
 
 
-			string[] oggPath = Directory.GetFiles(dirpath + "\\temp\\", "*.ogg");
-			FileInfo oggFile = new FileInfo(oggPath[0]);
-
-			List<FileInfo> files = new List<FileInfo>();
-			files.Add(descFile);
-			files.Add(oggFile);
-
-			//push all .cues files to list
-			var cueFiles = Directory.GetFiles(dirpath + "\\temp\\", "*.cues");
-			if (cueFiles.Length > 0) {
-				foreach (var cue in cueFiles) {
-					FileInfo file = new FileInfo(cue);
-					files.Add(file);
-				}
-			}
-
-			string path = StandaloneFileBrowser.SaveFilePanel("Audica Save", Application.persistentDataPath, "Edica Save", "edica");
-			//PlayerPrefs.SetString("previousSave", path);
-			if (path.Length > 0)
-				Compress(files, path);
-
-		}
 
 		public void Export() {
 			string dirpath = Application.persistentDataPath;
@@ -794,86 +710,6 @@ namespace NotReaper {
 			System.Diagnostics.Process.Start(Path.Combine(newPath, "Audica.exe"));
 		}
 
-		public void ExportCueToTemp() {
-			Cue[] cues = new Cue[notes.Count];
-			for (int i = 0; i < notes.Count; i++) {
-				//cues[i] = orderedNotes[i].ToCue(offset);
-			}
-
-			string json = JsonUtility.ToJson(cues, true);
-			json = json.Replace("Items", "cues");
-
-			string dirpath = Application.persistentDataPath;
-
-			//if (notes.Count > 0)
-			//File.WriteAllText(Path.Combine(dirpath + "\\temp\\", DifficultySelection_s.Value + ".cues"), json);
-		}
-
-		public void Compress(List<FileInfo> files, string destination) {
-			string dirpath = Application.persistentDataPath;
-
-			if (!System.IO.Directory.Exists(dirpath + "\\TempSave\\")) {
-				//System.IO.Directory.CreateDirectory(dirpath + "\\TempSave\\", securityRules);
-
-			}
-
-			foreach (FileInfo fileToCompress in files) {
-				fileToCompress.CopyTo(dirpath + "\\TempSave\\" + fileToCompress.Name, true);
-			}
-
-			try {
-				ZipFile.CreateFromDirectory(dirpath + "\\TempSave\\", destination);
-			} catch (IOException e) {
-				Debug.Log(e.Message + "....Deleting File");
-				FileInfo fileToReplace = new FileInfo(destination);
-				fileToReplace.Delete();
-				try {
-					ZipFile.CreateFromDirectory(dirpath + "\\TempSave\\", destination);
-				} catch (IOException e2) {
-					Debug.Log(e2.Message + "....No More attempts");
-				}
-
-			}
-			DirectoryInfo dir = new DirectoryInfo(dirpath + "\\TempSave\\");
-			dir.Delete(true);
-		}
-
-		public void NewFile() {
-			DeleteAllTargets();
-
-			notes = new List<Target>();
-			//notesTimeline = new List<TimelineTarget>();
-
-			string dirpath = Application.persistentDataPath;
-
-			//create the new song desc
-			//songDesc = new SongDescyay();
-
-			//locate and copy ogg file to temp folder (used to save the project later)
-			var audioFiles = StandaloneFileBrowser.OpenFilePanel("Import .ogg file", System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyMusic), "ogg", false);
-			if (audioFiles.Length > 0) {
-				FileInfo oggFile = new FileInfo(audioFiles[0]);
-				if (!System.IO.Directory.Exists(dirpath + "\\temp\\")) {
-					//System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
-				} else {
-					DirectoryInfo direct = new DirectoryInfo(dirpath + "\\temp\\");
-					direct.Delete(true);
-
-					//System.IO.Directory.CreateDirectory(dirpath + "\\temp\\", securityRules);
-				}
-				oggFile.CopyTo(dirpath + "\\temp\\" + oggFile.Name, true);
-
-				//load ogg into audio clip
-				if (audioFiles.Length > 0) {
-					StartCoroutine(GetAudioClip(audioFiles[0]));
-				} else {
-					Debug.Log("ogg not found");
-				}
-			} else {
-				Application.Quit();
-			}
-
-		}
 
 
 		public void LoadTimingMode(AudioClip clip) {
@@ -966,7 +802,8 @@ namespace NotReaper {
 			//AddTarget(cue);
 			//}
 			//Difficulty manager loads stuff now
-			//difficultyManager.LoadHighestDifficulty();
+			audicaLoaded = true;
+			difficultyManager.LoadHighestDifficulty();
 
 			//Loaded successfully
 
@@ -993,7 +830,7 @@ namespace NotReaper {
 					audicaLoaded = true;
 
 					//Difficulty manager loads stuff now
-					difficultyManager.LoadHighestDifficulty(false);
+					//difficultyManager.LoadHighestDifficulty(false);
 					//SetScale(20);
 					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
 
@@ -1283,9 +1120,8 @@ namespace NotReaper {
 			float newTime = BeatsToDuration(newX);
 			//time = newTime;
 
-			StartCoroutine(AnimateSetTime(newTime));
-			//SafeSetTime();
-			//SetBeatTime(BeatTime());
+
+			StartCoroutine(AnimateSetTime(newTime * (scale / 20f)));
 		}
 
 
@@ -1385,6 +1221,9 @@ namespace NotReaper {
 
 			time = timeToAnimate;
 			animatingTimeline = false;
+
+			SafeSetTime();
+			SetBeatTime(time);
 
 			SetCurrentTime();
 			SetCurrentTick();
