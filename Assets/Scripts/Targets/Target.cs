@@ -21,9 +21,9 @@ namespace NotReaper.Targets {
 
 
 		//Events and stuff:
-		public event Action<Target, bool, bool> DeleteNoteEvent;
-		public void DeleteNote(bool genUndoAction = true) {
-			DeleteNoteEvent(this, genUndoAction, true);
+		public event Action<Target> DeleteNoteEvent;
+		public void DeleteNote() {
+			DeleteNoteEvent(this);
 		}
 
 		public event Action<Target> TargetEnterLoadedNotesEvent;

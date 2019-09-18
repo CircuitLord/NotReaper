@@ -43,10 +43,10 @@ namespace NotReaper.Targets {
         /// <summary>
         /// For when the note is right clicked on. Bool is for if it should gen an undo action
         /// </summary>
-        public event Action<bool> OnTryRemoveEvent;
+        public event Action OnTryRemoveEvent;
 
         public void OnTryRemove() {
-            OnTryRemoveEvent(true);
+            OnTryRemoveEvent();
         }
 
         public void Remove() {

@@ -213,7 +213,7 @@ namespace NotReaper.Tools {
 			// TODO: Move these actions into timeline to record sane undo actions!
 			Action delete = () => {
 				if (timeline.selectedNotes.Count > 0) {
-					timeline.DeleteTargets(timeline.selectedNotes, true, true);
+					timeline.DeleteTargets(timeline.selectedNotes);
 				}
 				timeline.selectedNotes = new List<Target>();
 			};
