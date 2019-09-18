@@ -77,16 +77,26 @@ namespace NotReaper.Grid {
 
         }
 
+        IEnumerator AnimateHandChange(SpriteRenderer sr, Color color) {
 
+            sr.DOColor(color, 0.3f);
+
+
+            yield break;
+        }
+
+
+
+        public float animColorSpeed = 0.3f;
         public void UpdateUIHandColor(Color color) {
-            standard.GetComponent<SpriteRenderer>().color = color;
-            hold.GetComponent<SpriteRenderer>().color = color;
-            horizontal.GetComponent<SpriteRenderer>().color = color;
-            vertical.GetComponent<SpriteRenderer>().color = color;
-            chainStart.GetComponent<SpriteRenderer>().color = color;
-            chainNode.GetComponent<SpriteRenderer>().color = color;
-            melee.GetComponent<SpriteRenderer>().color = color;
-            cursorTint.color = color;
+            standard.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
+            hold.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
+            horizontal.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
+            vertical.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
+            chainStart.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
+            chainNode.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
+            melee.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
+            cursorTint.DOColor(color, animColorSpeed);
         }
 
         public void UpdateUITool(EditorTool tool) {

@@ -567,6 +567,7 @@ namespace NotReaper {
 		public void ExportAndPlay() {
 			Export();
 			string songFolder = PathLogic.GetSongFolder();
+			File.Delete(Path.Combine(songFolder, audicaFile.desc.songID + ".audica"));
 			File.Copy(audicaFile.filepath, Path.Combine(songFolder, audicaFile.desc.songID + ".audica"));
 
 			string newPath = Path.GetFullPath(Path.Combine(songFolder, @"..\..\..\..\"));
@@ -576,10 +577,7 @@ namespace NotReaper {
 
 
 		public void LoadTimingMode(AudioClip clip) {
-
-			if (audicaLoaded) {
-				return;
-			}
+			if (audicaLoaded) return;
 
 			inTimingMode = true;
 
