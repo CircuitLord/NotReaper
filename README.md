@@ -99,7 +99,7 @@ NotReaper is the work of quite a few awesome people.
 
 [october](https://www.youtube.com/channel/UCEEYUbrnMtNs7XGbOp4Gbdg): Concept artist, graphics designer, and bugtester.
 
-All the awesome people on Audica Modding Discord who've reported bugs and tested it out.
+And all the awesome people on Audica Modding Discord who've reported bugs and tested it out.
 
 ## History
 
