@@ -84,7 +84,7 @@ namespace NotReaper.UI {
 
 
         public void JumpToBookmark(int i) {
-            if (bookmarks[i] = null) return;
+            if (bookmarks[i] == null) return;
             timeline.JumpToPercent((float)bookmarks[i].GetComponent<Bookmark>().percentBookmark);
 
         }
