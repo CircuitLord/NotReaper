@@ -21,6 +21,7 @@ namespace NotReaper.UserInput {
 		public static EditorTool selectedTool = EditorTool.Standard;
         public static EditorTool previousTool = EditorTool.Standard;
 		public static TargetHandType selectedHand = TargetHandType.Left;
+		public static TargetHandType previousHand = TargetHandType.Left;
 		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
 		public static TargetBehavior selectedBehavior = TargetBehavior.Standard;
 		public static UITargetVelocity selectedVelocity = UITargetVelocity.Standard;
@@ -198,6 +199,9 @@ namespace NotReaper.UserInput {
 		}
 
 		public void SelectTool(EditorTool tool) {
+			if(tool == selectedTool) {
+				return;
+			}
 
 			uiToolSelect.UpdateUINoteSelected(tool);
 
@@ -205,6 +209,10 @@ namespace NotReaper.UserInput {
 
             previousTool = selectedTool;
 			selectedTool = tool;
+
+			if(previousTool == EditorTool.Melee && selectedHand == TargetHandType.Either) {
+				SelectHand(previousHand);
+			}
 
 			//Update the UI based on the tool:
 			switch (tool) {
@@ -253,6 +261,7 @@ namespace NotReaper.UserInput {
 
 				case EditorTool.Melee:
 					selectedBehavior = TargetBehavior.Melee;
+					previousHand = selectedHand;
 					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
 					SelectVelocity(UITargetVelocity.Melee);
 					SelectSnappingMode(SnappingMode.Melee);
