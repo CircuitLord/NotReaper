@@ -138,9 +138,9 @@ While in selection mode, you can adjust the length of sustain notes
 
 `Escape`: Main menu
 
-`Shift + Scroll` on smaller timeline to scale.  
+`Shift + Scroll` while hovering over the big timeline to scale it up and down.  
 `Space`: Toggle song playback  
-Scroll to scrub through the song
+Scroll with the mouse wheel to scrub through the song
 
 Sounds:  
 `Q`: Kick  
