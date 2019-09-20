@@ -334,13 +334,14 @@ namespace NotReaper.UserInput {
 
 
 			if (Input.GetKeyDown(KeyCode.Escape)) {
-				if (pauseMenu.isOpened) {
+				if (pauseMenu.isOpened)
+				{
 					if (!Timeline.audioLoaded) return;
-					if (selectedMode == EditorMode.Compose) return;
-					
+
 					pauseMenu.ClosePauseMenu();
 					FigureOutIsInUI();
 				} else {
+					if (selectedMode == EditorMode.Compose) return;
 					pauseMenu.OpenPauseMenu();
 					FigureOutIsInUI();
 				}
