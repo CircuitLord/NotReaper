@@ -132,7 +132,9 @@ While in selection mode, you can adjust the length of sustain notes
 `F`: Swap color of selected notes.
 `Ctrl + F`: Swap horizontal positon of selected notes.
 `Shift + F`: Swap vertical position of selected notes.
+`Ctrl + Q-Y`: Change the hitsound of the selected notes.
 `Ctrl + D`: Deselect all notes.
+
 
 `Escape`: Main menu
 
