@@ -65,11 +65,12 @@ Make your dreams become a reality with the selector that can be dragged.
 
 
 <h3 align="center">Customization</h3>
+
 <p align="center">
 <img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR3.gif" alt="Customization" width=500/>
-
+</p>
+<p align="center">
 Get bored of staring at the same UI over and over? Make NotReaper more like home.
-
 </p>
 
 
