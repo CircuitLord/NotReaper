@@ -83,8 +83,8 @@ namespace NotReaper.Models {
 	public class DiffsList {
 		public CueFile expert = new CueFile();
 		public CueFile advanced = new CueFile();
-		public CueFile standard = new CueFile();
-		public CueFile easy = new CueFile();
+		public CueFile moderate = new CueFile();
+		public CueFile beginner = new CueFile();
 
 	}
 

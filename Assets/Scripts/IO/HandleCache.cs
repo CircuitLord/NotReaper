@@ -22,8 +22,8 @@ namespace NotReaper.IO {
 		public static void ClearCueCache() {
 			File.Delete($"{Application.dataPath}/.cache/expert.cues");
 			File.Delete($"{Application.dataPath}/.cache/advanced.cues");
-			File.Delete($"{Application.dataPath}/.cache/standard.cues");
-			File.Delete($"{Application.dataPath}/.cache/easy.cues");
+			File.Delete($"{Application.dataPath}/.cache/moderate.cues");
+			File.Delete($"{Application.dataPath}/.cache/beginner.cues");
 		}
 
 	}

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
     <e p="C:\Files\Programming\UnityProjects\NotReaper" t="IncludeRecursive">
@@ -177,6 +177,7 @@
             <e p="TargetIcon.cs" t="Include" />
             <e p="TargetMoveIntent.cs" t="Include" />
             <e p="TargetOld.cs" t="Include" />
+            <e p="TargetSetHitsoundIntent.cs" t="Include" />
             <e p="TimelineTarget.cs" t="Include" />
           </e>
           <e p="Ticker.cs" t="Include" />

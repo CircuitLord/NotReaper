@@ -38,12 +38,12 @@ namespace NotReaper.Managers {
                 return 1;  
             }
 
-            else if (Timeline.audicaFile.diffs.standard.cues != null) {
+            else if (Timeline.audicaFile.diffs.moderate.cues != null) {
                 LoadDifficulty(2, save);
                 return 2;  
             }
 
-            else if (Timeline.audicaFile.diffs.easy.cues != null) {
+            else if (Timeline.audicaFile.diffs.beginner.cues != null) {
                 LoadDifficulty(3, save);
                 return 3;  
             }
@@ -72,10 +72,10 @@ namespace NotReaper.Managers {
                     Timeline.audicaFile.diffs.advanced.cues = new List<Cue>();
                     break;
                 case 2:
-                    Timeline.audicaFile.diffs.standard.cues = new List<Cue>();
+                    Timeline.audicaFile.diffs.moderate.cues = new List<Cue>();
                     break;
                 case 3:
-                    Timeline.audicaFile.diffs.easy.cues = new List<Cue>();
+                    Timeline.audicaFile.diffs.beginner.cues = new List<Cue>();
                     break;
                 
             }
@@ -92,10 +92,10 @@ namespace NotReaper.Managers {
                     Timeline.audicaFile.diffs.advanced.cues = null;
                     break;
                 case 2:
-                    Timeline.audicaFile.diffs.standard.cues = null;
+                    Timeline.audicaFile.diffs.moderate.cues = null;
                     break;
                 case 3:
-                    Timeline.audicaFile.diffs.easy.cues = null;
+                    Timeline.audicaFile.diffs.beginner.cues = null;
                     break;
                 
             }
@@ -116,12 +116,12 @@ namespace NotReaper.Managers {
                     }
                     break;
                 case 2:
-                    if (diffs.standard.cues != null) {
+                    if (diffs.moderate.cues != null) {
                         return true;
                     }
                     break;
                 case 3:
-                    if (diffs.easy.cues != null) {
+                    if (diffs.beginner.cues != null) {
                         return true;
                     }
                     break;
@@ -147,10 +147,10 @@ namespace NotReaper.Managers {
                     ActuallyCopyToOtherDifficulty(diffs.advanced.cues, dest);
                     break;
                 case 2:
-                    ActuallyCopyToOtherDifficulty(diffs.standard.cues, dest);
+                    ActuallyCopyToOtherDifficulty(diffs.moderate.cues, dest);
                     break;
                 case 3:
-                    ActuallyCopyToOtherDifficulty(diffs.easy.cues, dest);
+                    ActuallyCopyToOtherDifficulty(diffs.beginner.cues, dest);
                     break;
             }
 
@@ -168,10 +168,10 @@ namespace NotReaper.Managers {
                     Timeline.audicaFile.diffs.advanced.cues = cues;
                     break;
                 case 2:
-                    Timeline.audicaFile.diffs.standard.cues = cues;
+                    Timeline.audicaFile.diffs.moderate.cues = cues;
                     break;
                 case 3:
-                    Timeline.audicaFile.diffs.easy.cues = cues;
+                    Timeline.audicaFile.diffs.beginner.cues = cues;
                     break;
             }
         }
@@ -208,9 +208,9 @@ namespace NotReaper.Managers {
                     }
                     break;
                 case 2:
-                    if (diffs.standard.cues != null) {
+                    if (diffs.moderate.cues != null) {
                         curSongDiff.text = "Standard";
-                        LoadTimelineDiff(diffs.standard.cues, save);
+                        LoadTimelineDiff(diffs.moderate.cues, save);
                         loadedIndex = index;
 
                         nrDiscordPresence.UpdatePresenceDifficulty(2);
@@ -218,9 +218,9 @@ namespace NotReaper.Managers {
                     }
                     break;
                 case 3:
-                    if (diffs.easy.cues != null) {
+                    if (diffs.beginner.cues != null) {
                         curSongDiff.text = "Easy";
-                        LoadTimelineDiff(diffs.easy.cues, save);
+                        LoadTimelineDiff(diffs.beginner.cues, save);
                         loadedIndex = index;
 
                         nrDiscordPresence.UpdatePresenceDifficulty(3);

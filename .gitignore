@@ -5,6 +5,8 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+.idea/
+
 # Visual Studio cache directory
 .vs/
 Assets/saves/
@@ -45,3 +47,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 song.desc
+.idea/.idea.NotReaper/.idea/contentModel.xml

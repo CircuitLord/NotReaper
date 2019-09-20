@@ -40,12 +40,12 @@ namespace NotReaper.IO {
 					File.WriteAllText($"{Application.dataPath}/.cache/advanced-new.cues", CuesToJson(audicaFile.diffs.advanced));
 					advanced = true;
 				}
-				if (audicaFile.diffs.standard.cues != null) {
-					File.WriteAllText($"{Application.dataPath}/.cache/standard-new.cues", CuesToJson(audicaFile.diffs.standard));
+				if (audicaFile.diffs.moderate.cues != null) {
+					File.WriteAllText($"{Application.dataPath}/.cache/moderate-new.cues", CuesToJson(audicaFile.diffs.moderate));
 					standard = true;
 				}
-				if (audicaFile.diffs.easy.cues != null) {
-					File.WriteAllText($"{Application.dataPath}/.cache/easy-new.cues", CuesToJson(audicaFile.diffs.easy));
+				if (audicaFile.diffs.beginner.cues != null) {
+					File.WriteAllText($"{Application.dataPath}/.cache/beginner-new.cues", CuesToJson(audicaFile.diffs.beginner));
 					easy = true;
 				}
 
@@ -61,9 +61,9 @@ namespace NotReaper.IO {
 						archive.RemoveEntry(entry);
 					} else if (entry.ToString() == "advanced.cues") {
 						archive.RemoveEntry(entry);
-					} else if (entry.ToString() == "standard.cues") {
+					} else if (entry.ToString() == "moderate.cues") {
 						archive.RemoveEntry(entry);
-					} else if (entry.ToString() == "easy.cues") {
+					} else if (entry.ToString() == "beginner.cues") {
 						archive.RemoveEntry(entry);
 					}
 					
@@ -71,8 +71,8 @@ namespace NotReaper.IO {
 				}
 				if (expert) archive.AddEntry("expert.cues", $"{Application.dataPath}/.cache/expert-new.cues");
 				if (advanced) archive.AddEntry("advanced.cues", $"{Application.dataPath}/.cache/advanced-new.cues");
-				if (standard) archive.AddEntry("standard.cues", $"{Application.dataPath}/.cache/standard-new.cues");
-				if (easy) archive.AddEntry("easy.cues", $"{Application.dataPath}/.cache/easy-new.cues");
+				if (standard) archive.AddEntry("moderate.cues", $"{Application.dataPath}/.cache/moderate-new.cues");
+				if (easy) archive.AddEntry("beginner.cues", $"{Application.dataPath}/.cache/beginner-new.cues");
 
 				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/song-new.desc");
 				archive.SaveTo(audicaFile.filepath + ".temp", SharpCompress.Common.CompressionType.None);

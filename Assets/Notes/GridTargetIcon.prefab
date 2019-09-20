@@ -30,8 +30,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.01, y: 0.01, z: 1}
   m_Children:
-  - {fileID: 3369610169783005056}
-  - {fileID: 5788885614053577961}
+  - {fileID: 3303589124168388398}
+  - {fileID: 6002654664244032583}
   m_Father: {fileID: 8968295075570785497}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1449,6 +1449,9 @@ MonoBehaviour:
   behavior: 0
   sustainDirection: 0.6
   isSelected: 0
+  location: 0
+  isGridIcon: 1
+  holdParticles: {fileID: 6070676427362410163}
 --- !u!135 &4976088772993325799
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2484,6 +2487,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timelineNotes: {fileID: 0}
   endMarkerPrefab: {fileID: 4440669226093902584}
+  endMarker: {fileID: 0}
   sustainButtons: {fileID: 355477074140369082}
   sustainLength: 480
 --- !u!199 &8994708956538940186
@@ -8009,7 +8013,7 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
---- !u!224 &3369610169783005056 stripped
+--- !u!224 &3303589124168388398 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
     type: 3}
@@ -8175,7 +8179,7 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
---- !u!224 &5788885614053577961 stripped
+--- !u!224 &6002654664244032583 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
     type: 3}

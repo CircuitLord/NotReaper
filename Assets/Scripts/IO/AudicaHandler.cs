@@ -49,11 +49,11 @@ namespace NotReaper.IO {
 					entry.Extract($"{appPath}/.cache");
 					advanced = true;
 
-				} else if (entry.FileName == "standard.cues") {
+				} else if (entry.FileName == "moderate.cues") {
 					entry.Extract($"{appPath}/.cache");
 					standard = true;
 
-				} else if (entry.FileName == "easy.cues") {
+				} else if (entry.FileName == "beginner.cues") {
 					entry.Extract($"{appPath}/.cache");
 					easy = true;
 				}
@@ -75,10 +75,10 @@ namespace NotReaper.IO {
 				audicaFile.diffs.advanced = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/advanced.cues"));
 			}
 			if (standard) {
-				audicaFile.diffs.standard = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/standard.cues"));
+				audicaFile.diffs.moderate = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/moderate.cues"));
 			}
 			if (easy) {
-				audicaFile.diffs.easy = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/easy.cues"));
+				audicaFile.diffs.beginner = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/beginner.cues"));
 			}
 
 			MemoryStream temp = new MemoryStream();
