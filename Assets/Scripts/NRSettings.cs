@@ -13,12 +13,10 @@ namespace NotReaper {
 
         public static bool isLoaded = false;
 
-        private static string configFilePath = Path.Combine(Application.persistentDataPath, "NRConfig.json");
+        private static readonly string configFilePath = Path.Combine(Application.persistentDataPath, "NRConfig.json");
 
         public static void LoadSettingsJson(bool regenConfig = false) {
-
-
-
+            
             //If it doesn't exist, we need to gen a new one.
             if (regenConfig || !File.Exists(configFilePath)) {
                 GenNewConfig();
@@ -29,6 +27,10 @@ namespace NotReaper {
             } catch(Exception e) {
                 Debug.LogError(e);
             }
+
+            config.leftColor = new Color((float)config.userLeftColor.r, (float)config.userLeftColor.g, (float)config.userLeftColor.b);
+            config.rightColor = new Color((float)config.userRightColor.r, (float)config.userRightColor.g, (float)config.userRightColor.b);
+            config.selectedHighlightColor = new Color((float)config.userSelectedHighlightColor.r, (float)config.userSelectedHighlightColor.g, (float)config.userSelectedHighlightColor.b);
 
 
             isLoaded = true;
@@ -42,7 +44,7 @@ namespace NotReaper {
         }
 
 
-        public static void GenNewConfig() {
+        private static void GenNewConfig() {
 
             Debug.Log("Generating new configuration file...");
 
@@ -69,43 +71,21 @@ namespace NotReaper {
             g = 0.6,
             b = 0.8
         };
-
-        public Color leftColor {
-            get {
-                return new Color((float)userLeftColor.r, (float)userLeftColor.g, (float)userLeftColor.b);
-            }
-            set {
-                return;
-            }
-        }
+        public Color leftColor;
+        
         public UserColor userRightColor = new UserColor() {
             r = 0.9,
             g = 0.5,
             b = 0.05
         };
-        public Color rightColor {
-            get {
-                return new Color((float)userRightColor.r, (float)userRightColor.g, (float)userRightColor.b);
-            }
-            set {
-                return;
-            }
-        }
-
-        private UserColor userSelectedHighlightColor = new UserColor() {
+        public Color rightColor;
+        
+        public UserColor userSelectedHighlightColor = new UserColor() {
             r = 1.0,
             g = 0.5,
             b = 0.0
-
         };
-        public Color selectedHighlightColor {
-            get {
-                return new Color((float)userSelectedHighlightColor.r, (float)userSelectedHighlightColor.g, (float)userSelectedHighlightColor.b);
-            }
-            set {
-                return;
-            }
-        }
+        public Color selectedHighlightColor;
 
         public double mainVol = 0.5f;
         public double noteVol = 0.5f;
