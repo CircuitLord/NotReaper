@@ -37,6 +37,8 @@ namespace NotReaper.Tools {
 		private List<TargetMoveIntent> gridTargetMoveIntents = new List<TargetMoveIntent>();
 		private List<TargetMoveIntent> timelineTargetMoveIntents = new List<TargetMoveIntent>();
 
+		private List<TargetSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
+
 		//INFO: Code for selecting targets is on the drag select timeline thing itself
 
 		/// <summary>
@@ -154,6 +156,23 @@ namespace NotReaper.Tools {
 			}
 		}
 
+		private void SetHitsoundAction(TargetVelocity velocity) {
+			targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
+			timeline.selectedNotes.ForEach(target => {
+				var intent = new TargetSetHitsoundIntent();
+
+				intent.target = target;
+				intent.startingVelocity = target.velocity;
+				intent.newVelocity = velocity;
+				
+				targetSetHitsoundIntents.Add(intent);
+			});
+				
+			timeline.SetTargetHitsounds(targetSetHitsoundIntents);
+		}
+		
+		
+
 		private void StartSelectionAction() {
 			isSelectionDown = true;
 			hasMovedOutOfClickBounds = false;
@@ -175,6 +194,9 @@ namespace NotReaper.Tools {
 				iconUnderMouse.TrySelect();
 			}
 		}
+		
+		
+		
 
 		public Vector3 CalcAvgNotePos(List<Target> targets) {
 
@@ -198,6 +220,28 @@ namespace NotReaper.Tools {
 			//Applying hitsounds to selected:
 
 			if (!activated) return;
+			
+			
+			//TODO: Add shift + ctrl detection up here instead of multipule times
+
+
+			if (Input.GetKeyDown(KeyCode.Q))
+			{
+				SetHitsoundAction(TargetVelocity.Standard);
+			} else if (Input.GetKeyDown(KeyCode.W)) {
+				SetHitsoundAction(TargetVelocity.Snare);
+			} else if (Input.GetKeyDown(KeyCode.E)) {
+				SetHitsoundAction(TargetVelocity.Percussion);
+			} else if (Input.GetKeyDown(KeyCode.R)) {
+				SetHitsoundAction(TargetVelocity.ChainStart);
+			} else if (Input.GetKeyDown(KeyCode.T)) {
+				SetHitsoundAction(TargetVelocity.Chain);
+			} else if (Input.GetKeyDown(KeyCode.Y)) {
+				SetHitsoundAction(TargetVelocity.Melee);
+			}
+
+
+
 
 			var iconsUnderMouse = MouseUtil.IconsUnderMouse(notesLayer);
 			TargetIcon iconUnderMouse = iconsUnderMouse.Length > 0 ? iconsUnderMouse[0] : null;
@@ -288,8 +332,14 @@ namespace NotReaper.Tools {
 					if (iconUnderMouse) {
 						var anySelectedIconUnderMouse = iconsUnderMouse.Where(icon => icon.isSelected).ToArray();
 						if (anySelectedIconUnderMouse.Length == 0) return;
-						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
-						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
+						switch (iconUnderMouse.location) {
+							case TargetIconLocation.Grid:
+								StartDragGridTargetAction(iconUnderMouse);
+								break;
+							case TargetIconLocation.Timeline:
+								StartDragTimelineTargetAction(iconUnderMouse);
+								break;
+						}
 					}
 				}
 
@@ -298,9 +348,6 @@ namespace NotReaper.Tools {
 					if (isDraggingNotesOnTimeline) EndDragTimelineTargetAction();
 
 					foreach (Target target in timeline.selectedNotes) {
-
-						//TODO: does changing target in one list change it in another? no i don't think so
-
 						target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 					}
 				}

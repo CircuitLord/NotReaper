@@ -248,4 +248,35 @@ namespace NotReaper.Tools {
 			DoAction(timeline); //Swap is symmetrical
 		}
 	}
+	
+	public class TargetDataSetHitsoundIntent {
+		public TargetDataSetHitsoundIntent() {}
+
+		public TargetDataSetHitsoundIntent(TargetSetHitsoundIntent intent) {
+			targetData = new TargetData(intent.target);
+			startingVelocity = intent.startingVelocity;
+			newVelocity = intent.newVelocity;
+		}
+
+		public TargetData targetData;
+		public TargetVelocity startingVelocity;
+		public TargetVelocity newVelocity;
+	}
+	
+	public class NRActionSetTargetHitsound : NRAction {
+		public List<TargetDataSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetDataSetHitsoundIntent>();
+
+		public override void DoAction(Timeline timeline) {
+			targetSetHitsoundIntents.ForEach(intent => {
+				Target target = timeline.FindNote(intent.targetData);
+				target.SetVelocity(intent.newVelocity);
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			targetSetHitsoundIntents.ForEach(intent => {
+				Target target = timeline.FindNote(intent.targetData);
+				target.SetVelocity(intent.startingVelocity);
+			});
+		}
+	}
 }

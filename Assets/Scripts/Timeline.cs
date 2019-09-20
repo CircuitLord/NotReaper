@@ -23,6 +23,7 @@ using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+
 namespace NotReaper {
 
 
@@ -84,6 +85,8 @@ namespace NotReaper {
 		private Color bothColor;
 		private Color neitherColor;
 
+		private static readonly int MainTex = Shader.PropertyToID("_MainTex");
+		
 		/// <summary>
 		/// The position on the X axis of the current point in the timeline unity units (I think)
 		/// </summary>
@@ -281,9 +284,10 @@ namespace NotReaper {
 		private void UpdateSustains() {
 			foreach (var note in loadedNotes) {
 				if (note.behavior == TargetBehavior.Hold) {
-					if ((note.gridTargetIcon.transform.position.z < 0) && (note.gridTargetIcon.transform.position.z + note.beatLength / 480f > 0)) {
+					if ((note.gridTargetIcon.transform.position.z < 0) && (note.gridTargetIcon.transform.position.z + note.beatLength / 480f > 0))
+					{
 
-						var particles = note.gridTargetIcon.GetComponentInChildren<ParticleSystem>();
+						var particles = note.gridTargetIcon.holdParticles;
 						if (!particles.isEmitting) {
 							particles.Play();
 
@@ -310,8 +314,9 @@ namespace NotReaper {
 
 						particles.SetParticles(parts, particles.particleCount);
 
-					} else {
-						var particles = note.gridTargetIcon.GetComponentInChildren<ParticleSystem>();
+					} else
+					{
+						var particles = note.gridTargetIcon.holdParticles;
 						if (particles.isEmitting) {
 							particles.Stop();
 							if (note.handType == TargetHandType.Left) {
@@ -458,7 +463,12 @@ namespace NotReaper {
 			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
-
+		
+		public void SetTargetHitsounds(List<TargetSetHitsoundIntent> intents) {
+			var action = new NRActionSetTargetHitsound();
+			action.targetSetHitsoundIntents = intents.Select(intent => new TargetDataSetHitsoundIntent(intent)).ToList();
+			Tools.undoRedoManager.AddAction(action);
+		}
 
 		public void DeleteTarget(Target target) {
 			var action = new NRActionRemoveNote();
@@ -543,10 +553,10 @@ namespace NotReaper {
 					audicaFile.diffs.advanced = export;
 					break;
 				case 2:
-					audicaFile.diffs.standard = export;
+					audicaFile.diffs.moderate = export;
 					break;
 				case 3:
-					audicaFile.diffs.easy = export;
+					audicaFile.diffs.beginner = export;
 					break;
 			}
 
@@ -775,12 +785,13 @@ namespace NotReaper {
 
 
 		public void SetBeatTime(float t) {
-			timelineBG.material.SetTextureOffset("_MainTex", new Vector2(((t * bpm / 60 - offset / 480f) / 4f + scaleOffset), 1));
+			float x = (t * bpm / 60 - offset / 480f);
+			timelineBG.material.SetTextureOffset(MainTex, new Vector2((x / 4f + scaleOffset), 1));
 
-			timelineTransformParent.transform.localPosition = Vector3.left * (t * bpm / 60 - offset / 480f) / (scale / 20f);
+			timelineTransformParent.transform.localPosition = Vector3.left * x / (scale / 20f);
 			//spectrogram.localPosition = Vector3.left * (t * bpm / 60) / (scale / 20f);
 
-			gridTransformParent.transform.localPosition = Vector3.back * (t * bpm / 60 - offset / 480f);
+			gridTransformParent.transform.localPosition = Vector3.back * x;
 		}
 
 		public void SetScale(int newScale) {
@@ -887,6 +898,22 @@ namespace NotReaper {
 
 		bool checkForNearSustainsOnThisFrame = false;
 		public void Update() {
+			
+			//My custom testing stuff for figuring out how this works:
+			if (Input.GetKeyDown(KeyCode.Y))
+			{
+
+				if (notes.Count == 0)
+				{
+					Debug.Log("No notes");
+					return;
+				}
+				notes[0].behavior = TargetBehavior.Metronome;
+
+				Debug.Log("Target in notes (where it was changed): " + notes[0].behavior);
+				Debug.Log("Target in orderedNotes: " + orderedNotes[0].behavior);
+				Debug.Log("Target in loadedNotes: " + loadedNotes[0].behavior);
+			}
 
 			UpdateSustains();
 
@@ -1105,7 +1132,7 @@ namespace NotReaper {
 		}
 
 		public float GetPercentagePlayed() {
-			if (aud.clip != null)
+			if (aud.clip)
 				return (time / aud.clip.length);
 
 			else
@@ -1143,7 +1170,8 @@ namespace NotReaper {
 
 		}
 
-		string prevTickText;
+		private string prevTickText;
+
 		private void SetCurrentTick() {
 			string currentTick = Mathf.Floor((int) BeatTime() * 480f).ToString();
 			if (currentTick != prevTickText) {
