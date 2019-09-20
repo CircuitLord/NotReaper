@@ -571,6 +571,8 @@ namespace NotReaper {
 					break;
 			}
 
+			audicaFile.desc = desc;
+
 
 			AudicaExporter.ExportToAudicaFile(audicaFile);
 
@@ -680,6 +682,7 @@ namespace NotReaper {
 			//Difficulty manager loads stuff now
 			audicaLoaded = true;
 			difficultyManager.LoadHighestDifficulty();
+			
 
 			//Loaded successfully
 
@@ -704,6 +707,9 @@ namespace NotReaper {
 					SetBPM((float) desc.tempo);
 					audioLoaded = true;
 					audicaLoaded = true;
+					
+					//Load the preview start point
+					miniTimeline.SetPreviewStartPoint(desc.previewStartSeconds);
 
 					//Difficulty manager loads stuff now
 					//difficultyManager.LoadHighestDifficulty(false);
@@ -744,18 +750,6 @@ namespace NotReaper {
 
 				}
 			}
-		}
-
-
-		public void UpdateSongDesc(string songID, string title, int bpm, string songEndEvent = "C#", string mapper = "", int offset = 0) {
-			desc.songID = songID;
-			desc.title = title;
-			desc.tempo = bpm;
-			desc.songEndEvent = songEndEvent;
-			desc.mapper = mapper;
-			//desc.offset = offset;
-			SetBPM(bpm);
-			//SetOffset(offset);
 		}
 
 
@@ -993,6 +987,12 @@ namespace NotReaper {
 
 			EnableNearSustainButtons();
 
+		}
+
+
+		public double GetPercentPlayedFromSeconds(double seconds)
+		{
+			return seconds / aud.clip.length;
 		}
 
 

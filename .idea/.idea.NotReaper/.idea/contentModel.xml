@@ -218,7 +218,6 @@
             <e p="PauseStart" t="Include">
               <e p="PauseMenu.cs" t="Include" />
             </e>
-            <e p="SongDescModal.cs" t="Include" />
             <e p="SoundSelect" t="Include">
               <e p="SoundSelect.cs" t="Include" />
             </e>

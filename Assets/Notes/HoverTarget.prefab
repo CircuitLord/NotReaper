@@ -54,6 +54,7 @@ MonoBehaviour:
   chainStart: {fileID: 3120203564506043712}
   chainNode: {fileID: 8764296154717166052}
   melee: {fileID: 7705264566167428215}
+  animColorSpeed: 0.3
 --- !u!1 &1598388881796281647
 GameObject:
   m_ObjectHideFlags: 0
@@ -667,7 +668,7 @@ PrefabInstance:
     - target: {fileID: 3954297334106386590, guid: 92b51fe5c2ada95489df38c74ead81e7,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 729261787017123494, guid: 92b51fe5c2ada95489df38c74ead81e7,
         type: 3}

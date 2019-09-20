@@ -36,6 +36,20 @@ namespace NotReaper.UI {
             bar.localPosition = new Vector3((float)x, 0, 0);
         }
 
+        public void SetPreviewStartPoint(double seconds)
+        {
+            Timeline.desc.previewStartSeconds = seconds;
+
+            double percent = timeline.GetPercentPlayedFromSeconds(seconds);
+
+            double x = barLength * percent;
+            x -= barLength / 2;
+            songPreviewIcon.localPosition = new Vector3((float)x, 0, 0);
+
+        }
+        
+        
+
         float prevX = 0f;
         private void OnMouseDrag() {
             var x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
@@ -68,11 +82,11 @@ namespace NotReaper.UI {
         }
 
 
-        public void SetSongPreviewPoint(double percent) {
-            double x = barLength * percent;
-            x -= barLength / 2;
-            songPreviewIcon.localPosition = new Vector3((float)x, 0, 0);
-        }
+        //public void SetSongPreviewPoint(double percent) {
+        //    double x = barLength * percent;
+        //    x -= barLength / 2;
+       //     songPreviewIcon.localPosition = new Vector3((float)x, 0, 0);
+        //}
 
         private void OnMouseOver() {
             isMouseOver = true;
@@ -116,6 +130,12 @@ namespace NotReaper.UI {
 
             bool isCtrlDown = false;
             bool isShiftDown = false;
+
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                SetPreviewStartPoint(Timeline.time);
+            }
 
 
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {

@@ -341,7 +341,7 @@ namespace NotReaper.UserInput {
 					pauseMenu.ClosePauseMenu();
 					FigureOutIsInUI();
 				} else {
-					if (selectedMode == EditorMode.Compose) return;
+					if (selectedMode == EditorMode.Timing) return;
 					pauseMenu.OpenPauseMenu();
 					FigureOutIsInUI();
 				}

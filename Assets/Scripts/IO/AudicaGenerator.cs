@@ -14,7 +14,7 @@ namespace NotReaper.IO {
 
 	public class AudicaGenerator {
 
-		public static string Generate(string oggPath, string songID, string songName, string artist, double bpm, string songEndEvent, string mapper, int offset) {
+		public static string Generate(string oggPath, string songID, string songName, string artist, double bpm, string songEndEvent, string author, int offset) {
 
 
 			HandleCache.CheckSaveFolderValid();
@@ -62,7 +62,7 @@ namespace NotReaper.IO {
 			songDesc.artist = artist;
 			songDesc.tempo = (float)bpm;
 			songDesc.songEndEvent = songEndEvent;
-			songDesc.mapper = mapper;
+			songDesc.author = author;
 			songDesc.offset = offset;
 			File.WriteAllText(Path.Combine(workFolder, "song.desc"), JsonUtility.ToJson(songDesc, true));
 

@@ -54,8 +54,9 @@ namespace NotReaper.Models {
 		public float prerollSeconds = 0;
 		public bool useMidiForCues = false;
 		public bool hidden = false;
-		public string mapper = "";
+		public string author = "";
 		public int offset = 0;
+		public double previewStartSeconds = 0.0f;
 	}
 
 	public class SafeDesc {

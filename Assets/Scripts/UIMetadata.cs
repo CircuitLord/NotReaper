@@ -46,7 +46,7 @@ namespace NotReaper.UI {
 
             if (Timeline.desc.title != null) titleField.text = Timeline.desc.title;
             if (Timeline.desc.artist != null) artistField.text = Timeline.desc.artist;
-            if (Timeline.desc.mapper != null) mapperField.text = Timeline.desc.mapper;
+            if (Timeline.desc.author != null) mapperField.text = Timeline.desc.author;
 
             diffDropdown.value = difficultyManager.loadedIndex;
             ChangeSelectedDifficulty(difficultyManager.loadedIndex);
@@ -54,6 +54,12 @@ namespace NotReaper.UI {
             
         }
 
+        public void ApplyValues()
+        {
+            Timeline.desc.title = titleField.text;
+            Timeline.desc.artist = artistField.text;
+            Timeline.desc.author = mapperField.text;
+        }
 
         public void TryCopyCuesToOther() {
             selectDiffWindow.SetActive(true);
