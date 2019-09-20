@@ -253,8 +253,6 @@ namespace NotReaper {
 			target.SetBehavior(targetData.behavior);
 			target.SetVelocity(targetData.velocity);
 
-			UpdateTimelineOffset(target);
-
 			if (target.behavior == TargetBehavior.Hold) {
 				target.SetBeatLength(targetData.beatLength);
 			} else {
@@ -328,26 +326,6 @@ namespace NotReaper {
 					}
 				}
 			}
-		}
-
-		//Calculate the note offset for visual purpose on the timeline.
-		public void UpdateTimelineOffset(Target target) {
-			float xOffset = target.timelineTargetIcon.transform.localPosition.x;
-			float yOffset = 0;
-			float zOffset = 0;
-
-			switch (target.handType) {
-				case TargetHandType.Left:
-					yOffset = 0.1f;
-					zOffset = 0.1f;
-					break;
-				case TargetHandType.Right:
-					yOffset = -0.1f;
-					zOffset = 0.2f;
-					break;
-			}
-
-			target.timelineTargetIcon.transform.localPosition = new Vector3(xOffset, yOffset, zOffset);
 		}
 
 

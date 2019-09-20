@@ -199,7 +199,6 @@ namespace NotReaper.Tools {
 						targetData.handType = TargetHandType.Left;
 					break;
 				}
-				timeline.UpdateTimelineOffset(target);
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
