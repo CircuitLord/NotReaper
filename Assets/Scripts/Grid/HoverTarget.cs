@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using NotReaper.Models;
@@ -22,6 +23,25 @@ namespace NotReaper.Grid {
         public GameObject chainStart;
         public GameObject chainNode;
         public GameObject melee;
+
+        private SpriteRenderer srstandard;
+        private SpriteRenderer srhold;
+        private SpriteRenderer srhorizontal;
+        private SpriteRenderer srvertical;
+        private SpriteRenderer srchainstart;
+        private SpriteRenderer srchainnode;
+        private SpriteRenderer srmelee;
+
+
+        private void Start() {
+            srstandard = standard.GetComponent<SpriteRenderer>();
+            srhold = hold.GetComponent<SpriteRenderer>();
+            srhorizontal = horizontal.GetComponent<SpriteRenderer>();
+            srvertical = vertical.GetComponent<SpriteRenderer>();
+            srchainstart= chainStart.GetComponent<SpriteRenderer>();
+            srchainnode = chainNode.GetComponent<SpriteRenderer>();
+            srmelee = melee.GetComponent<SpriteRenderer>();
+        }
 
 
         public void TryEnable() {
@@ -77,25 +97,19 @@ namespace NotReaper.Grid {
 
         }
 
-        IEnumerator AnimateHandChange(SpriteRenderer sr, Color color) {
 
-            sr.DOColor(color, 0.3f);
-
-
-            yield break;
-        }
 
 
 
         public float animColorSpeed = 0.3f;
         public void UpdateUIHandColor(Color color) {
-            standard.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
-            hold.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
-            horizontal.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
-            vertical.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
-            chainStart.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
-            chainNode.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
-            melee.GetComponent<SpriteRenderer>().DOColor(color, animColorSpeed);
+            srstandard.DOColor(color, animColorSpeed);
+            srhold.DOColor(color, animColorSpeed);
+            srhorizontal.DOColor(color, animColorSpeed);
+            srvertical.DOColor(color, animColorSpeed);
+            srchainstart.DOColor(color, animColorSpeed);
+            srchainnode.DOColor(color, animColorSpeed);
+            srmelee.DOColor(color, animColorSpeed);
             cursorTint.DOColor(color, animColorSpeed);
         }
 
