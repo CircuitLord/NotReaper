@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using DG.Tweening;
+using NLayer;
 using NotReaper.IO;
 using NotReaper.UI;
 using NotReaper.UserInput;
@@ -51,14 +53,40 @@ namespace NotReaper.Timing {
         TrimAudio trimAudio = new TrimAudio();
 
 
+        Process ffmpeg = new Process();
+
+        private void Start() {
+            string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG/ffmpeg.exe");
+			ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+			ffmpeg.StartInfo.FileName = ffmpegPath;
+            ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            ffmpeg.StartInfo.UseShellExecute = false;
+            ffmpeg.StartInfo.RedirectStandardOutput = true;
+            ffmpeg.StartInfo.WorkingDirectory = Path.Combine(Application.streamingAssetsPath, "FFMPEG");
+            
+        }
+        
+
+
         public void SelectAudioFile() {
-            string[] paths = StandaloneFileBrowser.OpenFilePanel("ogg", Path.Combine(Application.persistentDataPath), "ogg", false);
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("MP3", Path.Combine(Application.persistentDataPath), "mp3", false);
 
             if (paths[0] == null) return;
+            UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg"));
+            ffmpeg.StartInfo.Arguments = String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg");
+            ffmpeg.Start();
+            ffmpeg.WaitForExit();
 
-            StartCoroutine(GetAudioClip($"file://" + paths[0]));
+
+
+            StartCoroutine(GetAudioClip($"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", "converted.ogg")));
+            //audioFile = LoadMp3(paths[0]);
             nameText.text = paths[0];
             loadedSong = paths[0];
+
+            //Double.TryParse(bpmInput.text, out bpm);
+
+            //timeline.LoadTimingMode(audioFile);
 
 
         }
@@ -86,12 +114,12 @@ namespace NotReaper.Timing {
             trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), offset, bpm);
             string path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), (songName + "-" + mapperName), "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
             timeline.LoadAudicaFile(false, path);
-            editorInput.SelectMode(EditorMode.Compose);    
+            editorInput.SelectMode(EditorMode.Compose);
 
             applyButton.interactable = false;
             genAudicaButton.interactable = false;
             selectSongButton.interactable = false;
-            
+
         }
 
         public void CheckAllUIFilled() {
@@ -106,7 +134,6 @@ namespace NotReaper.Timing {
 
 
             float fadeDuration = (float) NRSettings.config.UIFadeDuration;
-
 
 
             BG.DOFade(1.0f, fadeDuration / 2f);
@@ -139,7 +166,7 @@ namespace NotReaper.Timing {
                 yield return www.SendWebRequest();
 
                 if (www.isNetworkError) {
-                    Debug.Log(www.error);
+                    UnityEngine.Debug.Log(www.error);
                 } else {
                     audioFile = DownloadHandlerAudioClip.GetContent(www);
 
@@ -153,6 +180,25 @@ namespace NotReaper.Timing {
 
                 }
             }
+        }
+
+        public AudioClip LoadMp3(string filePath) {
+            string filename = System.IO.Path.GetFileNameWithoutExtension(filePath);
+
+            MpegFile mpegFile = new MpegFile(filePath);
+
+            // assign samples into AudioClip
+            AudioClip ac = AudioClip.Create(filename,
+                (int) (mpegFile.Length / sizeof(float) / mpegFile.Channels),
+                mpegFile.Channels,
+                mpegFile.SampleRate,
+                true,
+                data => { int actualReadCount = mpegFile.ReadSamples(data, 0, data.Length); },
+                position => { mpegFile = new MpegFile(filePath); });
+
+            //mpegFile.Dispose();
+
+            return ac;
         }
 
         public string RemoveSpecialCharacters(string str) {

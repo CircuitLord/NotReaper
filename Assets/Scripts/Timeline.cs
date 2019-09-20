@@ -24,6 +24,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 
+
 namespace NotReaper {
 
 
@@ -108,6 +109,11 @@ namespace NotReaper {
 
 		[HideInInspector] public bool hover = false;
 		public bool paused = true;
+
+
+		public Button applyButtonTiming;
+		public Button generateAudicaButton;
+		public Button loadAudioFileTiming;
 
 		//Tools
 		private void Start() {
@@ -618,7 +624,7 @@ namespace NotReaper {
 				handType = TargetHandType.Either
 			};
 
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 200; i++) {
 				cue.tick = (480 * i) + tickOffset;
 				AddTargetFromAction(new TargetData(cue, offset));
 			}
@@ -682,6 +688,12 @@ namespace NotReaper {
 			//Difficulty manager loads stuff now
 			audicaLoaded = true;
 			difficultyManager.LoadHighestDifficulty();
+
+			//Disable timing window buttons so users don't mess stuff up.
+			applyButtonTiming.interactable = false;
+			generateAudicaButton.interactable = false;
+			loadAudioFileTiming.interactable = false;
+
 			
 
 			//Loaded successfully
@@ -900,26 +912,10 @@ namespace NotReaper {
 			}
 		}
 
-
 		bool checkForNearSustainsOnThisFrame = false;
+
 		public void Update() {
 			
-			//My custom testing stuff for figuring out how this works:
-			if (Input.GetKeyDown(KeyCode.Y))
-			{
-
-				if (notes.Count == 0)
-				{
-					Debug.Log("No notes");
-					return;
-				}
-				notes[0].behavior = TargetBehavior.Metronome;
-
-				Debug.Log("Target in notes (where it was changed): " + notes[0].behavior);
-				Debug.Log("Target in orderedNotes: " + orderedNotes[0].behavior);
-				Debug.Log("Target in loadedNotes: " + loadedNotes[0].behavior);
-			}
-
 			UpdateSustains();
 
 			if (!paused) time += Time.deltaTime * playbackSpeed;

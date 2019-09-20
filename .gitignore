@@ -15,6 +15,8 @@ CACHE/
 Assets/StreamingAssets/build_info.txt
 Assets/StreamingAssets/Ogg2Audica/song.desc.meta
 Assets/StreamingAssets/FFMPEG/output.ogg
+Assets/StreamingAssets/FFMPEG/converted.ogg
+
 
 #Assets/ModernUIPack/
 Assets/TextMesh Pro/
