@@ -159,8 +159,11 @@ namespace NotReaper.Targets {
                         sustainDirection = 0.6f;
                         break;
                 }
+                
+                l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
+                var pos2 = l.GetPosition(2);
+                l.SetPosition(2, new Vector3(pos2.x, sustainDirection, pos2.z));
             }
-
         }
 
         public void SetSustainLength(float beatLength) {

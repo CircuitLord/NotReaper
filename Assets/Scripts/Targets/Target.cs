@@ -93,6 +93,24 @@ namespace NotReaper.Targets {
 			gridTargetIcon.SetHandType(newType);
 			timelineTargetIcon.SetHandType(newType);
 			handType = newType;
+
+			 //Handedness changes how the note is visually displayed in the timeline
+			float xOffset = timelineTargetIcon.transform.localPosition.x;
+			float yOffset = 0;
+			float zOffset = 0;
+
+			switch (handType) {
+				case TargetHandType.Left:
+					yOffset = 0.1f;
+					zOffset = 0.1f;
+					break;
+				case TargetHandType.Right:
+					yOffset = -0.1f;
+					zOffset = 0.2f;
+					break;
+			}
+
+			timelineTargetIcon.transform.localPosition = new Vector3(xOffset, yOffset, zOffset);
 		}
 
 
