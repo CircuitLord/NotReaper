@@ -75,12 +75,13 @@ namespace NotReaper.UserInput {
 				yield return new WaitForSeconds(0.1f);
 			}
 
+			selectedTool = EditorTool.None;
 			SelectMode(EditorMode.Compose);
 			SelectTool(EditorTool.Standard);
 			SelectHand(TargetHandType.Left);
 			SelectVelocity(UITargetVelocity.Standard);
 
-			NotificationShower.AddNotifToQueue(new NRNotification("Welcome to NotReaper!", 8f));
+			NotificationShower.AddNotifToQueue(new NRNotification("Welcome to NotReaper!", 3f));
 
 			pauseMenu.LoadUIColors();
 			pauseMenu.OpenPauseMenu();
@@ -90,6 +91,7 @@ namespace NotReaper.UserInput {
 			timeline.UpdateUIColors();
 
 			FigureOutIsInUI();
+
 
 
 		}
