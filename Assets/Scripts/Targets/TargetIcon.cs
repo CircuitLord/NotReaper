@@ -39,6 +39,8 @@ namespace NotReaper.Targets {
 		public TargetIconLocation location;
 
         public bool isGridIcon = true;
+        
+        public ParticleSystem holdParticles;
 
         /// <summary>
         /// For when the note is right clicked on. Bool is for if it should gen an undo action
