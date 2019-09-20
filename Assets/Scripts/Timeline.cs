@@ -148,21 +148,50 @@ namespace NotReaper {
 			//dir.Delete(true);
 		}
 
+		public static int BinarySearchOrderedNotes(float cueTime)
+		{ 
+			int min = 0;
+			int max = orderedNotes.Count - 1;
+				while (min <=max) {
+				int mid = (min + max) / 2;
+				float midCueTime = orderedNotes[mid].gridTargetIcon.transform.localPosition.z;
+				if (cueTime == midCueTime) {
+					while(mid != 0 && orderedNotes[mid - 1].gridTargetIcon.transform.localPosition.z == cueTime) {
+						--mid;
+					}
+					return mid;
+				}
+				else if (cueTime < midCueTime) {
+					max = mid - 1;
+				}
+				else {
+					min = mid + 1;
+				}
+			}
+			return -1;
+		}
+		
 		public Target FindNote(TargetData data) {
-			
-			for (int i = notes.Count - 1; i >= 0 ; i--) {
-				Target t = notes[i];
+			int idx = BinarySearchOrderedNotes(data.beatTime);
+			if(idx == -1) {
+				Debug.Log("Couldn't find note with time " + data.beatTime);
+				return null;
+			}
+
+			for(int i = idx; i < orderedNotes.Count; ++i) {
+				Target t = orderedNotes[i];
 				Vector3 pos = t.gridTargetIcon.transform.localPosition;
-				if (Mathf.Approximately(t.gridTargetIcon.transform.localPosition.x, data.x) &&
-				    Mathf.Approximately(t.gridTargetIcon.transform.localPosition.y, data.y) &&
-				    Mathf.Approximately(t.gridTargetIcon.transform.localPosition.z, data.beatTime) &&
-				    t.handType == data.handType) {
+				if (Mathf.Approximately(pos.x, data.x) &&
+					Mathf.Approximately(pos.y, data.y) &&
+					Mathf.Approximately(pos.z, data.beatTime) &&
+					t.handType == data.handType) {
 					return t;
 				}
 				
 				
 			}
 
+			Debug.Log("Couldn't find note with time " + data.beatTime + " and index " + idx);
 			return null;
 		}
 
