@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using NotReaper;
 using UnityEngine;
 
 public class UISettings : MonoBehaviour
@@ -26,6 +27,11 @@ public class UISettings : MonoBehaviour
    public void OpenSettingsFile()
    {
       System.Diagnostics.Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "CircuitCubed", "NotReaper", "NRConfig.json"));
+   }
+
+   public void RegenConfig()
+   {
+      NRSettings.LoadSettingsJson(true);
    }
    
 }

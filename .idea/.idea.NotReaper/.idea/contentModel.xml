@@ -222,13 +222,13 @@
             <e p="SoundSelect" t="Include">
               <e p="SoundSelect.cs" t="Include" />
             </e>
-            <e p="StartingModal.cs" t="Include" />
             <e p="UIDifficulty.cs" t="Include" />
             <e p="UIModeSelect.cs" t="Include" />
             <e p="UINoteHandler.cs" t="Include" />
             <e p="UIToolSelect.cs" t="Include" />
           </e>
           <e p="UIMetadata.cs" t="Include" />
+          <e p="UISettings.cs" t="Include" />
           <e p="UserInput" t="Include">
             <e p="EditorInput.cs" t="Include" />
             <e p="InputManager.cs" t="Include" />

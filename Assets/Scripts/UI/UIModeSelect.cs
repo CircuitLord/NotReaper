@@ -18,6 +18,7 @@ namespace NotReaper.UI {
 
         public UIMetadata uIMetadata;
         public UITiming uITiming;
+        public UISettings uISettings;
         public float startOffset = 51.08f;
         public float indexOffset = 66.6f;
 
@@ -55,6 +56,9 @@ namespace NotReaper.UI {
 
                     uITiming.StopAllCoroutines();
                     StartCoroutine(uITiming.FadeOut());
+                    
+                    uISettings.Deactivate();
+                    
 
                     break;
 
@@ -67,6 +71,8 @@ namespace NotReaper.UI {
 
                     uITiming.StopAllCoroutines();
                     StartCoroutine(uITiming.FadeOut());
+                    
+                    uISettings.Deactivate();
                     
 
 
@@ -84,6 +90,8 @@ namespace NotReaper.UI {
 
                     uIMetadata.StopAllCoroutines();
                     StartCoroutine(uIMetadata.FadeOut());
+                    
+                    uISettings.Deactivate();
 
                     break;
 
@@ -96,6 +104,10 @@ namespace NotReaper.UI {
 
                     uITiming.StopAllCoroutines();
                     StartCoroutine(uITiming.FadeOut());
+                    
+                    uISettings.Activate();
+                    
+                    
 
                     break;
 

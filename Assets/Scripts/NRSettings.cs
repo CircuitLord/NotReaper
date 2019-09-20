@@ -28,9 +28,9 @@ namespace NotReaper {
                 Debug.LogError(e);
             }
 
-            config.leftColor = new Color((float)config.userLeftColor.r, (float)config.userLeftColor.g, (float)config.userLeftColor.b);
-            config.rightColor = new Color((float)config.userRightColor.r, (float)config.userRightColor.g, (float)config.userRightColor.b);
-            config.selectedHighlightColor = new Color((float)config.userSelectedHighlightColor.r, (float)config.userSelectedHighlightColor.g, (float)config.userSelectedHighlightColor.b);
+            //config.leftColor = new Color((float)config.userLeftColor.r, (float)config.userLeftColor.g, (float)config.userLeftColor.b);
+            //config.rightColor = new Color((float)config.userRightColor.r, (float)config.userRightColor.g, (float)config.userRightColor.b);
+            //config.selectedHighlightColor = new Color((float)config.userSelectedHighlightColor.r, (float)config.userSelectedHighlightColor.g, (float)config.userSelectedHighlightColor.b);
 
 
             isLoaded = true;
@@ -49,6 +49,8 @@ namespace NotReaper {
             Debug.Log("Generating new configuration file...");
 
             NRJsonSettings temp = new NRJsonSettings();
+
+            if (File.Exists(configFilePath)) File.Delete(configFilePath);
             
             File.WriteAllText(configFilePath, JsonUtility.ToJson(temp, true));
 
@@ -66,26 +68,14 @@ namespace NotReaper {
 
     [System.Serializable]
     public class NRJsonSettings {
-        public UserColor userLeftColor = new UserColor() {
-            r = 0.05,
-            g = 0.6,
-            b = 0.8
-        };
-        public Color leftColor;
+
+        public Color leftColor = new Color(0.0f, 0.5f, 1.0f, 1.0f);
         
-        public UserColor userRightColor = new UserColor() {
-            r = 0.9,
-            g = 0.5,
-            b = 0.05
-        };
-        public Color rightColor;
+
+        public Color rightColor = new Color(1.0f, 0.47f, 0.14f, 1.0f);
         
-        public UserColor userSelectedHighlightColor = new UserColor() {
-            r = 1.0,
-            g = 0.5,
-            b = 0.0
-        };
-        public Color selectedHighlightColor;
+
+        public Color selectedHighlightColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
         public double mainVol = 0.5f;
         public double noteVol = 0.5f;

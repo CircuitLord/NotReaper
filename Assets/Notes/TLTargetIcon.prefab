@@ -74,6 +74,7 @@ MonoBehaviour:
   isSelected: 0
   location: 0
   isGridIcon: 1
+  holdParticles: {fileID: 0}
 --- !u!135 &7134394305720867247
 SphereCollider:
   m_ObjectHideFlags: 0

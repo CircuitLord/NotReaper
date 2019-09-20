@@ -149,14 +149,18 @@ namespace NotReaper {
 		}
 
 		public Target FindNote(TargetData data) {
-			foreach (Target t in notes) {
+			
+			for (int i = notes.Count - 1; i >= 0 ; i--) {
+				Target t = notes[i];
 				Vector3 pos = t.gridTargetIcon.transform.localPosition;
 				if (Mathf.Approximately(t.gridTargetIcon.transform.localPosition.x, data.x) &&
-					Mathf.Approximately(t.gridTargetIcon.transform.localPosition.y, data.y) &&
-					Mathf.Approximately(t.gridTargetIcon.transform.localPosition.z, data.beatTime) &&
-					t.handType == data.handType) {
+				    Mathf.Approximately(t.gridTargetIcon.transform.localPosition.y, data.y) &&
+				    Mathf.Approximately(t.gridTargetIcon.transform.localPosition.z, data.beatTime) &&
+				    t.handType == data.handType) {
 					return t;
 				}
+				
+				
 			}
 
 			return null;
