@@ -89,13 +89,12 @@ namespace NotReaper.UserInput {
 
 			pauseMenu.LoadUIColors();
 			pauseMenu.OpenPauseMenu();
-
+			
+			shortcutMenu.LoadUIColors();
 			soundSelect.LoadUIColors();
-
 			timeline.UpdateUIColors();
 
 			FigureOutIsInUI();
-
 			StartCoroutine(LoadBGImage("file://" + NRSettings.config.bgImagePath));
 
 
@@ -374,6 +373,14 @@ namespace NotReaper.UserInput {
 			}
 
 			if (inUI) return;
+
+			if (Input.GetKeyDown(KeyCode.F1)) {
+				shortcutMenu.show();
+			}
+
+			if (Input.GetKeyUp(KeyCode.F1)) {
+				shortcutMenu.hide();
+			}
 
 			if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {
 				SelectTool(EditorTool.DragSelect);
