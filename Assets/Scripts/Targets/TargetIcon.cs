@@ -32,13 +32,11 @@ namespace NotReaper.Targets {
         public SpriteRenderer meleeOutline;
         public SphereCollider sphereCollider;
 
-        public TargetVelocity velocity = TargetVelocity.Standard;
-        public TargetBehavior behavior = TargetBehavior.Standard;
+        public TargetData data;
+
         public float sustainDirection = 0.6f;
         public bool isSelected = false;
 		public TargetIconLocation location;
-
-        public bool isGridIcon = true;
         
         public ParticleSystem holdParticles;
 
@@ -77,7 +75,12 @@ namespace NotReaper.Targets {
             TryDeselectEvent();
         }
 
-
+        public void Init(TargetData targetData) {
+            data = targetData;
+            data.HandTypeChangeEvent += OnHandTypeChanged;
+            data.BehaviourChangeEvent += OnBehaviorChanged;
+            data.BeatLengthChangeEvent += OnSustainLengthChanged;
+        }
 
         public void EnableSelected(TargetBehavior behavior) {
             standardOutline.enabled = (behavior == TargetBehavior.Standard);
@@ -89,7 +92,6 @@ namespace NotReaper.Targets {
             meleeOutline.enabled = (behavior == TargetBehavior.Melee);
 
             isSelected = true;
-
         }
 
         public void DisableSelected() {
@@ -116,7 +118,7 @@ namespace NotReaper.Targets {
             meleeOutline.color = color;
         }
 
-        public void SetHandType(TargetHandType handType) {
+        private void OnHandTypeChanged(TargetHandType handType) {
             foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true)) {
 
                 if (r.name == "WhiteRing") continue;
@@ -161,7 +163,7 @@ namespace NotReaper.Targets {
                 }
                 
                 
-                if (behavior == TargetBehavior.Hold && l.positionCount >= 3) {
+                if (data.behavior == TargetBehavior.Hold && l.positionCount >= 3) {
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
                     var pos2 = l.GetPosition(2);
                     l.SetPosition(2, new Vector3(pos2.x, sustainDirection, pos2.z));
@@ -169,12 +171,24 @@ namespace NotReaper.Targets {
             }
         }
 
-        public void SetSustainLength(float beatLength) {
-            
+        private void OnSustainLengthChanged(float beatLength) {
+            UpdateTimelineSustainLength();
+        }
+
+        public void UpdateTimelineSustainLength() {
+            if (data.behavior != TargetBehavior.Hold) {
+                return;
+            }
+
             float scale = 20.0f / Timeline.scale;
+            float beatLength = data.beatLength;
 
             var lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>(true);
             foreach (LineRenderer l in lineRenderers) {
+                if(l.positionCount < 3) {
+                    continue;
+                }
+                
                 if (beatLength >= 1) {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
@@ -188,7 +202,7 @@ namespace NotReaper.Targets {
             }
         }
 
-        public void SetBehavior(TargetBehavior b) {
+        private void OnBehaviorChanged(TargetBehavior b) {
             standard.SetActive(b == TargetBehavior.Standard);
             hold.SetActive(b == TargetBehavior.Hold);
             horizontal.SetActive(b == TargetBehavior.Horizontal);
@@ -196,8 +210,6 @@ namespace NotReaper.Targets {
             chainStart.SetActive(b == TargetBehavior.ChainStart);
             chain.SetActive(b == TargetBehavior.Chain);
             melee.SetActive(b == TargetBehavior.Melee);
-
-            this.behavior = b;
         }
     }
 }

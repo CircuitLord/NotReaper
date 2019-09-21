@@ -154,7 +154,7 @@ namespace NotReaper {
 		}
 
 		public void SortOrderedList() {
-			orderedNotes.Sort((left, right) =>  left.gridTargetIcon.transform.localPosition.z.CompareTo(right.gridTargetIcon.transform.localPosition.z));
+			orderedNotes.Sort((left, right) =>  left.data.beatTime.CompareTo(right.data.beatTime));
 		}
 
 		public static int BinarySearchOrderedNotes(float cueTime)
@@ -163,9 +163,9 @@ namespace NotReaper {
 			int max = orderedNotes.Count - 1;
 				while (min <=max) {
 				int mid = (min + max) / 2;
-				float midCueTime = orderedNotes[mid].gridTargetIcon.transform.localPosition.z;
+				float midCueTime = orderedNotes[mid].data.beatTime;
 				if (cueTime == midCueTime) {
-					while(mid != 0 && orderedNotes[mid - 1].gridTargetIcon.transform.localPosition.z == cueTime) {
+					while(mid != 0 && orderedNotes[mid - 1].data.beatTime == cueTime) {
 						--mid;
 					}
 					return mid;
@@ -189,11 +189,10 @@ namespace NotReaper {
 
 			for(int i = idx; i < orderedNotes.Count; ++i) {
 				Target t = orderedNotes[i];
-				Vector3 pos = t.gridTargetIcon.transform.localPosition;
-				if (Mathf.Approximately(pos.x, data.x) &&
-					Mathf.Approximately(pos.y, data.y) &&
-					Mathf.Approximately(pos.z, data.beatTime) &&
-					t.handType == data.handType) {
+				if (Mathf.Approximately(t.data.x, data.x) &&
+					Mathf.Approximately(t.data.y, data.y) &&
+					Mathf.Approximately(t.data.beatTime, data.beatTime) &&
+					t.data.handType == data.handType) {
 					return t;
 				}
 				
@@ -221,6 +220,10 @@ namespace NotReaper {
 
 		//Use when adding a singular target to the project (from the user)
 		public void AddTarget(float x, float y) {
+			if(audicaLoaded == false) {
+				return;
+			}
+
 			TargetData data = new TargetData();
 			data.x = x;
 			data.y = y;
@@ -230,7 +233,7 @@ namespace NotReaper {
 			float tempTime = GetClosestBeatSnapped(DurationToBeats(time));
 
 			foreach (Target target in loadedNotes) {
-				if (Mathf.Approximately(target.gridTargetPos.z, tempTime) && (target.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
+				if (Mathf.Approximately(target.data.beatTime, tempTime) && (target.data.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 
 			data.beatTime = GetClosestBeatSnapped(DurationToBeats(time));
@@ -277,39 +280,25 @@ namespace NotReaper {
 
 		public Target AddTargetFromAction(TargetData targetData) {
 
-			Target target = new Target();
-			target.timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
-			target.timelineTargetIcon.location = TargetIconLocation.Timeline;
-			var transform1 = target.timelineTargetIcon.transform;
+			var timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
+			timelineTargetIcon.location = TargetIconLocation.Timeline;
+			var transform1 = timelineTargetIcon.transform;
 			transform1.localPosition = new Vector3(targetData.beatTime, 0, 0);
-			//transform1.localScale = targetScale * Vector3.one;
-			target.timelineTargetIcon.isGridIcon = false;
 
 			Vector3 noteScale = transform1.localScale;
 			noteScale.x = targetScale;
 			transform1.localScale = noteScale;
 
+			var gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
+			gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.beatTime);
+			gridTargetIcon.location = TargetIconLocation.Grid;
 
-			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
-			target.gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.beatTime);
-			target.gridTargetIcon.location = TargetIconLocation.Grid;
-			target.gridTargetIcon.isGridIcon = true;
-
-			target.SetHandType(targetData.handType);
-			target.SetBehavior(targetData.behavior);
-			target.SetVelocity(targetData.velocity);
-
-			if (target.behavior == TargetBehavior.Hold) {
-				target.SetBeatLength(targetData.beatLength);
-			} else {
-				target.SetBeatLength(0.25f);
-			}
+			Target target = new Target(targetData, timelineTargetIcon, gridTargetIcon);
 
 			//Now that all initial dependencies are met, we can init the target. (Loads sustain controller and outline color)
 			target.Init();
 			notes.Add(target);
-			orderedNotes = notes.OrderBy(v => v.gridTargetIcon.transform.position.z).ToList();
-
+			orderedNotes = notes.OrderBy(v => v.data.beatTime).ToList();
 
 			//Subscribe to the delete note event so we can delete it if the user wants. And other events.
 			target.DeleteNoteEvent += DeleteTarget;
@@ -327,26 +316,26 @@ namespace NotReaper {
 
 		private void UpdateSustains() {
 			foreach (var note in loadedNotes) {
-				if (note.behavior == TargetBehavior.Hold) {
-					if ((note.gridTargetIcon.transform.position.z < 0) && (note.gridTargetIcon.transform.position.z + note.beatLength / 480f > 0))
+				if (note.data.behavior == TargetBehavior.Hold) {
+					if ((note.GetRelativeBeatTime() < 0) && (note.GetRelativeBeatTime() + note.data.beatLength / 480f > 0))
 					{
 
-						var particles = note.gridTargetIcon.holdParticles;
+						var particles = note.GetHoldParticles();
 						if (!particles.isEmitting) {
 							particles.Play();
 
-							float panPos = (float) (note.gridTargetIcon.transform.position.x / 7.15);
-							if (note.handType == TargetHandType.Left) {
+							float panPos = (float) (note.data.x / 7.15);
+							if (note.data.handType == TargetHandType.Left) {
 								leftSustainAud.volume = sustainVolume;
 								leftSustainAud.panStereo = panPos;
 
-							} else if (note.handType == TargetHandType.Right) {
+							} else if (note.data.handType == TargetHandType.Right) {
 								rightSustainAud.volume = sustainVolume;
 								rightSustainAud.panStereo = panPos;
 							}
 
 							var main = particles.main;
-							main.startColor = note.handType == TargetHandType.Left ? new Color(leftColor.r, leftColor.g, leftColor.b, 1) : new Color(rightColor.r, rightColor.g, rightColor.b, 1);
+							main.startColor = note.data.handType == TargetHandType.Left ? new Color(leftColor.r, leftColor.g, leftColor.b, 1) : new Color(rightColor.r, rightColor.g, rightColor.b, 1);
 						}
 
 						ParticleSystem.Particle[] parts = new ParticleSystem.Particle[particles.particleCount];
@@ -360,12 +349,12 @@ namespace NotReaper {
 
 					} else
 					{
-						var particles = note.gridTargetIcon.holdParticles;
+						var particles = note.GetHoldParticles();
 						if (particles.isEmitting) {
 							particles.Stop();
-							if (note.handType == TargetHandType.Left) {
+							if (note.data.handType == TargetHandType.Left) {
 								leftSustainAud.volume = 0.0f;
-							} else if (note.handType == TargetHandType.Right) {
+							} else if (note.data.handType == TargetHandType.Right) {
 								rightSustainAud.volume = 0.0f;
 							}
 						}
@@ -418,39 +407,25 @@ namespace NotReaper {
 		/// <param name="target">The target to affect</param>
 		/// <param name="increase">If true, increase by one beat snap, if false, the opposite.</param>
 		public void UpdateSustainLength(Target target, bool increase) {
-			if (target.behavior != TargetBehavior.Hold) return;
+			if (target.data.behavior != TargetBehavior.Hold) return;
 
 			if (increase) {
-				target.UpdateSustainBeatLength(target.beatLength += (480 / beatSnap) * 4f);
+				target.data.beatLength += (480 / beatSnap) * 4f;
 			} else {
-				target.UpdateSustainBeatLength(Mathf.Max(target.beatLength -= (480 / beatSnap) * 4f, 120));
-			}
-		}
-		
-		public void updateSustainEnd(Target target) {
-			if (target.behavior == TargetBehavior.Hold) {
-				var holdManager = target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
-				var holdEnd = holdManager.endMarker;
-
-				if (holdEnd) {
-					var targetPosition = target.gridTargetIcon.transform.localPosition;
-					var sustainEndPosition = targetPosition.z + (holdManager.sustainLength / 480);
-					holdEnd.transform.localPosition = new Vector3(targetPosition.x, targetPosition.y, sustainEndPosition);
-				}
+				target.data.beatLength = Mathf.Max(target.data.beatLength - (480 / beatSnap) * 4f, 120);
 			}
 		}
 
-		public void MoveGridTargets(List<TargetMoveIntent> intents) {
+		public void MoveGridTargets(List<TargetGridMoveIntent> intents) {
 			var action = new NRActionGridMoveNotes();
-			action.targetGridMoveIntents = intents.Select(intent => new TargetDataMoveIntent(intent)).ToList();
+			action.targetGridMoveIntents = intents.Select(intent => new TargetGridMoveIntent(intent)).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void MoveTimelineTargets(List<TargetMoveIntent> intents) {
+		public void MoveTimelineTargets(List<TargetTimelineMoveIntent> intents) {
 			SortOrderedList();
-
 			var action = new NRActionTimelineMoveNotes();
-			action.targetTimelineMoveIntents = intents.Select(intent => new TargetDataMoveIntent(intent)).ToList();
+			action.targetTimelineMoveIntents = intents.Select(intent => new TargetTimelineMoveIntent(intent)).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
@@ -479,39 +454,39 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 
 			DeselectAllTargets();
-			FindNotes(targetDataList).ForEach(target => target.gridTargetIcon.TrySelect());
+			FindNotes(targetDataList).ForEach(target => SelectTarget(target));
 		}
 
 		// Invert the selected targets' colour
 		public void SwapTargets(List<Target> targets) {
 			var action = new NRActionSwapNoteColors();
-			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
+			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
 		// Flip the selected targets on the grid about the X
 		public void FlipTargetsHorizontal(List<Target> targets) {
 			var action = new NRActionHFlipNotes();
-			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
+			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
 		// Flip the selected targets on the grid about the Y
 		public void FlipTargetsVertical(List<Target> targets) {
 			var action = new NRActionVFlipNotes();
-			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
+			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 		
 		public void SetTargetHitsounds(List<TargetSetHitsoundIntent> intents) {
 			var action = new NRActionSetTargetHitsound();
-			action.targetSetHitsoundIntents = intents.Select(intent => new TargetDataSetHitsoundIntent(intent)).ToList();
+			action.targetSetHitsoundIntents = intents.Select(intent => new TargetSetHitsoundIntent(intent)).ToList();
 			Tools.undoRedoManager.AddAction(action);
 	}
 
 		public void DeleteTarget(Target target) {
 			var action = new NRActionRemoveNote();
-			action.targetData = new TargetData(target);
+			action.targetData = new TargetData(target.data);
 			Tools.undoRedoManager.AddAction(action);
 		}
 
@@ -524,53 +499,26 @@ namespace NotReaper {
 			loadedNotes.Remove(target);
 			selectedNotes.Remove(target);
 
-			if (target.gridTargetIcon)
-				Destroy(target.gridTargetIcon.gameObject);
-
-			if (target.timelineTargetIcon)
-				Destroy(target.timelineTargetIcon.gameObject);
-
+			target.Destroy();
 			target = null;
 		}
 
 		public void DeleteTargets(List<Target> targets) {
 			var action = new NRActionMultiRemoveNote();
-			action.affectedTargets = targets.Select(target => new TargetData(target)).ToList();
+			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
 		public void DeleteAllTargets() {
 			foreach (Target target in notes) {
-				//if (obj)
-				Destroy(target.gridTargetIcon.gameObject);
-				Destroy(target.timelineTargetIcon.gameObject);
+				target.Destroy();
 			}
-
-			//Second check through ordered notes to make sure they're all gone.
-			foreach (Target obj in orderedNotes) {
-				if (obj.gridTargetIcon)
-					Destroy(obj.gridTargetIcon.gameObject);
-				if (obj.timelineTargetIcon)
-					Destroy(obj.timelineTargetIcon.gameObject);
-			}
-
-			//foreach (TimelineTarget obj in notesTimeline) {
-			//    if (obj)
-			//       Destroy(obj.gameObject);
-			//}
 
 			notes = new List<Target>();
 			orderedNotes = new List<Target>();
 			loadedNotes = new List<Target>();
 			selectedNotes = new List<Target>();
-
-			//var liner = gridTransformParent.gameObject.GetComponentInChildren<LineRenderer>();
-			//if (liner) {
-			//	liner.SetPositions(new Vector3[0]);
-			//	liner.positionCount = 0;
-			//}
-
-			//time = 0;
+			Tools.undoRedoManager.ClearActions();
 		}
 
 
@@ -581,7 +529,7 @@ namespace NotReaper {
 			export.cues = new List<Cue>();
 
 			foreach (Target target in orderedNotes) {
-				if (target.behavior == TargetBehavior.Metronome) continue;
+				if (target.data.behavior == TargetBehavior.Metronome) continue;
 				export.cues.Add(NotePosCalc.ToCue(target, offset, false));
 			}
 
@@ -870,9 +818,7 @@ namespace NotReaper {
 			scale = newScale;
 
 			foreach (Target target in orderedNotes) {
-				if (target.behavior == TargetBehavior.Hold) {
-					target.timelineTargetIcon.SetSustainLength(target.beatLength);
-				}
+				target.UpdateTimelineSustainLength();
 			}
 		}
 
@@ -899,15 +845,12 @@ namespace NotReaper {
 
 				while (j < orderedNotes.Count) {
 
-					float targetPos = orderedNotes[j].gridTargetIcon.transform.position.z;
+					float targetPos = orderedNotes[j].GetRelativeBeatTime();
 
 					if (targetPos > -20 && targetPos < 20) {
-						orderedNotes[j].gridTargetIcon.sphereCollider.enabled = true;
-						orderedNotes[j].timelineTargetIcon.sphereCollider.enabled = true;
+						orderedNotes[j].EnableColliders();
 					} else {
-						orderedNotes[j].gridTargetIcon.sphereCollider.enabled = false;
-						//TODO: This might break stuff if the user zooms out
-						orderedNotes[j].timelineTargetIcon.sphereCollider.enabled = false;
+						orderedNotes[j].DisableColliders();
 					}
 
 
@@ -922,12 +865,12 @@ namespace NotReaper {
 			}
 
 			while (j < orderedNotes.Count) {
-				float targetPos = orderedNotes[j].gridTargetIcon.transform.position.z;
+				float targetPos = orderedNotes[j].GetRelativeBeatTime();
 
 				if (targetPos > -20 && targetPos < 20) {
-					orderedNotes[j].gridTargetIcon.sphereCollider.enabled = true;
+					orderedNotes[j].EnableGridColliders();
 				} else {
-					orderedNotes[j].gridTargetIcon.sphereCollider.enabled = false;
+					orderedNotes[j].DisableGridColliders();
 				}
 				j++;
 			}
@@ -938,11 +881,11 @@ namespace NotReaper {
 
 		public void EnableNearSustainButtons() {
 			foreach (Target target in loadedNotes) {
-				if (target.behavior != TargetBehavior.Hold) continue;
-				if (paused && EditorInput.selectedTool == EditorTool.DragSelect && target.gridTargetIcon.transform.position.z < 2 && target.gridTargetIcon.transform.position.z > -2) {
-					target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>().EnableSustainButtons();
+				if (target.data.behavior != TargetBehavior.Hold) continue;
+				if (paused && EditorInput.selectedTool == EditorTool.DragSelect && target.GetRelativeBeatTime() < 2 && target.GetRelativeBeatTime() > -2) {
+					target.EnableSustainButtons();
 				} else {
-					target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>().DisableSustainButtons();
+					target.DisableSustainButtons();
 				}
 			}
 		}
