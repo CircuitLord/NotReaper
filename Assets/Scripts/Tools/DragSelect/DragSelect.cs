@@ -207,9 +207,7 @@ namespace NotReaper.Tools {
 		public void EndAllDragStuff() {
 			if (isDraggingNotesOnTimeline) {
 				EndDragTimelineTargetAction();
-				//isDraggingNotesOnTimeline = false;
 			} else if (isDraggingNotesOnGrid) {
-				//isDraggingNotesOnGrid = false;
 				EndDragGridTargetAction();
 			}
 
@@ -416,17 +414,11 @@ namespace NotReaper.Tools {
 
 					foreach (TargetMoveIntent intent in gridTargetMoveIntents) {
 
-						//var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 						var offsetFromDragPoint = intent.target.gridTargetPos - startDragMovePos;
-						//Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
 						var tempNewPos = newPos + offsetFromDragPoint;
 						intent.target.gridTargetIcon.transform.localPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
-						if (intent.target.behavior == TargetBehavior.Hold) {
-							var holdEnd = intent.target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>().endMarker;
-							if (holdEnd) holdEnd.transform.localPosition = new Vector3(tempNewPos.x, tempNewPos.y, holdEnd.transform.localPosition.z);
-						}
-
-						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+						
+						timeline.updateSustainEnd(intent.target);
 
 						intent.intendedPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
 					}
@@ -448,11 +440,15 @@ namespace NotReaper.Tools {
 						intent.target.timelineTargetIcon.transform.localPosition = new Vector3(newPos.x, pos.y, pos.z);
 						intent.target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
 
+						timeline.updateSustainEnd(intent.target);
+
 						intent.intendedPosition = new Vector3(newPos.x, pos.y, pos.z);
 					}
 				}
 			}
 		}
+
+
 
 		private Vector3 SnapToBeat(Vector3 position) {
 			var increments = ((480 / timeline.beatSnap) * 4f) / 480; // what even is life //42

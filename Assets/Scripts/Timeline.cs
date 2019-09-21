@@ -386,7 +386,6 @@ namespace NotReaper {
 				selectedNotes.Add(target);
 				target.Select();
 			}
-
 		}
 
 
@@ -401,14 +400,15 @@ namespace NotReaper {
 			}
 
 		}
+
 		public void DeselectAllTargets() {
 			foreach (Target target in selectedNotes) {
 				DeselectTarget(target, true);
 			}
+
 			selectedNotes = new List<Target>();
 		}
-
-
+		
 		/// <summary>
 		/// Updates a sustain length from the buttons next to sustains.
 		/// </summary>
@@ -421,6 +421,19 @@ namespace NotReaper {
 				target.UpdateSustainBeatLength(target.beatLength += (480 / beatSnap) * 4f);
 			} else {
 				target.UpdateSustainBeatLength(Mathf.Max(target.beatLength -= (480 / beatSnap) * 4f, 120));
+			}
+		}
+		
+		public void updateSustainEnd(Target target) {
+			if (target.behavior == TargetBehavior.Hold) {
+				var holdManager = target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
+				var holdEnd = holdManager.endMarker;
+
+				if (holdEnd) {
+					var targetPosition = target.gridTargetIcon.transform.localPosition;
+					var sustainEndPosition = targetPosition.z + (holdManager.sustainLength / 480);
+					holdEnd.transform.localPosition = new Vector3(targetPosition.x, targetPosition.y, sustainEndPosition);
+				}
 			}
 		}
 
@@ -719,8 +732,7 @@ namespace NotReaper {
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
 					aud.clip = myClip;
 					previewAud.clip = myClip;
-
-
+					
 					SetBPM((float) desc.tempo);
 					audioLoaded = true;
 					audicaLoaded = true;
