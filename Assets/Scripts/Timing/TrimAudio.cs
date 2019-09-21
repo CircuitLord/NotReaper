@@ -45,16 +45,15 @@ namespace NotReaper.Timing {
             
             Debug.Log(path);
 
-            path = path.Replace(@"'", @"\''");
+            //path = path.Replace(@"'", @"\'");
             
             Debug.Log(path);
             
-            return;
-            
+            UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output));
 
             ffmpeg.StartInfo.Arguments = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
 
-            UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output));
+
 
 
             ffmpeg.Start();

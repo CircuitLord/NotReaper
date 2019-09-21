@@ -964,7 +964,10 @@ namespace NotReaper {
 
 			if (!paused) time += Time.deltaTime * playbackSpeed;
 
+			bool isScrollingBeatSnap = false;
+			
 			bool isShiftDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+			bool isAltDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
 
 			if (hover) {
 				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
@@ -976,9 +979,19 @@ namespace NotReaper {
 					SetBeatTime(time);
 				}
 			}
+
+			if (isAltDown && Input.mouseScrollDelta.y < -0.1f) {
+				isScrollingBeatSnap = true;
+				beatSnapSelector.ForwardClick();
+
+			} else if (isAltDown && Input.mouseScrollDelta.y > 0.11f) {
+				isScrollingBeatSnap = true;
+				beatSnapSelector.PreviousClick();
+			}
+			
 			//if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
 
-			if (!isShiftDown && Input.mouseScrollDelta.y < -0.1f) {
+			if (!isShiftDown && Input.mouseScrollDelta.y < -0.1f && !isScrollingBeatSnap) {
 				if (!audioLoaded) return;
 				time += BeatsToDuration(4f / beatSnap);
 				time = SnapTime(time);
@@ -994,7 +1007,7 @@ namespace NotReaper {
 				StopCoroutine(AnimateSetTime(0));
 
 
-			} else if (!isShiftDown && Input.mouseScrollDelta.y > 0.1f) {
+			} else if (!isShiftDown && Input.mouseScrollDelta.y > 0.1f && !isScrollingBeatSnap) {
 				if (!audioLoaded) return;
 				time -= BeatsToDuration(4f / beatSnap);
 				time = SnapTime(time);
