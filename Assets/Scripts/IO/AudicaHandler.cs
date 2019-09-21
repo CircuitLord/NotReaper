@@ -3,6 +3,8 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using Ionic.Zip;
+using Melanchall.DryWetMidi.Smf;
+using Melanchall.DryWetMidi.Smf.Interaction;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -14,9 +16,6 @@ namespace NotReaper.IO {
 		public static AudicaFile LoadAudicaFile(string path) {
 
 			AudicaFile audicaFile = new AudicaFile();
-
-			
-
 			ZipFile audicaZip = ZipFile.Read(path);
 
 			string appPath = Application.dataPath;
@@ -56,16 +55,12 @@ namespace NotReaper.IO {
 				} else if (entry.FileName == "beginner.cues") {
 					entry.Extract($"{appPath}/.cache");
 					easy = true;
-				}
-
+				} 
 			}
-
-			
 
 			//Now we fill the audicaFile var with all the things it needs.
 			//Remember, all props in audicaFile.desc refer to either moggsong or the name of the mogg.
 			//Real clips are stored in main audicaFile object.
-
 
 			//Load the cues files.
 			if (expert) {
@@ -97,6 +92,10 @@ namespace NotReaper.IO {
 				} else if (entry.FileName == audicaFile.desc.sustainSongRight) {
 					entry.Extract(temp);
 					audicaFile.desc.moggSustainSongRight = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray())) [0];
+					
+				} else if (entry.FileName == "song.mid") {
+					entry.Extract($"{appPath}/.cache", ExtractExistingFileAction.OverwriteSilently);
+					audicaFile.song_mid = MidiFile.Read($"{appPath}/.cache/song.mid");
 				}
 
 				temp.SetLength(0);
@@ -106,13 +105,13 @@ namespace NotReaper.IO {
 
 			bool mainSongCached = false, sustainRightCached = false, sustainLeftCached = false;
 
-			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg"))
+			if (File.Exists($"{appPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg"))
 				mainSongCached = true;
 
-			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg"))
+			if (File.Exists($"{appPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg"))
 				sustainRightCached = true;
 
-			if (File.Exists($"{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg"))
+			if (File.Exists($"{appPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg"))
 				sustainLeftCached = true;
 
 
