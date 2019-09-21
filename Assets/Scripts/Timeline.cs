@@ -574,7 +574,9 @@ namespace NotReaper {
 		}
 
 
-		public void Export() {
+		public void Export()
+		{
+
 			string dirpath = Application.persistentDataPath;
 
 			CueFile export = new CueFile();
@@ -672,16 +674,19 @@ namespace NotReaper {
 			if (audicaLoaded) {
 				Export();
 			}
+			
 
-			DeleteAllTargets();
 
-			audicaFile = null;
 
 			if (loadRecent) {
+				audicaFile = null;
+				DeleteAllTargets();
 				audicaFile = AudicaHandler.LoadAudicaFile(PlayerPrefs.GetString("recentFile", null));
 				if (audicaFile == null) return false;
 
 			} else if (filePath != null) {
+				audicaFile = null;
+				DeleteAllTargets();
 				audicaFile = AudicaHandler.LoadAudicaFile(filePath);
 				PlayerPrefs.SetString("recentFile", audicaFile.filepath);
 
@@ -690,6 +695,10 @@ namespace NotReaper {
 				string[] paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Path.Combine(Application.persistentDataPath), "audica", false);
 
 				if (paths.Length == 0) return false;
+				
+				audicaFile = null;
+				DeleteAllTargets();
+				
 				audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
 				PlayerPrefs.SetString("recentFile", paths[0]);
 			}
@@ -700,13 +709,13 @@ namespace NotReaper {
 			if (audicaFile.song_mid != null) {
 				// TODO: Multi-bpm support :(
 				var midiBpm = audicaFile.song_mid.GetTempoMap().Tempo.AtTime(0).BeatsPerMinute;
-				if (midiBpm != desc.tempo) {
-					if (EditorUtility.DisplayDialog("BPM mismatch",
-						"Detected different BPM values in midi and song.desc. NotReaper does not currently support multi-bpm tracks.",
-						$"Use midi ({midiBpm})", $"Use song.desc ({desc.tempo})")) {
+				//if (midiBpm != desc.tempo) {
+					//if (EditorUtility.DisplayDialog("BPM mismatch",
+						//"Detected different BPM values in midi and song.desc. NotReaper does not currently support multi-bpm tracks.",
+					//	$"Use midi ({midiBpm})", $"Use song.desc ({desc.tempo})")) {
 						desc.tempo = midiBpm;
-					}
-				}
+					//}
+				//}
 			} 
 
 			//Update our discord presence

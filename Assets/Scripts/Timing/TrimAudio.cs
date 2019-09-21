@@ -7,6 +7,7 @@ using NAudio.Vorbis;
 using NAudio.Wave;
 using NVorbis;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace NotReaper.Timing {
 
@@ -25,7 +26,7 @@ namespace NotReaper.Timing {
         Process ffmpeg = new Process();
 
         public TrimAudio() {
-            string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG/ffmpeg.exe");
+            string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg.exe");
 			ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
 			ffmpeg.StartInfo.FileName = ffmpegPath;
             ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
@@ -41,6 +42,15 @@ namespace NotReaper.Timing {
             double offsetInMS = TicksToMS(offset, tempo);
             
             double ms = Math.Abs(GettingOffsetThing(offsetInMS, tempo));
+            
+            Debug.Log(path);
+
+            path = path.Replace(@"'", @"\''");
+            
+            Debug.Log(path);
+            
+            return;
+            
 
             ffmpeg.StartInfo.Arguments = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
 
