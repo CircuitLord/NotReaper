@@ -19,7 +19,7 @@ namespace NotReaper.UI {
         public UIMetadata uIMetadata;
         public UITiming uITiming;
         public UISettings uISettings;
-        public float startOffset = 51.08f;
+        public float startOffset = 80f;
         public float indexOffset = 66.6f;
 
     
@@ -97,7 +97,7 @@ namespace NotReaper.UI {
 
                 case EditorMode.Settings:
 
-                    DOSliderToButton(3, Color.white);
+                    DOSliderToButton(2, Color.white);
 
                     uIMetadata.StopAllCoroutines();
                     StartCoroutine(uIMetadata.FadeOut());
