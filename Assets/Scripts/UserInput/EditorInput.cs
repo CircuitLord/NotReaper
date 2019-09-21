@@ -8,6 +8,7 @@ using NotReaper.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace NotReaper.UserInput {
@@ -19,7 +20,7 @@ namespace NotReaper.UserInput {
 	public class EditorInput : MonoBehaviour {
 
 		public static EditorTool selectedTool = EditorTool.Standard;
-        public static EditorTool previousTool = EditorTool.Standard;
+		public static EditorTool previousTool = EditorTool.Standard;
 		public static TargetHandType selectedHand = TargetHandType.Left;
 		public static TargetHandType previousHand = TargetHandType.Left;
 		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
@@ -54,15 +55,15 @@ namespace NotReaper.UserInput {
 		public GameObject meleeGrid;
 
 
-
 		public UIModeSelect editorMode;
+
+		public Image bgImage;
 
 		bool isCTRLDown;
 		bool isShiftDown;
 
 		private void Start() {
 			InputManager.LoadHotkeys();
-
 
 
 			StartCoroutine(WaitForUserColors());
@@ -92,8 +93,31 @@ namespace NotReaper.UserInput {
 
 			FigureOutIsInUI();
 
+			StartCoroutine(LoadBGImage("file://" + NRSettings.config.bgImagePath));
 
 
+		}
+
+
+		IEnumerator LoadBGImage(string URL) {
+			WWW www = new WWW(URL);
+			while (!www.isDone) {
+				//Debug.Log("Download image on progress" + www.progress);
+				yield return null;
+			}
+
+			if (!string.IsNullOrEmpty(www.error)) {
+				Debug.Log("Download failed");
+			} else {
+				Debug.Log("BG Loaded");
+				Texture2D texture = new Texture2D(1, 1);
+				www.LoadImageIntoTexture(texture);
+
+				Sprite sprite = Sprite.Create(texture,
+					new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+
+				bgImage.sprite = sprite;
+			}
 		}
 
 		public static Color GetSelectedColor() {
@@ -195,13 +219,13 @@ namespace NotReaper.UserInput {
 			if (selectedMode == EditorMode.Timing && Timeline.inTimingMode) return;
 
 			editorMode.UpdateUI(mode);
-            selectedMode = mode;
+			selectedMode = mode;
 
 			FigureOutIsInUI();
 		}
 
 		public void SelectTool(EditorTool tool) {
-			if(tool == selectedTool) {
+			if (tool == selectedTool) {
 				return;
 			}
 
@@ -209,10 +233,10 @@ namespace NotReaper.UserInput {
 
 			hover.UpdateUITool(tool);
 
-            previousTool = selectedTool;
+			previousTool = selectedTool;
 			selectedTool = tool;
 
-			if(previousTool == EditorTool.Melee && selectedHand == TargetHandType.Either) {
+			if (previousTool == EditorTool.Melee && selectedHand == TargetHandType.Either) {
 				SelectHand(previousHand);
 			}
 
@@ -257,7 +281,7 @@ namespace NotReaper.UserInput {
 				case EditorTool.ChainNode:
 					selectedBehavior = TargetBehavior.Chain;
 					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Chain);
-					SelectVelocity(UITargetVelocity.ChainStart);
+					SelectVelocity(UITargetVelocity.Chain);
 					SelectSnappingMode(SnappingMode.None);
 					break;
 
@@ -272,7 +296,6 @@ namespace NotReaper.UserInput {
 
 				case EditorTool.DragSelect:
 					selectedBehavior = TargetBehavior.None;
-
 
 
 					Tools.dragSelect.Activate(true);
@@ -294,12 +317,12 @@ namespace NotReaper.UserInput {
 
 		}
 
-        public void RevertTool() {
-            SelectTool(previousTool);
-            previousTool = selectedTool;
-        }
+		public void RevertTool() {
+			SelectTool(previousTool);
+			previousTool = selectedTool;
+		}
 
-        public void FigureOutIsInUI() {
+		public void FigureOutIsInUI() {
 
 			if (pauseMenu.isOpened) {
 				inUI = true;
@@ -316,11 +339,11 @@ namespace NotReaper.UserInput {
 				case EditorMode.Settings:
 					inUI = true;
 					break;
-				
+
 			}
 		}
 
-        private void Update() {
+		private void Update() {
 
 			if (Timeline.inTimingMode && inUI) {
 				if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
@@ -331,13 +354,10 @@ namespace NotReaper.UserInput {
 			if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.S)) {
 				timeline.Export();
 			}
-			
-
 
 
 			if (Input.GetKeyDown(KeyCode.Escape)) {
-				if (pauseMenu.isOpened)
-				{
+				if (pauseMenu.isOpened) {
 					if (!Timeline.audioLoaded) return;
 
 					pauseMenu.ClosePauseMenu();
@@ -351,14 +371,13 @@ namespace NotReaper.UserInput {
 
 			if (inUI) return;
 
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {
-                SelectTool(EditorTool.DragSelect);
-            }
-            if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
+			if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {
+				SelectTool(EditorTool.DragSelect);
+			}
+			if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
 				if (Tools.dragSelect.isDraggingNotesOnTimeline) {
 					Tools.dragSelect.EndDragTimelineTargetAction();
-				}
-				else if (Tools.dragSelect.isDraggingNotesOnGrid) {
+				} else if (Tools.dragSelect.isDraggingNotesOnGrid) {
 					Tools.dragSelect.EndDragGridTargetAction();
 				}
 
@@ -367,16 +386,16 @@ namespace NotReaper.UserInput {
 
 				foreach (Target target in timeline.selectedNotes) {
 
-						target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-					}
+					target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+				}
 
 				Tools.dragSelect.EndSelectionAction();
 
-                RevertTool();
-				
-            }
+				RevertTool();
 
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
+			}
+
+			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
 				isCTRLDown = true;
 			} else {
 				isCTRLDown = false;

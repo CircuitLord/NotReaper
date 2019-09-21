@@ -279,8 +279,12 @@ namespace NotReaper {
 			target.timelineTargetIcon.location = TargetIconLocation.Timeline;
 			var transform1 = target.timelineTargetIcon.transform;
 			transform1.localPosition = new Vector3(targetData.beatTime, 0, 0);
-			transform1.localScale = targetScale * Vector3.one;
+			//transform1.localScale = targetScale * Vector3.one;
 			target.timelineTargetIcon.isGridIcon = false;
+
+			Vector3 noteScale = transform1.localScale;
+			noteScale.x = targetScale;
+			transform1.localScale = noteScale;
 
 
 			target.gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
