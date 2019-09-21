@@ -1,7 +1,7 @@
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NotReaper.Grid;
 using NotReaper.Models;
 using NotReaper.Targets;
@@ -56,8 +56,7 @@ namespace NotReaper.Tools {
 
 
 		}
-		
-		
+
 
 		private void StartTimelineDrag() {
 
@@ -88,7 +87,6 @@ namespace NotReaper.Tools {
 
 			Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-
 			dragSelectGrid.transform.position = new Vector3(mousePos.x, mousePos.y, 0f);
 			dragSelectGrid.transform.localScale = new Vector3(0, 0, 1f);
 
@@ -116,7 +114,7 @@ namespace NotReaper.Tools {
 
 				intent.target = target;
 				intent.startingPosition = new Vector3(pos.x, pos.y, pos.z);
-				
+
 				gridTargetMoveIntents.Add(intent);
 			});
 		}
@@ -164,14 +162,13 @@ namespace NotReaper.Tools {
 				intent.target = target;
 				intent.startingVelocity = target.velocity;
 				intent.newVelocity = velocity;
-				
+
 				targetSetHitsoundIntents.Add(intent);
 			});
-				
+
 			timeline.SetTargetHitsounds(targetSetHitsoundIntents);
 		}
-		
-		
+
 
 		private void StartSelectionAction() {
 			isSelectionDown = true;
@@ -189,14 +186,11 @@ namespace NotReaper.Tools {
 
 			if (iconUnderMouse && iconUnderMouse.isSelected) {
 				iconUnderMouse.TryDeselect();
-			}
-			else if (iconUnderMouse && !iconUnderMouse.isSelected) {
+			} else if (iconUnderMouse && !iconUnderMouse.isSelected) {
 				iconUnderMouse.TrySelect();
 			}
 		}
-		
-		
-		
+
 
 		public Vector3 CalcAvgNotePos(List<Target> targets) {
 
@@ -210,6 +204,28 @@ namespace NotReaper.Tools {
 		}
 
 
+		public void EndAllDragStuff() {
+			if (isDraggingNotesOnTimeline) {
+				EndDragTimelineTargetAction();
+				//isDraggingNotesOnTimeline = false;
+			} else if (isDraggingNotesOnGrid) {
+				//isDraggingNotesOnGrid = false;
+				EndDragGridTargetAction();
+			}
+
+			EndTimelineDrag();
+			EndGridDrag();
+
+			foreach (Target target in timeline.selectedNotes) {
+				if (target.gridTargetIcon) {
+					target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+				}
+			}
+
+			//EndSelectionAction();
+		}
+
+
 		void Update() {
 
 			//If the user decides they hate productivity and want to unselect all their notes, so be it.
@@ -220,13 +236,12 @@ namespace NotReaper.Tools {
 			//Applying hitsounds to selected:
 
 			if (!activated) return;
-			
-			
+
+
 			//TODO: Add shift + ctrl detection up here instead of multipule times
 
 
-			if (Input.GetKeyDown(KeyCode.Q))
-			{
+			if (Input.GetKeyDown(KeyCode.Q)) {
 				SetHitsoundAction(TargetVelocity.Standard);
 			} else if (Input.GetKeyDown(KeyCode.W)) {
 				SetHitsoundAction(TargetVelocity.Snare);
@@ -239,8 +254,6 @@ namespace NotReaper.Tools {
 			} else if (Input.GetKeyDown(KeyCode.Y)) {
 				SetHitsoundAction(TargetVelocity.Melee);
 			}
-
-
 
 
 			var iconsUnderMouse = MouseUtil.IconsUnderMouse(notesLayer);
@@ -348,7 +361,9 @@ namespace NotReaper.Tools {
 					if (isDraggingNotesOnTimeline) EndDragTimelineTargetAction();
 
 					foreach (Target target in timeline.selectedNotes) {
-						target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+						if (target.gridTargetIcon) {
+							target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+						}
 					}
 				}
 
@@ -356,8 +371,7 @@ namespace NotReaper.Tools {
 
 					//If we're not already dragging
 
-					if (
-						!isDraggingTimeline &&
+					if (!isDraggingTimeline &&
 						!isDraggingGrid &&
 						!isDraggingNotesOnGrid &&
 						!isDraggingNotesOnTimeline &&
@@ -365,32 +379,26 @@ namespace NotReaper.Tools {
 					) {
 						if (timeline.hover) {
 							StartTimelineDrag();
-						}
-						else {
+						} else {
 							StartGridDrag();
 						}
-					}
-					else if (isDraggingTimeline) {
+					} else if (isDraggingTimeline) {
 						float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
 						float timelineScaleMulti = Timeline.scale / 20f;
 						dragSelectTimeline.localScale = new Vector3(diff * timelineScaleMulti, 1.1f * (Timeline.scale / 20f), 1);
-					}
-					else if (isDraggingGrid) {
+					} else if (isDraggingGrid) {
 
 						Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - dragSelectGrid.transform.position;
 						dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
 
-					}
-					else if (iconUnderMouse && !isSelectionDown) {
+					} else if (iconUnderMouse && !isSelectionDown) {
 						StartSelectionAction();
-					}
-					else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBounds) {
+					} else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBounds) {
 						iconUnderMouse.TrySelect();
 						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
 						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
 					}
-				}
-				else {
+				} else {
 					if (isDraggingTimeline) EndTimelineDrag();
 					else if (isDraggingGrid) EndGridDrag();
 				}
@@ -415,7 +423,7 @@ namespace NotReaper.Tools {
 						intent.target.gridTargetIcon.transform.localPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
 						if (intent.target.behavior == TargetBehavior.Hold) {
 							var holdEnd = intent.target.gridTargetIcon.GetComponentInChildren<HoldTargetManager>().endMarker;
-							if (holdEnd) holdEnd.transform.localPosition = new Vector3 (tempNewPos.x, tempNewPos.y, holdEnd.transform.localPosition.z);
+							if (holdEnd) holdEnd.transform.localPosition = new Vector3(tempNewPos.x, tempNewPos.y, holdEnd.transform.localPosition.z);
 						}
 
 						//target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
@@ -447,7 +455,7 @@ namespace NotReaper.Tools {
 		}
 
 		private Vector3 SnapToBeat(Vector3 position) {
-			var increments = ((480 / timeline.beatSnap) * 4f) / 480;        // what even is life //42
+			var increments = ((480 / timeline.beatSnap) * 4f) / 480; // what even is life //42
 			return new Vector3(
 				Mathf.Round(position.x / increments) * increments,
 				position.y,

@@ -375,21 +375,7 @@ namespace NotReaper.UserInput {
 				SelectTool(EditorTool.DragSelect);
 			}
 			if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
-				if (Tools.dragSelect.isDraggingNotesOnTimeline) {
-					Tools.dragSelect.EndDragTimelineTargetAction();
-				} else if (Tools.dragSelect.isDraggingNotesOnGrid) {
-					Tools.dragSelect.EndDragGridTargetAction();
-				}
-
-				Tools.dragSelect.EndTimelineDrag();
-				Tools.dragSelect.EndGridDrag();
-
-				foreach (Target target in timeline.selectedNotes) {
-
-					target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-				}
-
-				Tools.dragSelect.EndSelectionAction();
+				Tools.dragSelect.EndAllDragStuff();
 
 				RevertTool();
 
@@ -487,7 +473,7 @@ namespace NotReaper.UserInput {
 			}
 
 			if (Input.GetKeyDown(KeyCode.V) && !isCTRLDown) {
-				SelectTool(EditorTool.DragSelect);
+				//SelectTool(EditorTool.DragSelect);
 			}
 
 			if (Input.GetKeyDown(KeyCode.G)) {

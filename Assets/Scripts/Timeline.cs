@@ -489,7 +489,7 @@ namespace NotReaper {
 			var action = new NRActionSetTargetHitsound();
 			action.targetSetHitsoundIntents = intents.Select(intent => new TargetDataSetHitsoundIntent(intent)).ToList();
 			Tools.undoRedoManager.AddAction(action);
-		}
+	}
 
 		public void DeleteTarget(Target target) {
 			var action = new NRActionRemoveNote();
@@ -504,6 +504,7 @@ namespace NotReaper {
 			notes.Remove(target);
 			orderedNotes.Remove(target);
 			loadedNotes.Remove(target);
+			selectedNotes.Remove(target);
 
 			if (target.gridTargetIcon)
 				Destroy(target.gridTargetIcon.gameObject);

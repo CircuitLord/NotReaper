@@ -6,6 +6,7 @@ using NotReaper.UserInput;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using NotReaper.Managers;
 
 namespace NotReaper.Tools {
 
@@ -159,6 +160,8 @@ namespace NotReaper.Tools {
 		public List<TargetDataMoveIntent> targetTimelineMoveIntents = new List<TargetDataMoveIntent>();
 
 		public override void DoAction(Timeline timeline) {
+			//timeline.Tools.dragSelect.EndAllDragStuff();
+			
 			targetTimelineMoveIntents.ForEach(intent => {
 				Target target = timeline.FindNote(intent.targetData);
 				var newPos = intent.intendedPosition;
@@ -170,6 +173,8 @@ namespace NotReaper.Tools {
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
+			//timeline.Tools.dragSelect.EndAllDragStuff();
+			
 			targetTimelineMoveIntents.ForEach(intent => {
 				Target target = timeline.FindNote(intent.targetData);
 				var newPos = intent.startingPosition;

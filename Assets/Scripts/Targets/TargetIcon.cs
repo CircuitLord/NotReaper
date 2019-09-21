@@ -93,7 +93,7 @@ namespace NotReaper.Targets {
         }
 
         public void DisableSelected() {
-            //if (standardOutline == null) return;
+            if (!standardOutline) return;
             standardOutline.enabled = false;
             holdOutline.enabled = false;
             horzOutline.enabled = false;
