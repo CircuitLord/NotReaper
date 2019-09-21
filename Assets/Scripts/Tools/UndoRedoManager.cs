@@ -142,6 +142,7 @@ namespace NotReaper.Tools {
 			targetGridMoveIntents.ForEach(intent => {
 				Target target = timeline.FindNote(intent.targetData);
 				target.gridTargetIcon.transform.localPosition = intent.intendedPosition;
+				timeline.updateSustainEnd(target);
 				intent.targetData.x = intent.intendedPosition.x;
 				intent.targetData.y = intent.intendedPosition.y;
 			});
@@ -150,6 +151,7 @@ namespace NotReaper.Tools {
 			targetGridMoveIntents.ForEach(intent => {
 				Target target = timeline.FindNote(intent.targetData);
 				target.gridTargetIcon.transform.localPosition = intent.startingPosition;
+				timeline.updateSustainEnd(target);
 				intent.targetData.x = intent.startingPosition.x;
 				intent.targetData.y = intent.startingPosition.y;
 			});
@@ -169,6 +171,7 @@ namespace NotReaper.Tools {
 				var gridPos = target.gridTargetIcon.transform.localPosition;
 				target.timelineTargetIcon.transform.localPosition = newPos;
 				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
+				timeline.updateSustainEnd(target);
 				intent.targetData.beatTime = newPos.x;
 			});
 		}
@@ -182,6 +185,7 @@ namespace NotReaper.Tools {
 				var gridPos = target.gridTargetIcon.transform.localPosition;
 				target.timelineTargetIcon.transform.localPosition = newPos;
 				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
+				timeline.updateSustainEnd(target);
 				intent.targetData.beatTime = newPos.x;
 			});
 		}
