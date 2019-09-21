@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +10,12 @@ public class UISettings : MonoBehaviour
    public GameObject bg;
    public GameObject window;
 
-
+   public void Start() {
+      var t = transform;
+      var position = t.localPosition;
+      t.localPosition = new Vector3(0, position.y, position.z);
+      Deactivate();
+   }
 
    public void Activate()
    {

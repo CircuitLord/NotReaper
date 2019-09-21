@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -39,7 +39,12 @@ namespace NotReaper.UI {
 
         public TMP_Dropdown diffDropdown;
 
-
+        public void Start() {
+            var t = transform;
+            var position = t.localPosition;
+            t.localPosition = new Vector3(0, position.y, position.z);
+        }
+        
         public void UpdateUIValues() {
 
             if (!Timeline.audicaLoaded) return;

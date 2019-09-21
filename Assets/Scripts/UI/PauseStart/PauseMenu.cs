@@ -26,10 +26,10 @@ namespace NotReaper.UI {
         public bool isOpened = false;
 
 
-        private void Start() {
-
-
-            
+        public void Start() {
+            var t = transform;
+            var position = t.localPosition;
+            t.localPosition = new Vector3(0, position.y, position.z);
         }
 
         public void NewAudica() {

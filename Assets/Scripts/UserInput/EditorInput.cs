@@ -38,6 +38,7 @@ namespace NotReaper.UserInput {
 		[SerializeField] public EditorToolkit Tools;
 
 		public PauseMenu pauseMenu;
+		public ShortcutInfo shortcutMenu;
 		public SoundSelect soundSelect;
 		[SerializeField] private Timeline timeline;
 
