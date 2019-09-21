@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -56,6 +56,11 @@ namespace NotReaper.Timing {
         Process ffmpeg = new Process();
 
         private void Start() {
+            var t = this.transform;
+            var position = t.localPosition;
+            t.localPosition = new Vector3(0, position.y, position.z);
+            window.alpha = 0;
+
             string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG/ffmpeg.exe");
 			ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
 			ffmpeg.StartInfo.FileName = ffmpegPath;
