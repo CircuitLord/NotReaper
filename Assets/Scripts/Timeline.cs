@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -153,6 +153,10 @@ namespace NotReaper {
 			//dir.Delete(true);
 		}
 
+		public void SortOrderedList() {
+			orderedNotes.Sort((left, right) =>  left.gridTargetIcon.transform.localPosition.z.CompareTo(right.gridTargetIcon.transform.localPosition.z));
+		}
+
 		public static int BinarySearchOrderedNotes(float cueTime)
 		{ 
 			int min = 0;
@@ -179,7 +183,7 @@ namespace NotReaper {
 		public Target FindNote(TargetData data) {
 			int idx = BinarySearchOrderedNotes(data.beatTime);
 			if(idx == -1) {
-				Debug.Log("Couldn't find note with time " + data.beatTime);
+				Debug.LogError("Couldn't find note with time " + data.beatTime);
 				return null;
 			}
 
@@ -196,7 +200,7 @@ namespace NotReaper {
 				
 			}
 
-			Debug.Log("Couldn't find note with time " + data.beatTime + " and index " + idx);
+			Debug.LogError("Couldn't find note with time " + data.beatTime + " and index " + idx);
 			return null;
 		}
 
@@ -443,6 +447,8 @@ namespace NotReaper {
 		}
 
 		public void MoveTimelineTargets(List<TargetMoveIntent> intents) {
+			SortOrderedList();
+
 			var action = new NRActionTimelineMoveNotes();
 			action.targetTimelineMoveIntents = intents.Select(intent => new TargetDataMoveIntent(intent)).ToList();
 			Tools.undoRedoManager.AddAction(action);

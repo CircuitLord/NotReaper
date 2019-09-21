@@ -162,10 +162,11 @@ namespace NotReaper.Tools {
 		public List<TargetDataMoveIntent> targetTimelineMoveIntents = new List<TargetDataMoveIntent>();
 
 		public override void DoAction(Timeline timeline) {
-			//timeline.Tools.dragSelect.EndAllDragStuff();
-			
-			targetTimelineMoveIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.targetData);
+			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.targetData)).ToList();
+
+			for(int i = 0; i < targetTimelineMoveIntents.Count; ++i) {
+				TargetDataMoveIntent intent = targetTimelineMoveIntents[i];
+				Target target = targets[i];
 				var newPos = intent.intendedPosition;
 
 				var gridPos = target.gridTargetIcon.transform.localPosition;
@@ -173,13 +174,15 @@ namespace NotReaper.Tools {
 				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
 				timeline.updateSustainEnd(target);
 				intent.targetData.beatTime = newPos.x;
-			});
+			}
+			timeline.SortOrderedList();
 		}
 		public override void UndoAction(Timeline timeline) {
-			//timeline.Tools.dragSelect.EndAllDragStuff();
-			
-			targetTimelineMoveIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.targetData);
+			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.targetData)).ToList();
+
+			for(int i = 0; i < targetTimelineMoveIntents.Count; ++i) {
+				TargetDataMoveIntent intent = targetTimelineMoveIntents[i];
+				Target target = targets[i];
 				var newPos = intent.startingPosition;
 
 				var gridPos = target.gridTargetIcon.transform.localPosition;
@@ -187,7 +190,8 @@ namespace NotReaper.Tools {
 				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
 				timeline.updateSustainEnd(target);
 				intent.targetData.beatTime = newPos.x;
-			});
+			}
+			timeline.SortOrderedList();
 		}
 	}
 
