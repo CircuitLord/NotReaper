@@ -131,15 +131,11 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			targetGridMoveIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.target);
-				target.data.position = intent.intendedPosition;
 				intent.target.position = intent.intendedPosition;
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetGridMoveIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.target);
-				target.data.position = intent.startingPosition;
 				intent.target.position = intent.startingPosition;
 			});
 		}
@@ -149,25 +145,15 @@ namespace NotReaper.Tools {
 		public List<TargetTimelineMoveIntent> targetTimelineMoveIntents = new List<TargetTimelineMoveIntent>();
 
 		public override void DoAction(Timeline timeline) {
-			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.target)).ToList();
-
-			for(int i = 0; i < targetTimelineMoveIntents.Count; ++i) {
-				TargetTimelineMoveIntent intent = targetTimelineMoveIntents[i];
-				Target target = targets[i];
-				target.data.beatTime = intent.intendedTime;
+			targetTimelineMoveIntents.ForEach(intent => {
 				intent.target.beatTime = intent.intendedTime;
-			}
+			});
 			timeline.SortOrderedList();
 		}
 		public override void UndoAction(Timeline timeline) {
-			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.target)).ToList();
-
-			for(int i = 0; i < targetTimelineMoveIntents.Count; ++i) {
-				TargetTimelineMoveIntent intent = targetTimelineMoveIntents[i];
-				Target target = targets[i];
-				target.data.beatTime = intent.startTime;
+			targetTimelineMoveIntents.ForEach(intent => {
 				intent.target.beatTime = intent.startTime;
-			}
+			});
 			timeline.SortOrderedList();
 		}
 	}
@@ -177,15 +163,12 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
-				Target target = timeline.FindNote(targetData);
-				switch (target.data.handType) {
+				switch (targetData.handType) {
 					case TargetHandType.Left: 
-						target.data.handType = TargetHandType.Right;
 						targetData.handType = TargetHandType.Right;
 					break;
 					
 					case TargetHandType.Right: 
-						target.data.handType = TargetHandType.Left;
 						targetData.handType = TargetHandType.Left;
 					break;
 				}
@@ -201,8 +184,6 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
-				Target target = timeline.FindNote(targetData);
-				target.data.x *= -1;
 				targetData.x *= -1;
 			});
 		}
@@ -216,8 +197,6 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
-				Target target = timeline.FindNote(targetData);
-				target.data.y *= -1;
 				targetData.y *= -1;
 			});
 		}
@@ -231,15 +210,11 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			targetSetHitsoundIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.target);
-				target.data.velocity = intent.newVelocity;
 				intent.target.velocity = intent.newVelocity;
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetSetHitsoundIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.target);
-				target.data.velocity = intent.startingVelocity;
 				intent.target.velocity = intent.startingVelocity;
 			});
 		}

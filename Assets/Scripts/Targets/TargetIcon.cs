@@ -89,6 +89,12 @@ namespace NotReaper.Targets {
             this.target = target;
         }
 
+        public void OnDestroy() {
+            data.HandTypeChangeEvent -= OnHandTypeChanged;
+            data.BehaviourChangeEvent -= OnBehaviorChanged;
+            data.BeatLengthChangeEvent -= OnSustainLengthChanged;
+        }
+
         public void EnableSelected(TargetBehavior behavior) {
             standardOutline.enabled = (behavior == TargetBehavior.Standard);
             holdOutline.enabled = (behavior == TargetBehavior.Hold);

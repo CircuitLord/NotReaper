@@ -294,6 +294,7 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
+		//Adds a target directly to the timeline. targetData is kept as a reference NOT copied
 		public Target AddTargetFromAction(TargetData targetData, bool transient = false) {
 
 			var timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
@@ -309,11 +310,8 @@ namespace NotReaper {
 			gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.beatTime);
 			gridTargetIcon.location = TargetIconLocation.Grid;
 
-			Target target = new Target(targetData, timelineTargetIcon, gridTargetIcon);
-			target.transient = transient;
+			Target target = new Target(targetData, timelineTargetIcon, gridTargetIcon, transient);
 
-			//Now that all initial dependencies are met, we can init the target. (Loads sustain controller and outline color)
-			target.Init(this);
 			notes.Add(target);
 			orderedNotes = notes.OrderBy(v => v.data.beatTime).ToList();
 
@@ -483,21 +481,21 @@ namespace NotReaper {
 		// Invert the selected targets' colour
 		public void SwapTargets(List<Target> targets) {
 			var action = new NRActionSwapNoteColors();
-			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
 		// Flip the selected targets on the grid about the X
 		public void FlipTargetsHorizontal(List<Target> targets) {
 			var action = new NRActionHFlipNotes();
-			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
 		// Flip the selected targets on the grid about the Y
 		public void FlipTargetsVertical(List<Target> targets) {
 			var action = new NRActionVFlipNotes();
-			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 		
@@ -509,7 +507,7 @@ namespace NotReaper {
 
 		public void DeleteTarget(Target target) {
 			var action = new NRActionRemoveNote();
-			action.targetData = new TargetData(target.data);
+			action.targetData = target.data;
 			Tools.undoRedoManager.AddAction(action);
 		}
 
@@ -528,7 +526,7 @@ namespace NotReaper {
 
 		public void DeleteTargets(List<Target> targets) {
 			var action = new NRActionMultiRemoveNote();
-			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 

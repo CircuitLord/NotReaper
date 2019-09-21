@@ -50,11 +50,11 @@ namespace NotReaper.Targets {
 		}
 
 
-		public Target(TargetData targetData, TargetIcon timelineIcon, TargetIcon gridIcon) {
+		public Target(TargetData targetData, TargetIcon timelineIcon, TargetIcon gridIcon, bool transient) {
 			timelineTargetIcon = timelineIcon;
 			gridTargetIcon = gridIcon;
 
-			data = new TargetData();
+			data = targetData;
 			data.PositionChangeEvent += OnGridPositionChanged;
 			data.HandTypeChangeEvent += OnHandTypeChanged;
 			data.BeatTimeChangeEvent += OnBeatTimeChanged;
@@ -66,12 +66,9 @@ namespace NotReaper.Targets {
 			//Must be after the two init's, unfortunate timing restiction, but the new objects must be active to find the hold target managers
 			data.BehaviourChangeEvent += OnBehaviorChanged;
 
-			data.Copy(targetData);
+			data.Copy(data); //Trigger all callbacks
 			UpdateTimelineSustainLength();
-		}
 
-		//Do some stuff after all the target's references have been filled in by the timeline.
-		public void Init(Timeline timeline) {
 			gridTargetIcon.OnTryRemoveEvent += DeleteNote;
 			timelineTargetIcon.OnTryRemoveEvent += DeleteNote;
 
@@ -86,6 +83,7 @@ namespace NotReaper.Targets {
 
 			SetOutlineColor(NRSettings.config.selectedHighlightColor);
 
+			this.transient = transient;
 			if(transient) {
 				foreach (Renderer r in gridTargetIcon.GetComponentsInChildren<Renderer>(true)) {
 					if (r.name == "WhiteRing") {

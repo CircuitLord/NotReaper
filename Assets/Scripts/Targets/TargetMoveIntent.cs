@@ -5,7 +5,7 @@ namespace NotReaper.Targets {
 		public TargetGridMoveIntent() {}
 		
 		public TargetGridMoveIntent(TargetGridMoveIntent other) {
-			target = new TargetData(other.target);
+			target = other.target;
 			startingPosition = other.startingPosition;
 			intendedPosition = other.intendedPosition;
 		}
@@ -19,7 +19,7 @@ namespace NotReaper.Targets {
 		public TargetTimelineMoveIntent() {}
 
 		public TargetTimelineMoveIntent(TargetTimelineMoveIntent other) {
-			target = new TargetData(other.target);
+			target = other.target;
 			startTime = other.startTime;
 			intendedTime = other.intendedTime;
 		}
