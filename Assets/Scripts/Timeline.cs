@@ -1,13 +1,12 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Principal;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
+using Melanchall.DryWetMidi.Smf;
+using Melanchall.DryWetMidi.Smf.Interaction;
 using NotReaper.Grid;
 using NotReaper.IO;
 using NotReaper.Managers;
@@ -18,8 +17,8 @@ using NotReaper.UI;
 using NotReaper.UserInput;
 using SFB;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
@@ -619,6 +618,7 @@ namespace NotReaper {
 
 		public void SetTimingModeStats(double newBPM, int tickOffset) {
 			DeleteAllTargets();
+
 			SetBPM((float) newBPM);
 
 			var cue = new Cue {
@@ -674,9 +674,21 @@ namespace NotReaper {
 				audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
 				PlayerPrefs.SetString("recentFile", paths[0]);
 			}
-
-			//SetOffset(0);
+			
 			desc = audicaFile.desc;
+			
+			// Get song BPM
+			if (audicaFile.song_mid != null) {
+				// TODO: Multi-bpm support :(
+				var midiBpm = audicaFile.song_mid.GetTempoMap().Tempo.AtTime(0).BeatsPerMinute;
+				if (midiBpm != desc.tempo) {
+					if (EditorUtility.DisplayDialog("BPM mismatch",
+						"Detected different BPM values in midi and song.desc. NotReaper does not currently support multi-bpm tracks.",
+						$"Use midi ({midiBpm})", $"Use song.desc ({desc.tempo})")) {
+						desc.tempo = midiBpm;
+					}
+				}
+			} 
 
 			//Update our discord presence
 			nrDiscordPresence.UpdatePresenceSongName(desc.title);
