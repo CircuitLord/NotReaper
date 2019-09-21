@@ -6,6 +6,7 @@ using NotReaper.Targets;
 using NotReaper.Tools;
 using NotReaper.UI;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -23,7 +24,8 @@ namespace NotReaper.UserInput {
 		public static EditorTool previousTool = EditorTool.Standard;
 		public static TargetHandType selectedHand = TargetHandType.Left;
 		public static TargetHandType previousHand = TargetHandType.Left;
-		public static SnappingMode selectedSnappingMode = SnappingMode.Grid;
+		public static SnappingMode selectedSnappingMode = SnappingMode.None;
+		public static SnappingMode previousSnappingMode = SnappingMode.None;
 		public static TargetBehavior selectedBehavior = TargetBehavior.Standard;
 		public static UITargetVelocity selectedVelocity = UITargetVelocity.Standard;
 
@@ -144,6 +146,8 @@ namespace NotReaper.UserInput {
 		}
 
 		public void SelectSnappingMode(SnappingMode mode) {
+			if (selectedSnappingMode == mode) return;
+			
 			selectedSnappingMode = mode;
 
 			switch (mode) {
@@ -165,7 +169,6 @@ namespace NotReaper.UserInput {
 
 			}
 		}
-
 
 		public void SelectHand(TargetHandType type) {
 			selectedHand = type;
@@ -376,9 +379,25 @@ namespace NotReaper.UserInput {
 			}
 			if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
 				Tools.dragSelect.EndAllDragStuff();
-
 				RevertTool();
-
+			}
+			
+			if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) {
+				previousSnappingMode = selectedSnappingMode;
+				switch (selectedSnappingMode) {
+					case SnappingMode.Grid:
+					case SnappingMode.Melee:
+						SelectSnappingMode(SnappingMode.None);
+						break;
+					case SnappingMode.None:
+						SelectSnappingMode(selectedTool == EditorTool.Melee ? SnappingMode.Melee : SnappingMode.Grid);
+						break;
+				}
+			}
+			if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift)) {
+				if (selectedSnappingMode != previousSnappingMode) {
+					SelectSnappingMode(previousSnappingMode);
+				}
 			}
 
 			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
@@ -473,7 +492,7 @@ namespace NotReaper.UserInput {
 			}
 
 			if (Input.GetKeyDown(KeyCode.V) && !isCTRLDown) {
-				//SelectTool(EditorTool.DragSelect);
+				SelectTool(EditorTool.DragSelect);
 			}
 
 			if (Input.GetKeyDown(KeyCode.G)) {
