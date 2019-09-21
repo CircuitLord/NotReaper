@@ -1,7 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Melanchall.DryWetMidi.Smf;
 
 namespace NotReaper.Models {
 
@@ -102,6 +102,7 @@ namespace NotReaper.Models {
 		public AudioClip song_extras;
 		public AudioClip song_sustain_l;
 		public AudioClip song_sustain_r;
+		public MidiFile song_mid;
 		public string filepath;
 
 	}
