@@ -69,26 +69,26 @@ namespace NotReaper.Timing {
 
 
         public void SelectAudioFile() {
-            string[] paths = StandaloneFileBrowser.OpenFilePanel("MP3", Path.Combine(Application.persistentDataPath), "mp3", false);
+            var compatible = new[] { new ExtensionFilter("Compatible Audio Files", "mp3", "ogg") }; 
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("Select music track", Path.Combine(Application.persistentDataPath), compatible, false);
+            var filePath = paths[0];
 
-            if (paths[0] == null) return;
-            UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg"));
-            ffmpeg.StartInfo.Arguments = String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg");
-            ffmpeg.Start();
-            ffmpeg.WaitForExit();
+            if (filePath != null) {
+                // if user loads mp3 instead of ogg, do the conversion first
+                if (paths[0].EndsWith(".mp3")) {
+                    UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg"));
+                    ffmpeg.StartInfo.Arguments =
+                        String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg");
+                    ffmpeg.Start();
+                    ffmpeg.WaitForExit();
+                    filePath = "converted.ogg";
+                }
 
-
-
-            StartCoroutine(GetAudioClip($"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", "converted.ogg")));
-            //audioFile = LoadMp3(paths[0]);
-            nameText.text = paths[0];
-            loadedSong = paths[0];
-
-            //Double.TryParse(bpmInput.text, out bpm);
-
-            //timeline.LoadTimingMode(audioFile);
-
-
+                StartCoroutine(
+                    GetAudioClip($"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", filePath)));
+                nameText.text = paths[0];
+                loadedSong = paths[0];
+            }
         }
 
 
