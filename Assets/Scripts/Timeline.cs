@@ -409,11 +409,14 @@ namespace NotReaper {
 		/// <param name="increase">If true, increase by one beat snap, if false, the opposite.</param>
 		public void UpdateSustainLength(Target target, bool increase) {
 			if (target.data.behavior != TargetBehavior.Hold) return;
-
+			var increment = (480f / beatSnap) * 4f;
+			var minimum = 120f;
+			
 			if (increase) {
-				target.data.beatLength += (480 / beatSnap) * 4f;
+				if (target.data.beatLength < increment) target.data.beatLength = 0;
+				target.data.beatLength += increment;
 			} else {
-				target.data.beatLength = Mathf.Max(target.data.beatLength - (480 / beatSnap) * 4f, 120);
+				target.data.beatLength = Mathf.Max(target.data.beatLength - increment, minimum);
 			}
 		}
 
