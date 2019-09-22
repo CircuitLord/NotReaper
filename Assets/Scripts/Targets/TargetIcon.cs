@@ -214,7 +214,7 @@ namespace NotReaper.Targets {
             melee.SetActive(behavior == TargetBehavior.Melee);
 
             sphereCollider.radius = 0.5f;
-            if (behavior == TargetBehavior.Chain) {
+            if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline) {
                 sphereCollider.radius = 0.25f;
             }
         }
