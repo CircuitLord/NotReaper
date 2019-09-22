@@ -21,7 +21,9 @@ namespace NotReaper {
 
             //If it doesn't exist, we need to gen a new one.
             if (regenConfig || !File.Exists(configFilePath)) {
+                //Gen new config will autoload the new config.
                 GenNewConfig();
+                return;
             }
 
             try {
@@ -48,22 +50,31 @@ namespace NotReaper {
 
         private static void GenNewConfig() {
 
-            Debug.Log("Generating new configuration file...");
+            //Debug.Log("Generating new configuration file...");
 
             NRJsonSettings temp = new NRJsonSettings();
+            
+            config = temp;
+            isLoaded = true;
 
             if (File.Exists(configFilePath)) File.Delete(configFilePath);
 
             File.WriteAllText(configFilePath, JsonUtility.ToJson(temp, true));
+            
 
             string destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "CircuitCubed", "NotReaper");
-
-
+            
+            //It's release time and I need a fix ok, don't make fun of my code.
+            if (File.Exists(Path.Combine(destPath, "BG1.png"))) return;
+            if (File.Exists(Path.Combine(destPath, "BG2.png"))) return;
+            if (File.Exists(Path.Combine(destPath, "BG3.png"))) return;
+            if (File.Exists(Path.Combine(destPath, "BG4.jpg"))) return;
+            
             //Copy bg images over
-            File.Copy(Path.Combine(Application.streamingAssetsPath, "BG1.png"), destPath + "/BG1.png");
-            File.Copy(Path.Combine(Application.streamingAssetsPath, "BG2.png"), destPath + "/BG2.png");
-            File.Copy(Path.Combine(Application.streamingAssetsPath, "BG3.png"), destPath + "/BG3.png");
-            File.Copy(Path.Combine(Application.streamingAssetsPath, "BG4.jpg"), destPath + "/BG4.jpg");
+            File.Copy(Path.Combine(Application.streamingAssetsPath, "BG1.png"), destPath + "/BG1.png", false);
+            File.Copy(Path.Combine(Application.streamingAssetsPath, "BG2.png"), destPath + "/BG2.png", false);
+            File.Copy(Path.Combine(Application.streamingAssetsPath, "BG3.png"), destPath + "/BG3.png", false);
+            File.Copy(Path.Combine(Application.streamingAssetsPath, "BG4.jpg"), destPath + "/BG4.jpg", false);
 
         }
 
