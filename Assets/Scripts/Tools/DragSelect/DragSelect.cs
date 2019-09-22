@@ -286,7 +286,7 @@ namespace NotReaper.Tools {
 				frameIntentCut = Input.GetKeyDown(KeyCode.X);
 				frameIntentCopy = Input.GetKeyDown(KeyCode.C);
 				frameIntentPaste = Input.GetKeyDown(KeyCode.V);
-				frameIntentDeselectAll = Input.GetKeyDown(KeyCode.A);
+				frameIntentDeselectAll = Input.GetKeyDown(KeyCode.D);
 			}
 			else if (secondaryModifierHeld) {
 				frameIntentFlipTargetsVertically = Input.GetKeyDown(KeyCode.F);
