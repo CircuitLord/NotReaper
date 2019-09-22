@@ -19,9 +19,32 @@ namespace NotReaper.Tools {
 		public bool isDraggingGrid = false;
 		public bool isDraggingNotesOnGrid = false;
 		public bool isDraggingNotesOnTimeline = false;
-		bool isSelectionDown = false;
-		bool hasMovedOutOfClickBounds = false;
+		bool isSelectionDownOld = false;
+		bool hasMovedOutOfClickBoundsOld = false;
 
+		// TODO: This should come from whatever new input handler we end up with, for now this at least should abstract input from intent (see CaptureInput())
+		// Represent action intents occuring this update frame.
+		private bool frameIntentSelect = false;		// click + release
+		private bool frameIntentDragStart = false;	// click + drag start frame
+		private bool frameIntentDragging = false;	// click + drag frame
+		private bool frameIntentDragEnd = false;	// click + drag end frame
+		private bool frameIntentCut = false;
+		private bool frameIntentCopy = false;
+		private bool frameIntentPaste = false;
+		private bool frameIntentDelete = false;
+		private bool frameIntentDeselectAll = false;
+		private bool frameIntentSwapColors = false;
+		private bool frameIntentFlipTargetsHorizontally = false;
+		private bool frameIntentFlipTargetsVertically = false;
+		private bool frameIntentSetHitSoundStandard = false;
+		private bool frameIntentSetHitSoundSnare = false;
+		private bool frameIntentSetHitSoundPercussion = false;
+		private bool frameIntentSetHitSoundChainStart = false;
+		private bool frameIntentSetHitSoundChain = false;
+		private bool frameIntentSetHitSoundMelee = false;
+		
+		bool hasInputDragMovedOutOfClickBounds = false;
+		
 		Vector3 startDragMovePos;
 		Vector2 startClickDetectPos;
 
@@ -171,13 +194,13 @@ namespace NotReaper.Tools {
 
 
 		private void StartSelectionAction() {
-			isSelectionDown = true;
-			hasMovedOutOfClickBounds = false;
+			isSelectionDownOld = true;
+			hasMovedOutOfClickBoundsOld = false;
 			startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 		}
 
 		public void EndSelectionAction() {
-			isSelectionDown = false;
+			isSelectionDownOld = false;
 		}
 
 		private void TryToggleSelection() {
@@ -223,8 +246,83 @@ namespace NotReaper.Tools {
 			//EndSelectionAction();
 		}
 
+		void CaptureInput() {
+			bool primaryModifierHeld = false;
+			bool secondaryModifierHeld = false;
+			frameIntentSelect = false;
+			frameIntentDragStart = false;
+			frameIntentDragEnd = false;
+			frameIntentCut = false;
+			frameIntentCopy = false;
+			frameIntentPaste = false;
+			frameIntentDelete = false;
+			frameIntentDeselectAll = false;
+			frameIntentSwapColors = false;
+			frameIntentFlipTargetsHorizontally = false;
+			frameIntentFlipTargetsVertically = false;
+			
+			// Keyboard input
+			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) primaryModifierHeld = true;
+			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) secondaryModifierHeld = true;
+
+			if (primaryModifierHeld && !secondaryModifierHeld) {	// permits holding primary and secondary down
+				frameIntentFlipTargetsHorizontally = Input.GetKeyDown(KeyCode.F);
+				frameIntentCut = Input.GetKeyDown(KeyCode.X);
+				frameIntentCopy = Input.GetKeyDown(KeyCode.C);
+				frameIntentPaste = Input.GetKeyDown(KeyCode.V);
+				frameIntentDeselectAll = Input.GetKeyDown(KeyCode.A);
+			}
+			else if (secondaryModifierHeld) {
+				frameIntentFlipTargetsVertically = Input.GetKeyDown(KeyCode.F);
+			}
+			else {
+				frameIntentDelete = Input.GetKeyDown(KeyCode.Delete);
+				frameIntentSwapColors = Input.GetKeyDown(KeyCode.F);
+				
+				// hitsound selection
+				frameIntentSetHitSoundStandard = Input.GetKeyDown(KeyCode.Q);
+				frameIntentSetHitSoundSnare = Input.GetKeyDown(KeyCode.W);
+				frameIntentSetHitSoundPercussion = Input.GetKeyDown(KeyCode.E);
+				frameIntentSetHitSoundChainStart = Input.GetKeyDown(KeyCode.R);
+				frameIntentSetHitSoundChain = Input.GetKeyDown(KeyCode.T);
+				frameIntentSetHitSoundMelee = Input.GetKeyDown(KeyCode.Y);
+			}
+			
+			// Mouse input
+			
+			if (Input.GetMouseButtonDown(0)) {
+				startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+			}
+			
+			bool isSelectionDown = Input.GetMouseButton(0);
+
+			if (isSelectionDown) {
+				if (hasInputDragMovedOutOfClickBounds && !frameIntentDragging) {
+					frameIntentDragStart = true;
+					frameIntentDragging = true;
+				} else {
+					// Check for a tiny amount of mouse movement to test whether a release is meant to be a selection
+					float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
+					hasInputDragMovedOutOfClickBounds = (movement > 2);
+				}
+			}
+
+			if (Input.GetMouseButtonUp(0)) {
+				frameIntentDragEnd = hasInputDragMovedOutOfClickBounds;
+				frameIntentSelect = !hasInputDragMovedOutOfClickBounds;
+				
+				hasInputDragMovedOutOfClickBounds = false; 
+				frameIntentDragging = false;
+			}
+		}
 
 		void Update() {
+
+			CaptureInput();
+			if (frameIntentDragStart) Debug.Log("drag start");
+			if (frameIntentDragging) Debug.Log("drag");
+			if (frameIntentDragEnd) Debug.Log("drag end");
+			if (frameIntentSelect) Debug.Log("click");
 
 			//If the user decides they hate productivity and want to unselect all their notes, so be it.
 			if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D)) {
@@ -258,18 +356,17 @@ namespace NotReaper.Tools {
 			TargetIcon iconUnderMouse = iconsUnderMouse.Length > 0 ? iconsUnderMouse[0] : null;
 
 			/** Click Detection **/
-			if (isSelectionDown && !hasMovedOutOfClickBounds) {
+			if (isSelectionDownOld && !hasMovedOutOfClickBoundsOld) {
 
 				// Check for a tiny amount of mouse movement to ensure this was meant to be a click
 
 				float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
 				if (movement > 2) {
-					hasMovedOutOfClickBounds = true;
+					hasMovedOutOfClickBoundsOld = true;
 				}
 			}
 
 			/** Cut Copy Paste Delete **/
-			// TODO: Move these actions into timeline to record sane undo actions!
 			Action delete = () => {
 				if (timeline.selectedNotes.Count > 0) {
 					timeline.DeleteTargets(timeline.selectedNotes);
@@ -389,9 +486,9 @@ namespace NotReaper.Tools {
 						Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - dragSelectGrid.transform.position;
 						dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
 
-					} else if (iconUnderMouse && !isSelectionDown) {
+					} else if (iconUnderMouse && !isSelectionDownOld) {
 						StartSelectionAction();
-					} else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBounds) {
+					} else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBoundsOld) {
 						iconUnderMouse.TrySelect();
 						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
 						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
@@ -402,7 +499,7 @@ namespace NotReaper.Tools {
 				}
 				if (Input.GetMouseButtonUp(0)) {
 					EndSelectionAction();
-					if (!hasMovedOutOfClickBounds) TryToggleSelection();
+					if (!hasMovedOutOfClickBoundsOld) TryToggleSelection();
 				}
 
 				if (isDraggingNotesOnGrid) {
