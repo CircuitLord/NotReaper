@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Models;
@@ -36,8 +36,8 @@ namespace NotReaper.Targets {
 
         public float sustainDirection = 0.6f;
         public bool isSelected = false;
-		public TargetIconLocation location;
-        
+        public TargetIconLocation location;
+
         public ParticleSystem holdParticles;
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace NotReaper.Targets {
 
             isSelected = false;
         }
-        
+
 
         public void SetOutlineColor(Color color) {
             standardOutline.color = color;
@@ -138,6 +138,7 @@ namespace NotReaper.Targets {
                         break;
                 }
             }
+
             foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
                 switch (handType) {
                     case TargetHandType.Left:
@@ -161,8 +162,8 @@ namespace NotReaper.Targets {
                         sustainDirection = 0.6f;
                         break;
                 }
-                
-                
+
+
                 if (data.behavior == TargetBehavior.Hold && l.positionCount >= 3) {
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
                     var pos2 = l.GetPosition(2);
@@ -185,16 +186,17 @@ namespace NotReaper.Targets {
 
             var lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>(true);
             foreach (LineRenderer l in lineRenderers) {
-                if(l.positionCount < 3) {
+                if (l.positionCount < 3) {
                     continue;
                 }
-                
+
                 if (beatLength >= 1) {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
                     beatLength = beatLength / 480;
                     l.SetPosition(2, new Vector3((beatLength / 0.7f) * scale, sustainDirection, 0.0f));
-                } else {
+                }
+                else {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(1, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(2, new Vector3(0.0f, 0.0f, 0.0f));
@@ -202,14 +204,19 @@ namespace NotReaper.Targets {
             }
         }
 
-        private void OnBehaviorChanged(TargetBehavior b) {
-            standard.SetActive(b == TargetBehavior.Standard);
-            hold.SetActive(b == TargetBehavior.Hold);
-            horizontal.SetActive(b == TargetBehavior.Horizontal);
-            vertical.SetActive(b == TargetBehavior.Vertical);
-            chainStart.SetActive(b == TargetBehavior.ChainStart);
-            chain.SetActive(b == TargetBehavior.Chain);
-            melee.SetActive(b == TargetBehavior.Melee);
+        private void OnBehaviorChanged(TargetBehavior behavior) {
+            standard.SetActive(behavior == TargetBehavior.Standard);
+            hold.SetActive(behavior == TargetBehavior.Hold);
+            horizontal.SetActive(behavior == TargetBehavior.Horizontal);
+            vertical.SetActive(behavior == TargetBehavior.Vertical);
+            chainStart.SetActive(behavior == TargetBehavior.ChainStart);
+            chain.SetActive(behavior == TargetBehavior.Chain);
+            melee.SetActive(behavior == TargetBehavior.Melee);
+
+            sphereCollider.radius = 0.5f;
+            if (behavior == TargetBehavior.Chain) {
+                sphereCollider.radius = 0.25f;
+            }
         }
     }
 }
