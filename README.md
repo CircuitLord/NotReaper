@@ -76,7 +76,7 @@ Get bored of staring at the same UI over and over? Make NotReaper more like home
 
 
 * Configure what colors you want to use for the Audica targets, and the UI will follow suite.
-* Don't like the background? Me neither. Change it to a picture of kittens for a 20% mapping speed increase. (soon)
+* Don't like the background? Me neither. Change it to a picture of kittens for a 20% mapping speed increase.
 * Custom keybindings! Want to save with Ctrl+C and add notes with L? Be my guest. (soon)
 
 
@@ -84,7 +84,7 @@ Get bored of staring at the same UI over and over? Make NotReaper more like home
 <h1>How the heck do I use this thing</h1>
 https://www.youtube.com/watch?v=FNIHvo8Nsm4 Full tutorial here.
 
-I ask myself that question everyday. For a comprehensive list of the default hotkeys, hit F1 in-game to pull up a neat page with words on it. (soon) Or, if you don't like in-game helpers, go [here](https://github.com/CircuitLord/NotReaper#controls) for a list of hotkeys.
+I ask myself that question everyday. For a comprehensive list of the default hotkeys, hit F1 in-game to pull up a neat page with words on it. Or, if you don't like in-game helpers, go [here](https://github.com/CircuitLord/NotReaper#controls) for a list of hotkeys.
 
 For help with using the tool itself, join the [Audica Modding Discord](https://discord.gg/cakQUt5)!
 
