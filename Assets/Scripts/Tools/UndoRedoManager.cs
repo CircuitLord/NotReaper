@@ -70,6 +70,11 @@ namespace NotReaper.Tools {
 
 			redoActions = new List<NRAction>();
 		}
+
+		public void ClearActions() {
+			actions = new List<NRAction>();
+			redoActions = new List<NRAction>();
+		}
 	}
 
 	public abstract class NRAction {
@@ -121,75 +126,47 @@ namespace NotReaper.Tools {
 		}
 	}
 
-	public class TargetDataMoveIntent {
-		public TargetDataMoveIntent() {}
-
-		public TargetDataMoveIntent(TargetMoveIntent intent) {
-			targetData = new TargetData(intent.target);
-			startingPosition = intent.startingPosition;
-			intendedPosition = intent.intendedPosition;
-		}
-
-		public TargetData targetData;
-		public Vector3 startingPosition;
-		public Vector3 intendedPosition;
-	}
-
 	public class NRActionGridMoveNotes : NRAction {
-		public List<TargetDataMoveIntent> targetGridMoveIntents = new List<TargetDataMoveIntent>();
+		public List<TargetGridMoveIntent> targetGridMoveIntents = new List<TargetGridMoveIntent>();
 
 		public override void DoAction(Timeline timeline) {
 			targetGridMoveIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.targetData);
-				target.gridTargetIcon.transform.localPosition = intent.intendedPosition;
-				timeline.updateSustainEnd(target);
-				intent.targetData.x = intent.intendedPosition.x;
-				intent.targetData.y = intent.intendedPosition.y;
+				Target target = timeline.FindNote(intent.target);
+				target.data.position = intent.intendedPosition;
+				intent.target.position = intent.intendedPosition;
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetGridMoveIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.targetData);
-				target.gridTargetIcon.transform.localPosition = intent.startingPosition;
-				timeline.updateSustainEnd(target);
-				intent.targetData.x = intent.startingPosition.x;
-				intent.targetData.y = intent.startingPosition.y;
+				Target target = timeline.FindNote(intent.target);
+				target.data.position = intent.startingPosition;
+				intent.target.position = intent.startingPosition;
 			});
 		}
 	}
 
 	public class NRActionTimelineMoveNotes : NRAction {
-		public List<TargetDataMoveIntent> targetTimelineMoveIntents = new List<TargetDataMoveIntent>();
+		public List<TargetTimelineMoveIntent> targetTimelineMoveIntents = new List<TargetTimelineMoveIntent>();
 
 		public override void DoAction(Timeline timeline) {
-			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.targetData)).ToList();
+			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.target)).ToList();
 
 			for(int i = 0; i < targetTimelineMoveIntents.Count; ++i) {
-				TargetDataMoveIntent intent = targetTimelineMoveIntents[i];
+				TargetTimelineMoveIntent intent = targetTimelineMoveIntents[i];
 				Target target = targets[i];
-				var newPos = intent.intendedPosition;
-
-				var gridPos = target.gridTargetIcon.transform.localPosition;
-				target.timelineTargetIcon.transform.localPosition = newPos;
-				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
-				timeline.updateSustainEnd(target);
-				intent.targetData.beatTime = newPos.x;
+				target.data.beatTime = intent.intendedTime;
+				intent.target.beatTime = intent.intendedTime;
 			}
 			timeline.SortOrderedList();
 		}
 		public override void UndoAction(Timeline timeline) {
-			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.targetData)).ToList();
+			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.target)).ToList();
 
 			for(int i = 0; i < targetTimelineMoveIntents.Count; ++i) {
-				TargetDataMoveIntent intent = targetTimelineMoveIntents[i];
+				TargetTimelineMoveIntent intent = targetTimelineMoveIntents[i];
 				Target target = targets[i];
-				var newPos = intent.startingPosition;
-
-				var gridPos = target.gridTargetIcon.transform.localPosition;
-				target.timelineTargetIcon.transform.localPosition = newPos;
-				target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
-				timeline.updateSustainEnd(target);
-				intent.targetData.beatTime = newPos.x;
+				target.data.beatTime = intent.startTime;
+				intent.target.beatTime = intent.startTime;
 			}
 			timeline.SortOrderedList();
 		}
@@ -201,14 +178,14 @@ namespace NotReaper.Tools {
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
 				Target target = timeline.FindNote(targetData);
-				switch (target.handType) {
+				switch (target.data.handType) {
 					case TargetHandType.Left: 
-						target.SetHandType(TargetHandType.Right); 
+						target.data.handType = TargetHandType.Right;
 						targetData.handType = TargetHandType.Right;
 					break;
 					
 					case TargetHandType.Right: 
-						target.SetHandType(TargetHandType.Left);
+						target.data.handType = TargetHandType.Left;
 						targetData.handType = TargetHandType.Left;
 					break;
 				}
@@ -225,14 +202,8 @@ namespace NotReaper.Tools {
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
 				Target target = timeline.FindNote(targetData);
-				var pos = target.gridTargetIcon.transform.localPosition;
-				target.gridTargetIcon.transform.localPosition = new Vector3(
-					pos.x * -1,
-					pos.y,
-					pos.z
-				);
-				target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-				targetData.x = target.gridTargetPos.x;
+				target.data.x *= -1;
+				targetData.x *= -1;
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
@@ -246,48 +217,30 @@ namespace NotReaper.Tools {
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
 				Target target = timeline.FindNote(targetData);
-				var pos = target.gridTargetIcon.transform.localPosition;
-				target.gridTargetIcon.transform.localPosition = new Vector3(
-					pos.x,
-					pos.y * -1,
-					pos.z
-				);
-				target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-				targetData.y = target.gridTargetPos.y;
+				target.data.y *= -1;
+				targetData.y *= -1;
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
 			DoAction(timeline); //Swap is symmetrical
 		}
 	}
-	
-	public class TargetDataSetHitsoundIntent {
-		public TargetDataSetHitsoundIntent() {}
 
-		public TargetDataSetHitsoundIntent(TargetSetHitsoundIntent intent) {
-			targetData = new TargetData(intent.target);
-			startingVelocity = intent.startingVelocity;
-			newVelocity = intent.newVelocity;
-		}
-
-		public TargetData targetData;
-		public TargetVelocity startingVelocity;
-		public TargetVelocity newVelocity;
-	}
-	
 	public class NRActionSetTargetHitsound : NRAction {
-		public List<TargetDataSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetDataSetHitsoundIntent>();
+		public List<TargetSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
 
 		public override void DoAction(Timeline timeline) {
 			targetSetHitsoundIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.targetData);
-				target.SetVelocity(intent.newVelocity);
+				Target target = timeline.FindNote(intent.target);
+				target.data.velocity = intent.newVelocity;
+				intent.target.velocity = intent.newVelocity;
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetSetHitsoundIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.targetData);
-				target.SetVelocity(intent.startingVelocity);
+				Target target = timeline.FindNote(intent.target);
+				target.data.velocity = intent.startingVelocity;
+				intent.target.velocity = intent.startingVelocity;
 			});
 		}
 	}
