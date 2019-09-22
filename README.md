@@ -95,7 +95,7 @@ NotReaper is the work of quite a few awesome people.
 ## NotReaper Team
 [CircuitLord](https://github.com/CircuitLord): Lead developer of the project, and video creation guy.
 
-[Jukibom](https://github.com/jukibom): Developer, organizer of issues and todo list.
+[Jukibom](https://github.com/jukibom): Developer, creator of many of Drag Select's features.
 
 [Mettra](https://github.com/Mettra): Developer, fixer of the undo/redo system nightmare.
 
