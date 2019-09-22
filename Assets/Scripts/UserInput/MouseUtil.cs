@@ -17,8 +17,7 @@ namespace NotReaper.UserInput {
 				.OrderBy(result => {
 					// sort by the distance from the centre of the timeline (closest = 0)
 					var target = result.transform.GetComponent<TargetIcon>();
-
-					bool isTimeline = !target.isGridIcon;
+					bool isTimeline = target.location == TargetIconLocation.Timeline;
 					var distance = isTimeline ?
 						Mathf.Abs(target.transform.localPosition.x) :
 						Mathf.Abs(target.transform.position.z);

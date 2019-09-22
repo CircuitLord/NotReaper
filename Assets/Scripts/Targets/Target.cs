@@ -7,19 +7,10 @@ namespace NotReaper.Targets {
 
 	public class Target {
 
-		public TargetIcon gridTargetIcon;
-		public TargetIcon timelineTargetIcon;
+		private TargetIcon gridTargetIcon;
+		private TargetIcon timelineTargetIcon;
 
-		public TargetHandType handType = TargetHandType.Left;
-		public TargetBehavior behavior = TargetBehavior.Standard;
-		public TargetVelocity velocity = TargetVelocity.Standard;
-		public float beatLength = 0.25f;
-		public bool isSelected = false;
-
-		public Vector3 gridTargetPos;
-		//public Vector3 timelineTargetPos;
-		
-
+		public TargetData data;
 
 		//Events and stuff:
 		public event Action<Target> DeleteNoteEvent;
@@ -53,6 +44,22 @@ namespace NotReaper.Targets {
 		}
 
 
+		public Target(TargetData targetData, TargetIcon timelineIcon, TargetIcon gridIcon) {
+			timelineTargetIcon = timelineIcon;
+			gridTargetIcon = gridIcon;
+
+			data = new TargetData();
+			data.PositionChangeEvent += OnGridPositionChanged;
+			data.HandTypeChangeEvent += OnHandTypeChanged;
+			data.BeatTimeChangeEvent += OnBeatTimeChanged;
+			data.BeatLengthChangeEvent += OnBeatLengthChanged;
+
+			timelineTargetIcon.Init(data);
+			gridTargetIcon.Init(data);
+
+			data.Copy(targetData);
+		}
+
 		//Do some stuff after all the target's references have been filled in by the timeline.
 		public void Init() {
 			gridTargetIcon.OnTryRemoveEvent += DeleteNote;
@@ -69,18 +76,74 @@ namespace NotReaper.Targets {
 
 			SetOutlineColor(NRSettings.config.selectedHighlightColor);
 
-			if (behavior == TargetBehavior.Hold) {
+			if (data.behavior == TargetBehavior.Hold) {
 				var gridHoldTargetManager = gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
 
-				gridHoldTargetManager.sustainLength = beatLength;
+				gridHoldTargetManager.sustainLength = data.beatLength;
 				gridHoldTargetManager.LoadSustainController();
 
 				gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength;
 			}
+		}
 
-		
-			gridTargetPos = gridTargetIcon.transform.localPosition;
+		public void Destroy() {
+			if(gridTargetIcon) {
+				UnityEngine.Object.Destroy(gridTargetIcon.gameObject);
+			}
+			if(timelineTargetIcon) {
+				UnityEngine.Object.Destroy(timelineTargetIcon.gameObject);
+			}
 
+			data.PositionChangeEvent -= OnGridPositionChanged;
+			data.HandTypeChangeEvent -= OnHandTypeChanged;
+			data.BeatTimeChangeEvent -= OnBeatTimeChanged;
+			data.BeatLengthChangeEvent -= OnBeatLengthChanged;
+		}
+
+		public float GetRelativeBeatTime() {
+			return gridTargetIcon.transform.position.z;
+		}
+
+		public ParticleSystem GetHoldParticles() {
+			return gridTargetIcon.holdParticles;
+		}
+
+		public void EnableSustainButtons() {
+			gridTargetIcon.GetComponentInChildren<HoldTargetManager>().EnableSustainButtons();
+		}
+
+		public void DisableSustainButtons() {
+			gridTargetIcon.GetComponentInChildren<HoldTargetManager>().DisableSustainButtons();
+		}
+
+		public void EnableColliders() {
+			gridTargetIcon.sphereCollider.enabled = true;
+			timelineTargetIcon.sphereCollider.enabled = true;
+		}
+
+		public void DisableColliders() {
+			gridTargetIcon.sphereCollider.enabled = false;
+			timelineTargetIcon.sphereCollider.enabled = false;
+		}
+
+		public void EnableGridColliders() {
+			gridTargetIcon.sphereCollider.enabled = true;
+		}
+
+		public void DisableGridColliders() {
+			gridTargetIcon.sphereCollider.enabled = false;
+		}
+
+		private void OnGridPositionChanged(float x, float y) {
+			var pos = gridTargetIcon.transform.localPosition;
+			pos.x = x;
+			pos.y = y;
+			gridTargetIcon.transform.localPosition = pos;
+
+			if (data.behavior == TargetBehavior.Hold) {
+				var holdEnd = gridTargetIcon.GetComponentInChildren<HoldTargetManager>().endMarker;
+				if (holdEnd) holdEnd.transform.localPosition = new Vector3 (x, y, holdEnd.transform.localPosition.z);
+			}
 		}
 
 		public void SetOutlineColor(Color color) {
@@ -89,17 +152,13 @@ namespace NotReaper.Targets {
 		}
 
 		//Wrapper function for setting the hand types of both targets.
-		public void SetHandType(TargetHandType newType) {
-			gridTargetIcon.SetHandType(newType);
-			timelineTargetIcon.SetHandType(newType);
-			handType = newType;
-
+		private void OnHandTypeChanged(TargetHandType newType) {
 			 //Handedness changes how the note is visually displayed in the timeline
 			float xOffset = timelineTargetIcon.transform.localPosition.x;
 			float yOffset = 0;
 			float zOffset = 0;
 
-			switch (handType) {
+			switch (data.handType) {
 				case TargetHandType.Left:
 					yOffset = 0.1f;
 					zOffset = 0.1f;
@@ -113,51 +172,35 @@ namespace NotReaper.Targets {
 			timelineTargetIcon.transform.localPosition = new Vector3(xOffset, yOffset, zOffset);
 		}
 
+		private void OnBeatTimeChanged(float newTime) {
+			var pos = gridTargetIcon.transform.localPosition;
+			pos.z = newTime;
+			gridTargetIcon.transform.localPosition = pos;
 
-		public void SetBehavior(TargetBehavior newBehavior) {
-			gridTargetIcon.SetBehavior(newBehavior);
-			timelineTargetIcon.SetBehavior(newBehavior);
-			behavior = newBehavior;
+			var timelinePos = timelineTargetIcon.transform.localPosition;
+			timelinePos.x = newTime;
+			timelineTargetIcon.transform.localPosition = timelinePos;
 		}
 
-		public void SetBeatLength(float newBeatLength) {
-			beatLength = newBeatLength;
-			
-
-			if (behavior == TargetBehavior.Hold) {
-				timelineTargetIcon.SetSustainLength(newBeatLength);
-			}
-		}
-
-		public void UpdateSustainBeatLength(float newBeatLength) {
-			if (behavior != TargetBehavior.Hold) return;
-			SetBeatLength(newBeatLength);
-			//Updates the grid icon target sustain length.
+		private void OnBeatLengthChanged(float newBeatLength) {
+			if (data.behavior != TargetBehavior.Hold) return;
 			gridTargetIcon.GetComponentInChildren<HoldTargetManager>().UpdateSustainLength(newBeatLength);
 		}
 
-		public void SetVelocity(TargetVelocity newVel) {
-			velocity = newVel;
-			gridTargetIcon.velocity = velocity;
-			timelineTargetIcon.velocity = velocity;
-
+		public void UpdateTimelineSustainLength() {
+			if (data.behavior != TargetBehavior.Hold) return;
+			timelineTargetIcon.UpdateTimelineSustainLength();
 		}
 
 		public void Select() {
-			timelineTargetIcon.EnableSelected(behavior);
-			gridTargetIcon.EnableSelected(behavior);
-			isSelected = true;
+			timelineTargetIcon.EnableSelected(data.behavior);
+			gridTargetIcon.EnableSelected(data.behavior);
 		}
 
 		public void Deselect() {
 			timelineTargetIcon.DisableSelected();
 			gridTargetIcon.DisableSelected();
-			isSelected = false;
 		}
-
-
-
-
 	}
 
 

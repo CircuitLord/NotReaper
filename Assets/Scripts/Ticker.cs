@@ -42,7 +42,7 @@ namespace NotReaper {
             if (layermask == (layermask | (1 << other.gameObject.layer))) {
                 if (other.transform.position.z > -1) {
 
-                    switch (other.GetComponent<TargetIcon>().velocity) {
+                    switch (other.GetComponent<TargetIcon>().data.velocity) {
                         case TargetVelocity.Standard:
                             {
                                 kick.Stop();

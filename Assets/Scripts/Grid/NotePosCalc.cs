@@ -23,10 +23,10 @@ namespace NotReaper.Grid {
 			float offsetX = 0, offsetY = 0;
 
 			//If it's a melee note.
-			if (target.behavior == TargetBehavior.Melee) {
+			if (target.data.behavior == TargetBehavior.Melee) {
 				pitch = 98;
-				if (target.gridTargetIcon.transform.position.x > 0) pitch += 1;
-				if (target.gridTargetIcon.transform.position.y > 0) pitch += 2;
+				if (target.data.x > 0) pitch += 1;
+				if (target.data.y > 0) pitch += 2;
 
 				offsetX = 0;
 				offsetY = 0;
@@ -34,8 +34,8 @@ namespace NotReaper.Grid {
 			} else {
 
 				//We have to divide by the new positions between the grid.
-				tempPos.x = (target.gridTargetIcon.transform.position.x  + xStart) / xSize;
-				tempPos.y = (target.gridTargetIcon.transform.position.y + yStart) / ySize;
+				tempPos.x = (target.data.x  + xStart) / xSize;
+				tempPos.y = (target.data.y + yStart) / ySize;
 
 				x = Mathf.Clamp(Mathf.RoundToInt(tempPos.x), 0, 11);
             	y = Mathf.Clamp(Mathf.RoundToInt(tempPos.y), 0, 6);
@@ -47,13 +47,13 @@ namespace NotReaper.Grid {
 			}
 
 			Cue cue = new Cue() {
-				tick = Mathf.RoundToInt(target.gridTargetIcon.transform.localPosition.z * 480f) + offset,
-					tickLength = Mathf.RoundToInt(target.beatLength),//Mathf.RoundToInt(target.beatLength * 480f),
+				tick = Mathf.RoundToInt(target.data.beatTime * 480f) + offset,
+					tickLength = Mathf.RoundToInt(target.data.beatLength),//Mathf.RoundToInt(target.beatLength * 480f),
 					pitch = pitch,
-					velocity = target.velocity,
+					velocity = target.data.velocity,
 					gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 2), y = (float) Math.Round(offsetY, 2) },
-					handType = target.handType,
-					behavior = target.behavior
+					handType = target.data.handType,
+					behavior = target.data.behavior
 			};
 
 

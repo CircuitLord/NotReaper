@@ -49,12 +49,13 @@ namespace NotReaper.Tools {
 		
 		private TargetIcon[] _iconsUnderMouse = new TargetIcon[0];
 
-		private Vector3 startDragMovePos;
+		private Vector2 startGridMovePos;
 		private Vector2 startClickDetectPos;
+		private float startTimelineMoveTime;
 
 		private List<Cue> clipboardNotes = new List<Cue>();
-		private List<TargetMoveIntent> gridTargetMoveIntents = new List<TargetMoveIntent>();
-		private List<TargetMoveIntent> timelineTargetMoveIntents = new List<TargetMoveIntent>();
+		private List<TargetGridMoveIntent> gridTargetMoveIntents = new List<TargetGridMoveIntent>();
+		private List<TargetTimelineMoveIntent> timelineTargetMoveIntents = new List<TargetTimelineMoveIntent>();
 		private List<TargetSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
 
 		/** Fetch all icons currently under the mouse
@@ -111,12 +112,6 @@ namespace NotReaper.Tools {
 
 			EndTimelineSelection();
 			EndGridSelection();
-
-			foreach (Target target in timeline.selectedNotes) {
-				if (target.gridTargetIcon) {
-					target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-				}
-			}
 		}
 
 		private void StartTimelineSelection() {
@@ -164,32 +159,30 @@ namespace NotReaper.Tools {
 
 		private void StartDragGridTargetAction(TargetIcon icon) {
 			isDraggingNotesOnGrid = true;
-			startDragMovePos = icon.transform.position;
-			gridTargetMoveIntents = new List<TargetMoveIntent>();
+			startGridMovePos = icon.data.position;
+			
+			gridTargetMoveIntents = new List<TargetGridMoveIntent>();
 			timeline.selectedNotes.ForEach(target => {
-				var intent = new TargetMoveIntent();
-				var pos = target.gridTargetIcon.transform.localPosition;
-				intent.target = target;
-				intent.startingPosition = new Vector3(pos.x, pos.y, pos.z);
+				var intent = new TargetGridMoveIntent();
+				intent.target = target.data;
+				intent.startingPosition = new Vector2(target.data.x, target.data.y);
+				
 				gridTargetMoveIntents.Add(intent);
 			});
 		}
 
 		private void UpdateDragGridTargetAction() {
 			var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+			var newPosVec3 = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
+			Vector2 newPos = new Vector2(newPosVec3.x, newPosVec3.y);
 
-			foreach (TargetMoveIntent intent in gridTargetMoveIntents) {
+			foreach (TargetGridMoveIntent intent in gridTargetMoveIntents) {
 
-				var offsetFromDragPoint = intent.target.gridTargetPos - startDragMovePos;
+				var offsetFromDragPoint = intent.startingPosition - startGridMovePos;
 				var tempNewPos = newPos + offsetFromDragPoint;
-				intent.target.gridTargetIcon.transform.localPosition = new Vector3(tempNewPos.x,
-					tempNewPos.y, intent.target.gridTargetPos.z);
+				intent.target.position = tempNewPos;
 
-				timeline.updateSustainEnd(intent.target);
-
-				intent.intendedPosition =
-					new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
+				intent.intendedPosition = tempNewPos;
 			}
 		}
 
@@ -197,45 +190,34 @@ namespace NotReaper.Tools {
 			isDraggingNotesOnGrid = false;
 			if (gridTargetMoveIntents.Count > 0) {
 				timeline.MoveGridTargets(gridTargetMoveIntents);
-				gridTargetMoveIntents = new List<TargetMoveIntent>();
+				gridTargetMoveIntents = new List<TargetGridMoveIntent>();
 			}
 		}
 
 		private void StartDragTimelineTargetAction(TargetIcon icon) {
 			isDraggingNotesOnTimeline = true;
-			startDragMovePos = icon.transform.position;
-			timelineTargetMoveIntents = new List<TargetMoveIntent>();
+			startTimelineMoveTime = icon.data.beatTime;
+			timelineTargetMoveIntents = new List<TargetTimelineMoveIntent>();
 			timeline.selectedNotes.ForEach(target => {
-				var intent = new TargetMoveIntent();
-				var pos = target.timelineTargetIcon.transform.localPosition;
-
-				intent.target = target;
-				intent.startingPosition = new Vector3(pos.x, pos.y, pos.z);
+				var intent = new TargetTimelineMoveIntent();
+				intent.target = target.data;
+				intent.startTime = target.data.beatTime;
 
 				timelineTargetMoveIntents.Add(intent);
 			});
 		}
 
 		private void UpdateDragTimelineTargetAction() {
-			foreach (TargetMoveIntent intent in timelineTargetMoveIntents) {
+			foreach (TargetTimelineMoveIntent intent in timelineTargetMoveIntents) {
 
-				var pos = intent.startingPosition;
-				var gridPos = intent.target.gridTargetIcon.transform.localPosition;
-
+				float offsetFromDragPoint = intent.startTime - startTimelineMoveTime;
 				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-				var offsetFromDragPoint = pos - startDragMovePos;
+				float newTime = SnapToBeat(mousePos);
 
-				Vector3 newPos = SnapToBeat(mousePos);
+				newTime += offsetFromDragPoint;
+				intent.target.beatTime = newTime;
 
-				newPos += offsetFromDragPoint;
-				intent.target.timelineTargetIcon.transform.localPosition =
-					new Vector3(newPos.x, pos.y, pos.z);
-				intent.target.gridTargetIcon.transform.localPosition =
-					new Vector3(gridPos.x, gridPos.y, newPos.x);
-
-				timeline.updateSustainEnd(intent.target);
-
-				intent.intendedPosition = new Vector3(newPos.x, pos.y, pos.z);
+				intent.intendedTime = newTime;
 			}
 		}
 
@@ -244,7 +226,7 @@ namespace NotReaper.Tools {
 			isDraggingNotesOnTimeline = false;
 			if (timelineTargetMoveIntents.Count > 0) {
 				timeline.MoveTimelineTargets(timelineTargetMoveIntents);
-				timelineTargetMoveIntents = new List<TargetMoveIntent>();
+				timelineTargetMoveIntents = new List<TargetTimelineMoveIntent>();
 			}
 		}
 
@@ -264,8 +246,8 @@ namespace NotReaper.Tools {
 			timeline.selectedNotes.ForEach(target => {
 				var intent = new TargetSetHitsoundIntent();
 
-				intent.target = target;
-				intent.startingVelocity = target.velocity;
+				intent.target = target.data;
+				intent.startingVelocity = target.data.velocity;
 				intent.newVelocity = velocity;
 
 				targetSetHitsoundIntents.Add(intent);
@@ -451,22 +433,12 @@ namespace NotReaper.Tools {
 			if (frameIntentDragEnd) {
 				if (isDraggingNotesOnGrid) EndDragGridTargetAction();
 				if (isDraggingNotesOnTimeline) EndDragTimelineTargetAction();
-
-				foreach (Target target in timeline.selectedNotes) {
-					if (target.gridTargetIcon) {
-						target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-					}
-				}
 			}
 		}
 		
-		private Vector3 SnapToBeat(Vector3 position) {
-			var increments = ((480 / timeline.beatSnap) * 4f) / 480; // what even is life //42
-			return new Vector3(
-				Mathf.Round(position.x / increments) * increments,
-				position.y,
-				position.z
-			);
+		private float SnapToBeat(Vector3 position) {
+			var increments = ((480 / timeline.beatSnap) * 4f) / 480;
+			return Timeline.DurationToBeats(Timeline.time) + Mathf.Round(position.x / increments) * increments; 
 		}
 	}
 }
