@@ -212,6 +212,7 @@ namespace NotReaper.Tools {
 
 				float offsetFromDragPoint = intent.startTime - startTimelineMoveTime;
 				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+				mousePos.x /= Timeline.scaleTransform;
 				float newTime = SnapToBeat(mousePos);
 
 				newTime += offsetFromDragPoint;

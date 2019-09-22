@@ -96,6 +96,7 @@ namespace NotReaper {
 		public int beatSnap { get; private set; } = 4;
 
 		[HideInInspector] public static int scale = 20;
+		public static float scaleTransform;
 		private float targetScale = 0.7f;
 		private float scaleOffset = 0;
 		private static float bpm = 60;
@@ -822,7 +823,7 @@ namespace NotReaper {
 		}
 
 		public void SetScale(int newScale) {
-			if (newScale < 10 || newScale > 35) return;
+			if (newScale < 5 || newScale > 100) return;
 			timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
 			scaleOffset = -newScale % 8 / 8f;
 
@@ -830,7 +831,7 @@ namespace NotReaper {
 
 			Vector3 timelineTransformScale = timelineTransformParent.transform.localScale;
 			timelineTransformScale.x *= (float) scale / newScale;
-
+			scaleTransform = timelineTransformScale.x;
 			timelineTransformParent.transform.localScale = timelineTransformScale;
 
 			targetScale *= (float) newScale / scale;
