@@ -129,6 +129,13 @@ namespace NotReaper.Tools {
 			isDraggingTimeline = true;
 		}
 
+		private void UpdateTimelineSelection() {
+			float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
+			float timelineScaleMulti = Timeline.scale / 20f;
+			dragSelectTimeline.localScale =
+				new Vector3(diff * timelineScaleMulti, 1.1f * (Timeline.scale / 20f), 1);
+		}
+
 		private void EndTimelineSelection() {
 			isDraggingTimeline = false;
 			dragSelectTimeline.gameObject.SetActive(false);
@@ -142,6 +149,12 @@ namespace NotReaper.Tools {
 			dragSelectGrid.transform.localScale = new Vector3(0, 0, 1f);
 			dragSelectGrid.SetActive(true);
 			isDraggingGrid = true;
+		}
+
+		private void UpdateGridSelection() {
+			Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) -
+			               dragSelectGrid.transform.position;
+			dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
 		}
 
 		private void EndGridSelection() {
@@ -261,6 +274,7 @@ namespace NotReaper.Tools {
 			timeline.SetTargetHitsounds(targetSetHitsoundIntents);
 		}
 		
+		// Capture raw input and set the state of frame intents 
 		private void CaptureInput() {
 			// TODO: Move these intents to a new input manager
 			bool primaryModifierHeld = false;
@@ -341,6 +355,7 @@ namespace NotReaper.Tools {
 			}
 		}
 
+		// execute simple actions which don't require any state management'
 		private void UpdateActions() {
 			
 			/** Setting hitsounds **/
@@ -383,6 +398,7 @@ namespace NotReaper.Tools {
 			if (frameIntentDeselectAll) timeline.DeselectAllTargets();
 		}
 
+		// Update the selection box and individually added / removed targets
 		private void UpdateSelections() {
 			
 			/** Clicking to add or remove targets **/
@@ -392,27 +408,14 @@ namespace NotReaper.Tools {
 			if (frameIntentDragStart) {
 				// if we're not hovering over an icon, start a new outline
 				if (!iconUnderMouse) {
-					if (timeline.hover) {
-						StartTimelineSelection();
-					}
-					else {
-						StartGridSelection();
-					}
+					if (timeline.hover) StartTimelineSelection();
+					else StartGridSelection();
 				}
 			}
-			
+
 			if (frameIntentDragging) {
-				if (isDraggingTimeline) {
-					float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
-					float timelineScaleMulti = Timeline.scale / 20f;
-					dragSelectTimeline.localScale =
-						new Vector3(diff * timelineScaleMulti, 1.1f * (Timeline.scale / 20f), 1);
-				}
-				else if (isDraggingGrid) {
-					Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) -
-					               dragSelectGrid.transform.position;
-					dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
-				}
+				if (isDraggingTimeline) UpdateTimelineSelection();
+				else if (isDraggingGrid) UpdateGridSelection();
 			}
 
 			if (frameIntentDragEnd) {
@@ -420,6 +423,7 @@ namespace NotReaper.Tools {
 			}
 		}
 
+		// Update the drag-around-the-area logic of selected targets
 		private void UpdateDragging() {
 			bool shouldDragNotes = (timeline.selectedNotes.Count > 0) || iconUnderMouse;
 			if (shouldDragNotes) {
@@ -433,14 +437,8 @@ namespace NotReaper.Tools {
 					}
 					
 					if (anySelectedIconUnderMouse) {
-						switch (iconUnderMouse.location) {
-							case TargetIconLocation.Grid:
-								StartDragGridTargetAction(iconUnderMouse);
-								break;
-							case TargetIconLocation.Timeline:
-								StartDragTimelineTargetAction(iconUnderMouse);
-								break;
-						}
+						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
+						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
 					}
 				}
 
