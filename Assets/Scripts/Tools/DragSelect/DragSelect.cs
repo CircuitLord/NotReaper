@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using NotReaper.Grid;
@@ -13,14 +12,16 @@ namespace NotReaper.Tools {
 	public class DragSelect : MonoBehaviour {
 
 		public Timeline timeline;
-
-		public bool activated = false;
-		public bool isDraggingTimeline = false;
-		public bool isDraggingGrid = false;
-		public bool isDraggingNotesOnGrid = false;
-		public bool isDraggingNotesOnTimeline = false;
-		bool isSelectionDownOld = false;
-		bool hasMovedOutOfClickBoundsOld = false;
+		public Transform dragSelectTimeline;
+		public Transform timelineNotes;
+		public GameObject dragSelectGrid;
+		public LayerMask notesLayer;
+		
+		private bool activated = false;
+		private bool isDraggingTimeline = false;
+		private bool isDraggingGrid = false;
+		private bool isDraggingNotesOnGrid = false;
+		private bool isDraggingNotesOnTimeline = false;
 
 		// TODO: This should come from whatever new input handler we end up with, for now this at least should abstract input from intent (see CaptureInput())
 		// Represent action intents occuring this update frame.
@@ -43,25 +44,39 @@ namespace NotReaper.Tools {
 		private bool frameIntentSetHitSoundChain = false;
 		private bool frameIntentSetHitSoundMelee = false;
 		
-		bool hasInputDragMovedOutOfClickBounds = false;
+		private bool hasInputDragMovedOutOfClickBounds = false;
+		private bool dragStarted = false;
 		
-		Vector3 startDragMovePos;
-		Vector2 startClickDetectPos;
+		private TargetIcon[] _iconsUnderMouse = new TargetIcon[0];
 
-		public Transform dragSelectTimeline;
-		public Transform timelineNotes;
+		private Vector3 startDragMovePos;
+		private Vector2 startClickDetectPos;
 
-		public GameObject dragSelectGrid;
-
-		public LayerMask notesLayer;
-
-		public List<Cue> clipboardNotes = new List<Cue>();
-
+		private List<Cue> clipboardNotes = new List<Cue>();
 		private List<TargetMoveIntent> gridTargetMoveIntents = new List<TargetMoveIntent>();
 		private List<TargetMoveIntent> timelineTargetMoveIntents = new List<TargetMoveIntent>();
-
 		private List<TargetSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
 
+		/** Fetch all icons currently under the mouse
+		 *  Will only ever happen once per frame */
+		public TargetIcon[] iconsUnderMouse {
+			get {
+				return _iconsUnderMouse = _iconsUnderMouse == null
+					? MouseUtil.IconsUnderMouse(notesLayer)
+					: _iconsUnderMouse;
+			}
+			set { _iconsUnderMouse = value; }
+		}
+
+		// Fetch the highest priority target (closest to current time)
+		public TargetIcon iconUnderMouse {
+			get {
+				return iconsUnderMouse != null && iconsUnderMouse.Length > 0
+					? iconsUnderMouse[0]
+					: null;
+			}
+		}
+		
 		//INFO: Code for selecting targets is on the drag select timeline thing itself
 
 		/// <summary>
@@ -72,78 +87,100 @@ namespace NotReaper.Tools {
 			activated = active;
 
 			if (!active) {
-				if (isDraggingTimeline) EndTimelineDrag();
-				else if (isDraggingGrid) EndGridDrag();
+				if (isDraggingTimeline) EndTimelineSelection();
+				else if (isDraggingGrid) EndGridSelection();
 				timeline.DeselectAllTargets();
 			}
+		}
+		
+		public void Update() {
+			if (!activated) return;
+			CaptureInput();
+			UpdateActions();
+			UpdateSelections();
+			UpdateDragging();
+			iconsUnderMouse = null;
+		}
+		
+		public void EndAllDragStuff() {
+			if (isDraggingNotesOnTimeline) {
+				EndDragTimelineTargetAction();
+			} else if (isDraggingNotesOnGrid) {
+				EndDragGridTargetAction();
+			}
 
+			EndTimelineSelection();
+			EndGridSelection();
 
+			foreach (Target target in timeline.selectedNotes) {
+				if (target.gridTargetIcon) {
+					target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
+				}
+			}
 		}
 
-
-		private void StartTimelineDrag() {
-
+		private void StartTimelineSelection() {
 			timeline.DeselectAllTargets();
-
 			float mouseX = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
-
 			dragSelectTimeline.SetParent(timelineNotes);
 			dragSelectTimeline.position = new Vector3(mouseX, 0, 0);
 			dragSelectTimeline.localPosition = new Vector3(dragSelectTimeline.transform.localPosition.x, 0.03f, 0);
-
 			dragSelectTimeline.gameObject.SetActive(true);
-
 			isDraggingTimeline = true;
 		}
 
-		public void EndTimelineDrag() {
+		private void EndTimelineSelection() {
 			isDraggingTimeline = false;
-
 			dragSelectTimeline.gameObject.SetActive(false);
-
 		}
 
 
-		private void StartGridDrag() {
-
+		private void StartGridSelection() {
 			timeline.DeselectAllTargets();
-
 			Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
 			dragSelectGrid.transform.position = new Vector3(mousePos.x, mousePos.y, 0f);
 			dragSelectGrid.transform.localScale = new Vector3(0, 0, 1f);
-
 			dragSelectGrid.SetActive(true);
-
-
 			isDraggingGrid = true;
 		}
 
-		public void EndGridDrag() {
-
+		private void EndGridSelection() {
 			dragSelectGrid.SetActive(false);
 			isDraggingGrid = false;
 		}
 
 		private void StartDragGridTargetAction(TargetIcon icon) {
-
 			isDraggingNotesOnGrid = true;
 			startDragMovePos = icon.transform.position;
-
 			gridTargetMoveIntents = new List<TargetMoveIntent>();
 			timeline.selectedNotes.ForEach(target => {
 				var intent = new TargetMoveIntent();
 				var pos = target.gridTargetIcon.transform.localPosition;
-
 				intent.target = target;
 				intent.startingPosition = new Vector3(pos.x, pos.y, pos.z);
-
 				gridTargetMoveIntents.Add(intent);
 			});
 		}
 
-		public void EndDragGridTargetAction() {
+		private void UpdateDragGridTargetAction() {
+			var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
 
+			foreach (TargetMoveIntent intent in gridTargetMoveIntents) {
+
+				var offsetFromDragPoint = intent.target.gridTargetPos - startDragMovePos;
+				var tempNewPos = newPos + offsetFromDragPoint;
+				intent.target.gridTargetIcon.transform.localPosition = new Vector3(tempNewPos.x,
+					tempNewPos.y, intent.target.gridTargetPos.z);
+
+				timeline.updateSustainEnd(intent.target);
+
+				intent.intendedPosition =
+					new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
+			}
+		}
+
+		private void EndDragGridTargetAction() {
 			isDraggingNotesOnGrid = false;
 			if (gridTargetMoveIntents.Count > 0) {
 				timeline.MoveGridTargets(gridTargetMoveIntents);
@@ -152,10 +189,8 @@ namespace NotReaper.Tools {
 		}
 
 		private void StartDragTimelineTargetAction(TargetIcon icon) {
-
 			isDraggingNotesOnTimeline = true;
 			startDragMovePos = icon.transform.position;
-
 			timelineTargetMoveIntents = new List<TargetMoveIntent>();
 			timeline.selectedNotes.ForEach(target => {
 				var intent = new TargetMoveIntent();
@@ -168,7 +203,30 @@ namespace NotReaper.Tools {
 			});
 		}
 
-		public void EndDragTimelineTargetAction() {
+		private void UpdateDragTimelineTargetAction() {
+			foreach (TargetMoveIntent intent in timelineTargetMoveIntents) {
+
+				var pos = intent.startingPosition;
+				var gridPos = intent.target.gridTargetIcon.transform.localPosition;
+
+				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+				var offsetFromDragPoint = pos - startDragMovePos;
+
+				Vector3 newPos = SnapToBeat(mousePos);
+
+				newPos += offsetFromDragPoint;
+				intent.target.timelineTargetIcon.transform.localPosition =
+					new Vector3(newPos.x, pos.y, pos.z);
+				intent.target.gridTargetIcon.transform.localPosition =
+					new Vector3(gridPos.x, gridPos.y, newPos.x);
+
+				timeline.updateSustainEnd(intent.target);
+
+				intent.intendedPosition = new Vector3(newPos.x, pos.y, pos.z);
+			}
+		}
+
+		private void EndDragTimelineTargetAction() {
 
 			isDraggingNotesOnTimeline = false;
 			if (timelineTargetMoveIntents.Count > 0) {
@@ -177,6 +235,17 @@ namespace NotReaper.Tools {
 			}
 		}
 
+		
+		private void TryToggleSelection() {
+			if (iconUnderMouse && iconUnderMouse.isSelected) {
+				iconUnderMouse.TryDeselect();
+			} else if (iconUnderMouse && !iconUnderMouse.isSelected) {
+				iconUnderMouse.TrySelect();
+			} else {
+				timeline.DeselectAllTargets();
+			}
+		}
+		
 		private void SetHitsoundAction(TargetVelocity velocity) {
 			targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
 			timeline.selectedNotes.ForEach(target => {
@@ -191,66 +260,16 @@ namespace NotReaper.Tools {
 
 			timeline.SetTargetHitsounds(targetSetHitsoundIntents);
 		}
-
-
-		private void StartSelectionAction() {
-			isSelectionDownOld = true;
-			hasMovedOutOfClickBoundsOld = false;
-			startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-		}
-
-		public void EndSelectionAction() {
-			isSelectionDownOld = false;
-		}
-
-		private void TryToggleSelection() {
-			var iconsUnderMouse = MouseUtil.IconsUnderMouse(notesLayer);
-			TargetIcon iconUnderMouse = iconsUnderMouse.Length > 0 ? iconsUnderMouse[0] : null;
-
-			if (iconUnderMouse && iconUnderMouse.isSelected) {
-				iconUnderMouse.TryDeselect();
-			} else if (iconUnderMouse && !iconUnderMouse.isSelected) {
-				iconUnderMouse.TrySelect();
-			}
-		}
-
-
-		public Vector3 CalcAvgNotePos(List<Target> targets) {
-
-			Vector3 avgPos = new Vector3(0, 0, 0);
-
-			foreach (Target target in targets) {
-				avgPos += target.gridTargetPos;
-
-			}
-			return avgPos / targets.Count;
-		}
-
-
-		public void EndAllDragStuff() {
-			if (isDraggingNotesOnTimeline) {
-				EndDragTimelineTargetAction();
-			} else if (isDraggingNotesOnGrid) {
-				EndDragGridTargetAction();
-			}
-
-			EndTimelineDrag();
-			EndGridDrag();
-
-			foreach (Target target in timeline.selectedNotes) {
-				if (target.gridTargetIcon) {
-					target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-				}
-			}
-
-			//EndSelectionAction();
-		}
-
-		void CaptureInput() {
+		
+		private void CaptureInput() {
+			// TODO: Move these intents to a new input manager
 			bool primaryModifierHeld = false;
 			bool secondaryModifierHeld = false;
+			
+			// all intents are reset every frame
 			frameIntentSelect = false;
 			frameIntentDragStart = false;
+			frameIntentDragging = false;
 			frameIntentDragEnd = false;
 			frameIntentCut = false;
 			frameIntentCopy = false;
@@ -289,157 +308,131 @@ namespace NotReaper.Tools {
 			}
 			
 			// Mouse input
-			
-			if (Input.GetMouseButtonDown(0)) {
-				startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-			}
-			
-			bool isSelectionDown = Input.GetMouseButton(0);
+			if (EditorInput.selectedTool == EditorTool.DragSelect) {
+				
+				if (Input.GetMouseButtonDown(0)) {
+					startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+				}
 
-			if (isSelectionDown) {
-				if (hasInputDragMovedOutOfClickBounds && !frameIntentDragging) {
-					frameIntentDragStart = true;
-					frameIntentDragging = true;
-				} else {
-					// Check for a tiny amount of mouse movement to test whether a release is meant to be a selection
-					float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
-					hasInputDragMovedOutOfClickBounds = (movement > 2);
+				bool isSelectionDown = Input.GetMouseButton(0);
+
+				if (isSelectionDown) {
+					frameIntentDragging = hasInputDragMovedOutOfClickBounds;
+					if (frameIntentDragging && !dragStarted) {
+						frameIntentDragStart = true;
+						dragStarted = true;
+					}
+					else {
+						// Check for a tiny amount of mouse movement to test whether a release is meant to be a selection
+						float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
+						hasInputDragMovedOutOfClickBounds = (movement > 2);
+					}
 				}
 			}
 
 			if (Input.GetMouseButtonUp(0)) {
-				frameIntentDragEnd = hasInputDragMovedOutOfClickBounds;
-				frameIntentSelect = !hasInputDragMovedOutOfClickBounds;
-				
-				hasInputDragMovedOutOfClickBounds = false; 
 				frameIntentDragging = false;
+				frameIntentDragEnd = dragStarted;
+				frameIntentSelect = !dragStarted;
+				
+				// these are not reset every frame, only on mouse up!
+				hasInputDragMovedOutOfClickBounds = false;
+				dragStarted = false;
 			}
 		}
 
-		void Update() {
-
-			CaptureInput();
-			if (frameIntentDragStart) Debug.Log("drag start");
-			if (frameIntentDragging) Debug.Log("drag");
-			if (frameIntentDragEnd) Debug.Log("drag end");
-			if (frameIntentSelect) Debug.Log("click");
-
-			//If the user decides they hate productivity and want to unselect all their notes, so be it.
-			if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D)) {
-				timeline.DeselectAllTargets();
-			}
-
-			//Applying hitsounds to selected:
-
-			if (!activated) return;
-
-
-			//TODO: Add shift + ctrl detection up here instead of multipule times
-
-
-			if (Input.GetKeyDown(KeyCode.Q)) {
-				SetHitsoundAction(TargetVelocity.Standard);
-			} else if (Input.GetKeyDown(KeyCode.W)) {
-				SetHitsoundAction(TargetVelocity.Snare);
-			} else if (Input.GetKeyDown(KeyCode.E)) {
-				SetHitsoundAction(TargetVelocity.Percussion);
-			} else if (Input.GetKeyDown(KeyCode.R)) {
-				SetHitsoundAction(TargetVelocity.ChainStart);
-			} else if (Input.GetKeyDown(KeyCode.T)) {
-				SetHitsoundAction(TargetVelocity.Chain);
-			} else if (Input.GetKeyDown(KeyCode.Y)) {
-				SetHitsoundAction(TargetVelocity.Melee);
-			}
-
-
-			var iconsUnderMouse = MouseUtil.IconsUnderMouse(notesLayer);
-			TargetIcon iconUnderMouse = iconsUnderMouse.Length > 0 ? iconsUnderMouse[0] : null;
-
-			/** Click Detection **/
-			if (isSelectionDownOld && !hasMovedOutOfClickBoundsOld) {
-
-				// Check for a tiny amount of mouse movement to ensure this was meant to be a click
-
-				float movement = Math.Abs(startClickDetectPos.magnitude - Input.mousePosition.magnitude);
-				if (movement > 2) {
-					hasMovedOutOfClickBoundsOld = true;
-				}
-			}
+		private void UpdateActions() {
+			
+			/** Setting hitsounds **/
+			if (frameIntentSetHitSoundStandard) SetHitsoundAction(TargetVelocity.Standard);
+			if (frameIntentSetHitSoundSnare) SetHitsoundAction(TargetVelocity.Snare);
+			if (frameIntentSetHitSoundPercussion) SetHitsoundAction(TargetVelocity.Percussion);
+			if (frameIntentSetHitSoundChain) SetHitsoundAction(TargetVelocity.Chain);
+			if (frameIntentSetHitSoundChainStart) SetHitsoundAction(TargetVelocity.ChainStart);
+			if (frameIntentSetHitSoundMelee) SetHitsoundAction(TargetVelocity.Melee);
 
 			/** Cut Copy Paste Delete **/
-			Action delete = () => {
+			if (frameIntentCut) {
+				frameIntentCopy = true;
+				frameIntentDelete = true;
+			}
+			
+			if (frameIntentCopy) {
+				clipboardNotes = new List<Cue>();
+				timeline.selectedNotes.ForEach(note => clipboardNotes.Add(NotePosCalc.ToCue(note, 0, false)));
+			}
+
+			if (frameIntentPaste) {
+				timeline.DeselectAllTargets();
+				timeline.PasteCues(clipboardNotes, Timeline.BeatTime());
+			}
+			
+			if (frameIntentDelete) {
 				if (timeline.selectedNotes.Count > 0) {
 					timeline.DeleteTargets(timeline.selectedNotes);
 				}
 				timeline.selectedNotes = new List<Target>();
-			};
-
-			Action copy = () => {
-				clipboardNotes = new List<Cue>();
-				timeline.selectedNotes.ForEach(note => clipboardNotes.Add(NotePosCalc.ToCue(note, 0, false)));
-			};
-
-			Action paste = () => {
-				timeline.DeselectAllTargets();
-				timeline.PasteCues(clipboardNotes, Timeline.BeatTime());
-			};
-
-			if (Input.GetKeyDown(KeyCode.Delete)) {
-				delete();
 			}
-
-			bool dev = false;
-			bool modifierHeld = dev ?
-				Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) :
-				Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-
-			if (modifierHeld) {
-				if (Input.GetKeyDown(KeyCode.X)) {
-					copy();
-					delete();
-				}
-
-				if (Input.GetKeyDown(KeyCode.C)) {
-					copy();
-				}
-
-				if (Input.GetKeyDown(KeyCode.V)) {
-					paste();
-				}
-			}
-
+			
 			/** Note flipping **/
-			if (Input.GetKeyDown(KeyCode.F)) {
+			if (frameIntentSwapColors) timeline.SwapTargets(timeline.selectedNotes);
+			if (frameIntentFlipTargetsHorizontally) timeline.FlipTargetsHorizontal(timeline.selectedNotes);
+			if (frameIntentFlipTargetsVertically) timeline.FlipTargetsVertical(timeline.selectedNotes);
 
-				var ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-				var shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+			/** Note selection and movement **/
+			if (frameIntentDeselectAll) timeline.DeselectAllTargets();
+		}
 
-				// flip horizontal
-				if (ctrlHeld && !shiftHeld) {
-					timeline.FlipTargetsHorizontal(timeline.selectedNotes);
+		private void UpdateSelections() {
+			
+			/** Clicking to add or remove targets **/
+			if (frameIntentSelect) TryToggleSelection();
+
+			/** Selection outline **/
+			if (frameIntentDragStart) {
+				// if we're not hovering over an icon, start a new outline
+				if (!iconUnderMouse) {
+					if (timeline.hover) {
+						StartTimelineSelection();
+					}
+					else {
+						StartGridSelection();
+					}
 				}
-
-				// flip vertical
-				else if (shiftHeld) {
-					timeline.FlipTargetsVertical(timeline.selectedNotes);
+			}
+			
+			if (frameIntentDragging) {
+				if (isDraggingTimeline) {
+					float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
+					float timelineScaleMulti = Timeline.scale / 20f;
+					dragSelectTimeline.localScale =
+						new Vector3(diff * timelineScaleMulti, 1.1f * (Timeline.scale / 20f), 1);
 				}
-
-				// invert
-				else {
-					timeline.SwapTargets(timeline.selectedNotes);
+				else if (isDraggingGrid) {
+					Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) -
+					               dragSelectGrid.transform.position;
+					dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
 				}
 			}
 
-			/** Click + Drag Handling **/
-			//TODOUNDO I think I fixed this? //TODO: it should deselect when resiszing the grid dragger, but not deselect when scrubbing through the timeline while grid dragging
+			if (frameIntentDragEnd) {
+				if (isDraggingGrid || isDraggingTimeline) EndAllDragStuff();
+			}
+		}
 
-			if (EditorInput.selectedTool == EditorTool.DragSelect) {
+		private void UpdateDragging() {
+			bool shouldDragNotes = (timeline.selectedNotes.Count > 0) || iconUnderMouse;
+			if (shouldDragNotes) {
+				/** Moving targets around the timeline or grid **/
+				if (frameIntentDragStart) {
 
-				if (Input.GetMouseButtonDown(0)) {
-
-					if (iconUnderMouse) {
-						var anySelectedIconUnderMouse = iconsUnderMouse.Where(icon => icon.isSelected).ToArray();
-						if (anySelectedIconUnderMouse.Length == 0) return;
+					bool anySelectedIconUnderMouse = iconsUnderMouse.Where(icon => icon.isSelected).ToArray().Length != 0;
+					if (iconUnderMouse && !anySelectedIconUnderMouse) {
+						TryToggleSelection();
+						anySelectedIconUnderMouse = true;
+					}
+					
+					if (anySelectedIconUnderMouse) {
 						switch (iconUnderMouse.location) {
 							case TargetIconLocation.Grid:
 								StartDragGridTargetAction(iconUnderMouse);
@@ -451,102 +444,24 @@ namespace NotReaper.Tools {
 					}
 				}
 
-				if (Input.GetMouseButtonUp(0)) {
-					if (isDraggingNotesOnGrid) EndDragGridTargetAction();
-					if (isDraggingNotesOnTimeline) EndDragTimelineTargetAction();
-
-					foreach (Target target in timeline.selectedNotes) {
-						if (target.gridTargetIcon) {
-							target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
-						}
-					}
+				if (frameIntentDragging) {
+					if (isDraggingNotesOnGrid) UpdateDragGridTargetAction();
+					if (isDraggingNotesOnTimeline) UpdateDragTimelineTargetAction();
 				}
+			}
 
-				if (Input.GetMouseButton(0)) {
+			if (frameIntentDragEnd) {
+				if (isDraggingNotesOnGrid) EndDragGridTargetAction();
+				if (isDraggingNotesOnTimeline) EndDragTimelineTargetAction();
 
-					//If we're not already dragging
-
-					if (!isDraggingTimeline &&
-						!isDraggingGrid &&
-						!isDraggingNotesOnGrid &&
-						!isDraggingNotesOnTimeline &&
-						!iconUnderMouse
-					) {
-						if (timeline.hover) {
-							StartTimelineDrag();
-						} else {
-							StartGridDrag();
-						}
-					} else if (isDraggingTimeline) {
-						float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
-						float timelineScaleMulti = Timeline.scale / 20f;
-						dragSelectTimeline.localScale = new Vector3(diff * timelineScaleMulti, 1.1f * (Timeline.scale / 20f), 1);
-					} else if (isDraggingGrid) {
-
-						Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - dragSelectGrid.transform.position;
-						dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
-
-					} else if (iconUnderMouse && !isSelectionDownOld) {
-						StartSelectionAction();
-					} else if (iconUnderMouse && timeline.selectedNotes.Count == 0 && hasMovedOutOfClickBoundsOld) {
-						iconUnderMouse.TrySelect();
-						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
-						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
-					}
-				} else {
-					if (isDraggingTimeline) EndTimelineDrag();
-					else if (isDraggingGrid) EndGridDrag();
-				}
-				if (Input.GetMouseButtonUp(0)) {
-					EndSelectionAction();
-					if (!hasMovedOutOfClickBoundsOld) TryToggleSelection();
-				}
-
-				if (isDraggingNotesOnGrid) {
-
-					// TODO: this should really be handled by intermediary semi-transparent objects rather than updating "real" state as we go ...
-
-					var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-					Vector3 newPos = NoteGridSnap.SnapToGrid(mousePos, EditorInput.selectedSnappingMode);
-
-					foreach (TargetMoveIntent intent in gridTargetMoveIntents) {
-
-						var offsetFromDragPoint = intent.target.gridTargetPos - startDragMovePos;
-						var tempNewPos = newPos + offsetFromDragPoint;
-						intent.target.gridTargetIcon.transform.localPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
-						
-						timeline.updateSustainEnd(intent.target);
-
-						intent.intendedPosition = new Vector3(tempNewPos.x, tempNewPos.y, intent.target.gridTargetPos.z);
-					}
-				}
-
-				if (isDraggingNotesOnTimeline) {
-					foreach (TargetMoveIntent intent in timelineTargetMoveIntents) {
-
-						var pos = intent.startingPosition;
-						var gridPos = intent.target.gridTargetIcon.transform.localPosition;
-
-						var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-						var offsetFromDragPoint = pos - startDragMovePos;
-
-						Vector3 newPos = SnapToBeat(mousePos);
-						// TODO: Snap!
-
-						newPos += offsetFromDragPoint;
-						intent.target.timelineTargetIcon.transform.localPosition = new Vector3(newPos.x, pos.y, pos.z);
-						intent.target.gridTargetIcon.transform.localPosition = new Vector3(gridPos.x, gridPos.y, newPos.x);
-
-						timeline.updateSustainEnd(intent.target);
-
-						intent.intendedPosition = new Vector3(newPos.x, pos.y, pos.z);
+				foreach (Target target in timeline.selectedNotes) {
+					if (target.gridTargetIcon) {
+						target.gridTargetPos = target.gridTargetIcon.transform.localPosition;
 					}
 				}
 			}
 		}
-
-
-
+		
 		private Vector3 SnapToBeat(Vector3 position) {
 			var increments = ((480 / timeline.beatSnap) * 4f) / 480; // what even is life //42
 			return new Vector3(
