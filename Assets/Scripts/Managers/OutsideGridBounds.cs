@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using NotReaper.Grid;
+using NotReaper.UserInput;
 
 namespace NotReaper.Managers
 {
@@ -36,6 +37,9 @@ namespace NotReaper.Managers
 
 		private void Update()
 		{
+
+			if (EditorInput.inUI) return;
+			
 			if (Input.GetKeyDown(KeyCode.J))
 			{
 				SetGridPosition(-1);

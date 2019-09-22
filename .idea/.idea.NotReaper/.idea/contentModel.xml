@@ -155,6 +155,7 @@
           <e p="Managers" t="Include">
             <e p="DifficultyManager.cs" t="Include" />
             <e p="EditorToolkit.cs" t="Include" />
+            <e p="OutsideGridBounds.cs" t="Include" />
             <e p="UserPrefsManager.cs" t="Include" />
           </e>
           <e p="Metronome" t="Include">
@@ -217,6 +218,7 @@
             <e p="ParallaxBG.cs" t="Include" />
             <e p="PauseStart" t="Include">
               <e p="PauseMenu.cs" t="Include" />
+              <e p="ShortcutInfo.cs" t="Include" />
             </e>
             <e p="SoundSelect" t="Include">
               <e p="SoundSelect.cs" t="Include" />

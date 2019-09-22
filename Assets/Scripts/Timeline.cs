@@ -818,6 +818,16 @@ namespace NotReaper {
 			leftSustainAud.pitch = speed;
 			rightSustainAud.pitch = speed;
 		}
+		
+		public void SetPlaybackSpeedFromSlider(Slider slider) {
+			if (!audioLoaded) return;
+
+			playbackSpeed = slider.value;
+			aud.pitch = slider.value;
+			previewAud.pitch = slider.value;
+			leftSustainAud.pitch = slider.value;
+			rightSustainAud.pitch = slider.value;
+		}
 
 		public void SetBPM(float newBpm) {
 			bpm = newBpm;
