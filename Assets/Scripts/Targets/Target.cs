@@ -58,6 +58,7 @@ namespace NotReaper.Targets {
 			gridTargetIcon.Init(data);
 
 			data.Copy(targetData);
+			UpdateTimelineSustainLength();
 		}
 
 		//Do some stuff after all the target's references have been filled in by the timeline.
