@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -707,15 +707,23 @@ namespace NotReaper {
 			
 			// Get song BPM
 			if (audicaFile.song_mid != null) {
-				// TODO: Multi-bpm support :(
-				var midiBpm = audicaFile.song_mid.GetTempoMap().Tempo.AtTime(0).BeatsPerMinute;
-				//if (midiBpm != desc.tempo) {
+				
+				float oneMinuteInMicroseconds = 60000000f;
+				var midiBpm = -1;
+				foreach (var tempo in audicaFile.song_mid.GetTempoMap().Tempo) {
+					// TODO: Multi-bpm support :(
+					// Debug.Log($"FOUND TEMPO EVENT: {tempo}, BPM: {tempo.Value.BeatsPerMinute}");
+					midiBpm = (int) Math.Round(oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote);
+				}
+
+				if (midiBpm != desc.tempo && midiBpm != -1) {
+					// TODO: in-scene dialog box :/
 					//if (EditorUtility.DisplayDialog("BPM mismatch",
 						//"Detected different BPM values in midi and song.desc. NotReaper does not currently support multi-bpm tracks.",
 					//	$"Use midi ({midiBpm})", $"Use song.desc ({desc.tempo})")) {
 						desc.tempo = midiBpm;
 					//}
-				//}
+				}
 			} 
 
 			//Update our discord presence
