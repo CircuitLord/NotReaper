@@ -1864,7 +1864,7 @@ Transform:
   m_GameObject: {fileID: 191590391}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -1.5}
-  m_LocalScale: {x: 12, y: 7, z: 2}
+  m_LocalScale: {x: 13, y: 12, z: 2}
   m_Children:
   - {fileID: 2009764268}
   - {fileID: 1624579830}
@@ -12510,18 +12510,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeline: {fileID: 1395334176}
-  activated: 0
-  isDraggingTimeline: 0
-  isDraggingGrid: 0
-  isDraggingNotesOnGrid: 0
-  isDraggingNotesOnTimeline: 0
   dragSelectTimeline: {fileID: 242522451}
   timelineNotes: {fileID: 249710224}
   dragSelectGrid: {fileID: 1330928945}
   notesLayer:
     serializedVersion: 2
     m_Bits: 512
-  clipboardNotes: []
 --- !u!1 &869613409
 GameObject:
   m_ObjectHideFlags: 0
