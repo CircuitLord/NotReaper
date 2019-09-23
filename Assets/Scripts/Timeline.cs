@@ -1141,7 +1141,7 @@ namespace NotReaper {
 
 		}
 
-		void OnMouseOver() {
+		void OnMouseEnter() {
 			hover = true;
 		}
 

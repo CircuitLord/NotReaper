@@ -171,15 +171,12 @@
             <e p="ProgramSettings.cs" t="Include" />
           </e>
           <e p="Targets" t="Include">
-            <e p="GridTarget.cs" t="Include" />
             <e p="HoldTargetManager.cs" t="Include" />
             <e p="Target.cs" t="Include" />
             <e p="TargetData.cs" t="Include" />
             <e p="TargetIcon.cs" t="Include" />
             <e p="TargetMoveIntent.cs" t="Include" />
-            <e p="TargetOld.cs" t="Include" />
             <e p="TargetSetHitsoundIntent.cs" t="Include" />
-            <e p="TimelineTarget.cs" t="Include" />
           </e>
           <e p="Ticker.cs" t="Include" />
           <e p="Timeline.cs" t="Include" />
