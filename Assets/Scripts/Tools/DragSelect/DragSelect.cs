@@ -8,15 +8,13 @@ using NotReaper.UserInput;
 using UnityEngine;
 
 namespace NotReaper.Tools {
-
 	public class DragSelect : MonoBehaviour {
-
 		public Timeline timeline;
 		public Transform dragSelectTimeline;
 		public Transform timelineNotes;
 		public GameObject dragSelectGrid;
 		public LayerMask notesLayer;
-		
+
 		private bool activated = false;
 		private bool isDraggingTimeline = false;
 		private bool isDraggingGrid = false;
@@ -25,10 +23,10 @@ namespace NotReaper.Tools {
 
 		// TODO: This should come from whatever new input handler we end up with, for now this at least should abstract input from intent (see CaptureInput())
 		// Represent action intents occuring this update frame.
-		private bool frameIntentSelect = false;		// click + release
-		private bool frameIntentDragStart = false;	// click + drag start frame
-		private bool frameIntentDragging = false;	// click + drag frame
-		private bool frameIntentDragEnd = false;	// click + drag end frame
+		private bool frameIntentSelect = false; // click + release
+		private bool frameIntentDragStart = false; // click + drag start frame
+		private bool frameIntentDragging = false; // click + drag frame
+		private bool frameIntentDragEnd = false; // click + drag end frame
 		private bool frameIntentCut = false;
 		private bool frameIntentCopy = false;
 		private bool frameIntentPaste = false;
@@ -43,10 +41,10 @@ namespace NotReaper.Tools {
 		private bool frameIntentSetHitSoundChainStart = false;
 		private bool frameIntentSetHitSoundChain = false;
 		private bool frameIntentSetHitSoundMelee = false;
-		
+
 		private bool hasInputDragMovedOutOfClickBounds = false;
 		private bool dragStarted = false;
-		
+
 		private TargetIcon[] _iconsUnderMouse = new TargetIcon[0];
 
 		private Vector2 startGridMovePos;
@@ -77,7 +75,7 @@ namespace NotReaper.Tools {
 					: null;
 			}
 		}
-		
+
 		//INFO: Code for selecting targets is on the drag select timeline thing itself
 
 		/// <summary>
@@ -93,7 +91,7 @@ namespace NotReaper.Tools {
 				timeline.DeselectAllTargets();
 			}
 		}
-		
+
 		public void Update() {
 			if (!activated) return;
 			CaptureInput();
@@ -102,11 +100,12 @@ namespace NotReaper.Tools {
 			UpdateDragging();
 			iconsUnderMouse = null;
 		}
-		
+
 		public void EndAllDragStuff() {
 			if (isDraggingNotesOnTimeline) {
 				EndDragTimelineTargetAction();
-			} else if (isDraggingNotesOnGrid) {
+			}
+			else if (isDraggingNotesOnGrid) {
 				EndDragGridTargetAction();
 			}
 
@@ -160,13 +159,13 @@ namespace NotReaper.Tools {
 		private void StartDragGridTargetAction(TargetIcon icon) {
 			isDraggingNotesOnGrid = true;
 			startGridMovePos = icon.data.position;
-			
+
 			gridTargetMoveIntents = new List<TargetGridMoveIntent>();
 			timeline.selectedNotes.ForEach(target => {
 				var intent = new TargetGridMoveIntent();
 				intent.target = target.data;
 				intent.startingPosition = new Vector2(target.data.x, target.data.y);
-				
+
 				gridTargetMoveIntents.Add(intent);
 			});
 		}
@@ -177,7 +176,6 @@ namespace NotReaper.Tools {
 			Vector2 newPos = new Vector2(newPosVec3.x, newPosVec3.y);
 
 			foreach (TargetGridMoveIntent intent in gridTargetMoveIntents) {
-
 				var offsetFromDragPoint = intent.startingPosition - startGridMovePos;
 				var tempNewPos = newPos + offsetFromDragPoint;
 				intent.target.position = tempNewPos;
@@ -209,7 +207,6 @@ namespace NotReaper.Tools {
 
 		private void UpdateDragTimelineTargetAction() {
 			foreach (TargetTimelineMoveIntent intent in timelineTargetMoveIntents) {
-
 				float offsetFromDragPoint = intent.startTime - startTimelineMoveTime;
 				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 				mousePos.x /= Timeline.scaleTransform;
@@ -223,7 +220,6 @@ namespace NotReaper.Tools {
 		}
 
 		private void EndDragTimelineTargetAction() {
-
 			isDraggingNotesOnTimeline = false;
 			if (timelineTargetMoveIntents.Count > 0) {
 				timeline.MoveTimelineTargets(timelineTargetMoveIntents);
@@ -231,17 +227,19 @@ namespace NotReaper.Tools {
 			}
 		}
 
-		
+
 		private void TryToggleSelection() {
 			if (iconUnderMouse && iconUnderMouse.isSelected) {
 				iconUnderMouse.TryDeselect();
-			} else if (iconUnderMouse && !iconUnderMouse.isSelected) {
+			}
+			else if (iconUnderMouse && !iconUnderMouse.isSelected) {
 				iconUnderMouse.TrySelect();
-			} else {
+			}
+			else {
 				timeline.DeselectAllTargets();
 			}
 		}
-		
+
 		private void SetHitsoundAction(TargetVelocity velocity) {
 			targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
 			timeline.selectedNotes.ForEach(target => {
@@ -256,13 +254,13 @@ namespace NotReaper.Tools {
 
 			timeline.SetTargetHitsounds(targetSetHitsoundIntents);
 		}
-		
+
 		// Capture raw input and set the state of frame intents 
 		private void CaptureInput() {
 			// TODO: Move these intents to a new input manager
 			bool primaryModifierHeld = false;
 			bool secondaryModifierHeld = false;
-			
+
 			// all intents are reset every frame
 			frameIntentSelect = false;
 			frameIntentDragStart = false;
@@ -276,12 +274,13 @@ namespace NotReaper.Tools {
 			frameIntentSwapColors = false;
 			frameIntentFlipTargetsHorizontally = false;
 			frameIntentFlipTargetsVertically = false;
-			
+
 			// Keyboard input
 			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) primaryModifierHeld = true;
 			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) secondaryModifierHeld = true;
 
-			if (primaryModifierHeld && !secondaryModifierHeld) {	// permits holding primary and secondary down
+			if (primaryModifierHeld && !secondaryModifierHeld) {
+				// permits holding primary and secondary down
 				frameIntentFlipTargetsHorizontally = Input.GetKeyDown(KeyCode.F);
 				frameIntentCut = Input.GetKeyDown(KeyCode.X);
 				frameIntentCopy = Input.GetKeyDown(KeyCode.C);
@@ -294,7 +293,7 @@ namespace NotReaper.Tools {
 			else {
 				frameIntentDelete = Input.GetKeyDown(KeyCode.Delete);
 				frameIntentSwapColors = Input.GetKeyDown(KeyCode.F);
-				
+
 				// hitsound selection
 				frameIntentSetHitSoundStandard = Input.GetKeyDown(KeyCode.Q);
 				frameIntentSetHitSoundSnare = Input.GetKeyDown(KeyCode.W);
@@ -303,10 +302,9 @@ namespace NotReaper.Tools {
 				frameIntentSetHitSoundChain = Input.GetKeyDown(KeyCode.T);
 				frameIntentSetHitSoundMelee = Input.GetKeyDown(KeyCode.Y);
 			}
-			
+
 			// Mouse input
 			if (EditorInput.selectedTool == EditorTool.DragSelect) {
-				
 				if (Input.GetMouseButtonDown(0)) {
 					startClickDetectPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 				}
@@ -331,7 +329,7 @@ namespace NotReaper.Tools {
 				frameIntentDragging = false;
 				frameIntentDragEnd = dragStarted;
 				frameIntentSelect = !dragStarted;
-				
+
 				// these are not reset every frame, only on mouse up!
 				hasInputDragMovedOutOfClickBounds = false;
 				dragStarted = false;
@@ -340,7 +338,6 @@ namespace NotReaper.Tools {
 
 		// execute simple actions which don't require any state management'
 		private void UpdateActions() {
-			
 			/** Setting hitsounds **/
 			if (frameIntentSetHitSoundStandard) SetHitsoundAction(TargetVelocity.Standard);
 			if (frameIntentSetHitSoundSnare) SetHitsoundAction(TargetVelocity.Snare);
@@ -354,7 +351,7 @@ namespace NotReaper.Tools {
 				frameIntentCopy = true;
 				frameIntentDelete = true;
 			}
-			
+
 			if (frameIntentCopy) {
 				clipboardNotes = new List<Cue>();
 				timeline.selectedNotes.ForEach(note => clipboardNotes.Add(NotePosCalc.ToCue(note, 0, false)));
@@ -364,14 +361,15 @@ namespace NotReaper.Tools {
 				timeline.DeselectAllTargets();
 				timeline.PasteCues(clipboardNotes, Timeline.BeatTime());
 			}
-			
+
 			if (frameIntentDelete) {
 				if (timeline.selectedNotes.Count > 0) {
 					timeline.DeleteTargets(timeline.selectedNotes);
 				}
+
 				timeline.selectedNotes = new List<Target>();
 			}
-			
+
 			/** Note flipping **/
 			if (frameIntentSwapColors) timeline.SwapTargets(timeline.selectedNotes);
 			if (frameIntentFlipTargetsHorizontally) timeline.FlipTargetsHorizontal(timeline.selectedNotes);
@@ -383,6 +381,8 @@ namespace NotReaper.Tools {
 
 		// Update the selection box and individually added / removed targets
 		private void UpdateSelections() {
+
+			if (EditorInput.selectedTool != EditorTool.DragSelect) return;
 			
 			/** Clicking to add or remove targets **/
 			if (frameIntentSelect) TryToggleSelection();
@@ -412,16 +412,18 @@ namespace NotReaper.Tools {
 			if (shouldDragNotes) {
 				/** Moving targets around the timeline or grid **/
 				if (frameIntentDragStart) {
-
-					bool anySelectedIconUnderMouse = iconsUnderMouse.Where(icon => icon.isSelected).ToArray().Length != 0;
+					bool anySelectedIconUnderMouse =
+						iconsUnderMouse.Where(icon => icon.isSelected).ToArray().Length != 0;
 					if (iconUnderMouse && !anySelectedIconUnderMouse) {
 						TryToggleSelection();
 						anySelectedIconUnderMouse = true;
 					}
-					
+
 					if (anySelectedIconUnderMouse) {
-						if (iconUnderMouse.location == TargetIconLocation.Grid) StartDragGridTargetAction(iconUnderMouse);
-						if (iconUnderMouse.location == TargetIconLocation.Timeline) StartDragTimelineTargetAction(iconUnderMouse);
+						if (iconUnderMouse.location == TargetIconLocation.Grid)
+							StartDragGridTargetAction(iconUnderMouse);
+						if (iconUnderMouse.location == TargetIconLocation.Timeline)
+							StartDragTimelineTargetAction(iconUnderMouse);
 					}
 				}
 
@@ -436,10 +438,10 @@ namespace NotReaper.Tools {
 				if (isDraggingNotesOnTimeline) EndDragTimelineTargetAction();
 			}
 		}
-		
+
 		private float SnapToBeat(Vector3 position) {
 			var increments = ((480 / timeline.beatSnap) * 4f) / 480;
-			return Timeline.DurationToBeats(Timeline.time) + Mathf.Round(position.x / increments) * increments; 
+			return Timeline.DurationToBeats(Timeline.time) + Mathf.Round(position.x / increments) * increments;
 		}
 	}
 }
