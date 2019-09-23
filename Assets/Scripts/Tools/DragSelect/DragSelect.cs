@@ -128,7 +128,7 @@ namespace NotReaper.Tools {
 			float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
 			float timelineScaleMulti = Timeline.scale / 20f;
 			dragSelectTimeline.localScale =
-				new Vector3(diff * timelineScaleMulti, 1.1f * (Timeline.scale / 20f), 1);
+				new Vector3(diff * timelineScaleMulti, 1.1f, 1);
 		}
 
 		private void EndTimelineSelection() {
