@@ -19802,6 +19802,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tools: {fileID: 1258393250}
+  nrDiscordPresence: {fileID: 664541462}
   pauseMenu: {fileID: 1338881383}
   shortcutMenu: {fileID: 1426037692}
   soundSelect: {fileID: 956585537}
