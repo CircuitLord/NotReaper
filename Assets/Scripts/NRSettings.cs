@@ -15,13 +15,27 @@ namespace NotReaper {
 
         public static bool isLoaded = false;
 
-        private static readonly string configFilePath = Path.Combine(Application.persistentDataPath, "NRConfig.json");
+        private static readonly string configFilePath = Path.Combine(Application.persistentDataPath, "NRConfig.txt");
+
+
+        private static bool failsafeThingy = false;
 
         public static void LoadSettingsJson(bool regenConfig = false) {
 
             //If it doesn't exist, we need to gen a new one.
             if (regenConfig || !File.Exists(configFilePath)) {
                 //Gen new config will autoload the new config.
+
+                if (!failsafeThingy && File.Exists(Path.Combine(Application.persistentDataPath, "NRConfig.json"))) {
+                    File.Move(Path.Combine(Application.persistentDataPath, "NRConfig.json"),
+                        Path.Combine(Application.persistentDataPath, "NRConfig.txt"));
+
+                    failsafeThingy = true;
+                    LoadSettingsJson();
+
+                    return;
+                }
+                
                 GenNewConfig();
                 return;
             }
