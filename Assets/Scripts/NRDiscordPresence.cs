@@ -16,7 +16,7 @@ namespace NotReaper {
 
         public DiscordPresence presence;
 
-        private void Start() {
+        public void InitPresence() {
             //Update the values
             //UpdateFields(presence);
             presence.details = "In Menus";
@@ -35,14 +35,21 @@ namespace NotReaper {
                 //UpdateFields(new DiscordPresence(message.Presence));
             });
 
+
+            if (!NRSettings.config.useDiscordRichPresence) {
+
+                gameObject.SetActive(false);
+                
+                return;
+                
+            }
+            
+            
             DiscordManager.current.SetPresence(presence);
 
         }
 
-        public void SendPresence() {
-            //UpdatePresence();
-            DiscordManager.current.SetPresence(presence);
-        }
+
 
 
         public void UpdatePresenceDifficulty(int diffIndex) {
@@ -76,6 +83,8 @@ namespace NotReaper {
                     };
                     break;
             }
+            
+            if (!NRSettings.config.useDiscordRichPresence) return;
 
             DiscordManager.current.SetPresence(presence);
         }
@@ -83,6 +92,8 @@ namespace NotReaper {
         public void UpdatePresenceSongName(string name) {
             presence.details = "Mapping:";
             presence.state = name;
+            
+            if (!NRSettings.config.useDiscordRichPresence) return;
             DiscordManager.current.SetPresence(presence);
         }
 

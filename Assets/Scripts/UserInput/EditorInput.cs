@@ -36,6 +36,7 @@ namespace NotReaper.UserInput {
 
 		//public PlaceNote toolPlaceNote;
 		[SerializeField] public EditorToolkit Tools;
+		[SerializeField] private NRDiscordPresence nrDiscordPresence;
 
 		public PauseMenu pauseMenu;
 		public ShortcutInfo shortcutMenu;
@@ -96,6 +97,8 @@ namespace NotReaper.UserInput {
 
 			FigureOutIsInUI();
 			StartCoroutine(LoadBGImage("file://" + NRSettings.config.bgImagePath));
+			
+			nrDiscordPresence.InitPresence();
 
 
 		}
