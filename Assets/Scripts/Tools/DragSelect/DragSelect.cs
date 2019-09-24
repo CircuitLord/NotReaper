@@ -229,6 +229,8 @@ namespace NotReaper.Tools {
 
 
 		private void TryToggleSelection() {
+			if (EditorInput.selectedTool != EditorTool.DragSelect) return;
+				
 			if (iconUnderMouse && iconUnderMouse.isSelected) {
 				iconUnderMouse.TryDeselect();
 			}
