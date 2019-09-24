@@ -1156,7 +1156,7 @@ namespace NotReaper {
 
 		private void OnMouseDown() {
 			//We don't want to interfere with drag select
-			if (Input.GetKey(KeyCode.LeftControl)) return;
+			if (EditorInput.selectedTool == EditorTool.DragSelect) return;
 			JumpToX(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
 		}
 
