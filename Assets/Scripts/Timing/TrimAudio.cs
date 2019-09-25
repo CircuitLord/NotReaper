@@ -12,8 +12,6 @@ using Debug = UnityEngine.Debug;
 namespace NotReaper.Timing {
 
     public class TrimAudio {
-
-
         //So I take the offset + 1920 ticks, and convert that to MS based on bpm
 
         //Tick to MS = ["tick"] / 480 * tempo / 1000000
@@ -22,7 +20,6 @@ namespace NotReaper.Timing {
         //positive offset = add silence
         //negative offset = trim the song
 
-        //private string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG/ffmpeg.exe");
         Process ffmpeg = new Process();
 
         public TrimAudio() {
@@ -34,56 +31,37 @@ namespace NotReaper.Timing {
             ffmpeg.StartInfo.RedirectStandardOutput = true;
         }
 
-        public void SetAudioLength(string path, string output, int offset, double tempo) {
+        public void SetAudioLength(string path, string output, int offset, double bpm) {
 
             string log = "";
-
-
-            double offsetInMS = TicksToMS(offset, tempo);
+            double offsetMs = TicksToMs(offset, bpm);
+            double ms = Math.Abs(GetOffsetMs(offsetMs, bpm));
             
-            double ms = Math.Abs(GettingOffsetThing(offsetInMS, tempo));
-            
-            Debug.Log(path);
+            var args = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
+            Debug.Log($"Running ffmpeg with args {args}");
 
-            //path = path.Replace(@"'", @"\'");
-            
-            Debug.Log(path);
-            
-            UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output));
-
-            ffmpeg.StartInfo.Arguments = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
-
-
-
-
+            ffmpeg.StartInfo.Arguments = args;
             ffmpeg.Start();
 
-            string logStuff = ffmpeg.StandardOutput.ReadToEnd();  
-
-            UnityEngine.Debug.Log(logStuff);
-
+            Debug.Log(ffmpeg.StandardOutput.ReadToEnd());
             ffmpeg.WaitForExit();
-
-    
         }
 
-
-
-        private double TicksToMS(double offset, double tempo) {
+        private double TicksToMs(double offset, double tempo) {
             double beatLength = 60000 / tempo;
             return (offset / 480.0) * beatLength;
- 
         }
 
-        private double GettingOffsetThing(double offset, double tempo) {
-            //return offset / 480 * tempo;
-            double beatLength = 60000 / tempo;
+        private double GetOffsetMs(double offset, double bpm) {
+            double beatLength = 60000 / bpm;
             return GetOffset(offset, beatLength);
-
         }
 
         private double GetOffset(double offset, double beatlength) {
-            return (beatlength * 2) + (offset - (offset + (offset % beatlength - beatlength))) + beatlength;
+            var cappedOffset = offset % beatlength;
+            var padding = beatlength * 3;
+            var shift = cappedOffset - beatlength;
+            return padding - shift;
         }
 
     }
