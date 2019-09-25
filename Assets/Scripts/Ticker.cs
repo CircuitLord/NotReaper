@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using NotReaper.Models;
 using NotReaper.Targets;
 using UnityEngine;
@@ -42,7 +41,12 @@ namespace NotReaper {
             if (layermask == (layermask | (1 << other.gameObject.layer))) {
                 if (other.transform.position.z > -1) {
 
-                    switch (other.GetComponent<TargetIcon>().data.velocity) {
+                    var icon = other.GetComponent<TargetIcon>();
+                    DOTween.To((float scale) => {
+                        icon.transform.localScale = new Vector3(scale, scale, 1f);
+                    }, 0.5f, 1f, 0.3f).SetEase(Ease.OutCubic);
+
+                    switch (icon.data.velocity) {
                         case TargetVelocity.Standard:
                             {
                                 kick.Stop();
