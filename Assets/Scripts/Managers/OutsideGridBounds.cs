@@ -19,19 +19,23 @@ namespace NotReaper.Managers
 		public Transform gridUI;
 		public Transform timelineTransform;
 		public GameObject gridOutline;
+		public GameObject fovOutline;
 
 
-		public float fadeSpeed = 0.2f;
+		public float fadeSpeed = 0.3f;
 		private float xModifier = 8.8f;
 		private float yModifier = 2.7f;
 
 		private List<MeshRenderer> gridOutlineLines = new List<MeshRenderer>();
+		private List<MeshRenderer> fovOutlineLines = new List<MeshRenderer>();
 		
 		private void Start()
 		{
-			foreach (MeshRenderer r in gridOutline.GetComponentsInChildren<MeshRenderer>())
-			{
+			foreach (MeshRenderer r in gridOutline.GetComponentsInChildren<MeshRenderer>()) {
 				gridOutlineLines.Add(r);
+			}
+			foreach (MeshRenderer r in fovOutline.GetComponentsInChildren<MeshRenderer>()) {
+				fovOutlineLines.Add(r);
 			}
 		}
 
@@ -85,10 +89,16 @@ namespace NotReaper.Managers
 				foreach (var line in gridOutlineLines) {
 					line.material.DOFade(0.0f, fadeSpeed);
 				}
+				foreach (var line in fovOutlineLines) {
+					line.material.DOFade(1.0f, fadeSpeed);
+				}
 			}
 			else {
 				foreach (var line in gridOutlineLines) {
 					line.material.DOFade(1.0f, fadeSpeed);
+				}
+				foreach (var line in fovOutlineLines) {
+					line.material.DOFade(0.0f, fadeSpeed);
 				}
 			}
 
