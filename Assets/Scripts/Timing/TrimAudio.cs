@@ -35,7 +35,8 @@ namespace NotReaper.Timing {
 
             string log = "";
             double offsetMs = TicksToMs(offset, bpm);
-            double ms = Math.Abs(GetOffsetMs(offsetMs, bpm));
+            double magicOctoberOffsetFix = 25.0f;
+            double ms = Math.Abs(GetOffsetMs(offsetMs, bpm)) - magicOctoberOffsetFix;
             
             var args = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
             Debug.Log($"Running ffmpeg with args {args}");
