@@ -153,6 +153,29 @@ Sounds:
 `Y`: Melee  
 
 
+# Config File
+
+This is the current config file and all possible values. Note that newer versions do not currently write all keys to the file and just use a default so if your config is out of date please check below for some configurable options you may set.
+
+```
+
+COLOR represents an rgba value as { "r": 0-1, "g": 0-1, "b": 0-1, "a": 0-1 }.
+
+{
+    "leftColor": { COLOR },                 // left note color, default { "r": 0.0, "g": 0.5, "b": 1.0, "a": 1.0 }
+    "rightColor": { COLOR },                // right note color, default { "r": 1.0, "g": 0.47, "b": 0.14, "a": 1.0 }
+    "selectedHighlightColor": { COLOR },    // halo around selected notes, default { "r": 1.0, "g": 1.0, "b": 1.0, "a": 1.0 }
+    "mainVol": 0-1,                         // music volume (also in pause menu), default 0.5
+    "noteVol": 0-1,                         // note hit volume (also in pause menu), default 0.5
+    "sustainVol": 0-1,                      // sustain not hit volume, default 0.5
+    "audioDSP": number,                     // DSP buffer size, lower = better latency but may cause crackling, default 480
+    "noteHitScale": number,                 // scale transform applied to hit notes, default 0.5 (1.0 for old behaviour)
+    "UIFadeDuration": number,               // duration in seconds of certain ui fades, default 1.0
+    "useDiscordRichPresence": true / false, // displays current working map in discord, default true
+    "showTimeElapsed": true / false,        // displays amount of time using NR in discord, default true
+    "bgImagePath": "Path\\To\\Image.png"    // image file to use as a background, default %appdata%\..\locallow\CircuitCubed\NotReaper\BG1.png
+}
+```
 # Donating
 
 Finding NotReaper useful? I'm glad! :) If you really want to, you can donate here:
