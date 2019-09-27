@@ -1,3 +1,4 @@
+using System.Collections;
 using DG.Tweening;
 using NotReaper.Models;
 using NotReaper.Targets;
@@ -24,17 +25,21 @@ namespace NotReaper {
         public Slider volumeSlider;
 
         private float volume;
+        private float noteHitScale;
 
         private void Start() {
             aud = GetComponent<AudioSource>();
-            //volume = PlayerPrefs.GetFloat("TickVol");
-            //volumeSlider.value = volume;
             volume = volumeSlider.value;
+            StartCoroutine(SetNoteHiteScale());
+        }
+
+        IEnumerator SetNoteHiteScale() {
+            while (!NRSettings.isLoaded) yield return new WaitForSeconds(0.5f);
+            noteHitScale = NRSettings.config.noteHitScale;
         }
 
         public void VolumeChange(Slider vol) {
             volume = vol.value;
-            //PlayerPrefs.SetFloat("TickVol", volume);
         }
 
         private void OnTriggerEnter(Collider other) {
@@ -44,7 +49,7 @@ namespace NotReaper {
                     var icon = other.GetComponent<TargetIcon>();
                     DOTween.To((float scale) => {
                         icon.transform.localScale = new Vector3(scale, scale, 1f);
-                    }, 0.5f, 1f, 0.3f).SetEase(Ease.OutCubic);
+                    }, noteHitScale, 1f, 0.3f).SetEase(Ease.OutCubic);
 
                     switch (icon.data.velocity) {
                         case TargetVelocity.Standard:
@@ -107,7 +112,6 @@ namespace NotReaper {
                                 break;
                             }
                     }
-
                 }
             }
         }

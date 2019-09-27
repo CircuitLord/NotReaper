@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using NotReaper.Grid;
 using NotReaper.IO;
@@ -17,7 +16,6 @@ using NotReaper.UI;
 using NotReaper.UserInput;
 using SFB;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -133,13 +131,12 @@ namespace NotReaper {
 
 			//Modify the note colors
 
-
+			StartCoroutine(SetAudioDSP());
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
 			Physics.autoSyncTransforms = false;
 
 		}
-
 
 		public void UpdateUIColors() {
 			curDiffText.color = NRSettings.config.rightColor;
@@ -767,6 +764,17 @@ namespace NotReaper {
 				}
 			}
 		}
+		
+		IEnumerator SetAudioDSP() {
+			while (!NRSettings.isLoaded) {
+				yield return new WaitForSeconds(0.1f);
+			}
+			
+			//Pull DSP setting from config
+			var configuration = AudioSettings.GetConfiguration();
+			configuration.dspBufferSize = NRSettings.config.audioDSP;
+			AudioSettings.Reset(configuration);
+		}
 
 
 		public void SetPlaybackSpeed(float speed) {
@@ -1027,6 +1035,8 @@ namespace NotReaper {
 		}
 
 		public void JumpToX(float x) {
+			StopCoroutine(AnimateSetTime(0));
+
 			float posX = Math.Abs(timelineTransformParent.position.x) + x;
 			float newX = GetClosestBeatSnapped(posX);
 			float newTime = BeatsToDuration(newX);
