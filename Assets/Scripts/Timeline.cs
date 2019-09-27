@@ -615,13 +615,11 @@ namespace NotReaper {
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
 			inTimingMode = false;
+			SetOffset(0);
 
 			if (audicaLoaded) {
 				Export();
 			}
-			
-
-
 
 			if (loadRecent) {
 				audicaFile = null;
@@ -791,9 +789,11 @@ namespace NotReaper {
 		}
 
 		public void SetOffset(int newOffset) {
+			var diff = offset - newOffset;
 			offset = newOffset;
-			//songDesc.offset = newOffset;
-			//audicaFile.desc.offset = newOffset;
+			
+			var newTime = time + BeatsToDuration(diff / 480f);
+			StartCoroutine(AnimateSetTime(newTime));
 		}
 
 		public void SetSnap(int newSnap) {
