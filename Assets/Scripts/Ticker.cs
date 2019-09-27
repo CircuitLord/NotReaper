@@ -30,11 +30,17 @@ namespace NotReaper {
         private void Start() {
             aud = GetComponent<AudioSource>();
             volume = volumeSlider.value;
-            NRSettings.OnLoad(() => noteHitScale = NRSettings.config.noteHitScale);
+            NRSettings.OnLoad(() => {
+                noteHitScale = NRSettings.config.noteHitScale;
+                volume = (float)NRSettings.config.noteVol;
+                volumeSlider.value = volume;
+            });
         }
 
         public void VolumeChange(Slider vol) {
             volume = vol.value;
+            NRSettings.config.noteVol = volume;
+            NRSettings.SaveSettingsJson();
         }
 
         private void OnTriggerEnter(Collider other) {

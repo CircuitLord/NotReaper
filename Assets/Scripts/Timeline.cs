@@ -61,9 +61,13 @@ namespace NotReaper {
 		public static Transform gridNotesStatic;
 		public static Transform timelineNotesStatic;
 		[SerializeField] private Renderer timelineBG;
+		
+		public Slider musicVolumeSlider;
 
 		[Header("Configuration")]
 		public float playbackSpeed = 1f;
+
+		public float musicVolume = 0.5f; 
 		public float sustainVolume = 0.5f;
 		public float previewDuration = 0.1f;
 
@@ -127,8 +131,19 @@ namespace NotReaper {
 			gridNotesStatic = gridTransformParent;
 			timelineNotesStatic = timelineTransformParent;
 
-			NRSettings.OnLoad(SetAudioDSP);
-			
+			NRSettings.OnLoad(() => {
+				sustainVolume = NRSettings.config.sustainVol;
+				musicVolume = NRSettings.config.mainVol;
+				musicVolumeSlider.value = musicVolume;
+				SetAudioDSP();
+			});
+
+			musicVolumeSlider.onValueChanged.AddListener(val => {
+				musicVolume = val;
+				NRSettings.config.mainVol = musicVolume;
+				NRSettings.SaveSettingsJson();
+			});
+
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
 			Physics.autoSyncTransforms = false;
@@ -990,7 +1005,7 @@ namespace NotReaper {
 				previewAud.Pause();
 			}
 
-			previewAud.volume = aud.volume;
+			previewAud.volume = aud.volume = musicVolume;
 
 			SetCurrentTime();
 			SetCurrentTick();

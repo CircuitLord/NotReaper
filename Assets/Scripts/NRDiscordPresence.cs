@@ -17,36 +17,36 @@ namespace NotReaper {
         public DiscordPresence presence;
 
         public void InitPresence() {
-            //Update the values
-            //UpdateFields(presence);
-            presence.details = "In Menus";
-            presence.state = "";
 
-            presence.startTime = showTime ? new DiscordTimestamp(Time.realtimeSinceStartup) : DiscordTimestamp.Invalid;
+            NRSettings.OnLoad(() => {
+                
+                if (!NRSettings.config.useDiscordRichPresence) {
+                    gameObject.SetActive(false);
+                    return;
+                }
+                
+                showTime = NRSettings.config.showTimeElapsed;
 
-            float duration = 0;
-            presence.endTime = duration > 0 ? new DiscordTimestamp(Time.realtimeSinceStartup + duration) : DiscordTimestamp.Invalid;
+                presence.details = "In Menus";
+                presence.state = "";
+
+                presence.startTime =
+                    showTime ? new DiscordTimestamp(Time.realtimeSinceStartup) : DiscordTimestamp.Invalid;
+
+                float duration = 0;
+                presence.endTime = duration > 0
+                    ? new DiscordTimestamp(Time.realtimeSinceStartup + duration)
+                    : DiscordTimestamp.Invalid;
 
 
 
-            //Register to a presence change
-            DiscordManager.current.events.OnPresenceUpdate.AddListener((message) => {
-                Debug.Log("Received a new presence! Current App: " + message.ApplicationID + ", " + message.Name);
-                //UpdateFields(new DiscordPresence(message.Presence));
+                //Register to a presence change
+                DiscordManager.current.events.OnPresenceUpdate.AddListener((message) => {
+                    Debug.Log("Received a new presence! Current App: " + message.ApplicationID + ", " + message.Name);
+                });
+
+                DiscordManager.current.SetPresence(presence);
             });
-
-
-            if (!NRSettings.config.useDiscordRichPresence) {
-
-                gameObject.SetActive(false);
-                
-                return;
-                
-            }
-            
-            
-            DiscordManager.current.SetPresence(presence);
-
         }
 
 
@@ -114,7 +114,6 @@ namespace NotReaper {
                 tooltip = "Standard"
             };
 
-            //float duration = float.Parse(inputEndTime.text);
             float duration = 0;
             presence.endTime = duration > 0 ? new DiscordTimestamp(Time.realtimeSinceStartup + duration) : DiscordTimestamp.Invalid;
         }

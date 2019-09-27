@@ -22409,7 +22409,9 @@ MonoBehaviour:
   timelineTransformParent: {fileID: 249710224}
   gridTransformParent: {fileID: 312348744}
   timelineBG: {fileID: 1052582752}
+  musicVolumeSlider: {fileID: 2098098317}
   playbackSpeed: 1
+  musicVolume: 0.5
   sustainVolume: 0.5
   previewDuration: 0.1
   hover: 0
