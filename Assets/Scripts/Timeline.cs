@@ -789,11 +789,14 @@ namespace NotReaper {
 		}
 
 		public void SetOffset(int newOffset) {
+			StopCoroutine(AnimateSetTime(0));
 			var diff = offset - newOffset;
 			offset = newOffset;
 			
 			var newTime = time + BeatsToDuration(diff / 480f);
-			StartCoroutine(AnimateSetTime(newTime));
+			if (newTime != time) {
+				StartCoroutine(AnimateSetTime(newTime));
+			}
 		}
 
 		public void SetSnap(int newSnap) {
