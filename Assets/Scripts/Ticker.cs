@@ -30,12 +30,7 @@ namespace NotReaper {
         private void Start() {
             aud = GetComponent<AudioSource>();
             volume = volumeSlider.value;
-            StartCoroutine(SetNoteHiteScale());
-        }
-
-        IEnumerator SetNoteHiteScale() {
-            while (!NRSettings.isLoaded) yield return new WaitForSeconds(0.5f);
-            noteHitScale = NRSettings.config.noteHitScale;
+            NRSettings.OnLoad(() => noteHitScale = NRSettings.config.noteHitScale);
         }
 
         public void VolumeChange(Slider vol) {

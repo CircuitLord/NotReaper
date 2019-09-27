@@ -68,18 +68,10 @@ namespace NotReaper.UserInput {
 
 		private void Start() {
 			InputManager.LoadHotkeys();
-
-
-			StartCoroutine(WaitForUserColors());
-
-
+			NRSettings.OnLoad(SetUserColors);
 		}
 
-		IEnumerator WaitForUserColors() {
-			while (!NRSettings.isLoaded) {
-				yield return new WaitForSeconds(0.1f);
-			}
-
+		private void SetUserColors() {
 			selectedTool = EditorTool.None;
 			SelectMode(EditorMode.Compose);
 			SelectTool(EditorTool.Standard);
@@ -99,8 +91,6 @@ namespace NotReaper.UserInput {
 			StartCoroutine(LoadBGImage("file://" + NRSettings.config.bgImagePath));
 			
 			nrDiscordPresence.InitPresence();
-
-
 		}
 
 

@@ -138,8 +138,7 @@ namespace NotReaper.UI {
         public IEnumerator FadeIn() {
 
             if (!Timeline.audicaLoaded) yield break;
-            if (!NRSettings.isLoaded) yield break;
-            
+
             titleLine.color = NRSettings.config.leftColor;
 
             //Set colors

@@ -123,19 +123,15 @@ namespace NotReaper {
 			orderedNotes = new List<Target>();
 			loadedNotes = new List<Target>();
 			selectedNotes = new List<Target>();
-
-			//securityRules.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
-
+			
 			gridNotesStatic = gridTransformParent;
 			timelineNotesStatic = timelineTransformParent;
 
-			//Modify the note colors
-
-			StartCoroutine(SetAudioDSP());
+			NRSettings.OnLoad(SetAudioDSP);
+			
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
 			Physics.autoSyncTransforms = false;
-
 		}
 
 		public void UpdateUIColors() {
@@ -765,18 +761,6 @@ namespace NotReaper {
 			}
 		}
 		
-		IEnumerator SetAudioDSP() {
-			while (!NRSettings.isLoaded) {
-				yield return new WaitForSeconds(0.1f);
-			}
-			
-			//Pull DSP setting from config
-			var configuration = AudioSettings.GetConfiguration();
-			configuration.dspBufferSize = NRSettings.config.audioDSP;
-			AudioSettings.Reset(configuration);
-		}
-
-
 		public void SetPlaybackSpeed(float speed) {
 			if (!audioLoaded) return;
 
@@ -1217,8 +1201,13 @@ namespace NotReaper {
 				prevTickText = currentTick;
 				curTick.text = currentTick;
 			}
-
 		}
-
+		
+		private void SetAudioDSP() {
+			//Pull DSP setting from config
+			var configuration = AudioSettings.GetConfiguration();
+			configuration.dspBufferSize = NRSettings.config.audioDSP;
+			AudioSettings.Reset(configuration);
+		}
 	}
 }
