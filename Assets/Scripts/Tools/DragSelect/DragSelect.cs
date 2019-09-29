@@ -336,6 +336,31 @@ namespace NotReaper.Tools {
 				hasInputDragMovedOutOfClickBounds = false;
 				dragStarted = false;
 			}
+
+
+			//Handle note movement by arrow keys
+			Vector2 noteMovement = new Vector2(0,0);
+			noteMovement.x += Input.GetKeyDown(KeyCode.RightArrow) ? NotePosCalc.xSize : 0;
+			noteMovement.x += Input.GetKeyDown(KeyCode.LeftArrow) ? -NotePosCalc.xSize : 0;
+			noteMovement.y += Input.GetKeyDown(KeyCode.UpArrow) ? NotePosCalc.ySize : 0;
+			noteMovement.y += Input.GetKeyDown(KeyCode.DownArrow) ? -NotePosCalc.ySize : 0;
+
+			if(noteMovement.x != 0 || noteMovement.y != 0) {
+				if(primaryModifierHeld) {
+					noteMovement /= 2;
+				}
+				if(secondaryModifierHeld) {
+					noteMovement /= 4;
+				}
+
+				timeline.MoveGridTargets(timeline.selectedNotes.Select(target => {
+					var intent = new TargetGridMoveIntent();
+					intent.target = target.data;
+					intent.startingPosition = new Vector2(target.data.x, target.data.y);
+					intent.intendedPosition = new Vector2(target.data.x + noteMovement.x, target.data.y + noteMovement.y);
+					return intent;
+				}).ToList());
+			}
 		}
 
 		// execute simple actions which don't require any state management'
