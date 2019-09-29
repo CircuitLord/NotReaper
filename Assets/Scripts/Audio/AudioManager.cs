@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +16,10 @@ namespace NotReaper {
 
         private void Start() {
             SetDefaultVolumes();
+            NRSettings.OnLoad(() => {
+                mainSlider.value = (float) NRSettings.config.mainVol;
+                SetMainVol();
+            });
         }
 
         public void SetDefaultVolumes() {
@@ -26,12 +30,15 @@ namespace NotReaper {
 
         public void SetMainVol() {
             main.volume = mainSlider.value;
+            NRSettings.config.mainVol = main.volume;
+            NRSettings.SaveSettingsJson();
         }
 
 
         public void SetSustainVol() {
             timeline.sustainVolume = sustainSlider.value;
+            NRSettings.config.sustainVol = timeline.sustainVolume;
+            NRSettings.SaveSettingsJson();
         }
-
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -12,13 +13,10 @@ namespace NotReaper {
     public class NRSettings : MonoBehaviour {
 
         public static NRJsonSettings config = new NRJsonSettings();
-
-        public static bool isLoaded = false;
-
+        private static bool isLoaded = false;
         private static readonly string configFilePath = Path.Combine(Application.persistentDataPath, "NRConfig.txt");
-
-
         private static bool failsafeThingy = false;
+        private static List<Action> pendingActions = new List<Action>();
 
         public static void LoadSettingsJson(bool regenConfig = false) {
 
@@ -46,16 +44,19 @@ namespace NotReaper {
                 Debug.LogError(e);
             }
 
-            //config.leftColor = new Color((float)config.userLeftColor.r, (float)config.userLeftColor.g, (float)config.userLeftColor.b);
-            //config.rightColor = new Color((float)config.userRightColor.r, (float)config.userRightColor.g, (float)config.userRightColor.b);
-            //config.selectedHighlightColor = new Color((float)config.userSelectedHighlightColor.r, (float)config.userSelectedHighlightColor.g, (float)config.userSelectedHighlightColor.b);
-
-
             isLoaded = true;
-
+            foreach (var pendingAction in pendingActions) {
+                pendingAction();
+            }
+            pendingActions.Clear();
         }
 
-
+        public static void OnLoad(Action action) {
+            if (isLoaded) action();
+            else {
+                pendingActions.Add(action);
+            }
+        }
 
         public static void SaveSettingsJson() {
             File.WriteAllText(configFilePath, JsonUtility.ToJson(config, true));
@@ -106,16 +107,14 @@ namespace NotReaper {
     public class NRJsonSettings {
 
         public Color leftColor = new Color(0.0f, 0.5f, 1.0f, 1.0f);
-
-
         public Color rightColor = new Color(1.0f, 0.47f, 0.14f, 1.0f);
-
-
         public Color selectedHighlightColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
-        public double mainVol = 0.5f;
-        public double noteVol = 0.5f;
-        public double sustainVol = 0.5f;
+        public float mainVol = 0.5f;
+        public float noteVol = 0.5f;
+        public float sustainVol = 0.5f;
+        public int audioDSP = 480;
+        public float noteHitScale = 0.5f;
 
         public double UIFadeDuration = 1.0f;
 

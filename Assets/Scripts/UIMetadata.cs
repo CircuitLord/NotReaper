@@ -55,8 +55,6 @@ namespace NotReaper.UI {
 
             diffDropdown.value = difficultyManager.loadedIndex;
             ChangeSelectedDifficulty(difficultyManager.loadedIndex);
-
-            
         }
 
         public void ApplyValues()
@@ -85,7 +83,6 @@ namespace NotReaper.UI {
                 case 3:
                     selectDiffWindow.GetComponent<UIDifficulty>().DifficultyComingFrom("easy");
                     break;
-
             }
         }
         //Called when the value is changed the dropdown box for the difficulties
@@ -106,14 +103,6 @@ namespace NotReaper.UI {
                 generateDiff.interactable = true;
                 loadThisDiff.interactable = false;
             }
-
-
-
-
-         
-
-            
-
         }
 
         public void TryDeleteDifficulty() {
@@ -148,52 +137,28 @@ namespace NotReaper.UI {
 
         public IEnumerator FadeIn() {
 
-
             if (!Timeline.audicaLoaded) yield break;
-
-            float fadeDuration = (float) NRSettings.config.UIFadeDuration;
-
 
             titleLine.color = NRSettings.config.leftColor;
 
             //Set colors
             foreach (Image img in inputBoxLines) {
                 img.color = NRSettings.config.leftColor;
-
             }
 
             foreach (Image img in inputBoxLinesCover) {
                 img.color = NRSettings.config.rightColor;
-
             }
 
             UpdateUIValues();
 
-            //BG.DOFade(1.0f, fadeDuration / 12f);
             BG.gameObject.SetActive(true);
-
-            //yield return new WaitForSeconds(fadeDuration / 10f);
-
-            //DOTween.To(x => window.alpha = x, 0.0f, 1.0f, fadeDuration / 10f);
             window.gameObject.SetActive(true);
-            //window.alpha = 1.0f;
-
-            yield break;
         }
 
         public IEnumerator FadeOut() {
             BG.gameObject.SetActive(false);
-
-            //float fadeDuration = (float) NRSettings.config.UIFadeDuration;
-
-            //DOTween.To(x => window.alpha = x, 1.0f, 0.0f, fadeDuration / 4f);
-
-            //BG.DOFade(0.0f, fadeDuration / 2f);
-
-           // yield return new WaitForSeconds(fadeDuration / 2f);
-
             window.gameObject.SetActive(false);
-
             yield break;
         }
 

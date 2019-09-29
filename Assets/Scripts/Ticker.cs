@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+using System.Collections;
+using DG.Tweening;
 using NotReaper.Models;
 using NotReaper.Targets;
 using UnityEngine;
@@ -25,24 +25,34 @@ namespace NotReaper {
         public Slider volumeSlider;
 
         private float volume;
+        private float noteHitScale;
 
         private void Start() {
             aud = GetComponent<AudioSource>();
-            //volume = PlayerPrefs.GetFloat("TickVol");
-            //volumeSlider.value = volume;
             volume = volumeSlider.value;
+            NRSettings.OnLoad(() => {
+                noteHitScale = NRSettings.config.noteHitScale;
+                volume = (float)NRSettings.config.noteVol;
+                volumeSlider.value = volume;
+            });
         }
 
         public void VolumeChange(Slider vol) {
             volume = vol.value;
-            //PlayerPrefs.SetFloat("TickVol", volume);
+            NRSettings.config.noteVol = volume;
+            NRSettings.SaveSettingsJson();
         }
 
         private void OnTriggerEnter(Collider other) {
             if (layermask == (layermask | (1 << other.gameObject.layer))) {
                 if (other.transform.position.z > -1) {
 
-                    switch (other.GetComponent<TargetIcon>().data.velocity) {
+                    var icon = other.GetComponent<TargetIcon>();
+                    DOTween.To((float scale) => {
+                        icon.transform.localScale = new Vector3(scale, scale, 1f);
+                    }, noteHitScale, 1f, 0.3f).SetEase(Ease.OutCubic);
+
+                    switch (icon.data.velocity) {
                         case TargetVelocity.Standard:
                             {
                                 kick.Stop();
@@ -103,7 +113,6 @@ namespace NotReaper {
                                 break;
                             }
                     }
-
                 }
             }
         }

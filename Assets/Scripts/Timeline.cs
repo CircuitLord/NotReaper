@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using NotReaper.Grid;
 using NotReaper.IO;
@@ -17,7 +16,6 @@ using NotReaper.UI;
 using NotReaper.UserInput;
 using SFB;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -63,9 +61,13 @@ namespace NotReaper {
 		public static Transform gridNotesStatic;
 		public static Transform timelineNotesStatic;
 		[SerializeField] private Renderer timelineBG;
+		
+		public Slider musicVolumeSlider;
 
 		[Header("Configuration")]
 		public float playbackSpeed = 1f;
+
+		public float musicVolume = 0.5f; 
 		public float sustainVolume = 0.5f;
 		public float previewDuration = 0.1f;
 
@@ -125,21 +127,27 @@ namespace NotReaper {
 			orderedNotes = new List<Target>();
 			loadedNotes = new List<Target>();
 			selectedNotes = new List<Target>();
-
-			//securityRules.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
-
+			
 			gridNotesStatic = gridTransformParent;
 			timelineNotesStatic = timelineTransformParent;
 
-			//Modify the note colors
+			NRSettings.OnLoad(() => {
+				sustainVolume = NRSettings.config.sustainVol;
+				musicVolume = NRSettings.config.mainVol;
+				musicVolumeSlider.value = musicVolume;
+				SetAudioDSP();
+			});
 
+			musicVolumeSlider.onValueChanged.AddListener(val => {
+				musicVolume = val;
+				NRSettings.config.mainVol = musicVolume;
+				NRSettings.SaveSettingsJson();
+			});
 
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
 			Physics.autoSyncTransforms = false;
-
 		}
-
 
 		public void UpdateUIColors() {
 			curDiffText.color = NRSettings.config.rightColor;
@@ -622,13 +630,11 @@ namespace NotReaper {
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
 			inTimingMode = false;
+			SetOffset(0);
 
 			if (audicaLoaded) {
 				Export();
 			}
-			
-
-
 
 			if (loadRecent) {
 				audicaFile = null;
@@ -767,8 +773,7 @@ namespace NotReaper {
 				}
 			}
 		}
-
-
+		
 		public void SetPlaybackSpeed(float speed) {
 			if (!audioLoaded) return;
 
@@ -799,9 +804,14 @@ namespace NotReaper {
 		}
 
 		public void SetOffset(int newOffset) {
+			StopCoroutine(AnimateSetTime(0));
+			var diff = offset - newOffset;
 			offset = newOffset;
-			//songDesc.offset = newOffset;
-			//audicaFile.desc.offset = newOffset;
+			
+			var newTime = time + BeatsToDuration(diff / 480f);
+			if (newTime != time) {
+				StartCoroutine(AnimateSetTime(newTime));
+			}
 		}
 
 		public void SetSnap(int newSnap) {
@@ -995,7 +1005,7 @@ namespace NotReaper {
 				previewAud.Pause();
 			}
 
-			previewAud.volume = aud.volume;
+			previewAud.volume = aud.volume = musicVolume;
 
 			SetCurrentTime();
 			SetCurrentTick();
@@ -1027,6 +1037,8 @@ namespace NotReaper {
 		}
 
 		public void JumpToX(float x) {
+			StopCoroutine(AnimateSetTime(0));
+
 			float posX = Math.Abs(timelineTransformParent.position.x) + x;
 			float newX = GetClosestBeatSnapped(posX);
 			float newTime = BeatsToDuration(newX);
@@ -1156,7 +1168,7 @@ namespace NotReaper {
 
 		private void OnMouseDown() {
 			//We don't want to interfere with drag select
-			if (Input.GetKey(KeyCode.LeftControl)) return;
+			if (EditorInput.selectedTool == EditorTool.DragSelect) return;
 			JumpToX(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
 		}
 
@@ -1207,8 +1219,13 @@ namespace NotReaper {
 				prevTickText = currentTick;
 				curTick.text = currentTick;
 			}
-
 		}
-
+		
+		private void SetAudioDSP() {
+			//Pull DSP setting from config
+			var configuration = AudioSettings.GetConfiguration();
+			configuration.dspBufferSize = NRSettings.config.audioDSP;
+			AudioSettings.Reset(configuration);
+		}
 	}
 }

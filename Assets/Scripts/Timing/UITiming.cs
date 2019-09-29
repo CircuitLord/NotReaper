@@ -107,6 +107,7 @@ namespace NotReaper.Timing {
             Int32.TryParse(offsetInput.text, out offset);
 
             timeline.SetTimingModeStats(bpm, offset);
+            timeline.SetOffset(offset);
 
             mapperName = RemoveSpecialCharacters(mapperInput.text);
             songName = RemoveSpecialCharacters(songNameInput.text);
