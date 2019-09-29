@@ -14,9 +14,9 @@ public class BGFPS : MonoBehaviour {
 
             Application.targetFrameRate = rate;
         } else if (rr > 60) {
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = 144;
         }
-        Application.targetFrameRate = 144;
+        //Application.targetFrameRate = 144;
     }
 
 }

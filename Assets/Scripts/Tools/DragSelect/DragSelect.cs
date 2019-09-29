@@ -338,6 +338,8 @@ namespace NotReaper.Tools {
 
 		// execute simple actions which don't require any state management'
 		private void UpdateActions() {
+		
+			//if (EditorInput.selectedTool != EditorTool.DragSelect) return;
 			/** Setting hitsounds **/
 			if (frameIntentSetHitSoundStandard) SetHitsoundAction(TargetVelocity.Standard);
 			if (frameIntentSetHitSoundSnare) SetHitsoundAction(TargetVelocity.Snare);
