@@ -223,6 +223,7 @@ namespace NotReaper {
 		//When loading from cues, use this.
 		public void AddTarget(Cue cue) {
 			TargetData data = new TargetData(cue, offset);
+			if (data.beatTime == 0) data.beatTime = 120f;
 			AddTargetFromAction(data);
 		}
 
@@ -250,6 +251,8 @@ namespace NotReaper {
 			//Default sustains length should be more than 0.
 			if (data.behavior == TargetBehavior.Hold) {
 				data.beatLength = 480;
+			} else {
+				data.beatLength = 120;
 			}
 
 			switch (EditorInput.selectedVelocity) {
