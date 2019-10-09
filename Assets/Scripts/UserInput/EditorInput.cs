@@ -243,6 +243,7 @@ namespace NotReaper.UserInput {
 					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Standard);
 					SelectVelocity(UITargetVelocity.Standard);
 					SelectSnappingMode(SnappingMode.Grid);
+					
 
 					break;
 
@@ -295,14 +296,14 @@ namespace NotReaper.UserInput {
 
 
 					Tools.dragSelect.Activate(true);
-					Tools.chainBuilder.Activate(false);
+					Tools.chainBuilder.Deactivate();
 					break;
 
 				case EditorTool.ChainBuilder:
 					selectedBehavior = TargetBehavior.None;
 
 					Tools.dragSelect.Activate(false);
-					Tools.chainBuilder.Activate(true);
+					Tools.chainBuilder.Activate();
 					break;
 
 
@@ -377,10 +378,12 @@ namespace NotReaper.UserInput {
 
 			if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {
 				SelectTool(EditorTool.DragSelect);
+				previousSnappingMode = selectedSnappingMode;
 			}
 			if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
 				Tools.dragSelect.EndAllDragStuff();
 				RevertTool();
+				SelectSnappingMode(previousSnappingMode);
 			}
 			
 			if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) {
@@ -490,6 +493,21 @@ namespace NotReaper.UserInput {
 			}
 			if (Input.GetKeyDown(InputManager.selectMelee)) {
 				SelectTool(EditorTool.Melee);
+			}
+			
+			//Toggles the chain builder state
+			if (Input.GetKeyDown(KeyCode.T)) {
+
+				return; //TODO CHAINBUILDER IS DISABLED
+				
+				if (Tools.chainBuilder.active) {
+					Tools.chainBuilder.Deactivate();
+					RevertTool();
+				}
+				else {
+					SelectTool(EditorTool.ChainBuilder);
+					
+				}
 			}
 
 			if (Input.GetKeyDown(KeyCode.V) && !isCTRLDown) {

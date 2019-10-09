@@ -20,7 +20,7 @@ namespace NotReaper.Tools.ChainBuilder {
 
 		public bool isDragging = false;
 		public bool isEditMode = false;
-		bool activated = false;
+		public bool active = false;
 
 		private Transform draggingPoint;
 		public GameObject activeChain;
@@ -33,10 +33,18 @@ namespace NotReaper.Tools.ChainBuilder {
 		/// Sets if the tool is active or not.
 		/// </summary>
 		/// <param name="active"></param>
-		public void Activate(bool active) {
-			activated = active;
+		public void Activate() {
+			active = true;
+
+			var startPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			
+			NewChain(startPos);
 
 
+		}
+
+		public void Deactivate() {
+			active = false;
 		}
 		
 
@@ -101,8 +109,8 @@ namespace NotReaper.Tools.ChainBuilder {
 
 
 		private void Update() {
-
-			if (!activated) return;
+			
+			if (!active) return;
 
 
 
