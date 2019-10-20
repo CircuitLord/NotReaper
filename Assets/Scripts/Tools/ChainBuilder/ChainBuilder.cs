@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using NotReaper.Grid;
+using NotReaper.Models;
+using NotReaper.Targets;
 using NotReaper.UserInput;
 using UnityEngine;
 
@@ -7,6 +11,29 @@ namespace NotReaper.Tools.ChainBuilder {
 
 
 	public class ChainBuilder : MonoBehaviour {
+		public LayerMask notesLayer;
+
+		private TargetIcon[] _iconsUnderMouse = new TargetIcon[0];
+
+		/** Fetch all icons currently under the mouse
+		 *  Will only ever happen once per frame */
+		public TargetIcon[] iconsUnderMouse {
+			get {
+				return _iconsUnderMouse = _iconsUnderMouse == null
+					? MouseUtil.IconsUnderMouse(notesLayer)
+					: _iconsUnderMouse;
+			}
+			set { _iconsUnderMouse = value; }
+		}
+
+		// Fetch the highest priority target (closest to current time)
+		public TargetIcon iconUnderMouse {
+			get {
+				return iconsUnderMouse != null && iconsUnderMouse.Length > 0
+					? iconsUnderMouse[0]
+					: null;
+			}
+		}
 
 
 		public GameObject curvedLinePrefab;
@@ -33,18 +60,8 @@ namespace NotReaper.Tools.ChainBuilder {
 		/// Sets if the tool is active or not.
 		/// </summary>
 		/// <param name="active"></param>
-		public void Activate() {
-			active = true;
-
-			var startPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			
-			NewChain(startPos);
-
-
-		}
-
-		public void Deactivate() {
-			active = false;
+		public void Activate(bool active) {
+			activated = active;
 		}
 		
 
@@ -52,12 +69,6 @@ namespace NotReaper.Tools.ChainBuilder {
 		/// Sets the tool to be in select mode.
 		/// </summary>
 		public void SelectMode() {
-
-			//TODO: Check if we want to apply or save our current chain
-			if (activeChain) {
-
-			}
-
 			isEditMode = false;
 		}
 
@@ -65,36 +76,6 @@ namespace NotReaper.Tools.ChainBuilder {
 			//TODO: Find which chain we clicked on to trigger edit mode
 			isEditMode = true;
 		}
-
-
-
-		public void NewChain(Vector2 p1) {
-			Vector3 startPos = new Vector3(p1.x, p1.y, 0f);
-			activeChain = Instantiate(curvedLinePrefab, startPos, Quaternion.identity, chainBuilderLinesParent);
-
-			AddPointToActive(startPos, true);
-			
-			//Spawn the first point somewhere safe in the grid.
-			Vector3 pos2 = new Vector3(p1.x, p1.y, 0f);
-
-			if (p1.x >= 0) {
-				pos2.x -= 2f;
-			} else {
-				pos2.x += 2;
-			}
-			if (p1.y >= 0) {
-				pos2.y -= 2f;
-			} else {
-				pos2.y += 2;
-			}
-
-			AddPointToActive(pos2, false);
-			
-			tempNodeIconsParent = activeChain.transform.Find("TempNodeIcons");
-
-
-		}
-
 
 		
 		public GameObject AddPointToActive(Vector3 pos, bool isChainStart = false) {
@@ -112,44 +93,13 @@ namespace NotReaper.Tools.ChainBuilder {
 			
 			if (!active) return;
 
-
-
-
-			if (Input.GetMouseButtonDown(0) && EditorInput.isOverGrid) {
-				Transform point = FindLinePointUnderMouse();
-
-				if (point) {
-					draggingPoint = point;
-					isDragging = true;
-
-				} else {
-					draggingPoint = AddPointToActive(Camera.main.ScreenToWorldPoint(Input.mousePosition), false).transform;
-					isDragging = true;
+			if (Input.GetMouseButtonDown(0)) {
+				if(iconUnderMouse != null) {
+					iconUnderMouse.data.behavior = TargetBehavior.NR_Pathbuilder;
 				}
 			}
 
-			if (Input.GetMouseButtonDown(1) && EditorInput.isOverGrid) {
-				Transform point = FindLinePointUnderMouse();
-				if (point && !point.GetComponent<CurvedLinePoint>().isChainStart) {
-					Destroy(point.gameObject);
-
-
-				}
-
-			}
-
-			
-			if (isDragging) {
-				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-				draggingPoint.position = new Vector3(mousePos.x, mousePos.y, 0);
-
-				DrawTempChain();
-				
-			}
-
-			if (!Input.GetMouseButton(0)) isDragging = false;
-
-
+			iconsUnderMouse = null;
 		}
 
 

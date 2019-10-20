@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Models;
@@ -22,6 +22,7 @@ namespace NotReaper.Targets {
         public GameObject chain;
         public GameObject melee;
         public GameObject line;
+        public GameObject pathBuilder;
 
         public SpriteRenderer standardOutline;
         public SpriteRenderer holdOutline;
@@ -30,6 +31,7 @@ namespace NotReaper.Targets {
         public SpriteRenderer chainStartOutline;
         public SpriteRenderer chainOutline;
         public SpriteRenderer meleeOutline;
+        public SpriteRenderer pathBuilderOutline;
         public SphereCollider sphereCollider;
 
         public TargetData data;
@@ -90,6 +92,7 @@ namespace NotReaper.Targets {
             chainStartOutline.enabled = (behavior == TargetBehavior.ChainStart);
             chainOutline.enabled = (behavior == TargetBehavior.Chain);
             meleeOutline.enabled = (behavior == TargetBehavior.Melee);
+            pathBuilderOutline.enabled = (behavior == TargetBehavior.NR_Pathbuilder);
 
             isSelected = true;
         }
@@ -103,6 +106,7 @@ namespace NotReaper.Targets {
             chainStartOutline.enabled = false;
             chainOutline.enabled = false;
             meleeOutline.enabled = false;
+            pathBuilderOutline.enabled = false;
 
             isSelected = false;
         }
@@ -116,6 +120,7 @@ namespace NotReaper.Targets {
             chainStartOutline.color = color;
             chainOutline.color = color;
             meleeOutline.color = color;
+            pathBuilderOutline.color = color;
         }
 
         private void OnHandTypeChanged(TargetHandType handType) {
@@ -212,10 +217,16 @@ namespace NotReaper.Targets {
             chainStart.SetActive(behavior == TargetBehavior.ChainStart);
             chain.SetActive(behavior == TargetBehavior.Chain);
             melee.SetActive(behavior == TargetBehavior.Melee);
+            pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
 
             sphereCollider.radius = 0.5f;
             if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline) {
                 sphereCollider.radius = 0.25f;
+            }
+
+            if(behavior == TargetBehavior.NR_Pathbuilder) {
+                data.handType = TargetHandType.None;
+                data.velocity = TargetVelocity.None;
             }
         }
     }
