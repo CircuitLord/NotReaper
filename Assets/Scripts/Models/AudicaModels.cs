@@ -93,6 +93,19 @@ namespace NotReaper.Models {
 	public class CueFile {
 		public List<Cue> cues = null;
 	}
+    
+
+    public class ErrorLogEntry
+    {
+        public float beatTime; 
+        public readonly string errorDesc;
+
+        public ErrorLogEntry(float beatTime, string v)
+        {
+            this.beatTime = beatTime;
+            this.errorDesc = v;
+        }
+    }
 
 	public class AudicaFile {
 		public SongDesc desc = new SongDesc();
