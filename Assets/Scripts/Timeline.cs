@@ -546,6 +546,9 @@ namespace NotReaper {
 			export.cues = new List<Cue>();
 
 			foreach (Target target in orderedNotes) {
+
+				if (target.data.beatLength == 0) target.data.beatLength = 120;
+				
 				if (target.data.behavior == TargetBehavior.Metronome) continue;
 				export.cues.Add(NotePosCalc.ToCue(target, offset, false));
 			}
