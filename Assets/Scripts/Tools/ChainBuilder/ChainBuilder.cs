@@ -6,9 +6,9 @@ using NotReaper.Models;
 using NotReaper.Targets;
 using NotReaper.UserInput;
 using UnityEngine;
+using DG.Tweening;
 
-namespace NotReaper.Tools.ChainBuilder {
-
+namespace NotReaper.Tools.ChainBuilder { 
 
 	public class ChainBuilder : MonoBehaviour {
 		public LayerMask notesLayer;
@@ -56,12 +56,31 @@ namespace NotReaper.Tools.ChainBuilder {
 
 
 
+		[SerializeField] private GameObject chainBuilderWindow; 
+
+		void Start() {
+			Vector3 defaultPos;
+			defaultPos.x = 289.0f;
+			defaultPos.y = -92.2f;
+			defaultPos.z = -10.0f;
+
+			chainBuilderWindow.GetComponent<RectTransform>().localPosition = defaultPos;
+			chainBuilderWindow.GetComponent<CanvasGroup>().alpha = 0.0f;
+		}
+
 		/// <summary>
 		/// Sets if the tool is active or not.
 		/// </summary>
 		/// <param name="active"></param>
 		public void Activate(bool active) {
 			activated = active;
+
+			if(active) {
+				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
+			}
+			else {
+				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
+			}
 		}
 		
 
