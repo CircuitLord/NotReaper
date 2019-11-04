@@ -172,6 +172,21 @@ namespace NotReaper.Tools {
 						targetData.handType = TargetHandType.Left;
 					break;
 				}
+
+				if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+					switch (targetData.pathBuilderData.handType) {
+						case TargetHandType.Left: 
+							targetData.pathBuilderData.handType = TargetHandType.Right;
+						break;
+						
+						case TargetHandType.Right: 
+							targetData.pathBuilderData.handType = TargetHandType.Left;
+						break;
+					}
+
+					targetData.handType = targetData.handType;
+					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+				}
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
@@ -182,9 +197,23 @@ namespace NotReaper.Tools {
 	public class NRActionHFlipNotes : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
 
+		public float FlipAngle(float angle) {
+			angle = ((angle + 180) % 360) - 180;
+			return -angle;
+		}
+
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
 				targetData.x *= -1;
+
+				if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+					targetData.pathBuilderData.initialAngle = FlipAngle(targetData.pathBuilderData.initialAngle);
+					targetData.pathBuilderData.angle *= -1;
+					targetData.pathBuilderData.angleIncrement *= -1;
+
+					timeline.FindNote(targetData).UpdatePathInitialAngle(targetData.pathBuilderData.initialAngle);
+					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+				}
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
@@ -195,9 +224,27 @@ namespace NotReaper.Tools {
 	public class NRActionVFlipNotes : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
 
+		public float FlipAngle(float angle) {
+			angle = ((angle + 180) % 360) - 180;
+
+			if (angle >= 0)
+				return 180 - angle;
+			else
+				return -180 - angle;
+		}
+
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
 				targetData.y *= -1;
+
+				if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+					targetData.pathBuilderData.initialAngle = FlipAngle(targetData.pathBuilderData.initialAngle);
+					targetData.pathBuilderData.angle *= -1;
+					targetData.pathBuilderData.angleIncrement *= -1;
+
+					timeline.FindNote(targetData).UpdatePathInitialAngle(targetData.pathBuilderData.initialAngle);
+					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+				}
 			});
 		}
 		public override void UndoAction(Timeline timeline) {

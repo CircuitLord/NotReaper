@@ -65,8 +65,7 @@ namespace NotReaper.Targets {
 
 			//Must be after the two init's, unfortunate timing restiction, but the new objects must be active to find the hold target managers
 			data.BehaviourChangeEvent += OnBehaviorChanged;
-
-			data.Copy(data); //Trigger all callbacks
+			
 			UpdateTimelineSustainLength();
 
 			gridTargetIcon.OnTryRemoveEvent += DeleteNote;

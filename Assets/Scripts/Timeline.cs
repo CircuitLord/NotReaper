@@ -328,6 +328,14 @@ namespace NotReaper {
 
 			target.MakeTimelineUpdateSustainLengthEvent += UpdateSustainLength;
 
+			//Trigger all callbacks on the note
+			targetData.Copy(targetData); 
+
+			//Also generate chains if needed
+			if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+				ChainBuilder.GenerateChainNotes(targetData);
+			}
+
 			return target;
 		}
 
@@ -455,7 +463,19 @@ namespace NotReaper {
 		public void PasteCues(List<Cue> cues, float pasteBeatTime) {
 
 			// paste new targets in the original locations
-			var targetDataList = cues.Select(cue => new TargetData(cue, offset)).ToList();
+			var targetDataList = cues.Select(cue => {
+				var data = new TargetData(cue, offset);
+
+				if(data.behavior == TargetBehavior.NR_Pathbuilder) {
+					data.pathBuilderData = new PathBuilderData();
+					var note = FindNote(data);
+					if(note != null) {
+						data.pathBuilderData.Copy(note.data.pathBuilderData);
+					}
+				}
+
+				return data;
+			}).ToList();
 
 			// find the soonest target in the selection
 			float earliestTargetBeatTime = Mathf.Infinity;

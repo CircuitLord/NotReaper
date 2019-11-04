@@ -115,6 +115,9 @@ namespace NotReaper.Tools.ChainBuilder {
 				if(timeline.selectedNotes.Count != 1 || timeline.selectedNotes[0].data.behavior != TargetBehavior.NR_Pathbuilder) {
 					timeline.DeselectAllTargets();
 				}
+				else {
+					SetPathbuilderStateToSelectedNote();
+				}
 
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
 			}
@@ -346,19 +349,7 @@ namespace NotReaper.Tools.ChainBuilder {
 					startClickNote = iconUnderMouse.target;
 
 					if(timeline.selectedNotes.Count == 1) {
-						angleIncrement.value = iconUnderMouse.data.pathBuilderData.angle;
-						angleIncrementIncrement.value = iconUnderMouse.data.pathBuilderData.angleIncrement;
-						stepDistance.value = iconUnderMouse.data.pathBuilderData.stepDistance;
-						stepIncrement.value = iconUnderMouse.data.pathBuilderData.stepIncrement;
-
-						var intervalStr = "1/" + iconUnderMouse.data.pathBuilderData.interval;
-						for(int i = 0; i < pathBuilderInterval.elements.Count; ++i) {
-							if(pathBuilderInterval.elements[i] == intervalStr) {
-								pathBuilderInterval.index = i;
-								pathBuilderInterval.PreviousClick();
-								pathBuilderInterval.ForwardClick();
-							}
-						}
+						SetPathbuilderStateToSelectedNote();
 					}
 				}
 			}
@@ -377,6 +368,22 @@ namespace NotReaper.Tools.ChainBuilder {
 			}
 		}
 
+
+		private void SetPathbuilderStateToSelectedNote() {
+			angleIncrement.value = timeline.selectedNotes[0].data.pathBuilderData.angle;
+			angleIncrementIncrement.value = timeline.selectedNotes[0].data.pathBuilderData.angleIncrement;
+			stepDistance.value = timeline.selectedNotes[0].data.pathBuilderData.stepDistance;
+			stepIncrement.value = timeline.selectedNotes[0].data.pathBuilderData.stepIncrement;
+
+			var intervalStr = "1/" + timeline.selectedNotes[0].data.pathBuilderData.interval;
+			for(int i = 0; i < pathBuilderInterval.elements.Count; ++i) {
+				if(pathBuilderInterval.elements[i] == intervalStr) {
+					pathBuilderInterval.index = i;
+					pathBuilderInterval.PreviousClick();
+					pathBuilderInterval.ForwardClick();
+				}
+			}
+		}
 
 		public void DrawTempChain() {
 			List<Vector2> points = FindPointsAlongChain(10);

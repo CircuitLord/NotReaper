@@ -20,8 +20,19 @@ namespace NotReaper.Targets {
 		public float stepIncrement = 0.0f;
 		[NonSerialized] public List<TargetData> generatedNotes = new List<TargetData>();
 		[NonSerialized] public bool createdNotes = false;
+
+		public void Copy(PathBuilderData data) {
+			behavior = data.behavior;
+			velocity = data.velocity;
+			handType = data.handType;
+			interval = data.interval;
+			initialAngle = data.initialAngle;
+			angle = data.angle;
+			stepDistance = data.stepDistance;
+			stepIncrement = data.stepIncrement;
+		}
 	}
-	
+
 	public class TargetData {
 		public TargetData() {
 			beatLength = 0.25f;
