@@ -4,20 +4,90 @@ using System.Collections.Generic;
 using UnityEngine;
 using NotReaper.Models;
 using NotReaper.Grid;
+using NotReaper.Tools.ChainBuilder;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace NotReaper.Targets {
 
 	[Serializable]
 	public class PathBuilderData {
-		public TargetBehavior behavior;
-		public TargetVelocity velocity;
-		public TargetHandType handType;
-		public int interval = 4;
-		public float initialAngle = 0.0f;
-		public float angle = 0.0f;
-		public float angleIncrement = 0.0f;
-		public float stepDistance = 0.5f;
-		public float stepIncrement = 0.0f;
+		
+		[SerializeField]
+		private TargetBehavior _behavior;
+
+		[SerializeField]
+		private TargetVelocity _velocity;
+
+		[SerializeField]
+		private TargetHandType _handType;
+
+		[SerializeField]
+		private int _interval = 4;
+
+		[SerializeField]
+		private float _initialAngle = 0.0f;
+
+		[SerializeField]
+		private float _angle = 0.0f;
+
+		[SerializeField]
+		private float _angleIncrement = 0.0f;
+
+		[SerializeField]
+		private float _stepDistance = 0.5f;
+
+		[SerializeField]
+		private float _stepIncrement = 0.0f;
+
+		public TargetBehavior behavior {
+			get { return _behavior; }
+			set { _behavior = value; RecalculateChain(); }
+		}
+		public TargetVelocity velocity {
+			get { return _velocity; }
+			set { _velocity = value; RecalculateChain(); }
+		}
+		public TargetHandType handType {
+			get { return _handType; }
+			set { _handType = value; RecalculateChain(); }
+		}
+		public int interval {
+			get { return _interval; }
+			set { _interval = value; RecalculateChain(); }
+		}
+		public float initialAngle {
+			get { return _initialAngle; }
+			set { _initialAngle = value; InitialAngleChangedEvent(); RecalculateChain(); }
+		}
+		public float angle {
+			get { return _angle; }
+			set { _angle = value; RecalculateChain(); }
+		}
+		public float angleIncrement {
+			get { return _angleIncrement; }
+			set { _angleIncrement = value; RecalculateChain(); }
+		}
+		public float stepDistance {
+			get { return _stepDistance; }
+			set { _stepDistance = value; RecalculateChain(); }
+		}
+		public float stepIncrement {
+			get { return _stepIncrement; }
+			set { _stepIncrement = value; RecalculateChain(); }
+		}
+
+		public void RecalculateChain() {
+			RecalculateEvent();
+		}
+
+		public void OnFinishRecalculate() {
+			RecalculateFinishedEvent();
+		}
+
+		[NonSerialized] public Action RecalculateEvent = delegate {};
+		[NonSerialized] public Action RecalculateFinishedEvent = delegate {};
+		[NonSerialized] public Action InitialAngleChangedEvent = delegate {};
 		[NonSerialized] public List<TargetData> generatedNotes = new List<TargetData>();
 		[NonSerialized] public bool createdNotes = false;
 
@@ -34,7 +104,14 @@ namespace NotReaper.Targets {
 	}
 
 	public class TargetData {
+		private static uint TargetDataId = 0;
+
+		public static uint GetNextId() { return TargetDataId++; }
+		public uint ID {get; private set; }
+
 		public TargetData() {
+			ID = GetNextId();
+
 			beatLength = 0.25f;
 			velocity = TargetVelocity.Standard;
 			handType = TargetHandType.Left;
@@ -42,6 +119,8 @@ namespace NotReaper.Targets {
 		}
 
 		public TargetData(Cue cue, float offset) {
+			ID = GetNextId();
+
 			Vector2 pos = NotePosCalc.PitchToPos(cue);
 			x = pos.x;
 			y = pos.y;
@@ -53,6 +132,8 @@ namespace NotReaper.Targets {
 		}
 		
 		public TargetData(TargetData data) {
+			ID = GetNextId();
+
 			Copy(data);
 		}
 

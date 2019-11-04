@@ -211,7 +211,6 @@ namespace NotReaper.Tools {
 					targetData.pathBuilderData.angle *= -1;
 					targetData.pathBuilderData.angleIncrement *= -1;
 
-					timeline.FindNote(targetData).UpdatePathInitialAngle(targetData.pathBuilderData.initialAngle);
 					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
 				}
 			});
@@ -242,7 +241,6 @@ namespace NotReaper.Tools {
 					targetData.pathBuilderData.angle *= -1;
 					targetData.pathBuilderData.angleIncrement *= -1;
 
-					timeline.FindNote(targetData).UpdatePathInitialAngle(targetData.pathBuilderData.initialAngle);
 					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
 				}
 			});

@@ -261,7 +261,6 @@ namespace NotReaper.Targets {
             }
 
             if(behavior == TargetBehavior.NR_Pathbuilder) {
-                data.handType = TargetHandType.None;
                 data.velocity = TargetVelocity.None;
             }
         }

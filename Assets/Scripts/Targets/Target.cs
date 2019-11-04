@@ -103,7 +103,11 @@ namespace NotReaper.Targets {
 			}
 
 			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
-				UpdatePathInitialAngle(data.pathBuilderData.initialAngle);
+				data.pathBuilderData.InitialAngleChangedEvent += UpdatePathInitialAngle;
+				data.pathBuilderData.RecalculateEvent += RecalculatePathbuilderData;
+				data.pathBuilderData.RecalculateFinishedEvent += UpdatePath;
+
+				UpdatePathInitialAngle();
 			}
 		}
 
@@ -121,13 +125,19 @@ namespace NotReaper.Targets {
 			data.BeatLengthChangeEvent -= OnBeatLengthChanged;
 			data.BehaviourChangeEvent -= OnBehaviorChanged;
 
-			if(data.behavior == TargetBehavior.NR_Pathbuilder && data.pathBuilderData.createdNotes) {
-				data.pathBuilderData.generatedNotes.ForEach(t => {
-					timeline.DeleteTargetFromAction(t);
-				});
+			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
+				data.pathBuilderData.InitialAngleChangedEvent -= UpdatePathInitialAngle;
+				data.pathBuilderData.RecalculateEvent -= RecalculatePathbuilderData;
+				data.pathBuilderData.RecalculateFinishedEvent -= UpdatePath;
 
-				data.pathBuilderData.generatedNotes.Clear();
-				data.pathBuilderData.createdNotes = false;
+				if(data.pathBuilderData.createdNotes) {
+					data.pathBuilderData.generatedNotes.ForEach(t => {
+						timeline.DeleteTargetFromAction(t);
+					});
+
+					data.pathBuilderData.generatedNotes.Clear();
+					data.pathBuilderData.createdNotes = false;
+				}
 			}
 		}
 
@@ -262,6 +272,12 @@ namespace NotReaper.Targets {
 
 				gridTargetIcon.UpdatePath();
 			}
+
+			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
+				data.pathBuilderData.InitialAngleChangedEvent += UpdatePathInitialAngle;
+				data.pathBuilderData.RecalculateEvent += RecalculatePathbuilderData;
+				data.pathBuilderData.RecalculateFinishedEvent += UpdatePath;
+			}
 		}
 
 		public void UpdateTimelineSustainLength() {
@@ -283,15 +299,15 @@ namespace NotReaper.Targets {
 			gridTargetIcon.UpdatePath();
 		}
 
-		public void UpdatePathInitialAngle(float angle) {
-			if(data.behavior != TargetBehavior.NR_Pathbuilder) {
-				return;
-			}
-
-			data.pathBuilderData.initialAngle = angle;
+		public void RecalculatePathbuilderData() {
+			if(data.behavior != TargetBehavior.NR_Pathbuilder) return;
 			ChainBuilder.CalculateChainNotes(data);
+		}
 
-			gridTargetIcon.UpdatePathInitialAngle(angle);
+		public void UpdatePathInitialAngle() {
+			if(data.behavior != TargetBehavior.NR_Pathbuilder) return;
+
+			gridTargetIcon.UpdatePathInitialAngle(data.pathBuilderData.initialAngle);
 		}
 	}
 

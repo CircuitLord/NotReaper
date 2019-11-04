@@ -120,9 +120,11 @@ namespace NotReaper.Tools.ChainBuilder {
 				}
 
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
+				chainBuilderWindow.SetActive(true);
 			}
 			else {
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
+				chainBuilderWindow.SetActive(false);
 			}
 
 			if(wasActive && active == false) {
@@ -154,7 +156,6 @@ namespace NotReaper.Tools.ChainBuilder {
 			stepDistance.value = target.data.pathBuilderData.stepDistance;
 
 			target.data.pathBuilderData.interval = snap;
-			CalculateChainNotes(target.data);
 		}
 
 		public void OnAngleVelocityChange(float value) {
@@ -164,7 +165,6 @@ namespace NotReaper.Tools.ChainBuilder {
 			}
 
 			target.data.pathBuilderData.angle = value;
-			CalculateChainNotes(target.data);
 		}
 
 		public void OnAngleAccelerationChange(float value) {
@@ -174,7 +174,6 @@ namespace NotReaper.Tools.ChainBuilder {
 			}
 
 			target.data.pathBuilderData.angleIncrement = value;
-			CalculateChainNotes(target.data);
 		}
 
 		public void OnStepDistanceChange(float value) {
@@ -184,7 +183,6 @@ namespace NotReaper.Tools.ChainBuilder {
 			}
 
 			target.data.pathBuilderData.stepDistance = value;
-			CalculateChainNotes(target.data);
 		}
 
 		public void OnStepIncrementChange(float value) {
@@ -194,7 +192,6 @@ namespace NotReaper.Tools.ChainBuilder {
 			}
 
 			target.data.pathBuilderData.stepIncrement = value;
-			CalculateChainNotes(target.data);
 		}
 
 		public void GeneratePathFromSelectedNote() {
@@ -274,10 +271,7 @@ namespace NotReaper.Tools.ChainBuilder {
 				data.pathBuilderData.generatedNotes.Add(newData);
 			}
 
-			var target = timeline.FindNote(data);
-			if(target != null) {
-				target.UpdatePath();
-			}
+			data.pathBuilderData.OnFinishRecalculate();
 		}
 
 		/// <summary>
@@ -322,7 +316,7 @@ namespace NotReaper.Tools.ChainBuilder {
 							snappedAngle = 180 + (180 - snappedAngle);
 						}
 
-						startClickNote.UpdatePathInitialAngle(snappedAngle);
+						startClickNote.data.pathBuilderData.initialAngle = snappedAngle;
 					}
 				}
 			}

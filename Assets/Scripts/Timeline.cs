@@ -196,6 +196,26 @@ namespace NotReaper {
 			}
 			return -1;
 		}
+
+		public TargetData FindTargetData(float beatTime, TargetBehavior behavior, TargetHandType handType) {
+			int idx = BinarySearchOrderedNotes(beatTime);
+			if(idx == -1) {
+				Debug.LogWarning("Couldn't find note with time " + beatTime);
+				return null;
+			}
+
+			for(int i = idx; i < orderedNotes.Count; ++i) {
+				Target t = orderedNotes[i];
+				if (FastApproximately(t.data.beatTime, beatTime) &&
+					t.data.behavior == behavior &&
+					t.data.handType == handType) {
+					return t.data;
+				}
+			}
+
+			Debug.LogWarning("Couldn't find note with time " + beatTime + " and index " + idx);
+			return null;
+		}
 		
 		public Target FindNote(TargetData data) {
 			int idx = BinarySearchOrderedNotes(data.beatTime);
@@ -206,9 +226,7 @@ namespace NotReaper {
 
 			for(int i = idx; i < orderedNotes.Count; ++i) {
 				Target t = orderedNotes[i];
-				if (FastApproximately(t.data.beatTime, data.beatTime) &&
-					t.data.behavior == data.behavior &&
-					t.data.handType == data.handType) {
+				if (t.data.ID == data.ID) {
 					return t;
 				}
 			}
@@ -460,15 +478,15 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void PasteCues(List<Cue> cues, float pasteBeatTime) {
+		public void PasteCues(List<TargetData> cues, float pasteBeatTime) {
 
 			// paste new targets in the original locations
-			var targetDataList = cues.Select(cue => {
-				var data = new TargetData(cue, offset);
+			var targetDataList = cues.Select(copyData => {
+				var data = new TargetData(copyData);
 
 				if(data.behavior == TargetBehavior.NR_Pathbuilder) {
 					data.pathBuilderData = new PathBuilderData();
-					var note = FindNote(data);
+					var note = FindNote(copyData);
 					if(note != null) {
 						data.pathBuilderData.Copy(note.data.pathBuilderData);
 					}

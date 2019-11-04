@@ -253,9 +253,14 @@ namespace NotReaper.Managers {
                     var data = timeline.GetTargetDataForCue(cueFile.NRCueData.pathBuilderNoteCues[i]);
                     data.pathBuilderData = cueFile.NRCueData.pathBuilderNoteData[i];
 
-                    //Recalc the notes and say we generated them, since by loading the cues we "did"
+                    //Recalculate the notes, and remove any identical enties that would have been loaded through the cues
                     ChainBuilder.CalculateChainNotes(data);
-                    data.pathBuilderData.createdNotes = true;
+                    foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
+                        var foundData = timeline.FindTargetData(genData.beatTime, genData.behavior, genData.handType);
+                        if(foundData != null) {
+                            timeline.DeleteTargetFromAction(foundData);
+                        }
+                    }
 
                     timeline.AddTargetFromAction(data);
 
