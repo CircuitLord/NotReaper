@@ -169,6 +169,11 @@ namespace NotReaper {
 			orderedNotes.Sort((left, right) =>  left.data.beatTime.CompareTo(right.data.beatTime));
 		}
 
+		private static float BeatEpsilon = 0.00001f;
+		public static bool FastApproximately(float a, float b) {
+			return ((a - b) < 0 ? ((a - b) * -1) : (a - b)) <= BeatEpsilon;
+		}
+
 		public static int BinarySearchOrderedNotes(float cueTime)
 		{ 
 			int min = 0;
@@ -176,7 +181,7 @@ namespace NotReaper {
 				while (min <=max) {
 				int mid = (min + max) / 2;
 				float midCueTime = orderedNotes[mid].data.beatTime;
-				if (cueTime == midCueTime) {
+				if (FastApproximately(cueTime, midCueTime)) {
 					while(mid != 0 && orderedNotes[mid - 1].data.beatTime == cueTime) {
 						--mid;
 					}
@@ -195,24 +200,20 @@ namespace NotReaper {
 		public Target FindNote(TargetData data) {
 			int idx = BinarySearchOrderedNotes(data.beatTime);
 			if(idx == -1) {
-				Debug.LogError("Couldn't find note with time " + data.beatTime);
+				Debug.LogWarning("Couldn't find note with time " + data.beatTime);
 				return null;
 			}
 
 			for(int i = idx; i < orderedNotes.Count; ++i) {
 				Target t = orderedNotes[i];
-				if (Mathf.Approximately(t.data.x, data.x) &&
-					Mathf.Approximately(t.data.y, data.y) &&
-					Mathf.Approximately(t.data.beatTime, data.beatTime) &&
+				if (FastApproximately(t.data.beatTime, data.beatTime) &&
 					t.data.behavior == data.behavior &&
 					t.data.handType == data.handType) {
 					return t;
 				}
-				
-				
 			}
 
-			Debug.LogError("Couldn't find note with time " + data.beatTime + " and index " + idx);
+			Debug.LogWarning("Couldn't find note with time " + data.beatTime + " and index " + idx);
 			return null;
 		}
 
@@ -225,10 +226,11 @@ namespace NotReaper {
 		}
 
 		//When loading from cues, use this.
-		public void AddTarget(Cue cue) {
+		public TargetData GetTargetDataForCue(Cue cue) {
 			TargetData data = new TargetData(cue, offset);
 			if (data.beatTime == 0) data.beatTime = 120f;
 			AddTargetFromAction(data);
+			return data;
 		}
 
 
@@ -520,7 +522,7 @@ namespace NotReaper {
 			loadedNotes.Remove(target);
 			selectedNotes.Remove(target);
 
-			target.Destroy();
+			target.Destroy(this);
 			target = null;
 		}
 
@@ -532,7 +534,7 @@ namespace NotReaper {
 
 		public void DeleteAllTargets() {
 			foreach (Target target in notes) {
-				target.Destroy();
+				target.Destroy(this);
 			}
 
 			notes = new List<Target>();
@@ -545,18 +547,41 @@ namespace NotReaper {
 
 		public void Export()
 		{
+			//Ensure all chains are generated
+			List<TargetData> nonGeneratedNotes = new List<TargetData>();
 
+			foreach(Target note in notes) {
+				if(note.data.behavior == TargetBehavior.NR_Pathbuilder && note.data.pathBuilderData.createdNotes == false) {
+					nonGeneratedNotes.Add(note.data);
+				}
+			}
+
+			foreach(var data in nonGeneratedNotes) {
+				ChainBuilder.GenerateChainNotes(data);
+			}
+
+			//Export map
 			string dirpath = Application.persistentDataPath;
 
 			CueFile export = new CueFile();
 			export.cues = new List<Cue>();
+			export.NRCueData = new NRCueData();
 
 			foreach (Target target in orderedNotes) {
 
 				if (target.data.beatLength == 0) target.data.beatLength = 120;
 				
 				if (target.data.behavior == TargetBehavior.Metronome) continue;
-				export.cues.Add(NotePosCalc.ToCue(target, offset, false));
+				
+				var cue = NotePosCalc.ToCue(target, offset, false);
+
+				if(target.data.behavior == TargetBehavior.NR_Pathbuilder) {
+					export.NRCueData.pathBuilderNoteCues.Add(cue);
+					export.NRCueData.pathBuilderNoteData.Add(target.data.pathBuilderData);
+					continue;
+				}
+
+				export.cues.Add(cue);
 			}
 
 			switch (difficultyManager.loadedIndex) {

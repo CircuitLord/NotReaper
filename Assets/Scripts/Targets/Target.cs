@@ -102,9 +102,13 @@ namespace NotReaper.Targets {
 					r.material.color = color;
 				}
 			}
+
+			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
+				UpdatePathInitialAngle(data.pathBuilderData.initialAngle);
+			}
 		}
 
-		public void Destroy() {
+		public void Destroy(Timeline timeline) {
 			if(gridTargetIcon) {
 				UnityEngine.Object.Destroy(gridTargetIcon.gameObject);
 			}
@@ -117,6 +121,15 @@ namespace NotReaper.Targets {
 			data.BeatTimeChangeEvent -= OnBeatTimeChanged;
 			data.BeatLengthChangeEvent -= OnBeatLengthChanged;
 			data.BehaviourChangeEvent -= OnBehaviorChanged;
+
+			if(data.behavior == TargetBehavior.NR_Pathbuilder && data.pathBuilderData.createdNotes) {
+				data.pathBuilderData.generatedNotes.ForEach(t => {
+					timeline.DeleteTargetFromAction(t);
+				});
+
+				data.pathBuilderData.generatedNotes.Clear();
+				data.pathBuilderData.createdNotes = false;
+			}
 		}
 
 		public float GetRelativeBeatTime() {
@@ -171,6 +184,8 @@ namespace NotReaper.Targets {
 				foreach(TargetData note in data.pathBuilderData.generatedNotes) {
 					note.position -= delta;
 				}
+
+				gridTargetIcon.UpdatePath();
 			}
 		}
 
@@ -231,8 +246,6 @@ namespace NotReaper.Targets {
 			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
 				ChainBuilder.CalculateChainNotes(data);
 			}
-
-			gridTargetIcon.GetComponentInChildren<HoldTargetManager>().UpdateSustainLength(newBeatLength);
 		}
 
 		private void OnBehaviorChanged(TargetBehavior behavior) {
@@ -247,6 +260,8 @@ namespace NotReaper.Targets {
 				if(data.beatLength < 480) {
 					data.beatLength = 480;
 				}
+
+				gridTargetIcon.UpdatePath();
 			}
 		}
 
@@ -267,6 +282,17 @@ namespace NotReaper.Targets {
 
 		public void UpdatePath() {
 			gridTargetIcon.UpdatePath();
+		}
+
+		public void UpdatePathInitialAngle(float angle) {
+			if(data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+
+			data.pathBuilderData.initialAngle = angle;
+			ChainBuilder.CalculateChainNotes(data);
+
+			gridTargetIcon.UpdatePathInitialAngle(angle);
 		}
 	}
 

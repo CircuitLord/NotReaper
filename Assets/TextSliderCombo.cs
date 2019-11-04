@@ -28,7 +28,7 @@ public class TextSliderCombo : MonoBehaviour
         slider.onValueChanged.AddListener(delegate {SliderValueChangeCheck(); });
 
         inputFieldObject.GetComponent<TMP_InputField>().text = slider.value.ToString("F2");
-        inputFieldObject.GetComponent<TMP_InputField>().onValueChanged.AddListener(delegate {TextValueChangeCheck(); });
+        inputFieldObject.GetComponent<TMP_InputField>().onEndEdit.AddListener(delegate {TextValueChangeCheck(); });
     }
 
     public void SliderValueChangeCheck() {

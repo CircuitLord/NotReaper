@@ -23,6 +23,7 @@ namespace NotReaper.Targets {
         public GameObject melee;
         public GameObject line;
         public GameObject pathBuilder;
+        public GameObject pathBuilderArrow;
 
         public SpriteRenderer standardOutline;
         public SpriteRenderer holdOutline;
@@ -104,6 +105,7 @@ namespace NotReaper.Targets {
             chainOutline.enabled = (behavior == TargetBehavior.Chain);
             meleeOutline.enabled = (behavior == TargetBehavior.Melee);
             pathBuilderOutline.enabled = (behavior == TargetBehavior.NR_Pathbuilder);
+            if(pathBuilderArrow != null) pathBuilderArrow.SetActive((behavior == TargetBehavior.NR_Pathbuilder));
 
             isSelected = true;
 
@@ -124,6 +126,7 @@ namespace NotReaper.Targets {
             chainOutline.enabled = false;
             meleeOutline.enabled = false;
             pathBuilderOutline.enabled = false;
+            if(pathBuilderArrow != null) pathBuilderArrow.SetActive(false);
 
             isSelected = false;
             if(location == TargetIconLocation.Grid) {
@@ -167,6 +170,10 @@ namespace NotReaper.Targets {
             }
 
             foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
+                if(data.behavior == TargetBehavior.NR_Pathbuilder) {
+                    handType = data.pathBuilderData.handType;
+                }
+
                 switch (handType) {
                     case TargetHandType.Left:
                         l.startColor = NRSettings.config.leftColor;
@@ -189,7 +196,6 @@ namespace NotReaper.Targets {
                         sustainDirection = 0.6f;
                         break;
                 }
-
 
                 if (data.supportsBeatLength && l.positionCount >= 3) {
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
@@ -267,17 +273,6 @@ namespace NotReaper.Targets {
 
             var lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>();
             foreach (LineRenderer l in lineRenderers) {
-                List<Vector3> positions = new List<Vector3>();
-
-                foreach(TargetData d in data.pathBuilderData.generatedNotes) {
-                    positions.Add(new Vector3(d.x, d.y, 0.0f));
-                }
-
-                l.positionCount = positions.Count;
-                for(int i = 0; i < positions.Count; ++i) {
-                    l.SetPosition(i, positions[i]);
-                }
-
                 switch (data.pathBuilderData.handType) {
                     case TargetHandType.Left:
                         l.startColor = NRSettings.config.leftColor;
@@ -296,7 +291,30 @@ namespace NotReaper.Targets {
                         l.endColor = UserPrefsManager.neitherColor;
                         break;
                 }
+
+                List<Vector3> positions = new List<Vector3>();
+
+                foreach(TargetData d in data.pathBuilderData.generatedNotes) {
+                    positions.Add(new Vector3(d.x, d.y, 0.0f));
+                }
+
+                l.positionCount = positions.Count;
+                for(int i = 0; i < positions.Count; ++i) {
+                    l.SetPosition(i, positions[i]);
+                }
             }
+        }
+
+        public void UpdatePathInitialAngle(float angle) {
+            if(data.behavior != TargetBehavior.NR_Pathbuilder) {
+                return;
+            }
+
+            var transform = pathBuilderArrow.GetComponent<Transform>();
+            transform.localPosition = new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad) * 0.5f, Mathf.Cos(angle * Mathf.Deg2Rad) * 0.5f, 0);
+            transform.localRotation = Quaternion.Euler(0, 0, 180 - angle);
+            
+            UpdatePath();
         }
     }
 }

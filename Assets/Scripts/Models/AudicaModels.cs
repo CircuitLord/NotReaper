@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Melanchall.DryWetMidi.Smf;
+using NotReaper.Targets;
 
 namespace NotReaper.Models {
 
@@ -90,8 +91,15 @@ namespace NotReaper.Models {
 	}
 
 	[Serializable]
+	public class NRCueData {
+		public List<Cue> pathBuilderNoteCues = new List<Cue>();
+		public List<PathBuilderData> pathBuilderNoteData = new List<PathBuilderData>();
+	}
+
+	[Serializable]
 	public class CueFile {
 		public List<Cue> cues = null;
+		public NRCueData NRCueData = null;
 	}
     
 

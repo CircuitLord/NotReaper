@@ -7,6 +7,7 @@ using NotReaper.Grid;
 
 namespace NotReaper.Targets {
 
+	[Serializable]
 	public class PathBuilderData {
 		public TargetBehavior behavior;
 		public TargetVelocity velocity;
@@ -17,10 +18,10 @@ namespace NotReaper.Targets {
 		public float angleIncrement = 0.0f;
 		public float stepDistance = 0.5f;
 		public float stepIncrement = 0.0f;
-		public List<TargetData> generatedNotes = new List<TargetData>();
-		public bool createdNotes = false;
+		[NonSerialized] public List<TargetData> generatedNotes = new List<TargetData>();
+		[NonSerialized] public bool createdNotes = false;
 	}
-
+	
 	public class TargetData {
 		public TargetData() {
 			beatLength = 0.25f;

@@ -69,6 +69,8 @@ namespace NotReaper.Tools.ChainBuilder {
 
 		private int prevDrawPointsAmt = 0;
 
+		private Target startClickNote = null;
+
 
 
 		[SerializeField] private GameObject chainBuilderWindow; 
@@ -103,14 +105,35 @@ namespace NotReaper.Tools.ChainBuilder {
 		/// </summary>
 		/// <param name="active"></param>
 		public void Activate(bool active) {
+			bool wasActive = activated == true;
+
 			activated = active;
 
+			startClickNote = null;
+
 			if(active) {
-				timeline.DeselectAllTargets();
+				if(timeline.selectedNotes.Count != 1 || timeline.selectedNotes[0].data.behavior != TargetBehavior.NR_Pathbuilder) {
+					timeline.DeselectAllTargets();
+				}
+
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
 			}
 			else {
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
+			}
+
+			if(wasActive && active == false) {
+				List<TargetData> nonGeneratedNotes = new List<TargetData>();
+
+				foreach(Target note in timeline.notes) {
+					if(note.data.behavior == TargetBehavior.NR_Pathbuilder && note.data.pathBuilderData.createdNotes == false) {
+						nonGeneratedNotes.Add(note.data);
+					}
+				}
+
+				foreach(var data in nonGeneratedNotes) {
+					GenerateChainNotes(data);
+				}
 			}
 		}
 
@@ -123,6 +146,10 @@ namespace NotReaper.Tools.ChainBuilder {
 			string temp = pathBuilderInterval.elements[pathBuilderInterval.index];
 			int snap = 4;
 			int.TryParse(temp.Substring(2), out snap);
+
+			angleIncrement.value = target.data.pathBuilderData.angle;
+			stepDistance.value = target.data.pathBuilderData.stepDistance;
+
 			target.data.pathBuilderData.interval = snap;
 			CalculateChainNotes(target.data);
 		}
@@ -209,12 +236,15 @@ namespace NotReaper.Tools.ChainBuilder {
 			firstData.position = data.position;
 			data.pathBuilderData.generatedNotes.Add(firstData);
 
+			//We increment as if all these values were for 1/4 notes over 4 beats, makes the ui much better
+			float quarterIncrConvert = (4.0f / data.pathBuilderData.interval) * (480.0f * 4.0f / data.beatLength);
+
 			//Generate new notes
 			Vector2 currentPos = data.position;
-			Vector2 currentDir = new Vector2(0, 1);
-			float currentAngle = data.pathBuilderData.angle;
-			float currentStep = data.pathBuilderData.stepDistance;
-
+			Vector2 currentDir = new Vector2(Mathf.Sin(data.pathBuilderData.initialAngle * Mathf.Deg2Rad), Mathf.Cos(data.pathBuilderData.initialAngle * Mathf.Deg2Rad));
+			float currentAngle = (data.pathBuilderData.angle / 4) * quarterIncrConvert;
+			float currentStep = data.pathBuilderData.stepDistance * quarterIncrConvert;
+			
 			TargetBehavior generatedBehavior = data.pathBuilderData.behavior;
 			if(generatedBehavior == TargetBehavior.ChainStart) {
 				generatedBehavior = TargetBehavior.Chain;
@@ -228,8 +258,9 @@ namespace NotReaper.Tools.ChainBuilder {
 			for(int i = 1; i <= (data.beatLength / 480) * (data.pathBuilderData.interval / 4.0f); ++i) {
 				currentPos += currentDir * currentStep;
 				currentDir = currentDir.Rotate(currentAngle);
-				currentAngle += data.pathBuilderData.angleIncrement;
-				currentStep += data.pathBuilderData.stepIncrement;
+
+				currentAngle += (data.pathBuilderData.angleIncrement / 4) * quarterIncrConvert;
+				currentStep += data.pathBuilderData.stepIncrement * quarterIncrConvert;
 
 				TargetData newData = new TargetData();
 				newData.behavior = generatedBehavior;
@@ -274,8 +305,30 @@ namespace NotReaper.Tools.ChainBuilder {
 			
 			if (!active) return;
 
+			if(Input.GetMouseButton(0)) {
+				//We have already selected a pathbuilder note, do the initial angle flow
+				if(timeline.selectedNotes.Count == 1 && timeline.selectedNotes[0] == startClickNote && timeline.selectedNotes[0].data.behavior == TargetBehavior.NR_Pathbuilder) {
+					var mousePosV3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+					var mousePos = new Vector2(mousePosV3.x, mousePosV3.y);
+
+					var vecFromCenter = (mousePos - startClickNote.data.position);
+					if(vecFromCenter.sqrMagnitude > 0.5f) {
+						var angle = Vector2.SignedAngle(vecFromCenter.normalized, new Vector2(0, 1));
+						float snappedAngle = Mathf.Floor((Math.Abs(angle) + 22.5f) / 45.0f) * 45.0f;
+						if(Math.Sign(angle) < 0) {
+							snappedAngle = 180 + (180 - snappedAngle);
+						}
+
+						startClickNote.UpdatePathInitialAngle(snappedAngle);
+					}
+				}
+			}
+			else {
+				startClickNote = null;
+			}
+
 			if (Input.GetMouseButtonDown(0)) {
-				if(iconUnderMouse != null && !iconUnderMouse.target.transient) {
+				if(startClickNote == null && iconUnderMouse != null && !iconUnderMouse.target.transient) {
 
 					if(iconUnderMouse.data.behavior != TargetBehavior.NR_Pathbuilder) {
 						PathBuilderData data = new PathBuilderData();
@@ -289,6 +342,8 @@ namespace NotReaper.Tools.ChainBuilder {
 
 					timeline.DeselectAllTargets();
 					iconUnderMouse.TrySelect();
+
+					startClickNote = iconUnderMouse.target;
 
 					if(timeline.selectedNotes.Count == 1) {
 						angleIncrement.value = iconUnderMouse.data.pathBuilderData.angle;
@@ -307,6 +362,8 @@ namespace NotReaper.Tools.ChainBuilder {
 					}
 				}
 			}
+			
+			
 
 			iconsUnderMouse = null;
 

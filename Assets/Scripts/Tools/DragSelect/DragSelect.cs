@@ -87,7 +87,6 @@ namespace NotReaper.Tools {
 		}
 
 		public void Update() {
-			if (!activated) return;
 			CaptureInput();
 			UpdateActions();
 			UpdateSelections();
