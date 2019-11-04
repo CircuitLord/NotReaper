@@ -84,12 +84,6 @@ namespace NotReaper.Tools {
 		/// <param name="active"></param>
 		public void Activate(bool active) {
 			activated = active;
-
-			if (!active) {
-				if (isDraggingTimeline) EndTimelineSelection();
-				else if (isDraggingGrid) EndGridSelection();
-				timeline.DeselectAllTargets();
-			}
 		}
 
 		public void Update() {

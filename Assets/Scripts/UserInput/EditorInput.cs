@@ -311,6 +311,14 @@ namespace NotReaper.UserInput {
 					break;
 			}
 
+			if(tool != EditorTool.ChainBuilder) {
+				Tools.chainBuilder.Activate(false);
+			}
+
+			if(tool != EditorTool.DragSelect) {
+				Tools.dragSelect.Activate(false); 
+			}
+
 
 		}
 

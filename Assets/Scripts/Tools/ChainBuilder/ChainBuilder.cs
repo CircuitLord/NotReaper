@@ -10,7 +10,22 @@ using DG.Tweening;
 
 namespace NotReaper.Tools.ChainBuilder { 
 
+	public static class Vector2Extension {
+     public static Vector2 Rotate(this Vector2 v, float degrees) {
+         float radians = degrees * Mathf.Deg2Rad;
+         float sin = Mathf.Sin(radians);
+         float cos = Mathf.Cos(radians);
+         
+         float tx = v.x;
+         float ty = v.y;
+ 
+         return new Vector2(cos * tx - sin * ty, sin * tx + cos * ty);
+     }
+ }
+ 
+
 	public class ChainBuilder : MonoBehaviour {
+		public static Timeline timeline;
 		public LayerMask notesLayer;
 
 		private TargetIcon[] _iconsUnderMouse = new TargetIcon[0];
@@ -57,6 +72,16 @@ namespace NotReaper.Tools.ChainBuilder {
 
 
 		[SerializeField] private GameObject chainBuilderWindow; 
+		[SerializeField] private GameObject chainBuilderWindowSelectedControls; 
+		[SerializeField] private GameObject chainBuilderWindowUnselectedControls; 
+
+		[SerializeField] private Michsky.UI.ModernUIPack.HorizontalSelector pathBuilderInterval;
+		[SerializeField] private TextSliderCombo angleIncrement;
+		[SerializeField] private TextSliderCombo angleIncrementIncrement;
+		[SerializeField] private TextSliderCombo stepDistance;
+		[SerializeField] private TextSliderCombo stepIncrement;
+
+		
 
 		void Start() {
 			Vector3 defaultPos;
@@ -66,6 +91,11 @@ namespace NotReaper.Tools.ChainBuilder {
 
 			chainBuilderWindow.GetComponent<RectTransform>().localPosition = defaultPos;
 			chainBuilderWindow.GetComponent<CanvasGroup>().alpha = 0.0f;
+
+			angleIncrement.OnValueChanged += OnAngleVelocityChange;
+			angleIncrementIncrement.OnValueChanged += OnAngleAccelerationChange;
+			stepDistance.OnValueChanged += OnStepDistanceChange;
+			stepIncrement.OnValueChanged += OnStepIncrementChange;
 		}
 
 		/// <summary>
@@ -76,13 +106,145 @@ namespace NotReaper.Tools.ChainBuilder {
 			activated = active;
 
 			if(active) {
+				timeline.DeselectAllTargets();
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
 			}
 			else {
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
 			}
 		}
+
+		public void OnIntervalChange() {
+			Target target = timeline.selectedNotes.First();
+			if(target == null || target.data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+
+			string temp = pathBuilderInterval.elements[pathBuilderInterval.index];
+			int snap = 4;
+			int.TryParse(temp.Substring(2), out snap);
+			target.data.pathBuilderData.interval = snap;
+			CalculateChainNotes(target.data);
+		}
+
+		public void OnAngleVelocityChange(float value) {
+			Target target = timeline.selectedNotes.First();
+			if(target == null || target.data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+
+			target.data.pathBuilderData.angle = value;
+			CalculateChainNotes(target.data);
+		}
+
+		public void OnAngleAccelerationChange(float value) {
+			Target target = timeline.selectedNotes.First();
+			if(target == null || target.data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+
+			target.data.pathBuilderData.angleIncrement = value;
+			CalculateChainNotes(target.data);
+		}
+
+		public void OnStepDistanceChange(float value) {
+			Target target = timeline.selectedNotes.First();
+			if(target == null || target.data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+
+			target.data.pathBuilderData.stepDistance = value;
+			CalculateChainNotes(target.data);
+		}
+
+		public void OnStepIncrementChange(float value) {
+			Target target = timeline.selectedNotes.First();
+			if(target == null || target.data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+
+			target.data.pathBuilderData.stepIncrement = value;
+			CalculateChainNotes(target.data);
+		}
+
+		public void GeneratePathFromSelectedNote() {
+			Target target = timeline.selectedNotes.First();
+			if(target == null || target.data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+			GenerateChainNotes(target.data);
+		}
+
+		public static void GenerateChainNotes(TargetData data) {
+			CalculateChainNotes(data);
+
+			//Add new notes
+			data.pathBuilderData.generatedNotes.ForEach(t => {
+				var newTarget = timeline.AddTargetFromAction(t, true);
+			});
+
+			data.pathBuilderData.createdNotes = true;
+		}
 		
+		public static void CalculateChainNotes(TargetData data) {
+			if(data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+
+			if(data.pathBuilderData.createdNotes) {
+				data.pathBuilderData.generatedNotes.ForEach(t => {
+					timeline.DeleteTargetFromAction(t);
+				});
+				data.pathBuilderData.createdNotes = false;
+			}
+
+			data.pathBuilderData.generatedNotes = new List<TargetData>();
+
+			//Generate first note at the start
+			TargetData firstData = new TargetData();
+			firstData.behavior = data.pathBuilderData.behavior;
+			firstData.velocity = data.pathBuilderData.velocity;
+			firstData.handType = data.pathBuilderData.handType;
+			firstData.beatTime = data.beatTime;
+			firstData.position = data.position;
+			data.pathBuilderData.generatedNotes.Add(firstData);
+
+			//Generate new notes
+			Vector2 currentPos = data.position;
+			Vector2 currentDir = new Vector2(0, 1);
+			float currentAngle = data.pathBuilderData.angle;
+			float currentStep = data.pathBuilderData.stepDistance;
+
+			TargetBehavior generatedBehavior = data.pathBuilderData.behavior;
+			if(generatedBehavior == TargetBehavior.ChainStart) {
+				generatedBehavior = TargetBehavior.Chain;
+			}
+
+			TargetVelocity generatedVelocity = data.pathBuilderData.velocity;
+			if(generatedVelocity == TargetVelocity.ChainStart) {
+				generatedVelocity = TargetVelocity.Chain;
+			}
+
+			for(int i = 1; i <= (data.beatLength / 480) * (data.pathBuilderData.interval / 4.0f); ++i) {
+				currentPos += currentDir * currentStep;
+				currentDir = currentDir.Rotate(currentAngle);
+				currentAngle += data.pathBuilderData.angleIncrement;
+				currentStep += data.pathBuilderData.stepIncrement;
+
+				TargetData newData = new TargetData();
+				newData.behavior = generatedBehavior;
+				newData.velocity = generatedVelocity;
+				newData.handType = data.pathBuilderData.handType;
+				newData.beatTime = data.beatTime + i * (4.0f / data.pathBuilderData.interval);
+				newData.position = currentPos;
+				data.pathBuilderData.generatedNotes.Add(newData);
+			}
+
+			var target = timeline.FindNote(data);
+			if(target != null) {
+				target.UpdatePath();
+			}
+		}
 
 		/// <summary>
 		/// Sets the tool to be in select mode.
@@ -113,12 +275,49 @@ namespace NotReaper.Tools.ChainBuilder {
 			if (!active) return;
 
 			if (Input.GetMouseButtonDown(0)) {
-				if(iconUnderMouse != null) {
-					iconUnderMouse.data.behavior = TargetBehavior.NR_Pathbuilder;
+				if(iconUnderMouse != null && !iconUnderMouse.target.transient) {
+
+					if(iconUnderMouse.data.behavior != TargetBehavior.NR_Pathbuilder) {
+						PathBuilderData data = new PathBuilderData();
+						data.behavior = iconUnderMouse.data.behavior;
+						data.velocity = iconUnderMouse.data.velocity;
+						data.handType = iconUnderMouse.data.handType;
+						iconUnderMouse.data.pathBuilderData = data;
+
+						iconUnderMouse.data.behavior = TargetBehavior.NR_Pathbuilder;
+					}
+
+					timeline.DeselectAllTargets();
+					iconUnderMouse.TrySelect();
+
+					if(timeline.selectedNotes.Count == 1) {
+						angleIncrement.value = iconUnderMouse.data.pathBuilderData.angle;
+						angleIncrementIncrement.value = iconUnderMouse.data.pathBuilderData.angleIncrement;
+						stepDistance.value = iconUnderMouse.data.pathBuilderData.stepDistance;
+						stepIncrement.value = iconUnderMouse.data.pathBuilderData.stepIncrement;
+
+						var intervalStr = "1/" + iconUnderMouse.data.pathBuilderData.interval;
+						for(int i = 0; i < pathBuilderInterval.elements.Count; ++i) {
+							if(pathBuilderInterval.elements[i] == intervalStr) {
+								pathBuilderInterval.index = i;
+								pathBuilderInterval.PreviousClick();
+								pathBuilderInterval.ForwardClick();
+							}
+						}
+					}
 				}
 			}
 
 			iconsUnderMouse = null;
+
+			if(timeline.selectedNotes.Count == 1) {
+				chainBuilderWindowSelectedControls.SetActive(true);
+				chainBuilderWindowUnselectedControls.SetActive(false);
+			}
+			else {
+				chainBuilderWindowSelectedControls.SetActive(false);
+				chainBuilderWindowUnselectedControls.SetActive(true);
+			}
 		}
 
 

@@ -35,12 +35,15 @@ namespace NotReaper.Targets {
         public SphereCollider sphereCollider;
 
         public TargetData data;
+        public Target target;
 
         public float sustainDirection = 0.6f;
         public bool isSelected = false;
         public TargetIconLocation location;
 
         public ParticleSystem holdParticles;
+
+        public GameObject sustainButtons;
 
         /// <summary>
         /// For when the note is right clicked on. Bool is for if it should gen an undo action
@@ -77,11 +80,13 @@ namespace NotReaper.Targets {
             TryDeselectEvent();
         }
 
-        public void Init(TargetData targetData) {
+        public void Init(Target target, TargetData targetData) {
             data = targetData;
             data.HandTypeChangeEvent += OnHandTypeChanged;
             data.BehaviourChangeEvent += OnBehaviorChanged;
             data.BeatLengthChangeEvent += OnSustainLengthChanged;
+
+            this.target = target;
         }
 
         public void EnableSelected(TargetBehavior behavior) {
@@ -95,6 +100,12 @@ namespace NotReaper.Targets {
             pathBuilderOutline.enabled = (behavior == TargetBehavior.NR_Pathbuilder);
 
             isSelected = true;
+
+            if(location == TargetIconLocation.Grid) {
+                foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
+                    l.enabled = true;
+                }
+            }
         }
 
         public void DisableSelected() {
@@ -109,6 +120,11 @@ namespace NotReaper.Targets {
             pathBuilderOutline.enabled = false;
 
             isSelected = false;
+            if(location == TargetIconLocation.Grid) {
+                foreach (LineRenderer l in gameObject.GetComponentsInChildren<LineRenderer>(true)) {
+                    l.enabled = false;
+                }
+            }
         }
 
 
@@ -169,7 +185,7 @@ namespace NotReaper.Targets {
                 }
 
 
-                if (data.behavior == TargetBehavior.Hold && l.positionCount >= 3) {
+                if (data.supportsBeatLength && l.positionCount >= 3) {
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
                     var pos2 = l.GetPosition(2);
                     l.SetPosition(2, new Vector3(pos2.x, sustainDirection, pos2.z));
@@ -181,8 +197,16 @@ namespace NotReaper.Targets {
             UpdateTimelineSustainLength();
         }
 
+        public void IncreaseBeatLength() {
+            target.MakeTimelineUpdateSustainLength(true);
+        }
+
+        public void DescreseBeatLength() {
+            target.MakeTimelineUpdateSustainLength(false);
+        }
+
         public void UpdateTimelineSustainLength() {
-            if (data.behavior != TargetBehavior.Hold) {
+            if (!data.supportsBeatLength) {
                 return;
             }
 
@@ -227,6 +251,45 @@ namespace NotReaper.Targets {
             if(behavior == TargetBehavior.NR_Pathbuilder) {
                 data.handType = TargetHandType.None;
                 data.velocity = TargetVelocity.None;
+            }
+        }
+
+        public void UpdatePath() {
+            if(data.behavior != TargetBehavior.NR_Pathbuilder || location != TargetIconLocation.Grid) {
+                return;
+            }
+
+            var lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>();
+            foreach (LineRenderer l in lineRenderers) {
+                List<Vector3> positions = new List<Vector3>();
+
+                foreach(TargetData d in data.pathBuilderData.generatedNotes) {
+                    positions.Add(new Vector3(d.x, d.y, 0.0f));
+                }
+
+                l.positionCount = positions.Count;
+                for(int i = 0; i < positions.Count; ++i) {
+                    l.SetPosition(i, positions[i]);
+                }
+
+                switch (data.pathBuilderData.handType) {
+                    case TargetHandType.Left:
+                        l.startColor = NRSettings.config.leftColor;
+                        l.endColor = NRSettings.config.leftColor;
+                        break;
+                    case TargetHandType.Right:
+                        l.startColor = NRSettings.config.rightColor;
+                        l.endColor = NRSettings.config.rightColor;
+                        break;
+                    case TargetHandType.Either:
+                        l.startColor = UserPrefsManager.bothColor;
+                        l.endColor = UserPrefsManager.bothColor;
+                        break;
+                    default:
+                        l.startColor = UserPrefsManager.neitherColor;
+                        l.endColor = UserPrefsManager.neitherColor;
+                        break;
+                }
             }
         }
     }

@@ -1,9 +1,25 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using NotReaper.Models;
 using NotReaper.Grid;
 
 namespace NotReaper.Targets {
+
+	public class PathBuilderData {
+		public TargetBehavior behavior;
+		public TargetVelocity velocity;
+		public TargetHandType handType;
+		public int interval = 4;
+		public float initialAngle = 0.0f;
+		public float angle = 0.0f;
+		public float angleIncrement = 0.0f;
+		public float stepDistance = 0.5f;
+		public float stepIncrement = 0.0f;
+		public List<TargetData> generatedNotes = new List<TargetData>();
+		public bool createdNotes = false;
+	}
 
 	public class TargetData {
 		public TargetData() {
@@ -46,6 +62,7 @@ namespace NotReaper.Targets {
 		private TargetHandType _handType;
 		private TargetBehavior _behavior;
 
+		public PathBuilderData pathBuilderData;
 		
 		public float x
 		{
@@ -92,6 +109,11 @@ namespace NotReaper.Targets {
 			set { _behavior = value; BehaviourChangeEvent(behavior); }
 		}
 
+
+		public bool supportsBeatLength
+		{
+			get { return _behavior == TargetBehavior.Hold || _behavior == TargetBehavior.NR_Pathbuilder; }
+		}
 
 		public event Action<float, float> PositionChangeEvent = delegate {};
 		public event Action<float> BeatTimeChangeEvent = delegate {};

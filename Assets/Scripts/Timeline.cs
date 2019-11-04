@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +12,7 @@ using NotReaper.Managers;
 using NotReaper.Models;
 using NotReaper.Targets;
 using NotReaper.Tools;
+using NotReaper.Tools.ChainBuilder;
 using NotReaper.UI;
 using NotReaper.UserInput;
 using SFB;
@@ -147,6 +148,8 @@ namespace NotReaper {
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
 			Physics.autoSyncTransforms = false;
+
+			ChainBuilder.timeline = this;
 		}
 
 		public void UpdateUIColors() {
@@ -201,6 +204,7 @@ namespace NotReaper {
 				if (Mathf.Approximately(t.data.x, data.x) &&
 					Mathf.Approximately(t.data.y, data.y) &&
 					Mathf.Approximately(t.data.beatTime, data.beatTime) &&
+					t.data.behavior == data.behavior &&
 					t.data.handType == data.handType) {
 					return t;
 				}
@@ -249,7 +253,7 @@ namespace NotReaper {
 			data.beatTime = GetClosestBeatSnapped(DurationToBeats(time));
 
 			//Default sustains length should be more than 0.
-			if (data.behavior == TargetBehavior.Hold) {
+			if (data.supportsBeatLength) {
 				data.beatLength = 480;
 			} else {
 				data.beatLength = 120;
@@ -290,7 +294,7 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public Target AddTargetFromAction(TargetData targetData) {
+		public Target AddTargetFromAction(TargetData targetData, bool transient = false) {
 
 			var timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
 			timelineTargetIcon.location = TargetIconLocation.Timeline;
@@ -306,9 +310,10 @@ namespace NotReaper {
 			gridTargetIcon.location = TargetIconLocation.Grid;
 
 			Target target = new Target(targetData, timelineTargetIcon, gridTargetIcon);
+			target.transient = transient;
 
 			//Now that all initial dependencies are met, we can init the target. (Loads sustain controller and outline color)
-			target.Init();
+			target.Init(this);
 			notes.Add(target);
 			orderedNotes = notes.OrderBy(v => v.data.beatTime).ToList();
 
@@ -406,6 +411,8 @@ namespace NotReaper {
 		}
 
 		public void DeselectAllTargets() {
+			if (!audicaLoaded) return;
+
 			foreach (Target target in selectedNotes) {
 				DeselectTarget(target, true);
 			}
@@ -419,7 +426,8 @@ namespace NotReaper {
 		/// <param name="target">The target to affect</param>
 		/// <param name="increase">If true, increase by one beat snap, if false, the opposite.</param>
 		public void UpdateSustainLength(Target target, bool increase) {
-			if (target.data.behavior != TargetBehavior.Hold) return;
+			if (!target.data.supportsBeatLength) return;
+
 			var increment = (480f / beatSnap) * 4f;
 			var minimum = 120f;
 			
@@ -928,7 +936,7 @@ namespace NotReaper {
 
 		public void EnableNearSustainButtons() {
 			foreach (Target target in loadedNotes) {
-				if (target.data.behavior != TargetBehavior.Hold) continue;
+				if (!target.data.supportsBeatLength) continue;
 				if (paused && EditorInput.selectedTool == EditorTool.DragSelect && target.GetRelativeBeatTime() < 2 && target.GetRelativeBeatTime() > -2) {
 					target.EnableSustainButtons();
 				} else {

@@ -37,10 +37,11 @@ namespace NotReaper.Targets {
         public void LoadSustainController() {
             parentIcon = gameObject.GetComponentsInParent<TargetIcon>()[0];
 
-            endMarker = Instantiate(endMarkerPrefab, gameObject.transform.position + new Vector3(0, 0, sustainLength / 480f), Quaternion.identity, Timeline.gridNotesStatic);
+            if(endMarkerPrefab != null) {
+                endMarker = Instantiate(endMarkerPrefab, gameObject.transform.position + new Vector3(0, 0, sustainLength / 480f), Quaternion.identity, Timeline.gridNotesStatic);
 
-            endMarker.SetActive(true);
-
+                endMarker.SetActive(true);
+            }
         }
 
 
@@ -51,7 +52,10 @@ namespace NotReaper.Targets {
 
         public void UpdateSustainLength(float newLength) {
             sustainLength = newLength;
-            endMarker.transform.position = new Vector3(endMarker.transform.position.x, endMarker.transform.position.y, gameObject.transform.position.z + sustainLength / 480f);
+
+            if(endMarker != null) {
+                endMarker.transform.position = new Vector3(endMarker.transform.position.x, endMarker.transform.position.y, gameObject.transform.position.z + sustainLength / 480f);
+            }
         }
 
         /// <summary>
@@ -85,7 +89,6 @@ namespace NotReaper.Targets {
         //}
 
         void OnDestroy() {
-
             Destroy(endMarker);
             Destroy(endMarkerTl);
         }
