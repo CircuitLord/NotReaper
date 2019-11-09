@@ -98,6 +98,7 @@ namespace NotReaper.Targets {
 			interval = data.interval;
 			initialAngle = data.initialAngle;
 			angle = data.angle;
+			angleIncrement = data.angleIncrement;
 			stepDistance = data.stepDistance;
 			stepIncrement = data.stepIncrement;
 		}
