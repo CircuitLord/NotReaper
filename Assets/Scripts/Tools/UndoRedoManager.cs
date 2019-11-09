@@ -264,4 +264,27 @@ namespace NotReaper.Tools {
 			});
 		}
 	}
+
+	public class NRActionConvertNoteToPathbuilder : NRAction {
+		public TargetData data;
+		public PathBuilderData pathBuilderData = new PathBuilderData();
+
+		public override void DoAction(Timeline timeline) {
+			pathBuilderData.behavior = data.behavior;
+			pathBuilderData.velocity = data.velocity;
+			pathBuilderData.handType = data.handType;
+			data.pathBuilderData = pathBuilderData;
+
+			data.behavior = TargetBehavior.NR_Pathbuilder;
+			ChainBuilder.ChainBuilder.GenerateChainNotes(data);
+		}
+		public override void UndoAction(Timeline timeline) {
+			data.pathBuilderData.DeleteCreatedNotes(timeline);
+
+			data.behavior = data.pathBuilderData.behavior;
+			data.velocity = data.pathBuilderData.velocity;
+			data.handType = data.pathBuilderData.handType;
+			data.pathBuilderData = null;
+		}
+	}
 }

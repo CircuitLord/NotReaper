@@ -102,6 +102,16 @@ namespace NotReaper.Targets {
 			stepDistance = data.stepDistance;
 			stepIncrement = data.stepIncrement;
 		}
+
+		public void DeleteCreatedNotes(Timeline timeline) {
+			if(createdNotes) {
+				generatedNotes.ForEach(t => {
+					timeline.DeleteTargetFromAction(t);
+				});
+				generatedNotes.Clear();
+				createdNotes = false;
+			}
+		}
 	}
 
 	public class TargetData {
@@ -200,13 +210,17 @@ namespace NotReaper.Targets {
 		public TargetBehavior behavior
 		{
 			get { return _behavior; }
-			set { _behavior = value; BehaviourChangeEvent(behavior); }
+			set { var prevBehavior = _behavior; _behavior = value; BehaviourChangeEvent(prevBehavior, behavior); }
 		}
 
 
 		public bool supportsBeatLength
 		{
-			get { return _behavior == TargetBehavior.Hold || _behavior == TargetBehavior.NR_Pathbuilder; }
+			get {  return BehaviorSupportsBeatLength(behavior); }
+		}
+
+		public static bool BehaviorSupportsBeatLength(TargetBehavior behavior) {
+			return behavior == TargetBehavior.Hold || behavior == TargetBehavior.NR_Pathbuilder;
 		}
 
 		public event Action<float, float> PositionChangeEvent = delegate {};
@@ -214,6 +228,6 @@ namespace NotReaper.Targets {
 		public event Action<float> BeatLengthChangeEvent = delegate {};
 		public event Action<TargetVelocity> VelocityChangeEvent = delegate {};
 		public event Action<TargetHandType> HandTypeChangeEvent = delegate {};
-		public event Action<TargetBehavior> BehaviourChangeEvent = delegate {};
+		public event Action<TargetBehavior, TargetBehavior> BehaviourChangeEvent = delegate {};
 	}
 }

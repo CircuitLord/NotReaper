@@ -130,14 +130,7 @@ namespace NotReaper.Targets {
 				data.pathBuilderData.RecalculateEvent -= RecalculatePathbuilderData;
 				data.pathBuilderData.RecalculateFinishedEvent -= UpdatePath;
 
-				if(data.pathBuilderData.createdNotes) {
-					data.pathBuilderData.generatedNotes.ForEach(t => {
-						timeline.DeleteTargetFromAction(t);
-					});
-
-					data.pathBuilderData.generatedNotes.Clear();
-					data.pathBuilderData.createdNotes = false;
-				}
+				data.pathBuilderData.DeleteCreatedNotes(timeline);
 			}
 		}
 
@@ -257,7 +250,7 @@ namespace NotReaper.Targets {
 			}
 		}
 
-		private void OnBehaviorChanged(TargetBehavior behavior) {
+		private void OnBehaviorChanged(TargetBehavior oldBehavior, TargetBehavior newBehavior) {
 			if (data.supportsBeatLength) {
 				var gridHoldTargetManager = gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
 
@@ -272,11 +265,20 @@ namespace NotReaper.Targets {
 
 				gridTargetIcon.UpdatePath();
 			}
+			else {
+				DisableSustainButtons();
+			}
 
 			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
 				data.pathBuilderData.InitialAngleChangedEvent += UpdatePathInitialAngle;
 				data.pathBuilderData.RecalculateEvent += RecalculatePathbuilderData;
 				data.pathBuilderData.RecalculateFinishedEvent += UpdatePath;
+			}
+
+			if(oldBehavior == TargetBehavior.NR_Pathbuilder) {
+				data.pathBuilderData.InitialAngleChangedEvent -= UpdatePathInitialAngle;
+				data.pathBuilderData.RecalculateEvent -= RecalculatePathbuilderData;
+				data.pathBuilderData.RecalculateFinishedEvent -= UpdatePath;
 			}
 		}
 

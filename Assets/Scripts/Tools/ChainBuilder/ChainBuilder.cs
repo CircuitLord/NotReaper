@@ -328,13 +328,10 @@ namespace NotReaper.Tools.ChainBuilder {
 				if(startClickNote == null && iconUnderMouse != null && !iconUnderMouse.target.transient) {
 
 					if(iconUnderMouse.data.behavior != TargetBehavior.NR_Pathbuilder) {
-						PathBuilderData data = new PathBuilderData();
-						data.behavior = iconUnderMouse.data.behavior;
-						data.velocity = iconUnderMouse.data.velocity;
-						data.handType = iconUnderMouse.data.handType;
-						iconUnderMouse.data.pathBuilderData = data;
+						NRActionConvertNoteToPathbuilder action = new NRActionConvertNoteToPathbuilder();
+						action.data = iconUnderMouse.data;
 
-						iconUnderMouse.data.behavior = TargetBehavior.NR_Pathbuilder;
+						timeline.Tools.undoRedoManager.AddAction(action);
 					}
 
 					timeline.DeselectAllTargets();

@@ -245,7 +245,7 @@ namespace NotReaper.Targets {
             }
         }
 
-        private void OnBehaviorChanged(TargetBehavior behavior) {
+        private void OnBehaviorChanged(TargetBehavior oldbehavior, TargetBehavior behavior) {
             standard.SetActive(behavior == TargetBehavior.Standard);
             hold.SetActive(behavior == TargetBehavior.Hold);
             horizontal.SetActive(behavior == TargetBehavior.Horizontal);
@@ -254,6 +254,10 @@ namespace NotReaper.Targets {
             chain.SetActive(behavior == TargetBehavior.Chain);
             melee.SetActive(behavior == TargetBehavior.Melee);
             pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
+
+            if(location == TargetIconLocation.Timeline) {
+                line.SetActive(data.supportsBeatLength);
+            }
 
             sphereCollider.radius = 0.5f;
             if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline) {
