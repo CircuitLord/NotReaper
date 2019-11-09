@@ -227,6 +227,12 @@ namespace NotReaper.Tools.ChainBuilder {
 
 			data.pathBuilderData.generatedNotes = new List<TargetData>();
 
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			/////////                                            WARNING!                                                      /////////
+			/////////       Chainging this calculation breaks backwards compatibility with saves of older NotReaper versions!  /////////
+			/////////                    Make sure to update NRCueData.Version, and handle an upgrade path!                    /////////
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 			//Generate first note at the start
 			TargetData firstData = new TargetData();
 			firstData.behavior = data.pathBuilderData.behavior;
