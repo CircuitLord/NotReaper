@@ -247,7 +247,6 @@ namespace NotReaper {
 		public TargetData GetTargetDataForCue(Cue cue) {
 			TargetData data = new TargetData(cue, offset);
 			if (data.beatTime == 0) data.beatTime = 120f;
-			AddTargetFromAction(data);
 			return data;
 		}
 
@@ -962,7 +961,7 @@ namespace NotReaper {
 			for (int i = 0; i < framesToSplitOver; i++) {
 
 				while (j < orderedNotes.Count) {
-
+					
 					float targetPos = orderedNotes[j].GetRelativeBeatTime();
 
 					if (targetPos > -20 && targetPos < 20) {

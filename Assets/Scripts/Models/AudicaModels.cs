@@ -95,7 +95,6 @@ namespace NotReaper.Models {
 
 		//1 - Initial version
 		public uint Version = 1;
-
 		
 		public List<Cue> pathBuilderNoteCues = new List<Cue>();
 		public List<PathBuilderData> pathBuilderNoteData = new List<PathBuilderData>();

@@ -62,7 +62,7 @@ namespace NotReaper.Tools.ChainBuilder {
 
 		public bool isDragging = false;
 		public bool isEditMode = false;
-		public bool active = false;
+		public bool activated = false;
 
 		private Transform draggingPoint;
 		public GameObject activeChain;
@@ -309,7 +309,7 @@ namespace NotReaper.Tools.ChainBuilder {
 
 		private void Update() {
 			
-			if (!active) return;
+			if (!activated) return;
 
 			if(Input.GetMouseButton(0)) {
 				//We have already selected a pathbuilder note, do the initial angle flow
