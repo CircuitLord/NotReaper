@@ -112,15 +112,18 @@ namespace NotReaper.Tools.ChainBuilder {
 			startClickNote = null;
 
 			if(active) {
-				if(timeline.selectedNotes.Count != 1 || timeline.selectedNotes[0].data.behavior != TargetBehavior.NR_Pathbuilder) {
+				bool validNoteSelected = (timeline.selectedNotes.Count == 1 && timeline.selectedNotes[0].data.behavior == TargetBehavior.NR_Pathbuilder);
+
+				if(!validNoteSelected) {
 					timeline.DeselectAllTargets();
-				}
-				else {
-					SetPathbuilderStateToSelectedNote();
 				}
 
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
 				chainBuilderWindow.SetActive(true);
+
+				if(validNoteSelected) {
+					SetPathbuilderStateToSelectedNote();
+				}
 			}
 			else {
 				chainBuilderWindow.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
@@ -375,9 +378,9 @@ namespace NotReaper.Tools.ChainBuilder {
 			var intervalStr = "1/" + timeline.selectedNotes[0].data.pathBuilderData.interval;
 			for(int i = 0; i < pathBuilderInterval.elements.Count; ++i) {
 				if(pathBuilderInterval.elements[i] == intervalStr) {
-					pathBuilderInterval.index = i;
-					pathBuilderInterval.PreviousClick();
-					pathBuilderInterval.ForwardClick();
+					pathBuilderInterval.defaultIndex = i;
+					pathBuilderInterval.UpdateToIndex(i);
+					break;
 				}
 			}
 		}
