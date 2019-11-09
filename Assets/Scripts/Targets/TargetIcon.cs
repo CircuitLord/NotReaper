@@ -291,16 +291,15 @@ namespace NotReaper.Targets {
                         break;
                 }
 
-                List<Vector3> positions = new List<Vector3>();
+                Vector3[] positions = new Vector3[data.pathBuilderData.generatedNotes.Count];
 
-                foreach(TargetData d in data.pathBuilderData.generatedNotes) {
-                    positions.Add(new Vector3(d.x, d.y, 0.0f));
+                for(int i = 0; i < data.pathBuilderData.generatedNotes.Count; ++i) {
+                    var note = data.pathBuilderData.generatedNotes[i];
+                    positions[i] = new Vector3(note.x, note.y, 0.0f);
                 }
 
-                l.positionCount = positions.Count;
-                for(int i = 0; i < positions.Count; ++i) {
-                    l.SetPosition(i, positions[i]);
-                }
+                l.positionCount = positions.Length;
+                l.SetPositions(positions);
             }
         }
 

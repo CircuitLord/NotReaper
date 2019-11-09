@@ -463,6 +463,8 @@ namespace NotReaper {
 			} else {
 				target.data.beatLength = Mathf.Max(target.data.beatLength - increment, minimum);
 			}
+
+			target.UpdatePath();
 		}
 
 		public void MoveGridTargets(List<TargetGridMoveIntent> intents) {
