@@ -50,6 +50,9 @@ namespace NotReaper.Timing {
         public string mapperName = "";
 
 
+        public bool skipOffset = false;
+
+
         TrimAudio trimAudio = new TrimAudio();
 
 
@@ -70,11 +73,27 @@ namespace NotReaper.Timing {
             ffmpeg.StartInfo.WorkingDirectory = Path.Combine(Application.streamingAssetsPath, "FFMPEG");
             
         }
+
+
+
+        public void SkipOffset(bool yes) {
+
+	        if (yes) {
+		        offsetInput.interactable = false;
+	        }
+
+	        else {
+		        offsetInput.interactable = true;
+	        }
+
+	        skipOffset = yes;
+
+        }
         
 
 
         public void SelectAudioFile() {
-            var compatible = new[] { new ExtensionFilter("Compatible Audio Files", "mp3", "ogg") }; 
+            var compatible = new[] { new ExtensionFilter("Compatible Audio Types", "mp3", "ogg") }; 
             string[] paths = StandaloneFileBrowser.OpenFilePanel("Select music track", Path.Combine(Application.persistentDataPath), compatible, false);
             var filePath = paths[0];
 
@@ -117,8 +136,14 @@ namespace NotReaper.Timing {
         }
 
         public void GenerateOgg() {
-            trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), offset, bpm);
-            string path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), (songName + "-" + mapperName), "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
+
+	        string path;
+	        
+	        trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), offset, bpm, skipOffset);
+		        
+
+	        path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), songName, "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
+	        
             timeline.LoadAudicaFile(false, path);
             editorInput.SelectMode(EditorMode.Compose);
 

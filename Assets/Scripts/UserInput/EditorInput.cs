@@ -504,7 +504,7 @@ namespace NotReaper.UserInput {
 			}
 			
 			//Toggles the chain builder state
-			if (Input.GetKeyDown(KeyCode.T)) {
+			if (Input.GetKeyDown(KeyCode.H)) {
 				if (Tools.chainBuilder.activated) {
 					Tools.chainBuilder.Activate(false);
 					RevertTool();

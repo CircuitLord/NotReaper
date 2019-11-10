@@ -31,14 +31,24 @@ namespace NotReaper.Timing {
             ffmpeg.StartInfo.RedirectStandardOutput = true;
         }
 
-        public void SetAudioLength(string path, string output, int offset, double bpm) {
+        public void SetAudioLength(string path, string output, int offset, double bpm, bool skipRetime = false) {
 
             string log = "";
             double offsetMs = TicksToMs(offset, bpm);
             double magicOctoberOffsetFix = 25.0f;
             double ms = Math.Abs(GetOffsetMs(offsetMs, bpm)) - magicOctoberOffsetFix;
+
+            string args;
             
-            var args = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
+            if (skipRetime) {
+	            args = String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", path, output);
+            }
+
+            else {
+				args = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
+	            
+            }
+            
             Debug.Log($"Running ffmpeg with args {args}");
 
             ffmpeg.StartInfo.Arguments = args;
