@@ -131,15 +131,11 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			targetGridMoveIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.target);
-				target.data.position = intent.intendedPosition;
 				intent.target.position = intent.intendedPosition;
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetGridMoveIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.target);
-				target.data.position = intent.startingPosition;
 				intent.target.position = intent.startingPosition;
 			});
 		}
@@ -149,25 +145,15 @@ namespace NotReaper.Tools {
 		public List<TargetTimelineMoveIntent> targetTimelineMoveIntents = new List<TargetTimelineMoveIntent>();
 
 		public override void DoAction(Timeline timeline) {
-			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.target)).ToList();
-
-			for(int i = 0; i < targetTimelineMoveIntents.Count; ++i) {
-				TargetTimelineMoveIntent intent = targetTimelineMoveIntents[i];
-				Target target = targets[i];
-				target.data.beatTime = intent.intendedTime;
+			targetTimelineMoveIntents.ForEach(intent => {
 				intent.target.beatTime = intent.intendedTime;
-			}
+			});
 			timeline.SortOrderedList();
 		}
 		public override void UndoAction(Timeline timeline) {
-			List<Target> targets = targetTimelineMoveIntents.Select(intent => timeline.FindNote(intent.target)).ToList();
-
-			for(int i = 0; i < targetTimelineMoveIntents.Count; ++i) {
-				TargetTimelineMoveIntent intent = targetTimelineMoveIntents[i];
-				Target target = targets[i];
-				target.data.beatTime = intent.startTime;
+			targetTimelineMoveIntents.ForEach(intent => {
 				intent.target.beatTime = intent.startTime;
-			}
+			});
 			timeline.SortOrderedList();
 		}
 	}
@@ -177,17 +163,29 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
-				Target target = timeline.FindNote(targetData);
-				switch (target.data.handType) {
+				switch (targetData.handType) {
 					case TargetHandType.Left: 
-						target.data.handType = TargetHandType.Right;
 						targetData.handType = TargetHandType.Right;
 					break;
 					
 					case TargetHandType.Right: 
-						target.data.handType = TargetHandType.Left;
 						targetData.handType = TargetHandType.Left;
 					break;
+				}
+
+				if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+					switch (targetData.pathBuilderData.handType) {
+						case TargetHandType.Left: 
+							targetData.pathBuilderData.handType = TargetHandType.Right;
+						break;
+						
+						case TargetHandType.Right: 
+							targetData.pathBuilderData.handType = TargetHandType.Left;
+						break;
+					}
+
+					targetData.handType = targetData.handType;
+					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
 				}
 			});
 		}
@@ -199,11 +197,22 @@ namespace NotReaper.Tools {
 	public class NRActionHFlipNotes : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
 
+		public float FlipAngle(float angle) {
+			angle = ((angle + 180) % 360) - 180;
+			return -angle;
+		}
+
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
-				Target target = timeline.FindNote(targetData);
-				target.data.x *= -1;
 				targetData.x *= -1;
+
+				if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+					targetData.pathBuilderData.initialAngle = FlipAngle(targetData.pathBuilderData.initialAngle);
+					targetData.pathBuilderData.angle *= -1;
+					targetData.pathBuilderData.angleIncrement *= -1;
+
+					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+				}
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
@@ -214,11 +223,26 @@ namespace NotReaper.Tools {
 	public class NRActionVFlipNotes : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
 
+		public float FlipAngle(float angle) {
+			angle = ((angle + 180) % 360) - 180;
+
+			if (angle >= 0)
+				return 180 - angle;
+			else
+				return -180 - angle;
+		}
+
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
-				Target target = timeline.FindNote(targetData);
-				target.data.y *= -1;
 				targetData.y *= -1;
+
+				if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+					targetData.pathBuilderData.initialAngle = FlipAngle(targetData.pathBuilderData.initialAngle);
+					targetData.pathBuilderData.angle *= -1;
+					targetData.pathBuilderData.angleIncrement *= -1;
+
+					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+				}
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
@@ -231,17 +255,36 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			targetSetHitsoundIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.target);
-				target.data.velocity = intent.newVelocity;
 				intent.target.velocity = intent.newVelocity;
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetSetHitsoundIntents.ForEach(intent => {
-				Target target = timeline.FindNote(intent.target);
-				target.data.velocity = intent.startingVelocity;
 				intent.target.velocity = intent.startingVelocity;
 			});
+		}
+	}
+
+	public class NRActionConvertNoteToPathbuilder : NRAction {
+		public TargetData data;
+		public PathBuilderData pathBuilderData = new PathBuilderData();
+
+		public override void DoAction(Timeline timeline) {
+			pathBuilderData.behavior = data.behavior;
+			pathBuilderData.velocity = data.velocity;
+			pathBuilderData.handType = data.handType;
+			data.pathBuilderData = pathBuilderData;
+
+			data.behavior = TargetBehavior.NR_Pathbuilder;
+			ChainBuilder.ChainBuilder.GenerateChainNotes(data);
+		}
+		public override void UndoAction(Timeline timeline) {
+			data.pathBuilderData.DeleteCreatedNotes(timeline);
+
+			data.behavior = data.pathBuilderData.behavior;
+			data.velocity = data.pathBuilderData.velocity;
+			data.handType = data.pathBuilderData.handType;
+			data.pathBuilderData = null;
 		}
 	}
 }

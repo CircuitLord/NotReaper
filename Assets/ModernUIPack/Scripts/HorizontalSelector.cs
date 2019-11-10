@@ -28,6 +28,22 @@ namespace Michsky.UI.ModernUIPack {
             labeHelper.text = label.text;
         }
 
+        public void UpdateToIndex(int idx) {
+            if(labeHelper == null) {
+                return;
+            }
+            
+            labeHelper.text = label.text;
+
+            index = idx;
+            onValueChanged.Invoke();
+            label.text = elements[index];
+
+            selectorAnimator.Play(null);
+            selectorAnimator.StopPlayback();
+            selectorAnimator.Play("Previous");
+        }
+
         public void PreviousClick() {
             labeHelper.text = label.text;
 

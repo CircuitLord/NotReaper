@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Models;
+using NotReaper.Targets;
+using NotReaper.Tools.ChainBuilder;
 using TMPro;
 using UnityEngine;
 
@@ -190,7 +192,7 @@ namespace NotReaper.Managers {
                 case 0:
                     if (diffs.expert.cues != null) {
                         curSongDiff.text = "Expert";
-                        LoadTimelineDiff(diffs.expert.cues, save);
+                        LoadTimelineDiff(diffs.expert, save);
                         loadedIndex = index;
 
                         nrDiscordPresence.UpdatePresenceDifficulty(0);
@@ -200,7 +202,7 @@ namespace NotReaper.Managers {
                 case 1:
                     if (diffs.advanced.cues != null) {
                         curSongDiff.text = "Advanced";
-                        LoadTimelineDiff(diffs.advanced.cues, save);
+                        LoadTimelineDiff(diffs.advanced, save);
                         loadedIndex = index;
 
                         nrDiscordPresence.UpdatePresenceDifficulty(1);
@@ -210,7 +212,7 @@ namespace NotReaper.Managers {
                 case 2:
                     if (diffs.moderate.cues != null) {
                         curSongDiff.text = "Standard";
-                        LoadTimelineDiff(diffs.moderate.cues, save);
+                        LoadTimelineDiff(diffs.moderate, save);
                         loadedIndex = index;
 
                         nrDiscordPresence.UpdatePresenceDifficulty(2);
@@ -220,7 +222,7 @@ namespace NotReaper.Managers {
                 case 3:
                     if (diffs.beginner.cues != null) {
                         curSongDiff.text = "Easy";
-                        LoadTimelineDiff(diffs.beginner.cues, save);
+                        LoadTimelineDiff(diffs.beginner, save);
                         loadedIndex = index;
 
                         nrDiscordPresence.UpdatePresenceDifficulty(3);
@@ -236,14 +238,35 @@ namespace NotReaper.Managers {
 
         }
 
-        private bool LoadTimelineDiff(List<Cue> cues, bool save = true) {
+        private bool LoadTimelineDiff(CueFile cueFile, bool save = true) {
 
             if (save) timeline.Export();
 
             timeline.DeleteAllTargets();
 
-            foreach (Cue cue in cues) {
-                timeline.AddTarget(cue);
+            foreach (Cue cue in cueFile.cues) {
+                timeline.AddTargetFromAction(timeline.GetTargetDataForCue(cue));
+            }
+
+            if(cueFile.NRCueData.pathBuilderNoteData.Count == cueFile.NRCueData.pathBuilderNoteCues.Count) {
+                for(int i = 0; i < cueFile.NRCueData.pathBuilderNoteCues.Count; ++i) {
+                    var data = timeline.GetTargetDataForCue(cueFile.NRCueData.pathBuilderNoteCues[i]);
+                    data.pathBuilderData = cueFile.NRCueData.pathBuilderNoteData[i];
+
+                    //Recalculate the notes, and remove any identical enties that would have been loaded through the cues
+                    ChainBuilder.CalculateChainNotes(data);
+                    foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
+                        var foundData = timeline.FindTargetData(genData.beatTime, genData.behavior, genData.handType);
+                        if(foundData != null) {
+                            timeline.DeleteTargetFromAction(foundData);
+                        }
+                    }
+
+                    timeline.AddTargetFromAction(data);
+
+                    //Generate the notes, so the song is complete
+                    ChainBuilder.GenerateChainNotes(data);
+                }
             }
 
             return true;
