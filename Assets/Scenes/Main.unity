@@ -33883,7 +33883,7 @@ MonoBehaviour:
   m_text: 'Plese select a note.
 
 
-    A non-pathbuilder note will be converted into a pathbuilder note that generated
+    A non-pathbuilder note will be converted into a pathbuilder note that generates
     notes of the initially selected type.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a2083ced2e4bb5f4bb44cdd878d4279e, type: 2}
