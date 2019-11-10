@@ -20,7 +20,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-
+using Application = UnityEngine.Application;
 
 
 namespace NotReaper {
@@ -124,6 +124,7 @@ namespace NotReaper {
 			//Load the config file
 			NRSettings.LoadSettingsJson();
 
+
 			notes = new List<Target>();
 			orderedNotes = new List<Target>();
 			loadedNotes = new List<Target>();
@@ -136,6 +137,11 @@ namespace NotReaper {
 				sustainVolume = NRSettings.config.sustainVol;
 				musicVolume = NRSettings.config.mainVol;
 				musicVolumeSlider.value = musicVolume;
+
+				if (NRSettings.config.clearCacheOnStartup) {
+					HandleCache.ClearCache();
+				}
+				
 				SetAudioDSP();
 			});
 
@@ -586,6 +592,9 @@ namespace NotReaper {
 
 		public void Export()
 		{
+
+			Debug.Log("Saving: " + audicaFile.desc.title);
+			
 			//Ensure all chains are generated
 			List<TargetData> nonGeneratedNotes = new List<TargetData>();
 
@@ -686,7 +695,7 @@ namespace NotReaper {
 				handType = TargetHandType.Either
 			};
 
-			for (int i = 0; i < 200; i++) {
+			for (int i = 0; i < 300; i++) {
 				cue.tick = (480 * i) + tickOffset;
 				AddTargetFromAction(new TargetData(cue, offset));
 			}
@@ -708,7 +717,7 @@ namespace NotReaper {
 			inTimingMode = false;
 			SetOffset(0);
 
-			if (audicaLoaded) {
+			if (audicaLoaded && NRSettings.config.saveOnLoadNew) {
 				Export();
 			}
 
@@ -1186,7 +1195,7 @@ namespace NotReaper {
 			rightSustainAud.time = tempTime;
 		}
 
-		IEnumerator AnimateSetTime(float timeToAnimate) {
+		public IEnumerator AnimateSetTime(float timeToAnimate) {
 
 			animatingTimeline = true;
 

@@ -82,6 +82,8 @@ namespace NotReaper.Tools.ErrorChecker
             EnableErrorCheckingUI();
 
             UpdateErrorCount();
+
+            currentErrorIndex = -1;
             
             NextError();
         }
@@ -97,9 +99,17 @@ namespace NotReaper.Tools.ErrorChecker
 
         public void NextError() {
 	        
+	        //Deselect any previous targets
+	        if (currentError != null) {
+		        foreach (Target target in currentError.affectedTargets) {
+			        target.Deselect();
+		        }
+	        }
+	        
+	        
 	        if (currentErrors.Count <= 0) return;
 
-	        if (currentErrorIndex >= currentErrors.Count) return;
+	        if (currentErrorIndex >= currentErrors.Count - 1) return;
 
 	        currentErrorIndex++;
 
@@ -110,8 +120,19 @@ namespace NotReaper.Tools.ErrorChecker
 	        errorBodyText.SetText(currentError.errorDesc);
 	        
 	        if (!timeline.paused) timeline.TogglePlayback();
-	        timeline.JumpToX(currentError.beatTime);
+	        //timeline.JumpToX(currentError.beatTime);
+
+	        float time = timeline.BeatsToDuration(currentError.beatTime);
 	        
+	        StartCoroutine(timeline.AnimateSetTime(time));
+	        
+	        
+	        //Select the targets
+
+	        foreach (Target target in currentError.affectedTargets) {
+		        target.Select();
+	        }
+
 
 
 
@@ -133,8 +154,10 @@ namespace NotReaper.Tools.ErrorChecker
 	        
 	        if (!timeline.paused) timeline.TogglePlayback();
 	        
-	        timeline.JumpToX(currentError.beatTime);
-	        //Debug.Log(currentError.beatTime);
+	        float time = timeline.BeatsToDuration(currentError.beatTime);
+
+	       // timeline.SetBeatTime(time);
+	       StartCoroutine(timeline.AnimateSetTime(time));
 
         }
 
@@ -167,6 +190,15 @@ namespace NotReaper.Tools.ErrorChecker
             TargetData prevMeleeTarget = new TargetData();
             TargetData lastLastTarget = new TargetData();
             int consecutiveCounter = 0;
+            
+            
+            
+            
+            //Check for a preview point:
+            if (Timeline.audicaFile.desc.previewStartSeconds == 0) {
+	            errorLog.Add(new ErrorLogEntry(0, "No preview start point has been added. Go to a point in the song and press P to set it."));
+            }
+            
 
             ////////////////////////
             // main parsing block //
@@ -182,7 +214,10 @@ namespace NotReaper.Tools.ErrorChecker
                 //cues without hitsounds
                 if (!HasHitSound(curTarget))
                 {
-                    errorLog.Add(new ErrorLogEntry(curTarget.data.beatTime, "ERROR, target has an invalid hitsound."));
+                    var error = new ErrorLogEntry(curTarget.data.beatTime, "ERROR, target has an invalid hitsound.");
+                    
+                    error.affectedTargets.Add(curTarget);
+                    errorLog.Add(error);
                 }
 
                 //////////////////////////////
@@ -204,7 +239,9 @@ namespace NotReaper.Tools.ErrorChecker
                     else if(beatTimeDiff != 0 && beatTimeDiff < rhythmLimit)
                     {
                         //straight up too fast
-                        errorLog.Add(new ErrorLogEntry(curTarget.data.beatTime, "WARNING, for " + label + ", this target happens too soon after the previous target."));
+                        var error = new ErrorLogEntry(curTarget.data.beatTime, "WARNING, for " + label + ", this target happens too soon after the previous target.");
+                        error.affectedTargets.Add(curTarget);
+                        errorLog.Add(error);
                     }
                     else if(curTarget.data.beatTime - prevTarget.beatTime == rhythmLimit)
                     {
@@ -212,7 +249,9 @@ namespace NotReaper.Tools.ErrorChecker
                         if(difficulty==2 && prevTarget.handType.Equals(curTarget.data.handType))
                         {
                             Debug.Log("consecutive 8t notes on one hand");
-                            errorLog.Add(new ErrorLogEntry(curTarget.data.beatTime, "WARNING, in " + label + ", consecutive 8th notes on one hand are not recommended."));
+                            var error = new ErrorLogEntry(curTarget.data.beatTime, "WARNING, in " + label + ", consecutive 8th notes on one hand are not recommended.");
+                            error.affectedTargets.Add(curTarget);
+                            errorLog.Add(error);
                         }
                         
                         //increment counter, if it gets above the countLimit, log an error
@@ -221,7 +260,10 @@ namespace NotReaper.Tools.ErrorChecker
                         if(consecutiveCounter >= countLimit)
                         {
                             //TODO convert rhythmLimit to quarter note, eigth note, etc.
-                            errorLog.Add(new ErrorLogEntry(curTarget.data.beatTime, "WARNING, in " + label + ", having more than " + countLimit + " consecutive " + rhythmLimit + " targets is not recommended."));
+                            var error = new ErrorLogEntry(curTarget.data.beatTime, "WARNING, in " + label + ", having more than " + countLimit + " consecutive " + rhythmLimit + " targets is not recommended.");
+                            
+                            error.affectedTargets.Add(curTarget);
+                            errorLog.Add(error);
                         }
                     }
 
@@ -234,13 +276,18 @@ namespace NotReaper.Tools.ErrorChecker
                     // same pitch
                     if (prevTarget.position == curTarget.data.position)
                     {
-                        errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "ERROR, there are multiple targets occupying the same position."));
+                        var error = new ErrorLogEntry(prevTarget.beatTime, "ERROR, there are multiple targets occupying the same position.");
+                        error.affectedTargets.Add(timeline.FindNote(prevTarget));
+                        errorLog.Add(error);
                     }
 
                     // same color
-                    if (prevTarget.handType.Equals(curTarget.data.handType) && !prevTarget.handType.Equals(TargetHandType.Either))
-                    {
-                        errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "ERROR, the " + prevTarget.handType + " hand has multiple targets at the same time."));
+                    if (prevTarget.handType.Equals(curTarget.data.handType) && !prevTarget.handType.Equals(TargetHandType.Either)) {
+	                    var error = new ErrorLogEntry(prevTarget.beatTime,
+		                    "ERROR, the " + prevTarget.handType + " hand has multiple targets at the same time.");
+	                    
+	                    error.affectedTargets.Add(timeline.FindNote(prevTarget));
+	                    errorLog.Add(error);
                     }
 
                     // ADVANCED and lower
@@ -250,7 +297,9 @@ namespace NotReaper.Tools.ErrorChecker
                         //simultaneous shot and melee
                         if (IsSimultaneousShotAndMelee(prevTarget,curTarget))
                         {
-                            errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "WARNING, in " + label + ", simultaneous melee and shot targets are not recommended."));
+                            var error = new ErrorLogEntry(prevTarget.beatTime, "WARNING, in " + label + ", simultaneous melee and shot targets are not recommended.");
+                            error.affectedTargets.Add(timeline.FindNote(prevTarget));
+                            errorLog.Add(error);
                         }
                         //simultaneous targets must be within 4 spaces apart for Advanced, 3 for Standard/Beginner
                         else
@@ -258,7 +307,9 @@ namespace NotReaper.Tools.ErrorChecker
                             float distance = (difficulty == 1 ? 4 : 3);
                             if (!IsCloseEnough(prevTarget, curTarget, distance))
                             {
-                                errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "WARNING, in " + label + ", simultaneous targets more than " + distance + " spaces apart are not recommended."));
+                                var error = new ErrorLogEntry(prevTarget.beatTime, "WARNING, in " + label + ", simultaneous targets more than " + distance + " spaces apart are not recommended.");
+                                error.affectedTargets.Add(timeline.FindNote(prevTarget));
+                                errorLog.Add(error);
                             }
                         }
                     }
@@ -275,14 +326,21 @@ namespace NotReaper.Tools.ErrorChecker
                     //ADVANCED
                     if (difficulty == 1)
                     {
-                        if (!IsSlottedNote(prevTarget) && InsufficientBreakAfterPreviousTarget(prevTarget, curTarget, 2*TickBeatConst))
-                        {
-                            errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "WARNING, in ADVANCED, it is recommended to have at least 2 beats of lead-in time before introducing a horizontal/vertical slotted note."));
+                        if (!IsSlottedNote(prevTarget) && InsufficientBreakAfterPreviousTarget(prevTarget, curTarget, 2*TickBeatConst)) {
+	                        var error = new ErrorLogEntry(prevTarget.beatTime,
+		                        "WARNING, in ADVANCED, it is recommended to have at least 2 beats of lead-in time before introducing a horizontal/vertical slotted note.");
+	                        
+	                        error.affectedTargets.Add(timeline.FindNote(prevTarget));
+	                        errorLog.Add(error);
                         }
                     }
                     else // no slotted notes for STANDARD or BEGINNER
                     {
-                        errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "WARNING, in " + label + ", use of horizontal/vertical slotted notes is not recommended."));
+	                    var error = new ErrorLogEntry(prevTarget.beatTime,
+		                    "WARNING, in " + label + ", use of horizontal/vertical slotted notes is not recommended.");
+	                    
+	                    error.affectedTargets.Add(timeline.FindNote(prevTarget));
+	                    errorLog.Add(error);
                     }
                 }
 
@@ -295,7 +353,9 @@ namespace NotReaper.Tools.ErrorChecker
                 {
                     if (IsLowSoloMelee(lastLastTarget, prevTarget, curTarget.data))
                     {
-                        errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "WARNING, this Melee Target is by itself in the lower slot. Single melees should be in the higher slot. Only use the lower slot for making simultaneous melees stacked on top of each other."));
+                        var error = new ErrorLogEntry(prevTarget.beatTime, "WARNING, this Melee Target is by itself in the lower slot. Single melees should be in the higher slot. Only use the lower slot for making simultaneous melees stacked on top of each other.");
+                        error.affectedTargets.Add(timeline.FindNote(prevTarget));
+                        errorLog.Add(error);
                     }
                 }
 
@@ -303,7 +363,9 @@ namespace NotReaper.Tools.ErrorChecker
                     //non melee hitsound
                     if (!IsMeleeHitSound(curTarget))
                     {
-                        errorLog.Add(new ErrorLogEntry(curTarget.data.beatTime, "WARNING, Melee Target doesn't have a Melee hitsound."));
+                        var error = new ErrorLogEntry(curTarget.data.beatTime, "WARNING, Melee Target doesn't have a Melee hitsound.");
+                        error.affectedTargets.Add(curTarget);
+                        errorLog.Add(error);
                     }
 
                     //low melee
@@ -334,23 +396,31 @@ namespace NotReaper.Tools.ErrorChecker
                     {
                         if (InsufficientBreakAfterSustain(prevTarget,curTarget,sustainLeadTime))
                         {
-                            errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "WARNING, the time between the end of this sustain target and the next target on the same hand is very short; at least " + sustainLeadTime + " is recommended."));
+                            var error = new ErrorLogEntry(prevTarget.beatTime, "WARNING, the time between the end of this sustain target and the next target on the same hand is very short; at least " + sustainLeadTime + " is recommended.");
+                            error.affectedTargets.Add(curTarget);
+                            errorLog.Add(error);
                         }
                     }
                    
                     //short break after chain node
                     if (prevTarget.behavior.Equals(TargetBehavior.Chain) && !curTarget.data.behavior.Equals(TargetBehavior.Chain))
                     {
-                        if (InsufficientBreakAfterPreviousTarget(prevTarget,curTarget,chainLeadTime))
-                        {
-                            errorLog.Add(new ErrorLogEntry(prevTarget.beatTime, "WARNING, the time between the end of this chain and the next target on the same hand is very short; at least " + chainLeadTime + " is recommended."));
+                        if (InsufficientBreakAfterPreviousTarget(prevTarget,curTarget,chainLeadTime)) {
+	                        var error = new ErrorLogEntry(prevTarget.beatTime,
+		                        "WARNING, the time between the end of this chain and the next target on the same hand is very short; at least " +
+		                        chainLeadTime + " is recommended.");
+	                        
+	                        error.affectedTargets.Add(curTarget);
+	                        errorLog.Add(error);
                         }
                     }
 
                     //headless chains
                     if (curTarget.data.behavior.Equals(TargetBehavior.Chain) && !(prevTarget.behavior.Equals(TargetBehavior.Chain) || prevTarget.behavior.Equals(TargetBehavior.ChainStart)))
                     {
-                        errorLog.Add(new ErrorLogEntry(curTarget.data.beatTime, "ERROR, this chain node does not have a proper Chain Start."));
+                        var error = new ErrorLogEntry(curTarget.data.beatTime, "ERROR, this chain node does not have a proper Chain Start.");
+                        error.affectedTargets.Add(curTarget);
+                        errorLog.Add(error);
                     }
 
                     // update prev target
