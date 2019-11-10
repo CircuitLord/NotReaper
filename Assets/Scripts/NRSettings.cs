@@ -63,6 +63,10 @@ namespace NotReaper {
         }
 
 
+        private void OnApplicationQuit() {
+	        SaveSettingsJson();
+        }
+
         private static void GenNewConfig() {
 
             //Debug.Log("Generating new configuration file...");
@@ -120,6 +124,9 @@ namespace NotReaper {
 
         public bool useDiscordRichPresence = true;
         public bool showTimeElapsed = true;
+
+        public bool clearCacheOnStartup = true;
+        public bool saveOnLoadNew = true;
 
         public string bgImagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "CircuitCubed", "NotReaper", "BG1.png");
     }

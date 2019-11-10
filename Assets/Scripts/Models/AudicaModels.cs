@@ -57,7 +57,7 @@ namespace NotReaper.Models {
 		public bool hidden = false;
 		public string author = "";
 		public int offset = 0;
-		public double previewStartSeconds = 0.0f;
+		public double previewStartSeconds = 0.0d;
 	}
 
 	public class SafeDesc {
@@ -111,6 +111,8 @@ namespace NotReaper.Models {
     {
         public float beatTime; 
         public readonly string errorDesc;
+
+        public List<Target> affectedTargets = new List<Target>();
 
         public ErrorLogEntry(float beatTime, string v)
         {

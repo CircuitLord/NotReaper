@@ -18,6 +18,12 @@ namespace NotReaper.IO {
 			}
 		}
 
+		public static void ClearCache() {
+			if (Directory.Exists($"{Application.dataPath}/.cache")) {
+				Directory.Delete($"{Application.dataPath}/.cache", true);
+			}
+		}
+
 
 		public static void ClearCueCache() {
 			File.Delete($"{Application.dataPath}/.cache/expert.cues");
