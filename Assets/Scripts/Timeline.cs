@@ -52,6 +52,7 @@ namespace NotReaper {
 		[Header("Prefabs")]
 		public TargetIcon timelineTargetIconPrefab;
 		public TargetIcon gridTargetIconPrefab;
+		public GameObject BPM_MarkerPrefab;
 
 		[Header("Extras")]
 		[SerializeField] private NRDiscordPresence nrDiscordPresence;
@@ -102,7 +103,6 @@ namespace NotReaper {
 		public static float scaleTransform;
 		private float targetScale = 0.7f;
 		private float scaleOffset = 0;
-		private static float bpm = 60;
 		private static int offset = 0;
 
 		/// <summary>
@@ -117,6 +117,9 @@ namespace NotReaper {
 		public Button applyButtonTiming;
 		public Button generateAudicaButton;
 		public Button loadAudioFileTiming;
+
+		public List<TempoChange> tempoChanges = new List<TempoChange>();
+		private List<GameObject> bpmMarkerObjects = new List<GameObject>();
 
 		//Tools
 		private void Start() {
@@ -685,7 +688,7 @@ namespace NotReaper {
 		public void SetTimingModeStats(double newBPM, int tickOffset) {
 			DeleteAllTargets();
 
-			SetBPM((float) newBPM);
+			SetBPM(0.0f, (float) newBPM);
 
 			var cue = new Cue {
 				pitch = 40,
@@ -752,20 +755,13 @@ namespace NotReaper {
 			if (audicaFile.song_mid != null) {
 				
 				float oneMinuteInMicroseconds = 60000000f;
-				var midiBpm = -1;
 				foreach (var tempo in audicaFile.song_mid.GetTempoMap().Tempo) {
-					// TODO: Multi-bpm support :(
-					// Debug.Log($"FOUND TEMPO EVENT: {tempo}, BPM: {tempo.Value.BeatsPerMinute}");
-					midiBpm = (int) Math.Round(oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote);
-				}
+					float time = 0.0f;
+					if(tempo.Time != 0.0f) {
+						time = BeatsToDuration(0.0f, tempo.Time / 480.0f, BeatDurationDirection.Forward);
+					}
 
-				if (midiBpm != desc.tempo && midiBpm != -1) {
-					// TODO: in-scene dialog box :/
-					//if (EditorUtility.DisplayDialog("BPM mismatch",
-						//"Detected different BPM values in midi and song.desc. NotReaper does not currently support multi-bpm tracks.",
-					//	$"Use midi ({midiBpm})", $"Use song.desc ({desc.tempo})")) {
-						desc.tempo = midiBpm;
-					//}
+					SetBPM(time, (int) Math.Round(oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote));
 				}
 			} 
 
@@ -811,7 +807,14 @@ namespace NotReaper {
 					aud.clip = myClip;
 					previewAud.clip = myClip;
 					
-					SetBPM((float) desc.tempo);
+					SetBPM(0.0f, (float) desc.tempo);
+
+					//We modify the list, so we need to copy it
+					var cloneList = desc.tempoList.ToList();
+					foreach(var tempo in cloneList) {
+						SetBPM(tempo.time, tempo.bpm);
+					}
+					
 					audioLoaded = true;
 					audicaLoaded = true;
 					
@@ -879,13 +882,45 @@ namespace NotReaper {
 			rightSustainAud.pitch = slider.value;
 		}
 
-		public void SetBPM(float newBpm) {
-			bpm = newBpm;
-			if (desc != null) {
-				desc.tempo = newBpm;
+		public void SetBPM(float time, float newBpm) {
+			foreach(var bpm in bpmMarkerObjects) {
+				Destroy(bpm);
+			}
+			bpmMarkerObjects.Clear();
 
+			TempoChange c = new TempoChange();
+			c.time = time;
+			c.bpm = newBpm;
+
+			bool found = false;
+			for(int i = 0; i < tempoChanges.Count; ++i) {
+				if(FastApproximately(tempoChanges[i].time, time)) {
+					tempoChanges[i] = c;
+					if(newBpm == 0) {
+						tempoChanges.RemoveAt(i);
+					}
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found && newBpm != 0) {
+				tempoChanges.Add(c);
+			}
+			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time).ToList();
+			
+			if (desc != null) {
+				desc.tempoList = tempoChanges;
 			}
 			SetScale(scale);
+
+			foreach(var tempo in tempoChanges) {
+				var timelineBPM = Instantiate(BPM_MarkerPrefab, timelineTransformParent);
+				var transform1 = timelineBPM.transform;
+				transform1.localPosition = new Vector3(DurationToBeats(tempo.time), -0.5f, 0);
+				timelineBPM.GetComponentInChildren<TextMesh>().text = tempo.bpm.ToString();
+				bpmMarkerObjects.Add(timelineBPM);
+			}
 		}
 
 		public void SetOffset(int newOffset) {
@@ -893,7 +928,7 @@ namespace NotReaper {
 			var diff = offset - newOffset;
 			offset = newOffset;
 			
-			var newTime = time + BeatsToDuration(diff / 480f);
+			var newTime = time + BeatsToDuration(0.0f, diff / 480f, BeatDurationDirection.Forward);
 			if (newTime != time) {
 				StartCoroutine(AnimateSetTime(newTime));
 			}
@@ -909,13 +944,36 @@ namespace NotReaper {
 			beatSnap = snap;
 		}
 
+		private int GetCurrentBPMIndex(float t) {
+			if(t < 0) t = 0.0f;
+
+			for(int i = 0; i < tempoChanges.Count; ++i) {
+				var c = tempoChanges[i];
+
+				if(t >= c.time && (i + 1 >= tempoChanges.Count || t < tempoChanges[i + 1].time)) {
+					return i;
+				}
+			}
+
+			return -1;
+		}
+
+		public float GetBpmFromTime(float t) {
+			int idx = GetCurrentBPMIndex(t);
+			if(idx != -1) {
+				return tempoChanges[idx].bpm;
+			}
+			else {
+				return 1.0f;
+			}
+		}
 
 		public void SetBeatTime(float t) {
-			float x = (t * bpm / 60 - offset / 480f);
+			float x = DurationToBeats(t) - (offset / 480f);
+
 			timelineBG.material.SetTextureOffset(MainTex, new Vector2((x / 4f + scaleOffset), 1));
 
 			timelineTransformParent.transform.localPosition = Vector3.left * x / (scale / 20f);
-			//spectrogram.localPosition = Vector3.left * (t * bpm / 60) / (scale / 20f);
 
 			gridTransformParent.transform.localPosition = Vector3.back * x;
 		}
@@ -924,8 +982,6 @@ namespace NotReaper {
 			if (newScale < 5 || newScale > 100) return;
 			timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
 			scaleOffset = -newScale % 8 / 8f;
-
-			//spectrogram.localScale = new Vector3(aud.clip.length / 2 * bpm / 60 / (newScale / 20f), 1, 1);
 
 			Vector3 timelineTransformScale = timelineTransformParent.transform.localScale;
 			timelineTransformScale.x *= (float) scale / newScale;
@@ -1060,7 +1116,7 @@ namespace NotReaper {
 
 			if (!isShiftDown && Input.mouseScrollDelta.y < -0.1f && !isScrollingBeatSnap) {
 				if (!audioLoaded) return;
-				time += BeatsToDuration(4f / beatSnap);
+				time += BeatsToDuration(time, 4f / beatSnap, BeatDurationDirection.Forward);
 				time = SnapTime(time);
 
 				SafeSetTime();
@@ -1076,7 +1132,7 @@ namespace NotReaper {
 
 			} else if (!isShiftDown && Input.mouseScrollDelta.y > 0.1f && !isScrollingBeatSnap) {
 				if (!audioLoaded) return;
-				time -= BeatsToDuration(4f / beatSnap);
+				time -= BeatsToDuration(time, 4f / beatSnap, BeatDurationDirection.Backward);
 				time = SnapTime(time);
 				SafeSetTime();
 				if (paused) {
@@ -1133,8 +1189,7 @@ namespace NotReaper {
 
 			float posX = Math.Abs(timelineTransformParent.position.x) + x;
 			float newX = GetClosestBeatSnapped(posX);
-			float newTime = BeatsToDuration(newX);
-			//time = newTime;
+			float newTime = BeatsToDuration(0.0f, newX, BeatDurationDirection.Forward);
 
 			StartCoroutine(AnimateSetTime(newTime * (scale / 20f)));
 		}
@@ -1272,24 +1327,94 @@ namespace NotReaper {
 				return 0;
 		}
 
-		public static float DurationToBeats(float t) {
-			return t * bpm / 60;
+		public float DurationToBeats(float t) {
+			if(t < 0) t = 0.0f;
+			float beats = 0.0f;
+
+			for(int i = 0; i < tempoChanges.Count; ++i) {
+				var c = tempoChanges[i];
+				
+				if(t >= c.time && (i + 1 >= tempoChanges.Count || t < tempoChanges[i + 1].time)) {
+					beats += (c.bpm / 60) * (t - c.time);
+					break;
+				}
+				else if(i + 1 < tempoChanges.Count) {
+					//Add in all the beats for this section
+					beats += (c.bpm / 60) * (tempoChanges[i + 1].time - c.time);
+				}
+			}
+
+			return beats;
 		}
 
-		public float BeatsToDuration(float beat) {
-			return beat * 60 / bpm;
+		public enum BeatDurationDirection {
+			Forward,
+			Backward
+		};
+
+		public float BeatsToDuration(float startTime, float beats, BeatDurationDirection direction) {
+			if(startTime < 0) startTime = 0.0f;
+
+			int currentBpmIdx = GetCurrentBPMIndex(startTime);
+			if(currentBpmIdx == -1) {
+				return beats;
+			}
+
+
+			float duration = 0.0f;
+			float currentTime = startTime;
+			float remainingBeats = beats;
+
+			while(remainingBeats > 0 && currentBpmIdx >= 0 && currentBpmIdx < tempoChanges.Count) {
+				var tempo = tempoChanges[currentBpmIdx];
+
+				float bpmTime = remainingBeats * 60 / tempo.bpm;
+
+				if(direction == BeatDurationDirection.Forward) {
+					if(currentBpmIdx + 1 < tempoChanges.Count) {
+						float nextTime = tempoChanges[currentBpmIdx + 1].time;
+						if(currentTime + bpmTime >= nextTime) {
+							float timeUntilTempoShift = nextTime - currentTime;
+							float beatsUntilTempoShift = (tempo.bpm / 60) * timeUntilTempoShift;
+							currentTime += timeUntilTempoShift;
+							duration += timeUntilTempoShift;
+							remainingBeats -= beatsUntilTempoShift;
+							currentBpmIdx++;
+							continue;
+						}
+					}
+				}
+				else {
+					if(currentBpmIdx - 1 >= 0) {
+						if(currentTime - bpmTime < tempo.time) {
+							float timeUntilTempoShift = currentTime - tempo.time;
+							float beatsUntilTempoShift = (tempo.bpm / 60) * timeUntilTempoShift;
+							currentTime -= timeUntilTempoShift;
+							duration += timeUntilTempoShift;
+							remainingBeats -= beatsUntilTempoShift;
+							currentBpmIdx--;
+							continue;
+						}
+					}
+				}
+
+				duration += bpmTime;
+				remainingBeats = 0;
+			}
+
+			return duration;
 		}
 
 		public float Snap(float beat) {
 			return Mathf.Round(beat * beatSnap / 4f) * 4f / beatSnap;
 		}
 
-		public static float BeatTime() {
+		public float BeatTime() {
 			return DurationToBeats(time) - offset / 480f;
 		}
 
-		public float SnapTime(float t) {
-			return BeatsToDuration(Snap(DurationToBeats(t) - offset / 480f) + offset / 480f);
+		public float SnapTime(float timePoint) {
+			return BeatsToDuration(0.0f, Snap(DurationToBeats(timePoint) - offset / 480f) + offset / 480f, BeatDurationDirection.Forward);
 		}
 
 		string prevTimeText;

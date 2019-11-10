@@ -5,6 +5,10 @@ using Melanchall.DryWetMidi.Smf;
 using NotReaper.Targets;
 
 namespace NotReaper.Models {
+	public struct TempoChange {
+		public float time;
+		public float bpm;
+	}
 
 	//KEEP IN MIND, almost all the song references are to the moggsong, not the mogg.
 	// moggSusatinSongRight references the name of the mogg, the actual file is stored on the AudicaFile object.
@@ -58,6 +62,7 @@ namespace NotReaper.Models {
 		public string author = "";
 		public int offset = 0;
 		public double previewStartSeconds = 0.0d;
+		public List<TempoChange> tempoList;
 	}
 
 	public class SafeDesc {

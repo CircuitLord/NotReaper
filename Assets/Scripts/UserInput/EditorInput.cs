@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using NotReaper.Grid;
 using NotReaper.Managers;
 using NotReaper.Models;
@@ -49,6 +50,7 @@ namespace NotReaper.UserInput {
 		[SerializeField] private HandTypeSelect handTypeSelect;
 
 		[SerializeField] private GameObject focusGrid;
+		[SerializeField] private GameObject bpmWindow;
 
 
 		public HoverTarget hover;
@@ -346,6 +348,11 @@ namespace NotReaper.UserInput {
 					break;
 
 			}
+
+			if(bpmWindow.activeSelf) {
+				inUI = true;
+				return;
+			}
 		}
 
 		private void Update() {
@@ -366,15 +373,31 @@ namespace NotReaper.UserInput {
 					if (!Timeline.audioLoaded) return;
 
 					pauseMenu.ClosePauseMenu();
-					FigureOutIsInUI();
 				} else {
 					if (selectedMode == EditorMode.Timing) return;
-					pauseMenu.OpenPauseMenu();
-					FigureOutIsInUI();
+
+					if(bpmWindow.activeSelf) {
+						bpmWindow.GetComponent<DynamicBPMWindow>().Deactivate();
+					}
+					else {
+						pauseMenu.OpenPauseMenu();
+					}
 				}
 			}
 
-			if (inUI) return;
+			if(Input.GetKeyDown(KeyCode.B)) {
+				if(bpmWindow.activeSelf) {
+					bpmWindow.GetComponent<DynamicBPMWindow>().Deactivate();
+				}
+				else {
+					bpmWindow.GetComponent<DynamicBPMWindow>().Activate();
+				}
+			}
+
+			bool wasInUI = inUI;
+			FigureOutIsInUI();
+
+			if (wasInUI || inUI) return;
 
 			if (Input.GetKeyDown(KeyCode.F1)) {
 				shortcutMenu.show();
@@ -566,7 +589,7 @@ namespace NotReaper.UserInput {
 				Tools.undoRedoManager.Redo();
 				Debug.Log("Redoing...");
 			}
-
+			
 		}
 
 	}

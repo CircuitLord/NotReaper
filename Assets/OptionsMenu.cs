@@ -54,7 +54,7 @@ public class OptionsMenu : MonoBehaviour {
 
     public void BPMWasChanged() {
         float newBpm = float.Parse(bpmField.text);
-        timeline.SetBPM(newBpm);
+        timeline.SetBPM(0.0f, newBpm);
     }
 
     public void OffsetWasChanged() {
