@@ -381,7 +381,7 @@ namespace NotReaper.Tools {
 
 			if (frameIntentPaste) {
 				timeline.DeselectAllTargets();
-				timeline.PasteCues(clipboardNotes, Timeline.BeatTime());
+				timeline.PasteCues(clipboardNotes, timeline.BeatTime());
 			}
 
 			if (frameIntentDelete) {
@@ -463,7 +463,7 @@ namespace NotReaper.Tools {
 
 		private float SnapToBeat(Vector3 position) {
 			var increments = ((480 / timeline.beatSnap) * 4f) / 480;
-			return Timeline.DurationToBeats(Timeline.time) + Mathf.Round(position.x / increments) * increments;
+			return timeline.DurationToBeats(Timeline.time) + Mathf.Round(position.x / increments) * increments;
 		}
 	}
 }
