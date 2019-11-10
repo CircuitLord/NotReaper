@@ -389,7 +389,7 @@ namespace NotReaper.UserInput {
 				if(bpmWindow.activeSelf) {
 					bpmWindow.GetComponent<DynamicBPMWindow>().Deactivate();
 				}
-				else {
+				else if (!inUI) {
 					bpmWindow.GetComponent<DynamicBPMWindow>().Activate();
 				}
 			}
