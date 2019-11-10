@@ -6,7 +6,7 @@ namespace NotReaper.Targets {
 		public TargetSetHitsoundIntent() {}
 
 		public TargetSetHitsoundIntent(TargetSetHitsoundIntent other) {
-			target = new TargetData(other.target);
+			target = other.target;
 			startingVelocity = other.startingVelocity;
 			newVelocity = other.newVelocity;
 		}

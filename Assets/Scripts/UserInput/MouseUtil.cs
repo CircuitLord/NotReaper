@@ -13,7 +13,7 @@ namespace NotReaper.UserInput {
 
 			var results = Physics.RaycastAll(ray, 3.4f, mask);
 			return results
-				.Where(result => result.transform.GetComponent<TargetIcon>() != null)
+				.Where(result => result.transform.GetComponent<TargetIcon>() != null && !result.transform.GetComponent<TargetIcon>().target.transient)
 				.OrderBy(result => {
 					// sort by the distance from the centre of the timeline (closest = 0)
 					var target = result.transform.GetComponent<TargetIcon>();

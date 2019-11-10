@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ContentModelStore">
     <e p="C:\Files\Programming\UnityProjects\NotReaper" t="IncludeRecursive">
+      <e p=".git\info\exclude" t="IncludeRecursive" />
       <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
@@ -196,6 +197,9 @@
               <e p="DragSelect.cs" t="Include" />
               <e p="GridBoxDragSelect.cs" t="Include" />
             </e>
+            <e p="ErrorChecker" t="Include">
+              <e p="ErrorChecker.cs" t="Include" />
+            </e>
             <e p="PlaceNote.cs" t="Include" />
             <e p="ToolsActiveArea.cs" t="Include" />
             <e p="UndoRedoManager.cs" t="Include" />
@@ -347,6 +351,7 @@
       <e p="packages" t="ExcludeRecursive" />
       <e p="Temp\bin" t="ExcludeRecursive" />
     </e>
+    <e p="C:\Users\circu\.Rider2019.2\config\scratches" t="IncludeRecursive" />
     <e p="C:\Users\circu\.Rider2019.2\system\extResources" t="IncludeRecursive" />
     <e p="C:\Users\circu\.Rider2019.2\system\resharper-host\Local\Transient\ReSharperHost\v192\SolutionCaches\_NotReaper.-1185763192.00" t="ExcludeRecursive" />
   </component>

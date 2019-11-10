@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +12,7 @@ using NotReaper.Managers;
 using NotReaper.Models;
 using NotReaper.Targets;
 using NotReaper.Tools;
+using NotReaper.Tools.ChainBuilder;
 using NotReaper.UI;
 using NotReaper.UserInput;
 using SFB;
@@ -147,6 +148,8 @@ namespace NotReaper {
 			StartCoroutine(CalculateNoteCollidersEnabled());
 
 			Physics.autoSyncTransforms = false;
+
+			ChainBuilder.timeline = this;
 		}
 
 		public void UpdateUIColors() {
@@ -166,6 +169,11 @@ namespace NotReaper {
 			orderedNotes.Sort((left, right) =>  left.data.beatTime.CompareTo(right.data.beatTime));
 		}
 
+		private static float BeatEpsilon = 0.00001f;
+		public static bool FastApproximately(float a, float b) {
+			return ((a - b) < 0 ? ((a - b) * -1) : (a - b)) <= BeatEpsilon;
+		}
+
 		public static int BinarySearchOrderedNotes(float cueTime)
 		{ 
 			int min = 0;
@@ -173,7 +181,7 @@ namespace NotReaper {
 				while (min <=max) {
 				int mid = (min + max) / 2;
 				float midCueTime = orderedNotes[mid].data.beatTime;
-				if (cueTime == midCueTime) {
+				if (FastApproximately(cueTime, midCueTime)) {
 					while(mid != 0 && orderedNotes[mid - 1].data.beatTime == cueTime) {
 						--mid;
 					}
@@ -188,27 +196,42 @@ namespace NotReaper {
 			}
 			return -1;
 		}
-		
-		public Target FindNote(TargetData data) {
-			int idx = BinarySearchOrderedNotes(data.beatTime);
+
+		public TargetData FindTargetData(float beatTime, TargetBehavior behavior, TargetHandType handType) {
+			int idx = BinarySearchOrderedNotes(beatTime);
 			if(idx == -1) {
-				Debug.LogError("Couldn't find note with time " + data.beatTime);
+				Debug.LogWarning("Couldn't find note with time " + beatTime);
 				return null;
 			}
 
 			for(int i = idx; i < orderedNotes.Count; ++i) {
 				Target t = orderedNotes[i];
-				if (Mathf.Approximately(t.data.x, data.x) &&
-					Mathf.Approximately(t.data.y, data.y) &&
-					Mathf.Approximately(t.data.beatTime, data.beatTime) &&
-					t.data.handType == data.handType) {
-					return t;
+				if (FastApproximately(t.data.beatTime, beatTime) &&
+					t.data.behavior == behavior &&
+					t.data.handType == handType) {
+					return t.data;
 				}
-				
-				
 			}
 
-			Debug.LogError("Couldn't find note with time " + data.beatTime + " and index " + idx);
+			Debug.LogWarning("Couldn't find note with time " + beatTime + " and index " + idx);
+			return null;
+		}
+		
+		public Target FindNote(TargetData data) {
+			int idx = BinarySearchOrderedNotes(data.beatTime);
+			if(idx == -1) {
+				Debug.LogWarning("Couldn't find note with time " + data.beatTime);
+				return null;
+			}
+
+			for(int i = idx; i < orderedNotes.Count; ++i) {
+				Target t = orderedNotes[i];
+				if (t.data.ID == data.ID) {
+					return t;
+				}
+			}
+
+			Debug.LogWarning("Couldn't find note with time " + data.beatTime + " and index " + idx);
 			return null;
 		}
 
@@ -221,10 +244,10 @@ namespace NotReaper {
 		}
 
 		//When loading from cues, use this.
-		public void AddTarget(Cue cue) {
+		public TargetData GetTargetDataForCue(Cue cue) {
 			TargetData data = new TargetData(cue, offset);
 			if (data.beatTime == 0) data.beatTime = 120f;
-			AddTargetFromAction(data);
+			return data;
 		}
 
 
@@ -249,7 +272,7 @@ namespace NotReaper {
 			data.beatTime = GetClosestBeatSnapped(DurationToBeats(time));
 
 			//Default sustains length should be more than 0.
-			if (data.behavior == TargetBehavior.Hold) {
+			if (data.supportsBeatLength) {
 				data.beatLength = 480;
 			} else {
 				data.beatLength = 120;
@@ -290,7 +313,8 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public Target AddTargetFromAction(TargetData targetData) {
+		//Adds a target directly to the timeline. targetData is kept as a reference NOT copied
+		public Target AddTargetFromAction(TargetData targetData, bool transient = false) {
 
 			var timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
 			timelineTargetIcon.location = TargetIconLocation.Timeline;
@@ -305,10 +329,8 @@ namespace NotReaper {
 			gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.beatTime);
 			gridTargetIcon.location = TargetIconLocation.Grid;
 
-			Target target = new Target(targetData, timelineTargetIcon, gridTargetIcon);
+			Target target = new Target(targetData, timelineTargetIcon, gridTargetIcon, transient);
 
-			//Now that all initial dependencies are met, we can init the target. (Loads sustain controller and outline color)
-			target.Init();
 			notes.Add(target);
 			orderedNotes = notes.OrderBy(v => v.data.beatTime).ToList();
 
@@ -322,6 +344,14 @@ namespace NotReaper {
 			target.TargetDeselectEvent += DeselectTarget;
 
 			target.MakeTimelineUpdateSustainLengthEvent += UpdateSustainLength;
+
+			//Trigger all callbacks on the note
+			targetData.Copy(targetData); 
+
+			//Also generate chains if needed
+			if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+				ChainBuilder.GenerateChainNotes(targetData);
+			}
 
 			return target;
 		}
@@ -406,6 +436,8 @@ namespace NotReaper {
 		}
 
 		public void DeselectAllTargets() {
+			if (!audicaLoaded) return;
+
 			foreach (Target target in selectedNotes) {
 				DeselectTarget(target, true);
 			}
@@ -419,7 +451,8 @@ namespace NotReaper {
 		/// <param name="target">The target to affect</param>
 		/// <param name="increase">If true, increase by one beat snap, if false, the opposite.</param>
 		public void UpdateSustainLength(Target target, bool increase) {
-			if (target.data.behavior != TargetBehavior.Hold) return;
+			if (!target.data.supportsBeatLength) return;
+
 			var increment = (480f / beatSnap) * 4f;
 			var minimum = 120f;
 			
@@ -429,6 +462,8 @@ namespace NotReaper {
 			} else {
 				target.data.beatLength = Mathf.Max(target.data.beatLength - increment, minimum);
 			}
+
+			target.UpdatePath();
 		}
 
 		public void MoveGridTargets(List<TargetGridMoveIntent> intents) {
@@ -444,10 +479,22 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void PasteCues(List<Cue> cues, float pasteBeatTime) {
+		public void PasteCues(List<TargetData> cues, float pasteBeatTime) {
 
 			// paste new targets in the original locations
-			var targetDataList = cues.Select(cue => new TargetData(cue, offset)).ToList();
+			var targetDataList = cues.Select(copyData => {
+				var data = new TargetData(copyData);
+
+				if(data.behavior == TargetBehavior.NR_Pathbuilder) {
+					data.pathBuilderData = new PathBuilderData();
+					var note = FindNote(copyData);
+					if(note != null) {
+						data.pathBuilderData.Copy(note.data.pathBuilderData);
+					}
+				}
+
+				return data;
+			}).ToList();
 
 			// find the soonest target in the selection
 			float earliestTargetBeatTime = Mathf.Infinity;
@@ -475,21 +522,21 @@ namespace NotReaper {
 		// Invert the selected targets' colour
 		public void SwapTargets(List<Target> targets) {
 			var action = new NRActionSwapNoteColors();
-			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
 		// Flip the selected targets on the grid about the X
 		public void FlipTargetsHorizontal(List<Target> targets) {
 			var action = new NRActionHFlipNotes();
-			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
 		// Flip the selected targets on the grid about the Y
 		public void FlipTargetsVertical(List<Target> targets) {
 			var action = new NRActionVFlipNotes();
-			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 		
@@ -501,7 +548,7 @@ namespace NotReaper {
 
 		public void DeleteTarget(Target target) {
 			var action = new NRActionRemoveNote();
-			action.targetData = new TargetData(target.data);
+			action.targetData = target.data;
 			Tools.undoRedoManager.AddAction(action);
 		}
 
@@ -514,19 +561,19 @@ namespace NotReaper {
 			loadedNotes.Remove(target);
 			selectedNotes.Remove(target);
 
-			target.Destroy();
+			target.Destroy(this);
 			target = null;
 		}
 
 		public void DeleteTargets(List<Target> targets) {
 			var action = new NRActionMultiRemoveNote();
-			action.affectedTargets = targets.Select(target => new TargetData(target.data)).ToList();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
 		}
 
 		public void DeleteAllTargets() {
 			foreach (Target target in notes) {
-				target.Destroy();
+				target.Destroy(this);
 			}
 
 			notes = new List<Target>();
@@ -539,18 +586,41 @@ namespace NotReaper {
 
 		public void Export()
 		{
+			//Ensure all chains are generated
+			List<TargetData> nonGeneratedNotes = new List<TargetData>();
 
+			foreach(Target note in notes) {
+				if(note.data.behavior == TargetBehavior.NR_Pathbuilder && note.data.pathBuilderData.createdNotes == false) {
+					nonGeneratedNotes.Add(note.data);
+				}
+			}
+
+			foreach(var data in nonGeneratedNotes) {
+				ChainBuilder.GenerateChainNotes(data);
+			}
+
+			//Export map
 			string dirpath = Application.persistentDataPath;
 
 			CueFile export = new CueFile();
 			export.cues = new List<Cue>();
+			export.NRCueData = new NRCueData();
 
 			foreach (Target target in orderedNotes) {
 
 				if (target.data.beatLength == 0) target.data.beatLength = 120;
 				
 				if (target.data.behavior == TargetBehavior.Metronome) continue;
-				export.cues.Add(NotePosCalc.ToCue(target, offset, false));
+				
+				var cue = NotePosCalc.ToCue(target, offset, false);
+
+				if(target.data.behavior == TargetBehavior.NR_Pathbuilder) {
+					export.NRCueData.pathBuilderNoteCues.Add(cue);
+					export.NRCueData.pathBuilderNoteData.Add(target.data.pathBuilderData);
+					continue;
+				}
+
+				export.cues.Add(cue);
 			}
 
 			switch (difficultyManager.loadedIndex) {
@@ -891,7 +961,7 @@ namespace NotReaper {
 			for (int i = 0; i < framesToSplitOver; i++) {
 
 				while (j < orderedNotes.Count) {
-
+					
 					float targetPos = orderedNotes[j].GetRelativeBeatTime();
 
 					if (targetPos > -20 && targetPos < 20) {
@@ -928,7 +998,7 @@ namespace NotReaper {
 
 		public void EnableNearSustainButtons() {
 			foreach (Target target in loadedNotes) {
-				if (target.data.behavior != TargetBehavior.Hold) continue;
+				if (!target.data.supportsBeatLength) continue;
 				if (paused && EditorInput.selectedTool == EditorTool.DragSelect && target.GetRelativeBeatTime() < 2 && target.GetRelativeBeatTime() > -2) {
 					target.EnableSustainButtons();
 				} else {

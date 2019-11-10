@@ -68,3 +68,11 @@ Update Mode: updateDependencies
 
 The following packages were updated:
   com.unity.ide.vscode from version 1.0.7 to 1.1.0
+
+=== Tue Oct 29 00:58:03 2019
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.postprocessing from version 2.1.4 to 2.1.6

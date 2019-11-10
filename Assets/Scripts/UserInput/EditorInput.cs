@@ -296,19 +296,27 @@ namespace NotReaper.UserInput {
 
 
 					Tools.dragSelect.Activate(true);
-					Tools.chainBuilder.Deactivate();
+					Tools.chainBuilder.Activate(false);
 					break;
 
 				case EditorTool.ChainBuilder:
 					selectedBehavior = TargetBehavior.None;
 
 					Tools.dragSelect.Activate(false);
-					Tools.chainBuilder.Activate();
+					Tools.chainBuilder.Activate(true);
 					break;
 
 
 				default:
 					break;
+			}
+
+			if(tool != EditorTool.ChainBuilder) {
+				Tools.chainBuilder.Activate(false);
+			}
+
+			if(tool != EditorTool.DragSelect) {
+				Tools.dragSelect.Activate(false); 
 			}
 
 
@@ -497,11 +505,8 @@ namespace NotReaper.UserInput {
 			
 			//Toggles the chain builder state
 			if (Input.GetKeyDown(KeyCode.T)) {
-
-				return; //TODO CHAINBUILDER IS DISABLED
-				
-				if (Tools.chainBuilder.active) {
-					Tools.chainBuilder.Deactivate();
+				if (Tools.chainBuilder.activated) {
+					Tools.chainBuilder.Activate(false);
 					RevertTool();
 				}
 				else {

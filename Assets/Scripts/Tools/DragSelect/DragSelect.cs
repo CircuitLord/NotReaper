@@ -51,7 +51,7 @@ namespace NotReaper.Tools {
 		private Vector2 startClickDetectPos;
 		private float startTimelineMoveTime;
 
-		private List<Cue> clipboardNotes = new List<Cue>();
+		private List<TargetData> clipboardNotes = new List<TargetData>();
 		private List<TargetGridMoveIntent> gridTargetMoveIntents = new List<TargetGridMoveIntent>();
 		private List<TargetTimelineMoveIntent> timelineTargetMoveIntents = new List<TargetTimelineMoveIntent>();
 		private List<TargetSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
@@ -84,16 +84,9 @@ namespace NotReaper.Tools {
 		/// <param name="active"></param>
 		public void Activate(bool active) {
 			activated = active;
-
-			if (!active) {
-				if (isDraggingTimeline) EndTimelineSelection();
-				else if (isDraggingGrid) EndGridSelection();
-				timeline.DeselectAllTargets();
-			}
 		}
 
 		public void Update() {
-			if (!activated) return;
 			CaptureInput();
 			UpdateActions();
 			UpdateSelections();
@@ -382,8 +375,8 @@ namespace NotReaper.Tools {
 			}
 
 			if (frameIntentCopy) {
-				clipboardNotes = new List<Cue>();
-				timeline.selectedNotes.ForEach(note => clipboardNotes.Add(NotePosCalc.ToCue(note, 0, false)));
+				clipboardNotes = new List<TargetData>();
+				timeline.selectedNotes.ForEach(note => clipboardNotes.Add(note.data));
 			}
 
 			if (frameIntentPaste) {
