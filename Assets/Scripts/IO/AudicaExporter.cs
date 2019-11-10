@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Ionic.Zip;
+using Melanchall.DryWetMidi.Smf;
+using Melanchall.DryWetMidi.Smf.Interaction;
 using Newtonsoft.Json;
 using NotReaper.Models;
 using SharpCompress.Archives;
@@ -51,6 +55,22 @@ namespace NotReaper.IO {
 
 				File.WriteAllText($"{Application.dataPath}/.cache/song-new.desc", JsonUtility.ToJson(audicaFile.desc));
 
+				var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
+				MidiFile songMidi = MidiFile.Read(Path.Combine(workFolder, "songtemplate.mid"));
+
+				using (var tempoMapManager = new TempoMapManager(new TicksPerQuarterNoteTimeDivision(480)))
+				{
+					TempoMap tempoMap = tempoMapManager.TempoMap;
+
+					foreach(var tempo in audicaFile.desc.tempoList) {
+						tempoMapManager.SetTempo(new MetricTimeSpan((long)(tempo.time * 1000000)), Tempo.FromBeatsPerMinute((int)tempo.bpm));
+					}
+
+					songMidi.ReplaceTempoMap(tempoMap);
+				}
+
+				songMidi.Write(Path.Combine(workFolder, $"{Application.dataPath}/.cache/song.mid"), true, MidiFileFormat.MultiTrack);
+
 				//Remove any files we'll be replacing
 				foreach (ZipArchiveEntry entry in archive.Entries) {
 
@@ -58,6 +78,8 @@ namespace NotReaper.IO {
 						archive.RemoveEntry(entry);
 						
 					} else if (entry.ToString() == "song.desc") {
+						archive.RemoveEntry(entry);
+					} else if (entry.ToString() == "song.mid") {
 						archive.RemoveEntry(entry);
 					} else if (entry.ToString() == "advanced.cues") {
 						archive.RemoveEntry(entry);
@@ -75,6 +97,7 @@ namespace NotReaper.IO {
 				if (easy) archive.AddEntry("beginner.cues", $"{Application.dataPath}/.cache/beginner-new.cues");
 
 				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/song-new.desc");
+				archive.AddEntry("song.mid", $"{Application.dataPath}/.cache/song.mid");
 				archive.SaveTo(audicaFile.filepath + ".temp", SharpCompress.Common.CompressionType.None);
 				archive.Dispose();
 

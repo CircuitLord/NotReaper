@@ -5,7 +5,6 @@ using Melanchall.DryWetMidi.Smf;
 using NotReaper.Targets;
 
 namespace NotReaper.Models {
-	[Serializable]
 	public struct TempoChange {
 		public float time;
 		public float bpm;

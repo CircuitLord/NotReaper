@@ -52,6 +52,7 @@ namespace NotReaper {
 		[Header("Prefabs")]
 		public TargetIcon timelineTargetIconPrefab;
 		public TargetIcon gridTargetIconPrefab;
+		public GameObject BPM_MarkerPrefab;
 
 		[Header("Extras")]
 		[SerializeField] private NRDiscordPresence nrDiscordPresence;
@@ -117,20 +118,8 @@ namespace NotReaper {
 		public Button generateAudicaButton;
 		public Button loadAudioFileTiming;
 
-		class ItemEqualityComparer : IEqualityComparer<TempoChange>
-		{
-			public bool Equals(TempoChange a, TempoChange b)
-			{
-				return a.time == b.time;
-			}
-
-			public int GetHashCode(TempoChange obj)
-			{
-				return obj.GetHashCode();
-			}
-		}
-
-		private List<TempoChange> tempoChanges = new List<TempoChange>();
+		public List<TempoChange> tempoChanges = new List<TempoChange>();
+		private List<GameObject> bpmMarkerObjects = new List<GameObject>();
 
 		//Tools
 		private void Start() {
@@ -760,7 +749,7 @@ namespace NotReaper {
 				foreach (var tempo in audicaFile.song_mid.GetTempoMap().Tempo) {
 					float time = 0.0f;
 					if(tempo.Time != 0.0f) {
-						time = BeatsToDuration(0.0f, tempo.Time / 480, BeatDurationDirection.Forward);
+						time = BeatsToDuration(0.0f, tempo.Time / 480.0f, BeatDurationDirection.Forward);
 					}
 
 					SetBPM(time, (int) Math.Round(oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote));
@@ -885,18 +874,44 @@ namespace NotReaper {
 		}
 
 		public void SetBPM(float time, float newBpm) {
+			foreach(var bpm in bpmMarkerObjects) {
+				Destroy(bpm);
+			}
+			bpmMarkerObjects.Clear();
+
 			TempoChange c = new TempoChange();
 			c.time = time;
 			c.bpm = newBpm;
 
-			tempoChanges.Add(c);
-
-			tempoChanges = tempoChanges.Distinct().OrderBy(tempo => tempo.time).ToList();
+			bool found = false;
+			for(int i = 0; i < tempoChanges.Count; ++i) {
+				if(FastApproximately(tempoChanges[i].time, time)) {
+					tempoChanges[i] = c;
+					if(newBpm == 0) {
+						tempoChanges.RemoveAt(i);
+					}
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found && newBpm != 0) {
+				tempoChanges.Add(c);
+			}
+			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time).ToList();
 			
 			if (desc != null) {
 				desc.tempoList = tempoChanges;
 			}
 			SetScale(scale);
+
+			foreach(var tempo in tempoChanges) {
+				var timelineBPM = Instantiate(BPM_MarkerPrefab, timelineTransformParent);
+				var transform1 = timelineBPM.transform;
+				transform1.localPosition = new Vector3(DurationToBeats(tempo.time), -0.5f, 0);
+				timelineBPM.GetComponentInChildren<TextMesh>().text = tempo.bpm.ToString();
+				bpmMarkerObjects.Add(timelineBPM);
+			}
 		}
 
 		public void SetOffset(int newOffset) {
@@ -934,7 +949,7 @@ namespace NotReaper {
 			return -1;
 		}
 
-		private float GetBpmFromTime(float t) {
+		public float GetBpmFromTime(float t) {
 			int idx = GetCurrentBPMIndex(t);
 			if(idx != -1) {
 				return tempoChanges[idx].bpm;
