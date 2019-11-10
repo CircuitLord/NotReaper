@@ -21,6 +21,11 @@ namespace NotReaper.Grid {
 			Vector2 tempPos = new Vector2();
 			int x = 0, y = 0;
 			float offsetX = 0, offsetY = 0;
+			
+			Vector2 pitch98 = new Vector2(NotePosCalc.xSize * -2f, -NotePosCalc.ySize);
+			Vector2 pitch99 = new Vector2(NotePosCalc.xSize * 2f, -NotePosCalc.ySize);
+			Vector2 pitch100 = new Vector2(NotePosCalc.xSize * -2f, NotePosCalc.ySize);
+			Vector2 pitch101 = new Vector2(NotePosCalc.xSize * 2f, NotePosCalc.ySize);
 
 			//If it's a melee note.
 			if (target.data.behavior == TargetBehavior.Melee) {
@@ -28,8 +33,40 @@ namespace NotReaper.Grid {
 				if (target.data.x > 0) pitch += 1;
 				if (target.data.y > 0) pitch += 2;
 
-				offsetX = 0;
-				offsetY = 0;
+				switch (pitch) {
+					case 98:
+						offsetX = pitch98.x - target.data.position.x;
+						offsetY = pitch98.y - target.data.position.y;
+						break;
+					
+					case 99:
+						offsetX = pitch99.x - target.data.position.x;
+						offsetY = pitch99.y - target.data.position.y;
+						break;
+					
+					case 100:
+						offsetX = pitch100.x - target.data.position.x;
+						offsetY = pitch100.y - target.data.position.y;
+						break;
+					
+					case 101:
+						offsetX = pitch101.x - target.data.position.x;
+						offsetY = pitch101.y - target.data.position.y;
+						break;
+						
+
+
+				}
+
+				offsetX = -offsetX / NotePosCalc.xSize / 4;
+				offsetY = -offsetY / NotePosCalc.ySize / 4;
+				
+				
+
+				Debug.Log(offsetX);
+
+				
+
 
 			} else {
 
@@ -85,6 +122,11 @@ namespace NotReaper.Grid {
 						break;
 
 				}
+
+				x += (float) cue.gridOffset.x * NotePosCalc.xSize * 4;
+				y += (float) cue.gridOffset.y * NotePosCalc.ySize * 4;
+
+
 			} else {			
 				int col = cue.pitch % 12;
                 int row = cue.pitch / 12;
