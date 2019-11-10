@@ -122,7 +122,7 @@ namespace NotReaper.Tools.ErrorChecker
 	        if (!timeline.paused) timeline.TogglePlayback();
 	        //timeline.JumpToX(currentError.beatTime);
 
-	        float time = timeline.BeatsToDuration(currentError.beatTime);
+	        float time = timeline.BeatsToDuration(0.0f, currentError.beatTime, Timeline.BeatDurationDirection.Forward);
 	        
 	        StartCoroutine(timeline.AnimateSetTime(time));
 	        
@@ -154,7 +154,7 @@ namespace NotReaper.Tools.ErrorChecker
 	        
 	        if (!timeline.paused) timeline.TogglePlayback();
 	        
-	        float time = timeline.BeatsToDuration(currentError.beatTime);
+	        float time = timeline.BeatsToDuration(0.0f, currentError.beatTime, Timeline.BeatDurationDirection.Forward);
 
 	       // timeline.SetBeatTime(time);
 	       StartCoroutine(timeline.AnimateSetTime(time));
