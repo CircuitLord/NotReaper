@@ -117,11 +117,6 @@ namespace NotReaper {
 		public Button generateAudicaButton;
 		public Button loadAudioFileTiming;
 
-		struct TempoChange {
-			public float time;
-			public float bpm;
-		}
-
 		class ItemEqualityComparer : IEqualityComparer<TempoChange>
 		{
 			public bool Equals(TempoChange a, TempoChange b)
@@ -762,20 +757,13 @@ namespace NotReaper {
 			if (audicaFile.song_mid != null) {
 				
 				float oneMinuteInMicroseconds = 60000000f;
-				var midiBpm = -1;
 				foreach (var tempo in audicaFile.song_mid.GetTempoMap().Tempo) {
-					// TODO: Multi-bpm support :(
-					// Debug.Log($"FOUND TEMPO EVENT: {tempo}, BPM: {tempo.Value.BeatsPerMinute}");
-					midiBpm = (int) Math.Round(oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote);
-				}
+					float time = 0.0f;
+					if(tempo.Time != 0.0f) {
+						time = BeatsToDuration(0.0f, tempo.Time / 480, BeatDurationDirection.Forward);
+					}
 
-				if (midiBpm != desc.tempo && midiBpm != -1) {
-					// TODO: in-scene dialog box :/
-					//if (EditorUtility.DisplayDialog("BPM mismatch",
-						//"Detected different BPM values in midi and song.desc. NotReaper does not currently support multi-bpm tracks.",
-					//	$"Use midi ({midiBpm})", $"Use song.desc ({desc.tempo})")) {
-						desc.tempo = midiBpm;
-					//}
+					SetBPM(time, (int) Math.Round(oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote));
 				}
 			} 
 
@@ -822,6 +810,13 @@ namespace NotReaper {
 					previewAud.clip = myClip;
 					
 					SetBPM(0.0f, (float) desc.tempo);
+
+					//We modify the list, so we need to copy it
+					var cloneList = desc.tempoList.ToList();
+					foreach(var tempo in cloneList) {
+						SetBPM(tempo.time, tempo.bpm);
+					}
+					
 					audioLoaded = true;
 					audicaLoaded = true;
 					
@@ -896,14 +891,10 @@ namespace NotReaper {
 
 			tempoChanges.Add(c);
 
-			c.time = (11040.0f / 480) * 60 / newBpm;
-			c.bpm = newBpm * 2;
-			tempoChanges.Add(c);
-
 			tempoChanges = tempoChanges.Distinct().OrderBy(tempo => tempo.time).ToList();
 			
-			if (desc != null && time == 0.0f) {
-				desc.tempo = newBpm;
+			if (desc != null) {
+				desc.tempoList = tempoChanges;
 			}
 			SetScale(scale);
 		}
@@ -1167,8 +1158,7 @@ namespace NotReaper {
 
 			float posX = Math.Abs(timelineTransformParent.position.x) + x;
 			float newX = GetClosestBeatSnapped(posX);
-			float newTime = BeatsToDuration(0.0f, newX, BeatDurationDirection.Forward); //@FIX
-			//time = newTime;
+			float newTime = BeatsToDuration(0.0f, newX, BeatDurationDirection.Forward);
 
 			StartCoroutine(AnimateSetTime(newTime * (scale / 20f)));
 		}
@@ -1315,6 +1305,7 @@ namespace NotReaper {
 				
 				if(t >= c.time && (i + 1 >= tempoChanges.Count || t < tempoChanges[i + 1].time)) {
 					beats += (c.bpm / 60) * (t - c.time);
+					break;
 				}
 				else if(i + 1 < tempoChanges.Count) {
 					//Add in all the beats for this section
@@ -1330,17 +1321,17 @@ namespace NotReaper {
 			Backward
 		};
 
-		public float BeatsToDuration(float t, float beats, BeatDurationDirection direction) {
-			if(t < 0) t = 0.0f;
+		public float BeatsToDuration(float startTime, float beats, BeatDurationDirection direction) {
+			if(startTime < 0) startTime = 0.0f;
 
-			int currentBpmIdx = GetCurrentBPMIndex(t);
+			int currentBpmIdx = GetCurrentBPMIndex(startTime);
 			if(currentBpmIdx == -1) {
 				return beats;
 			}
 
 
 			float duration = 0.0f;
-			float currentTime = t;
+			float currentTime = startTime;
 			float remainingBeats = beats;
 
 			while(remainingBeats > 0 && currentBpmIdx >= 0 && currentBpmIdx < tempoChanges.Count) {
@@ -1363,15 +1354,14 @@ namespace NotReaper {
 					}
 				}
 				else {
-					if(currentBpmIdx - 1 > 0) {
-						float nextTime = tempoChanges[currentBpmIdx - 1].time;
-						if(currentTime - bpmTime >= nextTime) {
-							float timeUntilTempoShift = currentTime - nextTime;
+					if(currentBpmIdx - 1 >= 0) {
+						if(currentTime - bpmTime < tempo.time) {
+							float timeUntilTempoShift = currentTime - tempo.time;
 							float beatsUntilTempoShift = (tempo.bpm / 60) * timeUntilTempoShift;
 							currentTime -= timeUntilTempoShift;
 							duration += timeUntilTempoShift;
 							remainingBeats -= beatsUntilTempoShift;
-							currentBpmIdx++;
+							currentBpmIdx--;
 							continue;
 						}
 					}
