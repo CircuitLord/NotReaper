@@ -5,6 +5,7 @@ using NotReaper.Targets;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace NotReaper.Tools.ErrorChecker
@@ -18,9 +19,24 @@ namespace NotReaper.Tools.ErrorChecker
 
         [SerializeField] private DifficultyManager difficultyManager;
 
+
+        private List<ErrorLogEntry> currentErrors = new List<ErrorLogEntry>();
+        private int currentErrorIndex = -1;
+        private ErrorLogEntry currentError;
+
+        public Timeline timeline;
+
+        public GameObject errorCheckUI;
+        public TextMeshProUGUI errorCountText;
+        public TextMeshProUGUI errorBodyText;
+
         private float chainLeadTime = 360;
         private float sustainLeadTime = 360;
         private const float TickBeatConst = 480;
+
+        private void Start() {
+	        errorCheckUI.SetActive(false);
+        }
 
         public void RunErrorCheck()
         {
@@ -28,6 +44,8 @@ namespace NotReaper.Tools.ErrorChecker
              * parse notes for errors
              * export error messages to txt
              */
+            
+            currentErrors.Clear();
 
             //retrieve orderedNotes and difficulty label
             List<Target> notes = Timeline.orderedNotes;
@@ -54,15 +72,90 @@ namespace NotReaper.Tools.ErrorChecker
             }
 
             //parse and generate error log
-            string outputMessage = "";
-            outputMessage = ParseCues(notes, outputMessage, difficulty, difficultyLabel);
+            //string outputMessage = "";
+            currentErrors = ParseCues(notes, "", difficulty, difficultyLabel);
 
             //export
             //output to txt
-            System.IO.File.WriteAllText(@"D:\test\test.txt", outputMessage);
+            //System.IO.File.WriteAllText(@"D:\test\test.txt", outputMessage);
+            
+            EnableErrorCheckingUI();
+
+            UpdateErrorCount();
+            
+            NextError();
         }
 
-        private string ParseCues(List<Target> targetCues, string output, int difficulty, string label)
+
+        public void EnableErrorCheckingUI() {
+	        errorCheckUI.SetActive(true);
+        }
+
+        public void DisableErrorCheckingUI() {
+	        errorCheckUI.SetActive(false);
+        }
+
+        public void NextError() {
+	        
+	        if (currentErrors.Count <= 0) return;
+
+	        if (currentErrorIndex >= currentErrors.Count) return;
+
+	        currentErrorIndex++;
+
+	        currentError = currentErrors[currentErrorIndex];
+
+	        if (currentError == null) return;
+	        
+	        errorBodyText.SetText(currentError.errorDesc);
+	        
+	        if (!timeline.paused) timeline.TogglePlayback();
+	        timeline.JumpToX(currentError.beatTime);
+	        
+
+
+
+        }
+
+        public void PrevError() {
+
+	        if (currentErrors.Count <= 0) return;
+	        
+	        if (currentErrorIndex <= 0) return;
+
+	        currentErrorIndex--;
+
+	        currentError = currentErrors[currentErrorIndex];
+
+	        if (currentError == null) return;
+	        
+	        errorBodyText.SetText(currentError.errorDesc);
+	        
+	        if (!timeline.paused) timeline.TogglePlayback();
+	        
+	        timeline.JumpToX(currentError.beatTime);
+	        //Debug.Log(currentError.beatTime);
+
+        }
+
+        public void MarkCurrentFixed() {
+	        currentErrors.Remove(currentError);
+	        currentError = null;
+	        NextError();
+	        UpdateErrorCount();
+        }
+
+        public void UpdateErrorCount() {
+	        errorCountText.SetText("Errors: " + currentErrors.Count);
+        }
+        
+        
+        
+        
+        
+        
+
+        private List<ErrorLogEntry> ParseCues(List<Target> targetCues, string output, int difficulty, string label)
         {
             //error log
             List<ErrorLogEntry> errorLog = new List<ErrorLogEntry>();
@@ -272,12 +365,12 @@ namespace NotReaper.Tools.ErrorChecker
 
 
             // string output
-            output = "Error checker has detected " + errorLog.Count + " errors/warnings." + System.Environment.NewLine;
-            foreach(ErrorLogEntry item in errorLog)
-            {
-                output = output + "[" + (item.beatTime*TickBeatConst) + "] " + item.errorDesc + System.Environment.NewLine;
-            }
-            return output;
+            Debug.Log("Error checker has detected " + errorLog.Count + " errors/warnings.");
+          //  foreach(ErrorLogEntry item in errorLog)
+           // {
+                //output = output + "[" + (item.beatTime*TickBeatConst) + "] " + item.errorDesc + System.Environment.NewLine;
+           //}
+            return errorLog;
         }
 
 
@@ -368,17 +461,6 @@ namespace NotReaper.Tools.ErrorChecker
                     break;
             }
             return limit;
-        }
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
         }
 
 

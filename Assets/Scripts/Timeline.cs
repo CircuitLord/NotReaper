@@ -897,7 +897,7 @@ namespace NotReaper {
 					if (targetPos > -20 && targetPos < 20) {
 						orderedNotes[j].EnableColliders();
 					} else {
-						orderedNotes[j].DisableColliders();
+						orderedNotes[j].EnableColliders();
 					}
 
 
