@@ -51,6 +51,7 @@ namespace NotReaper.Timing {
 
 
         public bool skipOffset = false;
+        public bool isMp3 = false;
 
 
         TrimAudio trimAudio = new TrimAudio();
@@ -106,12 +107,20 @@ namespace NotReaper.Timing {
                     ffmpeg.Start();
                     ffmpeg.WaitForExit();
                     filePath = "converted.ogg";
+
+                    isMp3 = true;
+                    
+                    StartCoroutine(
+	                    GetAudioClip($"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", filePath)));
                 }
 
-                StartCoroutine(
-                    GetAudioClip($"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", filePath)));
-                nameText.text = paths[0];
-                loadedSong = paths[0];
+                else {
+	                isMp3 = false;
+	                StartCoroutine(GetAudioClip(filePath));
+	                nameText.text = paths[0];
+	                loadedSong = paths[0];
+                }
+
             }
         }
 
@@ -138,11 +147,18 @@ namespace NotReaper.Timing {
         public void GenerateOgg() {
 
 	        string path;
+
+	        if (isMp3 || !skipOffset) {
+				trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), offset, bpm, skipOffset);
+				path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), songName, "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
+		        
+	        }
+	        else {
+		        path = AudicaGenerator.Generate(loadedSong, (songName + "-" + mapperName), songName, "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
+	        }
 	        
-	        trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), offset, bpm, skipOffset);
 		        
 
-	        path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), songName, "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
 	        
             timeline.LoadAudicaFile(false, path);
             editorInput.SelectMode(EditorMode.Compose);
