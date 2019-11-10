@@ -270,8 +270,14 @@ namespace NotReaper.Tools.ErrorChecker
                 }
 
                 //simultaneous target checks
-                //chains and melees don't count
-                if (prevTarget.beatTime == curTarget.data.beatTime && (!prevTarget.behavior.Equals(TargetBehavior.Chain) && !curTarget.data.behavior.Equals(TargetBehavior.Chain)) && (!prevTarget.behavior.Equals(TargetBehavior.Melee) && !curTarget.data.behavior.Equals(TargetBehavior.Melee)))
+                //chains, melees, and pathbuilder notes don't count
+                if (
+                    prevTarget.beatTime == curTarget.data.beatTime && 
+                    (!prevTarget.behavior.Equals(TargetBehavior.Chain) && !curTarget.data.behavior.Equals(TargetBehavior.Chain)) && 
+                    (!prevTarget.behavior.Equals(TargetBehavior.Melee) && !curTarget.data.behavior.Equals(TargetBehavior.Melee)) &&
+                    (!prevTarget.behavior.Equals(TargetBehavior.NR_Pathbuilder) && !curTarget.data.behavior.Equals(TargetBehavior.NR_Pathbuilder))
+                )
+
                 {
                     // same pitch
                     if (prevTarget.position == curTarget.data.position)
