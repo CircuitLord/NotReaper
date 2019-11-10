@@ -320,7 +320,15 @@ namespace NotReaper.Tools.ChainBuilder {
 					var vecFromCenter = (mousePos - startClickNote.data.position);
 					if(vecFromCenter.sqrMagnitude > 0.5f) {
 						var angle = Vector2.SignedAngle(vecFromCenter.normalized, new Vector2(0, 1));
-						float snappedAngle = Mathf.Floor((Math.Abs(angle) + 22.5f) / 45.0f) * 45.0f;
+						float snappedAngle;
+						if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) {
+							snappedAngle = Mathf.Floor((Math.Abs(angle) + 2.5f) / 5.0f) * 5.0f;
+							//snappedAngle = angle;
+						}
+						else {
+							snappedAngle = Mathf.Floor((Math.Abs(angle) + 22.5f) / 45.0f) * 45.0f;
+							
+						}
 						if(Math.Sign(angle) < 0) {
 							snappedAngle = 180 + (180 - snappedAngle);
 						}
