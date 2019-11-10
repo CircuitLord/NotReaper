@@ -1008,7 +1008,14 @@ namespace NotReaper {
 		public void EnableNearSustainButtons() {
 			foreach (Target target in loadedNotes) {
 				if (!target.data.supportsBeatLength) continue;
-				if (paused && EditorInput.selectedTool == EditorTool.DragSelect && target.GetRelativeBeatTime() < 2 && target.GetRelativeBeatTime() > -2) {
+
+				bool shouldDisplayButton = paused; //Need to be paused
+				shouldDisplayButton &= target.GetRelativeBeatTime() < 2 && target.GetRelativeBeatTime() > -2; //Target needs to be "near"
+
+				//Be in drag select, or be a path builder note in path builder mode
+				shouldDisplayButton &= EditorInput.selectedTool == EditorTool.DragSelect || (target.data.behavior == TargetBehavior.NR_Pathbuilder && EditorInput.selectedTool == EditorTool.ChainBuilder);
+				
+				if (shouldDisplayButton) {
 					target.EnableSustainButtons();
 				} else {
 					target.DisableSustainButtons();
