@@ -60,10 +60,11 @@ namespace NotReaper.IO {
 
 				using (var tempoMapManager = new TempoMapManager(new TicksPerQuarterNoteTimeDivision(480)))
 				{
+					float oneMinuteInMicroseconds = 60000000f;
 					TempoMap tempoMap = tempoMapManager.TempoMap;
 
 					foreach(var tempo in audicaFile.desc.tempoList) {
-						tempoMapManager.SetTempo(new MetricTimeSpan((long)(tempo.time * 1000000)), Tempo.FromBeatsPerMinute((int)tempo.bpm));
+						tempoMapManager.SetTempo(new MetricTimeSpan((long)(tempo.time * 1000000)), new Tempo((long)(oneMinuteInMicroseconds / tempo.bpm)));
 					}
 
 					songMidi.ReplaceTempoMap(tempoMap);

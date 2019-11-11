@@ -31,8 +31,8 @@ namespace NotReaper.IO {
 			File.Delete(Path.Combine(workFolder, "song.mid"));
 			MidiFile songMidi = MidiFile.Read(Path.Combine(workFolder, "songtemplate.mid"));
 
-			//TODO: Only supports int BPM :(
-			songMidi.ReplaceTempoMap(TempoMap.Create(Tempo.FromBeatsPerMinute((int)bpm)));
+			float oneMinuteInMicroseconds = 60000000f;
+			songMidi.ReplaceTempoMap(TempoMap.Create(new Tempo((long)(oneMinuteInMicroseconds / bpm))));
 			songMidi.Write(Path.Combine(workFolder, "song.mid"), true, MidiFileFormat.MultiTrack);
 
 

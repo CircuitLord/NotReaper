@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -761,7 +761,7 @@ namespace NotReaper {
 						time = BeatsToDuration(0.0f, tempo.Time / 480.0f, BeatDurationDirection.Forward);
 					}
 
-					SetBPM(time, (int) Math.Round(oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote));
+					SetBPM(time, oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote);
 				}
 			} 
 
