@@ -248,7 +248,7 @@ namespace NotReaper.Managers {
                 timeline.AddTargetFromAction(timeline.GetTargetDataForCue(cue));
             }
 
-            if(cueFile.NRCueData.pathBuilderNoteData.Count == cueFile.NRCueData.pathBuilderNoteCues.Count) {
+            if(cueFile.NRCueData != null && cueFile.NRCueData.pathBuilderNoteData.Count == cueFile.NRCueData.pathBuilderNoteCues.Count) {
                 for(int i = 0; i < cueFile.NRCueData.pathBuilderNoteCues.Count; ++i) {
                     var data = timeline.GetTargetDataForCue(cueFile.NRCueData.pathBuilderNoteCues[i]);
                     data.pathBuilderData = cueFile.NRCueData.pathBuilderNoteData[i];
