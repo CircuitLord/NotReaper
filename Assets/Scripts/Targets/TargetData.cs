@@ -23,7 +23,7 @@ namespace NotReaper.Targets {
 		private TargetHandType _handType;
 
 		[SerializeField]
-		private int _interval = 4;
+		private int _interval = 16;
 
 		[SerializeField]
 		private float _initialAngle = 0.0f;
