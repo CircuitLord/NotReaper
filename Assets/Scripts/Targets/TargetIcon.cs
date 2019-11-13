@@ -52,7 +52,9 @@ namespace NotReaper.Targets {
         public event Action OnTryRemoveEvent;
 
         public void OnTryRemove() {
-            OnTryRemoveEvent();
+            if(!target.transient) {
+                OnTryRemoveEvent();
+            }
         }
 
         public void Remove() {
