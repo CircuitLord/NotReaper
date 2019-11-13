@@ -786,8 +786,6 @@ namespace NotReaper {
 			audicaLoaded = true;
 			difficultyManager.LoadHighestDifficulty();
 
-			StartCoroutine(AnimateSetTime(0));
-
 			//Disable timing window buttons so users don't mess stuff up.
 			applyButtonTiming.interactable = false;
 			generateAudicaButton.interactable = false;
