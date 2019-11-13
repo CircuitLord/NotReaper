@@ -13,6 +13,7 @@ using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers;
 using UnityEngine;
+using NotReaper.Timing;
 
 namespace NotReaper.IO {
 
@@ -58,13 +59,13 @@ namespace NotReaper.IO {
 				var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
 				MidiFile songMidi = MidiFile.Read(Path.Combine(workFolder, "songtemplate.mid"));
 
-				using (var tempoMapManager = new TempoMapManager(new TicksPerQuarterNoteTimeDivision(480)))
+				using (var tempoMapManager = new TempoMapManager(new TicksPerQuarterNoteTimeDivision((short)Constants.PulsesPerQuarterNote)))
 				{
 					float oneMinuteInMicroseconds = 60000000f;
 					TempoMap tempoMap = tempoMapManager.TempoMap;
 
 					foreach(var tempo in audicaFile.desc.tempoList) {
-						tempoMapManager.SetTempo(new MetricTimeSpan((long)(tempo.time * 1000000)), new Tempo((long)(oneMinuteInMicroseconds / tempo.bpm)));
+						tempoMapManager.SetTempo(new MetricTimeSpan((long)(tempo.time.tick * 1000000)), new Tempo((long)(oneMinuteInMicroseconds / tempo.bpm)));
 					}
 
 					songMidi.ReplaceTempoMap(tempoMap);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using NotReaper.Models;
+using NotReaper.Timing;
 
 namespace NotReaper.UI {
 
@@ -36,11 +37,11 @@ namespace NotReaper.UI {
             bar.localPosition = new Vector3((float)x, 0, 0);
         }
 
-        public void SetPreviewStartPoint(double seconds)
+        public void SetPreviewStartPoint(QNT_Timestamp timestamp)
         {
-            Timeline.desc.previewStartSeconds = seconds;
+            Timeline.desc.previewStartSeconds = timeline.TimestampToSeconds(timestamp);
 
-            double percent = timeline.GetPercentPlayedFromSeconds(seconds);
+            double percent = timeline.GetPercentPlayedFromSeconds(Timeline.desc.previewStartSeconds);
 
             double x = barLength * percent;
             x -= barLength / 2;

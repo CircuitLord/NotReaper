@@ -7,6 +7,7 @@ using NotReaper.Targets;
 using NotReaper.UserInput;
 using UnityEngine;
 using DG.Tweening;
+using NotReaper.Timing;
 
 namespace NotReaper.Tools.ChainBuilder { 
 
@@ -241,12 +242,12 @@ namespace NotReaper.Tools.ChainBuilder {
 			firstData.behavior = data.pathBuilderData.behavior;
 			firstData.velocity = data.pathBuilderData.velocity;
 			firstData.handType = data.pathBuilderData.handType;
-			firstData.beatTime = data.beatTime;
+			firstData.time = data.time;
 			firstData.position = data.position;
 			data.pathBuilderData.generatedNotes.Add(firstData);
 
 			//We increment as if all these values were for 1/4 notes over 4 beats, makes the ui much better
-			float quarterIncrConvert = (4.0f / data.pathBuilderData.interval) * (480.0f * 4.0f / data.beatLength);
+			float quarterIncrConvert = (4.0f / data.pathBuilderData.interval) * (Constants.PulsesPerQuarterNote * 4.0f / data.beatLength.tick);
 
 			//Generate new notes
 			Vector2 currentPos = data.position;
@@ -264,7 +265,7 @@ namespace NotReaper.Tools.ChainBuilder {
 				generatedVelocity = TargetVelocity.Chain;
 			}
 
-			for(int i = 1; i <= (data.beatLength / 480) * (data.pathBuilderData.interval / 4.0f); ++i) {
+			for(int i = 1; i <= (data.beatLength.tick / Constants.QuarterNoteDuration.tick) * (data.pathBuilderData.interval / 4.0f); ++i) {
 				currentPos += currentDir * currentStep;
 				currentDir = currentDir.Rotate(currentAngle);
 
@@ -275,7 +276,7 @@ namespace NotReaper.Tools.ChainBuilder {
 				newData.behavior = generatedBehavior;
 				newData.velocity = generatedVelocity;
 				newData.handType = data.pathBuilderData.handType;
-				newData.beatTime = data.beatTime + i * (4.0f / data.pathBuilderData.interval);
+				newData.time = data.time + QNT_Duration.FromBeatTime(i * (4.0f / data.pathBuilderData.interval));
 				newData.position = currentPos;
 				data.pathBuilderData.generatedNotes.Add(newData);
 			}

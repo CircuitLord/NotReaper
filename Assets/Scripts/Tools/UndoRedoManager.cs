@@ -146,13 +146,13 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			targetTimelineMoveIntents.ForEach(intent => {
-				intent.target.beatTime = intent.intendedTime;
+				intent.target.time = intent.intendedTick;
 			});
 			timeline.SortOrderedList();
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetTimelineMoveIntents.ForEach(intent => {
-				intent.target.beatTime = intent.startTime;
+				intent.target.time = intent.startTick;
 			});
 			timeline.SortOrderedList();
 		}

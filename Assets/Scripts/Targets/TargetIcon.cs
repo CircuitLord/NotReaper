@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.UI;
+using NotReaper.Timing;
 
 namespace NotReaper.Targets {
 
@@ -207,7 +208,7 @@ namespace NotReaper.Targets {
             }
         }
 
-        private void OnSustainLengthChanged(float beatLength) {
+        private void OnSustainLengthChanged(QNT_Duration beatLength) {
             UpdateTimelineSustainLength();
         }
 
@@ -225,7 +226,7 @@ namespace NotReaper.Targets {
             }
 
             float scale = 20.0f / Timeline.scale;
-            float beatLength = data.beatLength;
+            QNT_Duration beatLength = data.beatLength;
 
             var lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>(true);
             foreach (LineRenderer l in lineRenderers) {
@@ -233,11 +234,10 @@ namespace NotReaper.Targets {
                     continue;
                 }
 
-                if (beatLength >= 1) {
+                if (beatLength >= Constants.QuarterNoteDuration) {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                     l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
-                    beatLength = beatLength / 480;
-                    l.SetPosition(2, new Vector3((beatLength / 0.7f) * scale, sustainDirection, 0.0f));
+                    l.SetPosition(2, new Vector3((beatLength.ToBeatTime() / 0.7f) * scale, sustainDirection, 0.0f));
                 }
                 else {
                     l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));

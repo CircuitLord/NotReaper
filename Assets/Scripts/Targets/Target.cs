@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using NotReaper.Models;
 using NotReaper.Tools.ChainBuilder;
+using NotReaper.Timing;
 
 namespace NotReaper.Targets {
 
@@ -57,7 +58,7 @@ namespace NotReaper.Targets {
 			data = targetData;
 			data.PositionChangeEvent += OnGridPositionChanged;
 			data.HandTypeChangeEvent += OnHandTypeChanged;
-			data.BeatTimeChangeEvent += OnBeatTimeChanged;
+			data.TickChangeEvent += OnTickChanged;
 			data.BeatLengthChangeEvent += OnBeatLengthChanged;
 
 			timelineTargetIcon.Init(this, data);
@@ -121,7 +122,7 @@ namespace NotReaper.Targets {
 
 			data.PositionChangeEvent -= OnGridPositionChanged;
 			data.HandTypeChangeEvent -= OnHandTypeChanged;
-			data.BeatTimeChangeEvent -= OnBeatTimeChanged;
+			data.TickChangeEvent -= OnTickChanged;
 			data.BeatLengthChangeEvent -= OnBeatLengthChanged;
 			data.BehaviourChangeEvent -= OnBehaviorChanged;
 
@@ -223,26 +224,26 @@ namespace NotReaper.Targets {
 			}
 		}
 
-		private void OnBeatTimeChanged(float newTime) {
+		private void OnTickChanged(QNT_Timestamp newTime) {
 			var pos = gridTargetIcon.transform.localPosition;
-			pos.z = newTime;
+			pos.z = newTime.ToBeatTime();
 			gridTargetIcon.transform.localPosition = pos;
 
 			var timelinePos = timelineTargetIcon.transform.localPosition;
-			timelinePos.x = newTime;
+			timelinePos.x = newTime.ToBeatTime();
 			timelineTargetIcon.transform.localPosition = timelinePos;
 
 			if(data.behavior == TargetBehavior.NR_Pathbuilder && data.pathBuilderData.generatedNotes.Count > 0) {
 				var firstNote = data.pathBuilderData.generatedNotes[0];
-				var delta = firstNote.beatTime - newTime;
+				var delta = firstNote.time - newTime;
 
 				foreach(TargetData note in data.pathBuilderData.generatedNotes) {
-					note.beatTime -= delta;
+					note.time -= delta;
 				}
 			}
 		}
 
-		private void OnBeatLengthChanged(float newBeatLength) {
+		private void OnBeatLengthChanged(QNT_Duration newBeatLength) {
 			if (!data.supportsBeatLength) return;
 			
 			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
@@ -259,12 +260,12 @@ namespace NotReaper.Targets {
 
 				gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength;
 
-				if(data.beatLength < 480 && data.behavior != TargetBehavior.NR_Pathbuilder) {
-					data.beatLength = 480;
+				if(data.beatLength < Constants.QuarterNoteDuration && data.behavior != TargetBehavior.NR_Pathbuilder) {
+					data.beatLength = Constants.QuarterNoteDuration;
 				}
 
-				if(data.beatLength == 120 && data.behavior == TargetBehavior.NR_Pathbuilder) {
-					data.beatLength = 480;
+				if(data.beatLength == Constants.SixteenthNoteDuration && data.behavior == TargetBehavior.NR_Pathbuilder) {
+					data.beatLength = Constants.QuarterNoteDuration;
 				}
 
 				gridTargetIcon.UpdatePath();

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Melanchall.DryWetMidi.Smf;
 using NotReaper.Targets;
+using NotReaper.Timing;
 
 namespace NotReaper.Models {
 	public struct TempoChange {
-		public float time;
+		public QNT_Timestamp time;
 		public float bpm;
 	}
 
@@ -114,14 +115,14 @@ namespace NotReaper.Models {
 
     public class ErrorLogEntry
     {
-        public float beatTime; 
+        public QNT_Timestamp time; 
         public readonly string errorDesc;
 
         public List<Target> affectedTargets = new List<Target>();
 
-        public ErrorLogEntry(float beatTime, string v)
+        public ErrorLogEntry(QNT_Timestamp time, string v)
         {
-            this.beatTime = beatTime;
+            this.time = time;
             this.errorDesc = v;
         }
     }
@@ -169,5 +170,4 @@ namespace NotReaper.Models {
 			public double y;
 		}
 	}
-
 }

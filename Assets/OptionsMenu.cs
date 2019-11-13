@@ -6,7 +6,7 @@ using NotReaper.Models;
 using NotReaper.Targets;
 using UnityEngine;
 using UnityEngine.UI;
-
+using NotReaper.Timing;
 public class OptionsMenu : MonoBehaviour {
 
     public Timeline timeline;
@@ -54,12 +54,12 @@ public class OptionsMenu : MonoBehaviour {
 
     public void BPMWasChanged() {
         float newBpm = float.Parse(bpmField.text);
-        timeline.SetBPM(0.0f, newBpm);
+        timeline.SetBPM(new QNT_Timestamp(0), newBpm);
     }
 
     public void OffsetWasChanged() {
         int newOffset = int.Parse(offsetField.text);
-        timeline.SetOffset(newOffset);
+        timeline.SetOffset(new Relative_QNT(newOffset));
     }
 
     public void SnapWasChanged(float rawSnap) {

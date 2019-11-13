@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NotReaper.Timing;
 
 namespace NotReaper.Targets {
 
@@ -21,7 +22,7 @@ namespace NotReaper.Targets {
 
         private TargetIcon parentIcon;
 
-        public float sustainLength = 480;
+        public QNT_Duration sustainLength = Constants.QuarterNoteDuration;
 
 
         public void EnableSustainButtons() {
@@ -38,7 +39,7 @@ namespace NotReaper.Targets {
             parentIcon = gameObject.GetComponentsInParent<TargetIcon>()[0];
 
             if(endMarkerPrefab != null) {
-                endMarker = Instantiate(endMarkerPrefab, gameObject.transform.position + new Vector3(0, 0, sustainLength / 480f), Quaternion.identity, Timeline.gridNotesStatic);
+                endMarker = Instantiate(endMarkerPrefab, gameObject.transform.position + new Vector3(0, 0, sustainLength.ToBeatTime()), Quaternion.identity, Timeline.gridNotesStatic);
 
                 endMarker.SetActive(true);
             }
@@ -50,11 +51,11 @@ namespace NotReaper.Targets {
         }
 
 
-        public void UpdateSustainLength(float newLength) {
+        public void UpdateSustainLength(QNT_Duration newLength) {
             sustainLength = newLength;
 
             if(endMarker != null) {
-                endMarker.transform.position = new Vector3(endMarker.transform.position.x, endMarker.transform.position.y, gameObject.transform.position.z + sustainLength / 480f);
+                endMarker.transform.position = new Vector3(endMarker.transform.position.x, endMarker.transform.position.y, gameObject.transform.position.z + sustainLength.ToBeatTime());
             }
         }
 

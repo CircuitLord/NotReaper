@@ -6,6 +6,7 @@ using NotReaper.Models;
 using NotReaper.Targets;
 using NotReaper.UserInput;
 using UnityEngine;
+using NotReaper.Timing;
 
 namespace NotReaper.Tools {
 	public class DragSelect : MonoBehaviour {
@@ -49,7 +50,7 @@ namespace NotReaper.Tools {
 
 		private Vector2 startGridMovePos;
 		private Vector2 startClickDetectPos;
-		private float startTimelineMoveTime;
+		private QNT_Timestamp startTimelineMoveTime;
 
 		private List<TargetData> clipboardNotes = new List<TargetData>();
 		private List<TargetGridMoveIntent> gridTargetMoveIntents = new List<TargetGridMoveIntent>();
@@ -187,12 +188,12 @@ namespace NotReaper.Tools {
 
 		private void StartDragTimelineTargetAction(TargetIcon icon) {
 			isDraggingNotesOnTimeline = true;
-			startTimelineMoveTime = icon.data.beatTime;
+			startTimelineMoveTime = icon.data.time;
 			timelineTargetMoveIntents = new List<TargetTimelineMoveIntent>();
 			timeline.selectedNotes.ForEach(target => {
 				var intent = new TargetTimelineMoveIntent();
 				intent.target = target.data;
-				intent.startTime = target.data.beatTime;
+				intent.startTick = target.data.time;
 
 				timelineTargetMoveIntents.Add(intent);
 			});
@@ -200,15 +201,14 @@ namespace NotReaper.Tools {
 
 		private void UpdateDragTimelineTargetAction() {
 			foreach (TargetTimelineMoveIntent intent in timelineTargetMoveIntents) {
-				float offsetFromDragPoint = intent.startTime - startTimelineMoveTime;
+				Relative_QNT offsetFromDragPoint = intent.startTick - startTimelineMoveTime;
 				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 				mousePos.x /= Timeline.scaleTransform;
-				float newTime = SnapToBeat(mousePos);
+				QNT_Timestamp newTime = SnapToBeat(mousePos.x);
 
 				newTime += offsetFromDragPoint;
-				intent.target.beatTime = newTime;
-
-				intent.intendedTime = newTime;
+				intent.target.time = newTime;
+				intent.intendedTick = newTime;
 			}
 		}
 
@@ -381,7 +381,7 @@ namespace NotReaper.Tools {
 
 			if (frameIntentPaste) {
 				timeline.DeselectAllTargets();
-				timeline.PasteCues(clipboardNotes, timeline.BeatTime());
+				timeline.PasteCues(clipboardNotes, Timeline.time);
 			}
 
 			if (frameIntentDelete) {
@@ -461,9 +461,9 @@ namespace NotReaper.Tools {
 			}
 		}
 
-		private float SnapToBeat(Vector3 position) {
-			var increments = ((480 / timeline.beatSnap) * 4f) / 480;
-			return timeline.DurationToBeats(Timeline.time) + Mathf.Round(position.x / increments) * increments;
+		private QNT_Timestamp SnapToBeat(float posX) {
+			QNT_Timestamp time = new QNT_Timestamp(0) + QNT_Duration.FromBeatTime(posX);
+			return timeline.GetClosestBeatSnapped(Timeline.time);
 		}
 	}
 }

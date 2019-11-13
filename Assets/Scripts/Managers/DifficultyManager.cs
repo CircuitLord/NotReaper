@@ -256,7 +256,7 @@ namespace NotReaper.Managers {
                     //Recalculate the notes, and remove any identical enties that would have been loaded through the cues
                     ChainBuilder.CalculateChainNotes(data);
                     foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
-                        var foundData = timeline.FindTargetData(genData.beatTime, genData.behavior, genData.handType);
+                        var foundData = timeline.FindTargetData(genData.time, genData.behavior, genData.handType);
                         if(foundData != null) {
                             timeline.DeleteTargetFromAction(foundData);
                         }

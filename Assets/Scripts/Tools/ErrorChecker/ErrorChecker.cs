@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using NotReaper.Timing;
 
 namespace NotReaper.Tools.ErrorChecker
 {
@@ -30,9 +31,8 @@ namespace NotReaper.Tools.ErrorChecker
         public TextMeshProUGUI errorCountText;
         public TextMeshProUGUI errorBodyText;
 
-        private float chainLeadTime = 360;
-        private float sustainLeadTime = 360;
-        private const float TickBeatConst = 480;
+        private QNT_Duration chainLeadTime = new QNT_Duration(360);
+        private QNT_Duration sustainLeadTime = new QNT_Duration(360);
 
         private void Start() {
 	        errorCheckUI.SetActive(false);
@@ -121,10 +121,8 @@ namespace NotReaper.Tools.ErrorChecker
 	        
 	        if (!timeline.paused) timeline.TogglePlayback();
 	        //timeline.JumpToX(currentError.beatTime);
-
-	        float time = timeline.BeatsToDuration(0.0f, currentError.beatTime, Timeline.BeatDurationDirection.Forward);
 	        
-	        StartCoroutine(timeline.AnimateSetTime(time));
+	        StartCoroutine(timeline.AnimateSetTime(currentError.time));
 	        
 	        
 	        //Select the targets
@@ -153,11 +151,9 @@ namespace NotReaper.Tools.ErrorChecker
 	        errorBodyText.SetText(currentError.errorDesc);
 	        
 	        if (!timeline.paused) timeline.TogglePlayback();
-	        
-	        float time = timeline.BeatsToDuration(0.0f, currentError.beatTime, Timeline.BeatDurationDirection.Forward);
 
 	       // timeline.SetBeatTime(time);
-	       StartCoroutine(timeline.AnimateSetTime(time));
+	       StartCoroutine(timeline.AnimateSetTime(currentError.time));
 
         }
 
@@ -196,7 +192,7 @@ namespace NotReaper.Tools.ErrorChecker
             
             //Check for a preview point:
             if (Timeline.audicaFile.desc.previewStartSeconds == 0) {
-	            errorLog.Add(new ErrorLogEntry(0, "No preview start point has been added. Go to a point in the song and press P to set it."));
+	            errorLog.Add(new ErrorLogEntry(new QNT_Timestamp(0), "No preview start point has been added. Go to a point in the song and press P to set it."));
             }
             
 
@@ -214,7 +210,7 @@ namespace NotReaper.Tools.ErrorChecker
                 //cues without hitsounds
                 if (!HasHitSound(curTarget))
                 {
-                    var error = new ErrorLogEntry(curTarget.data.beatTime, "ERROR, target has an invalid hitsound.");
+                    var error = new ErrorLogEntry(curTarget.data.time, "ERROR, target has an invalid hitsound.");
                     
                     error.affectedTargets.Add(curTarget);
                     errorLog.Add(error);
@@ -228,10 +224,10 @@ namespace NotReaper.Tools.ErrorChecker
                 // if lower difficulties and not chain node
                 if (difficulty != 0 && (!prevTarget.behavior.Equals(TargetBehavior.Chain) && !curTarget.data.behavior.Equals(TargetBehavior.Chain)))
                 {
-                    float rhythmLimit = SetRhythmLimit(difficulty);
+                    QNT_Duration rhythmLimit = SetRhythmLimit(difficulty);
                     int countLimit = SetCountLimit(difficulty);
-                    float beatTimeDiff = curTarget.data.beatTime - prevTarget.beatTime;
-                    if (beatTimeDiff > rhythmLimit)
+                    QNT_Duration beatTimeDiff = new QNT_Duration(curTarget.data.time.tick - prevTarget.time.tick);
+                    if (beatTimeDiff.tick > rhythmLimit.tick)
                     {
                         //reset counter
                         consecutiveCounter = 0;
@@ -239,17 +235,17 @@ namespace NotReaper.Tools.ErrorChecker
                     else if(beatTimeDiff != 0 && beatTimeDiff < rhythmLimit)
                     {
                         //straight up too fast
-                        var error = new ErrorLogEntry(curTarget.data.beatTime, "WARNING, for " + label + ", this target happens too soon after the previous target.");
+                        var error = new ErrorLogEntry(curTarget.data.time, "WARNING, for " + label + ", this target happens too soon after the previous target.");
                         error.affectedTargets.Add(curTarget);
                         errorLog.Add(error);
                     }
-                    else if(curTarget.data.beatTime - prevTarget.beatTime == rhythmLimit)
+                    else if(beatTimeDiff == rhythmLimit)
                     {
                         // consecutive 8th notes on one hand
                         if(difficulty==2 && prevTarget.handType.Equals(curTarget.data.handType))
                         {
                             Debug.Log("consecutive 8t notes on one hand");
-                            var error = new ErrorLogEntry(curTarget.data.beatTime, "WARNING, in " + label + ", consecutive 8th notes on one hand are not recommended.");
+                            var error = new ErrorLogEntry(curTarget.data.time, "WARNING, in " + label + ", consecutive 8th notes on one hand are not recommended.");
                             error.affectedTargets.Add(curTarget);
                             errorLog.Add(error);
                         }
@@ -260,7 +256,7 @@ namespace NotReaper.Tools.ErrorChecker
                         if(consecutiveCounter >= countLimit)
                         {
                             //TODO convert rhythmLimit to quarter note, eigth note, etc.
-                            var error = new ErrorLogEntry(curTarget.data.beatTime, "WARNING, in " + label + ", having more than " + countLimit + " consecutive " + rhythmLimit + " targets is not recommended.");
+                            var error = new ErrorLogEntry(curTarget.data.time, "WARNING, in " + label + ", having more than " + countLimit + " consecutive " + rhythmLimit + " targets is not recommended.");
                             
                             error.affectedTargets.Add(curTarget);
                             errorLog.Add(error);
@@ -272,7 +268,7 @@ namespace NotReaper.Tools.ErrorChecker
                 //simultaneous target checks
                 //chains, melees, and pathbuilder notes don't count
                 if (
-                    prevTarget.beatTime == curTarget.data.beatTime && 
+                    prevTarget.time == curTarget.data.time && 
                     (!prevTarget.behavior.Equals(TargetBehavior.Chain) && !curTarget.data.behavior.Equals(TargetBehavior.Chain)) && 
                     (!prevTarget.behavior.Equals(TargetBehavior.Melee) && !curTarget.data.behavior.Equals(TargetBehavior.Melee)) &&
                     (!prevTarget.behavior.Equals(TargetBehavior.NR_Pathbuilder) && !curTarget.data.behavior.Equals(TargetBehavior.NR_Pathbuilder))
@@ -282,14 +278,14 @@ namespace NotReaper.Tools.ErrorChecker
                     // same pitch
                     if (prevTarget.position == curTarget.data.position)
                     {
-                        var error = new ErrorLogEntry(prevTarget.beatTime, "ERROR, there are multiple targets occupying the same position.");
+                        var error = new ErrorLogEntry(prevTarget.time, "ERROR, there are multiple targets occupying the same position.");
                         error.affectedTargets.Add(timeline.FindNote(prevTarget));
                         errorLog.Add(error);
                     }
 
                     // same color
                     if (prevTarget.handType.Equals(curTarget.data.handType) && !prevTarget.handType.Equals(TargetHandType.Either)) {
-	                    var error = new ErrorLogEntry(prevTarget.beatTime,
+	                    var error = new ErrorLogEntry(prevTarget.time,
 		                    "ERROR, the " + prevTarget.handType + " hand has multiple targets at the same time.");
 	                    
 	                    error.affectedTargets.Add(timeline.FindNote(prevTarget));
@@ -303,7 +299,7 @@ namespace NotReaper.Tools.ErrorChecker
                         //simultaneous shot and melee
                         if (IsSimultaneousShotAndMelee(prevTarget,curTarget))
                         {
-                            var error = new ErrorLogEntry(prevTarget.beatTime, "WARNING, in " + label + ", simultaneous melee and shot targets are not recommended.");
+                            var error = new ErrorLogEntry(prevTarget.time, "WARNING, in " + label + ", simultaneous melee and shot targets are not recommended.");
                             error.affectedTargets.Add(timeline.FindNote(prevTarget));
                             errorLog.Add(error);
                         }
@@ -313,7 +309,7 @@ namespace NotReaper.Tools.ErrorChecker
                             float distance = (difficulty == 1 ? 4 : 3);
                             if (!IsCloseEnough(prevTarget, curTarget, distance))
                             {
-                                var error = new ErrorLogEntry(prevTarget.beatTime, "WARNING, in " + label + ", simultaneous targets more than " + distance + " spaces apart are not recommended.");
+                                var error = new ErrorLogEntry(prevTarget.time, "WARNING, in " + label + ", simultaneous targets more than " + distance + " spaces apart are not recommended.");
                                 error.affectedTargets.Add(timeline.FindNote(prevTarget));
                                 errorLog.Add(error);
                             }
@@ -332,8 +328,8 @@ namespace NotReaper.Tools.ErrorChecker
                     //ADVANCED
                     if (difficulty == 1)
                     {
-                        if (!IsSlottedNote(prevTarget) && InsufficientBreakAfterPreviousTarget(prevTarget, curTarget, 2*TickBeatConst)) {
-	                        var error = new ErrorLogEntry(prevTarget.beatTime,
+                        if (!IsSlottedNote(prevTarget) && InsufficientBreakAfterPreviousTarget(prevTarget, curTarget, new QNT_Duration(Constants.PulsesPerQuarterNote * 2))) {
+	                        var error = new ErrorLogEntry(prevTarget.time,
 		                        "WARNING, in ADVANCED, it is recommended to have at least 2 beats of lead-in time before introducing a horizontal/vertical slotted note.");
 	                        
 	                        error.affectedTargets.Add(timeline.FindNote(prevTarget));
@@ -342,7 +338,7 @@ namespace NotReaper.Tools.ErrorChecker
                     }
                     else // no slotted notes for STANDARD or BEGINNER
                     {
-	                    var error = new ErrorLogEntry(prevTarget.beatTime,
+	                    var error = new ErrorLogEntry(prevTarget.time,
 		                    "WARNING, in " + label + ", use of horizontal/vertical slotted notes is not recommended.");
 	                    
 	                    error.affectedTargets.Add(timeline.FindNote(prevTarget));
@@ -359,7 +355,7 @@ namespace NotReaper.Tools.ErrorChecker
                 {
                     if (IsLowSoloMelee(lastLastTarget, prevTarget, curTarget.data))
                     {
-                        var error = new ErrorLogEntry(prevTarget.beatTime, "WARNING, this Melee Target is by itself in the lower slot. Single melees should be in the higher slot. Only use the lower slot for making simultaneous melees stacked on top of each other.");
+                        var error = new ErrorLogEntry(prevTarget.time, "WARNING, this Melee Target is by itself in the lower slot. Single melees should be in the higher slot. Only use the lower slot for making simultaneous melees stacked on top of each other.");
                         error.affectedTargets.Add(timeline.FindNote(prevTarget));
                         errorLog.Add(error);
                     }
@@ -369,7 +365,7 @@ namespace NotReaper.Tools.ErrorChecker
                     //non melee hitsound
                     if (!IsMeleeHitSound(curTarget))
                     {
-                        var error = new ErrorLogEntry(curTarget.data.beatTime, "WARNING, Melee Target doesn't have a Melee hitsound.");
+                        var error = new ErrorLogEntry(curTarget.data.time, "WARNING, Melee Target doesn't have a Melee hitsound.");
                         error.affectedTargets.Add(curTarget);
                         errorLog.Add(error);
                     }
@@ -402,7 +398,7 @@ namespace NotReaper.Tools.ErrorChecker
                     {
                         if (InsufficientBreakAfterSustain(prevTarget,curTarget,sustainLeadTime))
                         {
-                            var error = new ErrorLogEntry(prevTarget.beatTime, "WARNING, the time between the end of this sustain target and the next target on the same hand is very short; at least " + sustainLeadTime + " is recommended.");
+                            var error = new ErrorLogEntry(prevTarget.time, "WARNING, the time between the end of this sustain target and the next target on the same hand is very short; at least " + sustainLeadTime + " is recommended.");
                             error.affectedTargets.Add(curTarget);
                             errorLog.Add(error);
                         }
@@ -412,7 +408,7 @@ namespace NotReaper.Tools.ErrorChecker
                     if (prevTarget.behavior.Equals(TargetBehavior.Chain) && !curTarget.data.behavior.Equals(TargetBehavior.Chain))
                     {
                         if (InsufficientBreakAfterPreviousTarget(prevTarget,curTarget,chainLeadTime)) {
-	                        var error = new ErrorLogEntry(prevTarget.beatTime,
+	                        var error = new ErrorLogEntry(prevTarget.time,
 		                        "WARNING, the time between the end of this chain and the next target on the same hand is very short; at least " +
 		                        chainLeadTime + " is recommended.");
 	                        
@@ -424,7 +420,7 @@ namespace NotReaper.Tools.ErrorChecker
                     //headless chains
                     if (curTarget.data.behavior.Equals(TargetBehavior.Chain) && !(prevTarget.behavior.Equals(TargetBehavior.Chain) || prevTarget.behavior.Equals(TargetBehavior.ChainStart)))
                     {
-                        var error = new ErrorLogEntry(curTarget.data.beatTime, "ERROR, this chain node does not have a proper Chain Start.");
+                        var error = new ErrorLogEntry(curTarget.data.time, "ERROR, this chain node does not have a proper Chain Start.");
                         error.affectedTargets.Add(curTarget);
                         errorLog.Add(error);
                     }
@@ -471,21 +467,21 @@ namespace NotReaper.Tools.ErrorChecker
 
         private bool IsLowSoloMelee(TargetData prev, TargetData lm, TargetData next)
         {
-            if (prev.behavior.Equals(TargetBehavior.Melee) && prev.beatTime == lm.beatTime && prev.position.x * lm.position.x > 0)
+            if (prev.behavior.Equals(TargetBehavior.Melee) && prev.time == lm.time && prev.position.x * lm.position.x > 0)
             { return false; }
-            if (next.behavior.Equals(TargetBehavior.Melee) && next.beatTime == lm.beatTime && next.position.x * lm.position.x > 0)
+            if (next.behavior.Equals(TargetBehavior.Melee) && next.time == lm.time && next.position.x * lm.position.x > 0)
             { return false; }
                 return true;
         }
 
-        private bool InsufficientBreakAfterSustain(TargetData prevTarget, Target curTarget, float leadTime)
+        private bool InsufficientBreakAfterSustain(TargetData prevTarget, Target curTarget, QNT_Duration leadTime)
         {
-            return curTarget.data.beatTime * TickBeatConst - (prevTarget.beatTime * TickBeatConst + prevTarget.beatLength) < leadTime;
+            return curTarget.data.time.tick - (prevTarget.time.tick + prevTarget.beatLength.tick) < leadTime.tick;
         }
 
-        private bool InsufficientBreakAfterPreviousTarget(TargetData prevTarget, Target curTarget, float leadTime)
+        private bool InsufficientBreakAfterPreviousTarget(TargetData prevTarget, Target curTarget, QNT_Duration leadTime)
         {
-            return curTarget.data.beatTime * TickBeatConst - prevTarget.beatTime * TickBeatConst < leadTime;
+            return curTarget.data.time.tick - prevTarget.time.tick < leadTime.tick;
         }
 
         private bool IsCloseEnough(TargetData prevTarget, Target curTarget, float distance)
@@ -518,22 +514,22 @@ namespace NotReaper.Tools.ErrorChecker
             return (difficulty == 2 || difficulty == 3 ? 2 : 3);
         }
 
-        private float SetRhythmLimit(int difficulty)
+        private QNT_Duration SetRhythmLimit(int difficulty)
         {
-            float limit;
+            QNT_Duration limit = Constants.QuarterNoteDuration;
             switch (difficulty)
             {
                 case 1:
-                    limit = 0.25f;
+                    limit = new QNT_Duration(Constants.PulsesPerQuarterNote);
                     break;
                 case 2:
-                    limit = 0.5f;
+                    limit = new QNT_Duration(Constants.PulsesPerQuarterNote * 2);
                     break;
                 case 3:
-                    limit = 1f;
+                    limit = new QNT_Duration(Constants.PulsesPerQuarterNote * 4);
                     break;
                 default:
-                    limit = 0.25f;
+                    limit = new QNT_Duration(Constants.PulsesPerQuarterNote);
                     break;
             }
             return limit;

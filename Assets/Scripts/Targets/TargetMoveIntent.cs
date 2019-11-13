@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using NotReaper.Timing;
 
 namespace NotReaper.Targets {
 	public class TargetGridMoveIntent {
@@ -20,11 +21,11 @@ namespace NotReaper.Targets {
 
 		public TargetTimelineMoveIntent(TargetTimelineMoveIntent other) {
 			target = other.target;
-			startTime = other.startTime;
-			intendedTime = other.intendedTime;
+			startTick = other.startTick;
+			intendedTick = other.intendedTick;
 		}
 		public TargetData target;
-		public float startTime;
-		public float intendedTime;
+		public QNT_Timestamp startTick;
+		public QNT_Timestamp intendedTick;
 	}
 }

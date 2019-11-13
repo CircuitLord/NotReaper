@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +21,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using Application = UnityEngine.Application;
+using NotReaper.Timing;
 
 
 namespace NotReaper {
@@ -92,10 +93,10 @@ namespace NotReaper {
 		private static readonly int MainTex = Shader.PropertyToID("_MainTex");
 		
 		/// <summary>
-		/// The position on the X axis of the current point in the timeline unity units (I think)
+		/// The current time in the song
 		/// </summary>
 		/// <value></value>
-		public static float time { get; set; }
+		public static QNT_Timestamp time { get; set; }
 
 		public int beatSnap { get; private set; } = 4;
 
@@ -103,7 +104,7 @@ namespace NotReaper {
 		public static float scaleTransform;
 		private float targetScale = 0.7f;
 		private float scaleOffset = 0;
-		private static int offset = 0;
+		private static Relative_QNT offset = new Relative_QNT(0);
 
 		/// <summary>
 		/// If the timeline is currently being moved by an animation.
@@ -175,23 +176,18 @@ namespace NotReaper {
 		}
 
 		public void SortOrderedList() {
-			orderedNotes.Sort((left, right) =>  left.data.beatTime.CompareTo(right.data.beatTime));
+			orderedNotes.Sort((left, right) =>  left.data.time.CompareTo(right.data.time));
 		}
 
-		private static float BeatEpsilon = 0.00001f;
-		public static bool FastApproximately(float a, float b) {
-			return ((a - b) < 0 ? ((a - b) * -1) : (a - b)) <= BeatEpsilon;
-		}
-
-		public static int BinarySearchOrderedNotes(float cueTime)
+		public static int BinarySearchOrderedNotes(QNT_Timestamp cueTime)
 		{ 
 			int min = 0;
 			int max = orderedNotes.Count - 1;
 				while (min <=max) {
 				int mid = (min + max) / 2;
-				float midCueTime = orderedNotes[mid].data.beatTime;
-				if (FastApproximately(cueTime, midCueTime)) {
-					while(mid != 0 && orderedNotes[mid - 1].data.beatTime == cueTime) {
+				QNT_Timestamp midCueTime = orderedNotes[mid].data.time;
+				if (cueTime == midCueTime) {
+					while(mid != 0 && orderedNotes[mid - 1].data.time == cueTime) {
 						--mid;
 					}
 					return mid;
@@ -206,30 +202,30 @@ namespace NotReaper {
 			return -1;
 		}
 
-		public TargetData FindTargetData(float beatTime, TargetBehavior behavior, TargetHandType handType) {
-			int idx = BinarySearchOrderedNotes(beatTime);
+		public TargetData FindTargetData(QNT_Timestamp time, TargetBehavior behavior, TargetHandType handType) {
+			int idx = BinarySearchOrderedNotes(time);
 			if(idx == -1) {
-				Debug.LogWarning("Couldn't find note with time " + beatTime);
+				Debug.LogWarning("Couldn't find note with time " + time);
 				return null;
 			}
 
 			for(int i = idx; i < orderedNotes.Count; ++i) {
 				Target t = orderedNotes[i];
-				if (FastApproximately(t.data.beatTime, beatTime) &&
+				if (t.data.time == time &&
 					t.data.behavior == behavior &&
 					t.data.handType == handType) {
 					return t.data;
 				}
 			}
 
-			Debug.LogWarning("Couldn't find note with time " + beatTime + " and index " + idx);
+			Debug.LogWarning("Couldn't find note with time " + time + " and index " + idx);
 			return null;
 		}
 		
 		public Target FindNote(TargetData data) {
-			int idx = BinarySearchOrderedNotes(data.beatTime);
+			int idx = BinarySearchOrderedNotes(data.time);
 			if(idx == -1) {
-				Debug.LogWarning("Couldn't find note with time " + data.beatTime);
+				Debug.LogWarning("Couldn't find note with time " + data.time);
 				return null;
 			}
 
@@ -240,7 +236,7 @@ namespace NotReaper {
 				}
 			}
 
-			Debug.LogWarning("Couldn't find note with time " + data.beatTime + " and index " + idx);
+			Debug.LogWarning("Couldn't find note with time " + data.time + " and index " + idx);
 			return null;
 		}
 
@@ -254,8 +250,8 @@ namespace NotReaper {
 
 		//When loading from cues, use this.
 		public TargetData GetTargetDataForCue(Cue cue) {
-			TargetData data = new TargetData(cue, offset);
-			if (data.beatTime == 0) data.beatTime = 120f;
+			TargetData data = new TargetData(cue);
+			if (data.time.tick == 0) data.time = new QNT_Timestamp(120);
 			return data;
 		}
 
@@ -272,19 +268,19 @@ namespace NotReaper {
 			data.handType = EditorInput.selectedHand;
 			data.behavior = EditorInput.selectedBehavior;
 
-			float tempTime = GetClosestBeatSnapped(DurationToBeats(time));
+			QNT_Timestamp tempTime = time;
 
 			foreach (Target target in loadedNotes) {
-				if (Mathf.Approximately(target.data.beatTime, tempTime) && (target.data.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
+				if (target.data.time ==  tempTime && (target.data.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 
-			data.beatTime = GetClosestBeatSnapped(DurationToBeats(time));
+			data.time = time;
 
 			//Default sustains length should be more than 0.
 			if (data.supportsBeatLength) {
-				data.beatLength = 480;
+				data.beatLength = Constants.QuarterNoteDuration;
 			} else {
-				data.beatLength = 120;
+				data.beatLength = new QNT_Duration(Constants.PulsesPerQuarterNote / 2);
 			}
 
 			switch (EditorInput.selectedVelocity) {
@@ -328,20 +324,20 @@ namespace NotReaper {
 			var timelineTargetIcon = Instantiate(timelineTargetIconPrefab, timelineTransformParent);
 			timelineTargetIcon.location = TargetIconLocation.Timeline;
 			var transform1 = timelineTargetIcon.transform;
-			transform1.localPosition = new Vector3(targetData.beatTime, 0, 0);
+			transform1.localPosition = new Vector3(targetData.time.ToBeatTime(), 0, 0);
 
 			Vector3 noteScale = transform1.localScale;
 			noteScale.x = targetScale;
 			transform1.localScale = noteScale;
 
 			var gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
-			gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.beatTime);
+			gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.time.ToBeatTime());
 			gridTargetIcon.location = TargetIconLocation.Grid;
 
 			Target target = new Target(targetData, timelineTargetIcon, gridTargetIcon, transient);
 
 			notes.Add(target);
-			orderedNotes = notes.OrderBy(v => v.data.beatTime).ToList();
+			orderedNotes = notes.OrderBy(v => v.data.time.tick).ToList();
 
 			//Subscribe to the delete note event so we can delete it if the user wants. And other events.
 			target.DeleteNoteEvent += DeleteTarget;
@@ -368,7 +364,7 @@ namespace NotReaper {
 		private void UpdateSustains() {
 			foreach (var note in loadedNotes) {
 				if (note.data.behavior == TargetBehavior.Hold) {
-					if ((note.GetRelativeBeatTime() < 0) && (note.GetRelativeBeatTime() + note.data.beatLength / 480f > 0))
+					if ((note.GetRelativeBeatTime() < 0) && (note.GetRelativeBeatTime() + note.data.beatLength.ToBeatTime() > 0))
 					{
 
 						var particles = note.GetHoldParticles();
@@ -462,14 +458,14 @@ namespace NotReaper {
 		public void UpdateSustainLength(Target target, bool increase) {
 			if (!target.data.supportsBeatLength) return;
 
-			var increment = (480f / beatSnap) * 4f;
-			var minimum = 120f;
+			QNT_Duration increment = Constants.DurationFromBeatSnap((uint)beatSnap);
+			QNT_Duration minimum = Constants.SixteenthNoteDuration;
 			
 			if (increase) {
-				if (target.data.beatLength < increment) target.data.beatLength = 0;
+				if (target.data.beatLength < increment) target.data.beatLength = new QNT_Duration(0);
 				target.data.beatLength += increment;
 			} else {
-				target.data.beatLength = Mathf.Max(target.data.beatLength - increment, minimum);
+				target.data.beatLength =new QNT_Duration(Math.Max((target.data.beatLength - increment).tick, minimum.tick));
 			}
 
 			target.UpdatePath();
@@ -488,7 +484,7 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void PasteCues(List<TargetData> cues, float pasteBeatTime) {
+		public void PasteCues(List<TargetData> cues, QNT_Timestamp pasteBeatTime) {
 
 			// paste new targets in the original locations
 			var targetDataList = cues.Select(copyData => {
@@ -506,18 +502,18 @@ namespace NotReaper {
 			}).ToList();
 
 			// find the soonest target in the selection
-			float earliestTargetBeatTime = Mathf.Infinity;
+			QNT_Timestamp earliestTargetBeatTime = new QNT_Timestamp(long.MaxValue);
 			foreach (TargetData data in targetDataList) {
-				float time = data.beatTime;
+				QNT_Timestamp time = data.time;
 				if (time < earliestTargetBeatTime) {
 					earliestTargetBeatTime = time;
 				}
 			}
 
 			// shift all by the amount needed to move the earliest note to now
-			float diff = pasteBeatTime - earliestTargetBeatTime;
+			Relative_QNT diff = pasteBeatTime - earliestTargetBeatTime;
 			foreach (TargetData data in targetDataList) {
-				data.beatTime += diff;
+				data.time += diff;
 			}
 
 			var action = new NRActionMultiAddNote();
@@ -626,7 +622,7 @@ namespace NotReaper {
 
 			foreach (Target target in orderedNotes) {
 
-				if (target.data.beatLength == 0) target.data.beatLength = 120;
+				if (target.data.beatLength == 0) target.data.beatLength = Constants.SixteenthNoteDuration;
 				
 				if (target.data.behavior == TargetBehavior.Metronome) continue;
 				
@@ -698,7 +694,7 @@ namespace NotReaper {
 		public void SetTimingModeStats(double newBPM, int tickOffset) {
 			DeleteAllTargets();
 
-			SetBPM(0.0f, (float) newBPM);
+			SetBPM(new QNT_Timestamp(0), (float) newBPM);
 
 			var cue = new Cue {
 				pitch = 40,
@@ -710,7 +706,7 @@ namespace NotReaper {
 
 			for (int i = 0; i < 300; i++) {
 				cue.tick = (480 * i) + tickOffset;
-				AddTargetFromAction(new TargetData(cue, offset));
+				AddTargetFromAction(new TargetData(cue));
 			}
 
 			//time = 0;
@@ -728,7 +724,7 @@ namespace NotReaper {
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
 
 			inTimingMode = false;
-			SetOffset(0);
+			SetOffset(new Relative_QNT(0));
 
 			if (audicaLoaded && NRSettings.config.saveOnLoadNew) {
 				Export();
@@ -762,12 +758,12 @@ namespace NotReaper {
 			
 			// Get song BPM
 			if (audicaFile.song_mid != null) {
-				
+
 				float oneMinuteInMicroseconds = 60000000f;
 				foreach (var tempo in audicaFile.song_mid.GetTempoMap().Tempo) {
-					float time = 0.0f;
+					QNT_Timestamp time = new QNT_Timestamp(0);
 					if(tempo.Time != 0.0f) {
-						time = BeatsToDuration(0.0f, tempo.Time / 480.0f, BeatDurationDirection.Forward);
+						time = new QNT_Timestamp((UInt64)tempo.Time);
 					}
 
 					SetBPM(time, oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote);
@@ -816,7 +812,7 @@ namespace NotReaper {
 					aud.clip = myClip;
 					previewAud.clip = myClip;
 					
-					SetBPM(0.0f, (float) desc.tempo);
+					SetBPM(new QNT_Timestamp(0), (float) desc.tempo);
 
 					//We modify the list, so we need to copy it
 					var cloneList = desc.tempoList.ToList();
@@ -828,7 +824,7 @@ namespace NotReaper {
 					audicaLoaded = true;
 					
 					//Load the preview start point
-					miniTimeline.SetPreviewStartPoint(desc.previewStartSeconds);
+					miniTimeline.SetPreviewStartPoint(ShiftTick(new QNT_Timestamp(0), (float)desc.previewStartSeconds));
 
 					//Difficulty manager loads stuff now
 					//difficultyManager.LoadHighestDifficulty(false);
@@ -891,7 +887,7 @@ namespace NotReaper {
 			rightSustainAud.pitch = slider.value;
 		}
 
-		public void SetBPM(float time, float newBpm) {
+		public void SetBPM(QNT_Timestamp time, float newBpm) {
 			foreach(var bpm in bpmMarkerObjects) {
 				Destroy(bpm);
 			}
@@ -903,7 +899,7 @@ namespace NotReaper {
 
 			bool found = false;
 			for(int i = 0; i < tempoChanges.Count; ++i) {
-				if(FastApproximately(tempoChanges[i].time, time)) {
+				if(tempoChanges[i].time == time) {
 					tempoChanges[i] = c;
 					if(newBpm == 0) {
 						tempoChanges.RemoveAt(i);
@@ -916,7 +912,7 @@ namespace NotReaper {
 			if(!found && newBpm != 0) {
 				tempoChanges.Add(c);
 			}
-			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time).ToList();
+			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time.tick).ToList();
 			
 			if (desc != null) {
 				desc.tempoList = tempoChanges;
@@ -926,18 +922,90 @@ namespace NotReaper {
 			foreach(var tempo in tempoChanges) {
 				var timelineBPM = Instantiate(BPM_MarkerPrefab, timelineTransformParent);
 				var transform1 = timelineBPM.transform;
-				transform1.localPosition = new Vector3(DurationToBeats(tempo.time), -0.5f, 0);
+				transform1.localPosition = new Vector3(tempo.time.ToBeatTime(), -0.5f, 0);
 				timelineBPM.GetComponentInChildren<TextMesh>().text = tempo.bpm.ToString();
 				bpmMarkerObjects.Add(timelineBPM);
 			}
+
+			if(aud.clip == null) {
+				return;
+			}
+
+			QNT_Timestamp endOfAudio = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
+			
+			List<Vector3> vertices = new List<Vector3>();
+			List<int> indices = new List<int>();
+
+			uint barLengthIncr = 0;
+			UInt64 increment = Constants.PulsesPerQuarterNote;
+			for(UInt64 t = 0; t < endOfAudio.tick;) {
+				int indexStart = vertices.Count;
+
+				const float width = 0.025f;
+				const float maxHeight = 1.025f;
+				float start = t / (float)Constants.PulsesPerQuarterNote;
+				start -= width / 2;
+
+				float height = 0.0f;
+				if(barLengthIncr == 0) {
+					height = maxHeight;
+				}
+				else if(barLengthIncr == 2) {
+					height = maxHeight / 2;
+				}
+				else if(barLengthIncr == 1 || barLengthIncr == 3) {
+					height = maxHeight / 4;
+				}
+
+				vertices.Add(new Vector3(start, -0.5f, 0));
+				vertices.Add(new Vector3(start + width, -0.5f, 0));
+				vertices.Add(new Vector3(start + width, -0.5f + height, 0));
+				vertices.Add(new Vector3(start, -0.5f + height, 0));
+
+				indices.Add(indexStart + 0);
+				indices.Add(indexStart + 1);
+				indices.Add(indexStart + 2);
+
+				indices.Add(indexStart + 2);
+				indices.Add(indexStart + 3);
+				indices.Add(indexStart + 0);
+
+				barLengthIncr++;
+				barLengthIncr = barLengthIncr % 4;
+				
+				bool newTempo = false;
+				foreach(TempoChange tempoChange in tempoChanges) {
+					if(t < tempoChange.time.tick && t + increment >= tempoChange.time.tick) {
+						barLengthIncr = 0;
+						t = tempoChange.time.tick;
+						newTempo = true;
+						break;
+					}
+				}
+
+				if(!newTempo) {
+					t += increment;
+				}
+			}
+
+			Mesh mesh = timelineNotesStatic.gameObject.GetComponent<MeshFilter>().mesh;
+			mesh.Clear();
+
+			mesh.vertices = vertices.ToArray();
+			mesh.triangles = indices.ToArray();
+
+			//List<float> quaterNotePositions = new List<float>();
+			//for(int i = 0; i < DurationToBeats(aud.clip.length); ++i) {
+			//	float x = BeatsToDuration(0.0f, i, BeatDurationDirection.Forward) - DurationToBeats(t) - (offset / 480f);
+			//}
 		}
 
-		public void SetOffset(int newOffset) {
-			StopCoroutine(AnimateSetTime(0));
-			var diff = offset - newOffset;
+		public void SetOffset(Relative_QNT newOffset) {
+			StopCoroutine(AnimateSetTime(new QNT_Timestamp(0)));
+			Relative_QNT diff = offset - newOffset;
 			offset = newOffset;
 			
-			var newTime = time + BeatsToDuration(0.0f, diff / 480f, BeatDurationDirection.Forward);
+			QNT_Timestamp newTime = time + diff; //BeatsToDuration(0.0f, diff / 480f, BeatDurationDirection.Forward);
 			if (newTime != time) {
 				StartCoroutine(AnimateSetTime(newTime));
 			}
@@ -953,9 +1021,7 @@ namespace NotReaper {
 			beatSnap = snap;
 		}
 
-		private int GetCurrentBPMIndex(float t) {
-			if(t < 0) t = 0.0f;
-
+		private int GetCurrentBPMIndex(QNT_Timestamp t) {
 			for(int i = 0; i < tempoChanges.Count; ++i) {
 				var c = tempoChanges[i];
 
@@ -967,7 +1033,7 @@ namespace NotReaper {
 			return -1;
 		}
 
-		public float GetBpmFromTime(float t) {
+		public float GetBpmFromTime(QNT_Timestamp t) {
 			int idx = GetCurrentBPMIndex(t);
 			if(idx != -1) {
 				return tempoChanges[idx].bpm;
@@ -977,8 +1043,8 @@ namespace NotReaper {
 			}
 		}
 
-		public void SetBeatTime(float t) {
-			float x = DurationToBeats(t) - (offset / 480f);
+		public void SetBeatTime(QNT_Timestamp t) {
+			float x = t.ToBeatTime() - offset.ToBeatTime();
 
 			timelineBG.material.SetTextureOffset(MainTex, new Vector2((x / 4f + scaleOffset), 1));
 
@@ -1094,7 +1160,9 @@ namespace NotReaper {
 			
 			UpdateSustains();
 
-			if (!paused) time += Time.deltaTime * playbackSpeed;
+			if (!paused) {
+				time = ShiftTick(new QNT_Timestamp(0), aud.time + Time.deltaTime);
+			}
 
 			bool isScrollingBeatSnap = false;
 			
@@ -1126,8 +1194,7 @@ namespace NotReaper {
 
 			if (!isShiftDown && Input.mouseScrollDelta.y < -0.1f && !isScrollingBeatSnap) {
 				if (!audioLoaded) return;
-				time += BeatsToDuration(time, 4f / beatSnap, BeatDurationDirection.Forward);
-				time = SnapTime(time);
+				time = GetClosestBeatSnapped(time + Constants.DurationFromBeatSnap((uint)beatSnap));
 
 				SafeSetTime();
 				if (paused) {
@@ -1137,13 +1204,13 @@ namespace NotReaper {
 
 				SetBeatTime(time);
 
-				StopCoroutine(AnimateSetTime(0));
+				StopCoroutine(AnimateSetTime(new QNT_Timestamp(0)));
 
 
 			} else if (!isShiftDown && Input.mouseScrollDelta.y > 0.1f && !isScrollingBeatSnap) {
 				if (!audioLoaded) return;
-				time -= BeatsToDuration(time, 4f / beatSnap, BeatDurationDirection.Backward);
-				time = SnapTime(time);
+				time = GetClosestBeatSnapped(time - Constants.DurationFromBeatSnap((uint)beatSnap));
+
 				SafeSetTime();
 				if (paused) {
 					previewAud.Play();
@@ -1152,7 +1219,7 @@ namespace NotReaper {
 
 				SetBeatTime(time);
 
-				StopCoroutine(AnimateSetTime(0));
+				StopCoroutine(AnimateSetTime(new QNT_Timestamp(0)));
 
 			}
 
@@ -1163,7 +1230,7 @@ namespace NotReaper {
 			if (!paused && !animatingTimeline) {
 				SetBeatTime(time);
 			}
-			if (previewAud.time > time + previewDuration) {
+			if (previewAud.time > TimestampToSeconds(time) + previewDuration) {
 				previewAud.Pause();
 			}
 
@@ -1176,9 +1243,7 @@ namespace NotReaper {
 
 
 			EnableNearSustainButtons();
-
 		}
-
 
 		public double GetPercentPlayedFromSeconds(double seconds)
 		{
@@ -1189,7 +1254,7 @@ namespace NotReaper {
 		public void JumpToPercent(float percent) {
 			if (!audioLoaded) return;
 
-			time = SnapTime(aud.clip.length * percent);
+			time = ShiftTick(new QNT_Timestamp(0), aud.clip.length * percent);
 
 			SafeSetTime();
 			SetCurrentTime();
@@ -1199,13 +1264,13 @@ namespace NotReaper {
 		}
 
 		public void JumpToX(float x) {
-			StopCoroutine(AnimateSetTime(0));
+			StopCoroutine(AnimateSetTime(new QNT_Timestamp(0)));
 
 			float posX = Math.Abs(timelineTransformParent.position.x) + x;
-			float newX = GetClosestBeatSnapped(posX);
-			float newTime = BeatsToDuration(0.0f, newX, BeatDurationDirection.Forward);
+			QNT_Timestamp newTime = new QNT_Timestamp(0) + QNT_Duration.FromBeatTime(posX);
+			newTime = GetClosestBeatSnapped(newTime);
 
-			StartCoroutine(AnimateSetTime(newTime * (scale / 20f)));
+			StartCoroutine(AnimateSetTime(newTime)); //@FIX scale / 20?
 		}
 
 
@@ -1218,10 +1283,9 @@ namespace NotReaper {
 
 				previewAud.Pause();
 
-				if (leftSustainAud.clip && time < leftSustainAud.clip.length) {
+				if (leftSustainAud.clip && TimestampToSeconds(time) < leftSustainAud.clip.length) {
 					leftSustainAud.Play();
 					rightSustainAud.Play();
-
 				}
 
 				paused = false;
@@ -1236,71 +1300,76 @@ namespace NotReaper {
 				paused = true;
 
 				//Snap to the beat snap when we pause
-				time = SnapTime(time);
-				if (time < 0) time = 0;
-				if (time > aud.clip.length) time = aud.clip.length;
+				time = GetClosestBeatSnapped(time);
+
+				float currentTimeSeconds = TimestampToSeconds(time);
+				if (currentTimeSeconds > aud.clip.length) {
+					time = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
+				}
 
 				SetBeatTime(time);
 				SafeSetTime();
 				SetCurrentTick();
 				SetCurrentTime();
-
-
 			}
 		}
 
 		public void SafeSetTime() {
-			if (time < 0) time = 0;
+			if (time.tick < 0) time = new QNT_Timestamp(0);
 			if (!audioLoaded) return;
 
-			if (time > aud.clip.length) {
-				time = aud.clip.length;
-			}
-			aud.time = time;
-			previewAud.time = time;
+			float currentTimeSeconds = TimestampToSeconds(time);
 
-			float tempTime = time;
-			if (leftSustainAud.clip && time > leftSustainAud.clip.length) {
+			if (currentTimeSeconds > aud.clip.length) {
+				time = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
+			}
+			aud.time = currentTimeSeconds;
+			previewAud.time = currentTimeSeconds;
+
+			float tempTime = currentTimeSeconds;
+			if (leftSustainAud.clip && currentTimeSeconds > leftSustainAud.clip.length) {
 				tempTime = leftSustainAud.clip.length;
 			}
 			leftSustainAud.time = tempTime;
 
-			if (rightSustainAud.clip && time > rightSustainAud.clip.length) {
+			if (rightSustainAud.clip && currentTimeSeconds > rightSustainAud.clip.length) {
 				tempTime = rightSustainAud.clip.length;
 			}
 			rightSustainAud.time = tempTime;
 		}
 
-		public IEnumerator AnimateSetTime(float timeToAnimate) {
+		public IEnumerator AnimateSetTime(QNT_Timestamp newTime) {
 
 			animatingTimeline = true;
 
-			if (timeToAnimate < 0) timeToAnimate = 0;
 			if (!audioLoaded) yield break;
 
-			if (timeToAnimate > aud.clip.length) {
-				timeToAnimate = aud.clip.length;
+			if (TimestampToSeconds(newTime) > aud.clip.length) {
+				newTime = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
 			}
-			aud.time = timeToAnimate;
-			previewAud.time = timeToAnimate;
 
-			float tempTime = timeToAnimate;
-			if (leftSustainAud.clip && timeToAnimate > leftSustainAud.clip.length) {
+			float newTimeInSeconds = TimestampToSeconds(newTime);
+
+			aud.time = newTimeInSeconds;
+			previewAud.time = newTimeInSeconds;
+
+			float tempTime = newTimeInSeconds;
+			if (leftSustainAud.clip && newTimeInSeconds > leftSustainAud.clip.length) {
 				tempTime = leftSustainAud.clip.length;
 			}
 			leftSustainAud.time = tempTime;
 
-			if (rightSustainAud.clip && timeToAnimate > rightSustainAud.clip.length) {
+			if (rightSustainAud.clip && newTimeInSeconds > rightSustainAud.clip.length) {
 				tempTime = rightSustainAud.clip.length;
 			}
 			rightSustainAud.time = tempTime;
 
 			//DOTween.Play
-			DOTween.To(SetBeatTime, time, timeToAnimate, 0.2f).SetEase(Ease.InOutCubic);
+			DOTween.To(t => SetBeatTime(new QNT_Timestamp((UInt64)Math.Round(t))), time.tick, newTime.tick, 0.2f).SetEase(Ease.InOutCubic);
 
 			yield return new WaitForSeconds(0.2f);
 
-			time = timeToAnimate;
+			time = newTime;
 			animatingTimeline = false;
 
 			SafeSetTime();
@@ -1322,9 +1391,17 @@ namespace NotReaper {
 			hover = false;
 		}
 
-		public float GetClosestBeatSnapped(float timeToSnap) {
-			float increments = ((480 / beatSnap) * 4f) / 480;
-			return Mathf.Round(timeToSnap / increments) * increments;
+		//Snap (rounded down) to the nearest beat given by `beatSnap`
+		public QNT_Timestamp GetClosestBeatSnapped(QNT_Timestamp timeToSnap) {
+			int tempoIndex = GetCurrentBPMIndex(timeToSnap);
+			if(tempoIndex <= 0) {
+				return QNT_Timestamp.GetSnappedValue(timeToSnap, beatSnap);
+			}
+
+			TempoChange currentTempo = tempoChanges[tempoIndex];
+			QNT_Duration offsetFromTempoChange = new QNT_Duration(timeToSnap.tick - currentTempo.time.tick);
+			offsetFromTempoChange = QNT_Duration.GetSnappedValue(offsetFromTempoChange, beatSnap);
+			return currentTempo.time + offsetFromTempoChange;
 		}
 
 		private void OnMouseDown() {
@@ -1335,106 +1412,73 @@ namespace NotReaper {
 
 		public float GetPercentagePlayed() {
 			if (aud.clip)
-				return (time / aud.clip.length);
+				return (TimestampToSeconds(time) / aud.clip.length);
 
 			else
 				return 0;
 		}
 
-		public float DurationToBeats(float t) {
-			if(t < 0) t = 0.0f;
-			float beats = 0.0f;
+		//Shifts `startTime` by `duration` seconds, respecting bpm changes in between
+		public QNT_Timestamp ShiftTick(QNT_Timestamp startTime, float duration) {
+			int currentBpmIdx = GetCurrentBPMIndex(startTime);
+			if(currentBpmIdx == -1) {
+				return startTime;
+			}
+
+			QNT_Timestamp currentTime = startTime;
+
+			while(duration != 0 && currentBpmIdx >= 0 && currentBpmIdx < tempoChanges.Count) {
+				var tempo = tempoChanges[currentBpmIdx];
+
+				Relative_QNT remainingTime = Conversion.ToQNT(duration, tempo.bpm);
+				QNT_Timestamp timeOfNextBPM = new QNT_Timestamp(0);
+				int sign = Math.Sign(remainingTime.tick);
+
+				currentBpmIdx += sign;
+				if(currentBpmIdx > 0 && currentBpmIdx < tempoChanges.Count) {
+					timeOfNextBPM = tempoChanges[currentBpmIdx].time;
+				}
+
+				//If there is time to another bpm we need to shift to the next bpm point, then continue
+				if(timeOfNextBPM.tick != 0 && timeOfNextBPM < (currentTime + remainingTime)) {
+					Relative_QNT timeUntilTempoShift = timeOfNextBPM - currentTime;
+					currentTime += timeUntilTempoShift;
+					duration -= Conversion.FromQNT(timeUntilTempoShift, tempo.bpm);
+				}
+				//No bpm change, apply the time and break
+				else {
+					currentTime += remainingTime;
+					break;
+				}
+			}
+
+			return currentTime;
+		}
+
+		public float TimestampToSeconds(QNT_Timestamp timestamp) {
+			float duration = 0.0f;
 
 			for(int i = 0; i < tempoChanges.Count; ++i) {
 				var c = tempoChanges[i];
 				
-				if(t >= c.time && (i + 1 >= tempoChanges.Count || t < tempoChanges[i + 1].time)) {
-					beats += (c.bpm / 60) * (t - c.time);
+				if(timestamp >= c.time && (i + 1 >= tempoChanges.Count || timestamp < tempoChanges[i + 1].time)) {
+					duration += Conversion.FromQNT(timestamp - c.time, c.bpm);
 					break;
 				}
 				else if(i + 1 < tempoChanges.Count) {
-					//Add in all the beats for this section
-					beats += (c.bpm / 60) * (tempoChanges[i + 1].time - c.time);
+					duration += Conversion.FromQNT(tempoChanges[i + 1].time - c.time, c.bpm);
 				}
-			}
-
-			return beats;
-		}
-
-		public enum BeatDurationDirection {
-			Forward,
-			Backward
-		};
-
-		public float BeatsToDuration(float startTime, float beats, BeatDurationDirection direction) {
-			if(startTime < 0) startTime = 0.0f;
-
-			int currentBpmIdx = GetCurrentBPMIndex(startTime);
-			if(currentBpmIdx == -1) {
-				return beats;
-			}
-
-
-			float duration = 0.0f;
-			float currentTime = startTime;
-			float remainingBeats = beats;
-
-			while(remainingBeats > 0 && currentBpmIdx >= 0 && currentBpmIdx < tempoChanges.Count) {
-				var tempo = tempoChanges[currentBpmIdx];
-
-				float bpmTime = remainingBeats * 60 / tempo.bpm;
-
-				if(direction == BeatDurationDirection.Forward) {
-					if(currentBpmIdx + 1 < tempoChanges.Count) {
-						float nextTime = tempoChanges[currentBpmIdx + 1].time;
-						if(currentTime + bpmTime >= nextTime) {
-							float timeUntilTempoShift = nextTime - currentTime;
-							float beatsUntilTempoShift = (tempo.bpm / 60) * timeUntilTempoShift;
-							currentTime += timeUntilTempoShift;
-							duration += timeUntilTempoShift;
-							remainingBeats -= beatsUntilTempoShift;
-							currentBpmIdx++;
-							continue;
-						}
-					}
-				}
-				else {
-					if(currentBpmIdx - 1 >= 0) {
-						if(currentTime - bpmTime < tempo.time) {
-							float timeUntilTempoShift = currentTime - tempo.time;
-							float beatsUntilTempoShift = (tempo.bpm / 60) * timeUntilTempoShift;
-							currentTime -= timeUntilTempoShift;
-							duration += timeUntilTempoShift;
-							remainingBeats -= beatsUntilTempoShift;
-							currentBpmIdx--;
-							continue;
-						}
-					}
-				}
-
-				duration += bpmTime;
-				remainingBeats = 0;
 			}
 
 			return duration;
 		}
 
-		public float Snap(float beat) {
-			return Mathf.Round(beat * beatSnap / 4f) * 4f / beatSnap;
-		}
-
-		public float BeatTime() {
-			return DurationToBeats(time) - offset / 480f;
-		}
-
-		public float SnapTime(float timePoint) {
-			return BeatsToDuration(0.0f, Snap(DurationToBeats(timePoint) - offset / 480f) + offset / 480f, BeatDurationDirection.Forward);
-		}
-
 		string prevTimeText;
 		private void SetCurrentTime() {
-			string minutes = Mathf.Floor((int) time / 60).ToString("00");
-			string seconds = ((int) time % 60).ToString("00");
+			float timeSeconds = TimestampToSeconds(time);
+
+			string minutes = Mathf.Floor((int) timeSeconds / 60).ToString("00");
+			string seconds = ((int) timeSeconds % 60).ToString("00");
 			if (seconds != prevTimeText) {
 				prevTimeText = seconds;
 				songTimestamp.text = minutes + ":" + seconds;
@@ -1445,7 +1489,7 @@ namespace NotReaper {
 		private string prevTickText;
 
 		private void SetCurrentTick() {
-			string currentTick = Mathf.Floor((int) BeatTime() * 480f).ToString();
+			string currentTick = time.tick.ToString();
 			if (currentTick != prevTickText) {
 				prevTickText = currentTick;
 				curTick.text = currentTick;

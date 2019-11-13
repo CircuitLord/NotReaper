@@ -7,6 +7,7 @@ using NotReaper.Grid;
 using NotReaper.Tools.ChainBuilder;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using NotReaper.Timing;
 
 namespace NotReaper.Targets {
 
@@ -123,20 +124,20 @@ namespace NotReaper.Targets {
 		public TargetData() {
 			ID = GetNextId();
 
-			beatLength = 0.25f;
+			beatLength = Constants.SixteenthNoteDuration;
 			velocity = TargetVelocity.Standard;
 			handType = TargetHandType.Left;
 			behavior = TargetBehavior.Standard;
 		}
 
-		public TargetData(Cue cue, float offset) {
+		public TargetData(Cue cue) {
 			ID = GetNextId();
 
 			Vector2 pos = NotePosCalc.PitchToPos(cue);
 			x = pos.x;
 			y = pos.y;
-			beatTime = (cue.tick - offset) / 480f;
-			beatLength = cue.tickLength;
+			time = new QNT_Timestamp((UInt64)cue.tick);
+			beatLength = new QNT_Duration((UInt64)cue.tickLength);
 			velocity = cue.velocity;
 			handType = cue.handType;
 			behavior = cue.behavior;
@@ -151,7 +152,7 @@ namespace NotReaper.Targets {
 		public void Copy(TargetData data) {
 			x = data.x;
 			y = data.y;
-			beatTime = data.beatTime;
+			time = data.time;
 			beatLength = data.beatLength;
 			velocity = data.velocity;
 			handType = data.handType;
@@ -160,8 +161,8 @@ namespace NotReaper.Targets {
 
 		private float _x;
 		private float _y;
-		private float _beatTime;
-		private float _beatLength;
+		private QNT_Timestamp _time;
+		private QNT_Duration _beatLength;
 		private TargetVelocity _velocity;
 		private TargetHandType _handType;
 		private TargetBehavior _behavior;
@@ -185,13 +186,13 @@ namespace NotReaper.Targets {
 			set { _x = value.x; _y = value.y; PositionChangeEvent(x, y); }
 		}
 
-		public float beatTime
+		public QNT_Timestamp time
 		{
-			get { return _beatTime; }
-			set { _beatTime = value; BeatTimeChangeEvent(beatTime); }
+			get { return _time; }
+			set { _time = value; TickChangeEvent(time); }
 		}
 
-		public float beatLength
+		public QNT_Duration beatLength
 		{
 			get { return _beatLength; }
 			set { _beatLength = value; BeatLengthChangeEvent(beatLength); }
@@ -224,8 +225,8 @@ namespace NotReaper.Targets {
 		}
 
 		public event Action<float, float> PositionChangeEvent = delegate {};
-		public event Action<float> BeatTimeChangeEvent = delegate {};
-		public event Action<float> BeatLengthChangeEvent = delegate {};
+		public event Action<QNT_Timestamp> TickChangeEvent = delegate {};
+		public event Action<QNT_Duration> BeatLengthChangeEvent = delegate {};
 		public event Action<TargetVelocity> VelocityChangeEvent = delegate {};
 		public event Action<TargetHandType> HandTypeChangeEvent = delegate {};
 		public event Action<TargetBehavior, TargetBehavior> BehaviourChangeEvent = delegate {};

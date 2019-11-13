@@ -2,6 +2,7 @@ using System;
 using NotReaper.Models;
 using NotReaper.Targets;
 using UnityEngine;
+using NotReaper.Timing;
 
 namespace NotReaper.Grid {
 
@@ -15,7 +16,7 @@ namespace NotReaper.Grid {
 
 
 		//Gets the cue status based on a target.
-		public static Cue ToCue(Target target, int offset, bool includeGridOffset) {
+		public static Cue ToCue(Target target, Relative_QNT offset, bool includeGridOffset) {
 
 			int pitch = 0;
 			Vector2 tempPos = new Vector2();
@@ -84,13 +85,13 @@ namespace NotReaper.Grid {
 			}
 
 			Cue cue = new Cue() {
-				tick = Mathf.RoundToInt(target.data.beatTime * 480f) + offset,
-					tickLength = Mathf.RoundToInt(target.data.beatLength),//Mathf.RoundToInt(target.beatLength * 480f),
-					pitch = pitch,
-					velocity = target.data.velocity,
-					gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 2), y = (float) Math.Round(offsetY, 2) },
-					handType = target.data.handType,
-					behavior = target.data.behavior
+				tick = (int)(target.data.time + offset).tick,
+				tickLength = (int)target.data.beatLength.tick,
+				pitch = pitch,
+				velocity = target.data.velocity,
+				gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 2), y = (float) Math.Round(offsetY, 2) },
+				handType = target.data.handType,
+				behavior = target.data.behavior
 			};
 
 
