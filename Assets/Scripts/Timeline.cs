@@ -596,8 +596,6 @@ namespace NotReaper {
 			DeleteAllTargets();
 			Tools.undoRedoManager.ClearActions();
 			tempoChanges.Clear();
-
-			time = 0;
 		}
 
 
@@ -787,6 +785,8 @@ namespace NotReaper {
 			//Difficulty manager loads stuff now
 			audicaLoaded = true;
 			difficultyManager.LoadHighestDifficulty();
+
+			StartCoroutine(AnimateSetTime(0));
 
 			//Disable timing window buttons so users don't mess stuff up.
 			applyButtonTiming.interactable = false;
