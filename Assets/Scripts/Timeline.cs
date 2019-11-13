@@ -581,7 +581,8 @@ namespace NotReaper {
 		}
 
 		public void DeleteAllTargets() {
-			foreach (Target target in notes) {
+			var notesTemp = notes.ToList();
+			foreach (Target target in notesTemp) {
 				target.Destroy(this);
 			}
 
@@ -589,7 +590,14 @@ namespace NotReaper {
 			orderedNotes = new List<Target>();
 			loadedNotes = new List<Target>();
 			selectedNotes = new List<Target>();
+		}
+
+		public void ResetTimeline() {
+			DeleteAllTargets();
 			Tools.undoRedoManager.ClearActions();
+			tempoChanges.Clear();
+
+			time = 0;
 		}
 
 
@@ -726,13 +734,11 @@ namespace NotReaper {
 
 			if (loadRecent) {
 				audicaFile = null;
-				DeleteAllTargets();
 				audicaFile = AudicaHandler.LoadAudicaFile(PlayerPrefs.GetString("recentFile", null));
 				if (audicaFile == null) return false;
 
 			} else if (filePath != null) {
 				audicaFile = null;
-				DeleteAllTargets();
 				audicaFile = AudicaHandler.LoadAudicaFile(filePath);
 				PlayerPrefs.SetString("recentFile", audicaFile.filepath);
 
@@ -743,11 +749,12 @@ namespace NotReaper {
 				if (paths.Length == 0) return false;
 				
 				audicaFile = null;
-				DeleteAllTargets();
 				
 				audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
 				PlayerPrefs.SetString("recentFile", paths[0]);
 			}
+
+			ResetTimeline();
 			
 			desc = audicaFile.desc;
 			
