@@ -117,10 +117,10 @@ namespace NotReaper.Timing {
                 else {
 	                isMp3 = false;
 	                StartCoroutine(GetAudioClip(filePath));
-	                nameText.text = paths[0];
-	                loadedSong = paths[0];
                 }
 
+                nameText.text = paths[0];
+	            loadedSong = paths[0];
             }
         }
 
