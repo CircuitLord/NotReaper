@@ -259,7 +259,7 @@ namespace NotReaper.Targets {
 
 				gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength;
 
-				if(data.beatLength < 480) {
+				if(data.beatLength < 480 && data.behavior != TargetBehavior.NR_Pathbuilder) {
 					data.beatLength = 480;
 				}
 
