@@ -596,6 +596,12 @@ namespace NotReaper {
 			DeleteAllTargets();
 			Tools.undoRedoManager.ClearActions();
 			tempoChanges.Clear();
+			
+			AudioClip.Destroy(aud.clip);
+			AudioClip.Destroy(previewAud.clip);
+			AudioClip.Destroy(leftSustainAud.clip);
+			AudioClip.Destroy(rightSustainAud.clip);
+			
 		}
 
 

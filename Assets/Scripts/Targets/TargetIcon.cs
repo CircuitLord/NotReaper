@@ -96,6 +96,13 @@ namespace NotReaper.Targets {
             data.HandTypeChangeEvent -= OnHandTypeChanged;
             data.BehaviourChangeEvent -= OnBehaviorChanged;
             data.BeatLengthChangeEvent -= OnSustainLengthChanged;
+            
+            
+            foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true)) {
+
+                Destroy(r.material);
+            }
+            
         }
 
         public void EnableSelected(TargetBehavior behavior) {
