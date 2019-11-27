@@ -367,6 +367,9 @@ namespace NotReaper.UserInput {
 				timeline.Export();
 			}
 
+			if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.C)) {
+				timeline.CopyTimestampToClipboard();
+			}
 
 			if (Input.GetKeyDown(KeyCode.Escape)) {
 				if (pauseMenu.isOpened) {

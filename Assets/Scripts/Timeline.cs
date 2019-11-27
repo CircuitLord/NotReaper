@@ -690,6 +690,10 @@ namespace NotReaper {
 			audioLoaded = true;
 		}
 
+		public void CopyTimestampToClipboard() {
+			string timestamp = songTimestamp.text;
+			GUIUtility.systemCopyBuffer = "**" + timestamp + "**" + " - ";
+		}
 
 		public void SetTimingModeStats(double newBPM, int tickOffset) {
 			DeleteAllTargets();
@@ -1094,6 +1098,7 @@ namespace NotReaper {
 
 			bool isScrollingBeatSnap = false;
 			
+			
 			bool isShiftDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 			bool isAltDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
 
@@ -1110,11 +1115,11 @@ namespace NotReaper {
 
 			if (isAltDown && Input.mouseScrollDelta.y < -0.1f) {
 				isScrollingBeatSnap = true;
-				beatSnapSelector.ForwardClick();
+				beatSnapSelector.PreviousClick();
 
 			} else if (isAltDown && Input.mouseScrollDelta.y > 0.11f) {
 				isScrollingBeatSnap = true;
-				beatSnapSelector.PreviousClick();
+				beatSnapSelector.ForwardClick();
 			}
 			
 			//if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
@@ -1150,6 +1155,10 @@ namespace NotReaper {
 				StopCoroutine(AnimateSetTime(0));
 
 			}
+
+            if (Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.C)) {
+                CopyTimestampToClipboard();
+            }
 
 			if (!paused && !animatingTimeline) {
 				SetBeatTime(time);
@@ -1442,7 +1451,7 @@ namespace NotReaper {
 				curTick.text = currentTick;
 			}
 		}
-		
+
 		private void SetAudioDSP() {
 			//Pull DSP setting from config
 			var configuration = AudioSettings.GetConfiguration();
