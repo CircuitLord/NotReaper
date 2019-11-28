@@ -462,8 +462,8 @@ namespace NotReaper.Tools {
 		}
 
 		private QNT_Timestamp SnapToBeat(float posX) {
-			QNT_Timestamp time = new QNT_Timestamp(0) + QNT_Duration.FromBeatTime(posX);
-			return timeline.GetClosestBeatSnapped(Timeline.time);
+			QNT_Timestamp time = Timeline.time + QNT_Duration.FromBeatTime(posX);
+			return timeline.GetClosestBeatSnapped(time + Constants.DurationFromBeatSnap((uint)timeline.beatSnap) / 2);
 		}
 	}
 }
