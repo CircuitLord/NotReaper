@@ -943,6 +943,7 @@ namespace NotReaper {
 
 				const float width = 0.025f;
 				const float maxHeight = 1.025f;
+				const float zIndex = 3;
 				float start = t / (float)Constants.PulsesPerQuarterNote;
 				start -= width / 2;
 
@@ -957,10 +958,10 @@ namespace NotReaper {
 					height = maxHeight / 4;
 				}
 
-				vertices.Add(new Vector3(start, -0.5f, 0));
-				vertices.Add(new Vector3(start + width, -0.5f, 0));
-				vertices.Add(new Vector3(start + width, -0.5f + height, 0));
-				vertices.Add(new Vector3(start, -0.5f + height, 0));
+				vertices.Add(new Vector3(start, -0.5f, zIndex));
+				vertices.Add(new Vector3(start + width, -0.5f, zIndex));
+				vertices.Add(new Vector3(start + width, -0.5f + height, zIndex));
+				vertices.Add(new Vector3(start, -0.5f + height, zIndex));
 
 				indices.Add(indexStart + 0);
 				indices.Add(indexStart + 1);
@@ -1322,6 +1323,7 @@ namespace NotReaper {
 
 			if (currentTimeSeconds > aud.clip.length) {
 				time = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
+				currentTimeSeconds = aud.clip.length;
 			}
 			aud.time = currentTimeSeconds;
 			previewAud.time = currentTimeSeconds;
@@ -1394,7 +1396,7 @@ namespace NotReaper {
 		//Snap (rounded down) to the nearest beat given by `beatSnap`
 		public QNT_Timestamp GetClosestBeatSnapped(QNT_Timestamp timeToSnap) {
 			int tempoIndex = GetCurrentBPMIndex(timeToSnap);
-			if(tempoIndex <= 0) {
+			if(tempoIndex == -1) {
 				return QNT_Timestamp.GetSnappedValue(timeToSnap, beatSnap);
 			}
 
