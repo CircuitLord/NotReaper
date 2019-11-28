@@ -14,12 +14,7 @@ namespace NotReaper.UI {
         public Timeline timeline;
         public Button saveButton;
         public Button newAudicaButton;
-        
-        public List<Image> lColorLines = new List<Image>();
-        public List<Image> rColorLines = new List<Image>();
 
-        public List<Image> sliderFadeBG = new List<Image>();
-        
         public CanvasGroup window;
         public Image BG;
 
@@ -80,23 +75,7 @@ namespace NotReaper.UI {
         }
 
 
-        public void LoadUIColors() {
 
-            Color lColor = NRSettings.config.leftColor;
-            Color rColor = NRSettings.config.rightColor;
-
-            foreach (Image img in lColorLines) {
-                img.color = lColor;
-            }
-
-            foreach (Image img in rColorLines) {
-                img.color = rColor;
-            }
-
-            foreach (Image img in sliderFadeBG) {
-                img.color = new Color(rColor.r, rColor.g, rColor.b, 0.5f);
-            }
-        }
 
 
     }
