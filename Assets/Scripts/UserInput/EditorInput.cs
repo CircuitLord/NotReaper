@@ -81,8 +81,6 @@ namespace NotReaper.UserInput {
 			SelectVelocity(UITargetVelocity.Standard);
 
 			NotificationShower.AddNotifToQueue(new NRNotification("Welcome to NotReaper!", 3f));
-
-			pauseMenu.LoadUIColors();
 			pauseMenu.OpenPauseMenu();
 			
 			shortcutMenu.LoadUIColors();
