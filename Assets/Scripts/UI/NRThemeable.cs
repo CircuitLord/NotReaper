@@ -16,6 +16,8 @@ namespace NotReaper.UI {
 
         [SerializeField]
         [Range(-0.1f, 0.1f)] private float valueModifier = 0f;
+
+        [SerializeField] [Range(0.1f, 1.0f)] private float alpha = 1.0f;
         
         
 
@@ -42,7 +44,9 @@ namespace NotReaper.UI {
                     s += saturationModifier;
                     v += valueModifier;
 
-                    img.color = Color.HSVToRGB(h, s, v);
+                    newColor = Color.HSVToRGB(h, s, v);
+
+                    img.color = new Color(newColor.r, newColor.g, newColor.b, alpha);
 
 
 
