@@ -263,6 +263,10 @@ namespace NotReaper.Targets {
 					data.beatLength = 480;
 				}
 
+				if(data.beatLength == 120 && data.behavior == TargetBehavior.NR_Pathbuilder) {
+					data.beatLength = 480;
+				}
+
 				gridTargetIcon.UpdatePath();
 			}
 			else {
