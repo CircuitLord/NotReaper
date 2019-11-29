@@ -268,13 +268,13 @@ namespace NotReaper {
 			data.handType = EditorInput.selectedHand;
 			data.behavior = EditorInput.selectedBehavior;
 
-			QNT_Timestamp tempTime = time;
+			QNT_Timestamp tempTime = GetClosestBeatSnapped(time);
 
 			foreach (Target target in loadedNotes) {
 				if (target.data.time ==  tempTime && (target.data.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
 			}
 
-			data.time = time;
+			data.time = GetClosestBeatSnapped(time);
 
 			//Default sustains length should be more than 0.
 			if (data.supportsBeatLength) {
@@ -761,11 +761,7 @@ namespace NotReaper {
 
 				float oneMinuteInMicroseconds = 60000000f;
 				foreach (var tempo in audicaFile.song_mid.GetTempoMap().Tempo) {
-					QNT_Timestamp time = new QNT_Timestamp(0);
-					if(tempo.Time != 0.0f) {
-						time = new QNT_Timestamp((UInt64)tempo.Time);
-					}
-
+					QNT_Timestamp time = new QNT_Timestamp((UInt64)tempo.Time);
 					SetBPM(time, oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote);
 				}
 			} 
@@ -812,13 +808,17 @@ namespace NotReaper {
 					aud.clip = myClip;
 					previewAud.clip = myClip;
 					
-					SetBPM(new QNT_Timestamp(0), (float) desc.tempo);
+					int zeroBPMIndex = GetCurrentBPMIndex(new QNT_Timestamp(0));
+					if(zeroBPMIndex == -1) {
+						SetBPM(new QNT_Timestamp(0), (float) desc.tempo);
+					}
 
 					//We modify the list, so we need to copy it
 					var cloneList = desc.tempoList.ToList();
 					foreach(var tempo in cloneList) {
 						SetBPM(tempo.time, tempo.bpm);
 					}
+					desc.tempoList = tempoChanges;
 					
 					audioLoaded = true;
 					audicaLoaded = true;
@@ -1162,7 +1162,7 @@ namespace NotReaper {
 			UpdateSustains();
 
 			if (!paused) {
-				time = ShiftTick(new QNT_Timestamp(0), aud.time + Time.deltaTime);
+				time = ShiftTick(new QNT_Timestamp(0), aud.time + Time.unscaledDeltaTime);
 			}
 
 			bool isScrollingBeatSnap = false;

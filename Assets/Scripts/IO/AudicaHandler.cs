@@ -93,9 +93,17 @@ namespace NotReaper.IO {
 					entry.Extract(temp);
 					audicaFile.desc.moggSustainSongRight = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray())) [0];
 					
-				} else if (entry.FileName == "song.mid") {
+				} else if (entry.FileName == "song.mid" || entry.FileName == audicaFile.desc.midiFile) {
+					string midiFiileName = $"{appPath}/.cache/song.mid";
+
 					entry.Extract($"{appPath}/.cache", ExtractExistingFileAction.OverwriteSilently);
-					audicaFile.song_mid = MidiFile.Read($"{appPath}/.cache/song.mid");
+
+					if(entry.FileName == audicaFile.desc.midiFile) {
+						File.Delete(midiFiileName);
+						File.Move($"{appPath}/.cache/" + audicaFile.desc.midiFile, midiFiileName);
+					}
+
+					audicaFile.song_mid = MidiFile.Read(midiFiileName);
 				}
 
 				temp.SetLength(0);
