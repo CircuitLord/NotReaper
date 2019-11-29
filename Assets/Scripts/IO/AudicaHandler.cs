@@ -101,6 +101,9 @@ namespace NotReaper.IO {
 					if(entry.FileName == audicaFile.desc.midiFile) {
 						File.Delete(midiFiileName);
 						File.Move($"{appPath}/.cache/" + audicaFile.desc.midiFile, midiFiileName);
+
+						//Sometimes these midi files get marked with strange attributes. Reset them to normal so we don't have problems deleting them
+						File.SetAttributes(midiFiileName, FileAttributes.Normal);
 					}
 
 					audicaFile.song_mid = MidiFile.Read(midiFiileName);
