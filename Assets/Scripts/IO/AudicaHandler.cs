@@ -98,7 +98,7 @@ namespace NotReaper.IO {
 
 					entry.Extract($"{appPath}/.cache", ExtractExistingFileAction.OverwriteSilently);
 
-					if(entry.FileName == audicaFile.desc.midiFile) {
+					if(entry.FileName != "song.mid") {
 						File.Delete(midiFiileName);
 						File.Move($"{appPath}/.cache/" + audicaFile.desc.midiFile, midiFiileName);
 
