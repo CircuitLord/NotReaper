@@ -7,6 +7,7 @@ using TMPro;
 using UnityEngine;
 using NotReaper.UserInput;
 using UnityEngine.EventSystems;
+using NotReaper.Timing;
 
 public class DynamicBPMWindow : MonoBehaviour {
     public TMP_InputField dynamicBpmInput;
@@ -53,7 +54,7 @@ public class DynamicBPMWindow : MonoBehaviour {
     public void AddDynamicBPM() {
         double dynamicBpm = 0.0f;
         if(Double.TryParse(dynamicBpmInput.text, out dynamicBpm)) {
-            timeline.SetBPM(Timeline.time, (float)dynamicBpm);
+            timeline.SetBPM(Timeline.time, Constants.MicrosecondsPerQuarterNoteFromBPM(dynamicBpm));
             Deactivate();
         }
     }

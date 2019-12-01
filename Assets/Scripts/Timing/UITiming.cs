@@ -134,7 +134,7 @@ namespace NotReaper.Timing {
             Double.TryParse(bpmInput.text, out bpm);
             Int32.TryParse(offsetInput.text, out offset);
 
-            timeline.SetTimingModeStats(bpm, offset);
+            timeline.SetTimingModeStats(Constants.MicrosecondsPerQuarterNoteFromBPM(bpm), offset);
             timeline.SetOffset(new Relative_QNT(offset));
 
             mapperName = RemoveSpecialCharacters(mapperInput.text);

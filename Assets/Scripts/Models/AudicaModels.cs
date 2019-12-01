@@ -8,7 +8,7 @@ using NotReaper.Timing;
 namespace NotReaper.Models {
 	public struct TempoChange {
 		public QNT_Timestamp time;
-		public float bpm;
+		public UInt64 microsecondsPerQuarterNote;
 	}
 
 	//KEEP IN MIND, almost all the song references are to the moggsong, not the mogg.

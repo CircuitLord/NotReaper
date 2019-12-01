@@ -691,10 +691,10 @@ namespace NotReaper {
 			GUIUtility.systemCopyBuffer = "**" + timestamp + "**" + " - ";
 		}
 
-		public void SetTimingModeStats(double newBPM, int tickOffset) {
+		public void SetTimingModeStats(UInt64 microsecondsPerQuarterNote, int tickOffset) {
 			DeleteAllTargets();
 
-			SetBPM(new QNT_Timestamp(0), (float) newBPM);
+			SetBPM(new QNT_Timestamp(0), microsecondsPerQuarterNote);
 
 			var cue = new Cue {
 				pitch = 40,
@@ -758,11 +758,9 @@ namespace NotReaper {
 			
 			// Get song BPM
 			if (audicaFile.song_mid != null) {
-
-				float oneMinuteInMicroseconds = 60000000f;
 				foreach (var tempo in audicaFile.song_mid.GetTempoMap().Tempo) {
 					QNT_Timestamp time = new QNT_Timestamp((UInt64)tempo.Time);
-					SetBPM(time, oneMinuteInMicroseconds / tempo.Value.MicrosecondsPerQuarterNote);
+					SetBPM(time, (UInt64)tempo.Value.MicrosecondsPerQuarterNote);
 				}
 			} 
 
@@ -810,13 +808,13 @@ namespace NotReaper {
 					
 					int zeroBPMIndex = GetCurrentBPMIndex(new QNT_Timestamp(0));
 					if(zeroBPMIndex == -1) {
-						SetBPM(new QNT_Timestamp(0), (float) desc.tempo);
+						SetBPM(new QNT_Timestamp(0), Constants.MicrosecondsPerQuarterNoteFromBPM(desc.tempo));
 					}
 
 					//We modify the list, so we need to copy it
 					var cloneList = desc.tempoList.ToList();
 					foreach(var tempo in cloneList) {
-						SetBPM(tempo.time, tempo.bpm);
+						SetBPM(tempo.time, tempo.microsecondsPerQuarterNote);
 					}
 					desc.tempoList = tempoChanges;
 					
@@ -887,7 +885,7 @@ namespace NotReaper {
 			rightSustainAud.pitch = slider.value;
 		}
 
-		public void SetBPM(QNT_Timestamp time, float newBpm) {
+		public void SetBPM(QNT_Timestamp time, UInt64 microsecondsPerQuarterNote) {
 			foreach(var bpm in bpmMarkerObjects) {
 				Destroy(bpm);
 			}
@@ -895,13 +893,13 @@ namespace NotReaper {
 
 			TempoChange c = new TempoChange();
 			c.time = time;
-			c.bpm = newBpm;
+			c.microsecondsPerQuarterNote = microsecondsPerQuarterNote;
 
 			bool found = false;
 			for(int i = 0; i < tempoChanges.Count; ++i) {
 				if(tempoChanges[i].time == time) {
 					tempoChanges[i] = c;
-					if(newBpm == 0) {
+					if(microsecondsPerQuarterNote == 0) {
 						tempoChanges.RemoveAt(i);
 					}
 					found = true;
@@ -909,7 +907,7 @@ namespace NotReaper {
 				}
 			}
 			
-			if(!found && newBpm != 0) {
+			if(!found && microsecondsPerQuarterNote != 0) {
 				tempoChanges.Add(c);
 			}
 			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time.tick).ToList();
@@ -923,7 +921,9 @@ namespace NotReaper {
 				var timelineBPM = Instantiate(BPM_MarkerPrefab, timelineTransformParent);
 				var transform1 = timelineBPM.transform;
 				transform1.localPosition = new Vector3(tempo.time.ToBeatTime(), -0.5f, 0);
-				timelineBPM.GetComponentInChildren<TextMesh>().text = tempo.bpm.ToString();
+
+				float bpm = Constants.GetBPMFromMicrosecondsPerQuaterNote(tempo.microsecondsPerQuarterNote);
+				timelineBPM.GetComponentInChildren<TextMesh>().text = Conversion.MicrosecondsToString(tempo.microsecondsPerQuarterNote);
 				bpmMarkerObjects.Add(timelineBPM);
 			}
 
@@ -1037,7 +1037,7 @@ namespace NotReaper {
 		public float GetBpmFromTime(QNT_Timestamp t) {
 			int idx = GetCurrentBPMIndex(t);
 			if(idx != -1) {
-				return tempoChanges[idx].bpm;
+				return Constants.GetBPMFromMicrosecondsPerQuaterNote(tempoChanges[idx].microsecondsPerQuarterNote);
 			}
 			else {
 				return 1.0f;
@@ -1432,7 +1432,7 @@ namespace NotReaper {
 			while(duration != 0 && currentBpmIdx >= 0 && currentBpmIdx < tempoChanges.Count) {
 				var tempo = tempoChanges[currentBpmIdx];
 
-				Relative_QNT remainingTime = Conversion.ToQNT(duration, tempo.bpm);
+				Relative_QNT remainingTime = Conversion.ToQNT(duration, tempo.microsecondsPerQuarterNote);
 				QNT_Timestamp timeOfNextBPM = new QNT_Timestamp(0);
 				int sign = Math.Sign(remainingTime.tick);
 
@@ -1445,7 +1445,7 @@ namespace NotReaper {
 				if(timeOfNextBPM.tick != 0 && timeOfNextBPM < (currentTime + remainingTime)) {
 					Relative_QNT timeUntilTempoShift = timeOfNextBPM - currentTime;
 					currentTime += timeUntilTempoShift;
-					duration -= Conversion.FromQNT(timeUntilTempoShift, tempo.bpm);
+					duration -= Conversion.FromQNT(timeUntilTempoShift, tempo.microsecondsPerQuarterNote);
 				}
 				//No bpm change, apply the time and break
 				else {
@@ -1464,11 +1464,11 @@ namespace NotReaper {
 				var c = tempoChanges[i];
 				
 				if(timestamp >= c.time && (i + 1 >= tempoChanges.Count || timestamp < tempoChanges[i + 1].time)) {
-					duration += Conversion.FromQNT(timestamp - c.time, c.bpm);
+					duration += Conversion.FromQNT(timestamp - c.time, c.microsecondsPerQuarterNote);
 					break;
 				}
 				else if(i + 1 < tempoChanges.Count) {
-					duration += Conversion.FromQNT(tempoChanges[i + 1].time - c.time, c.bpm);
+					duration += Conversion.FromQNT(tempoChanges[i + 1].time - c.time, c.microsecondsPerQuarterNote);
 				}
 			}
 

@@ -54,7 +54,7 @@ public class OptionsMenu : MonoBehaviour {
 
     public void BPMWasChanged() {
         float newBpm = float.Parse(bpmField.text);
-        timeline.SetBPM(new QNT_Timestamp(0), newBpm);
+        timeline.SetBPM(new QNT_Timestamp(0), Constants.MicrosecondsPerQuarterNoteFromBPM(newBpm));
     }
 
     public void OffsetWasChanged() {

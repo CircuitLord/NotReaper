@@ -61,11 +61,10 @@ namespace NotReaper.IO {
 
 				using (var tempoMapManager = new TempoMapManager(new TicksPerQuarterNoteTimeDivision((short)Constants.PulsesPerQuarterNote)))
 				{
-					float oneMinuteInMicroseconds = 60000000f;
 					TempoMap tempoMap = tempoMapManager.TempoMap;
 
 					foreach(var tempo in audicaFile.desc.tempoList) {
-						tempoMapManager.SetTempo((long)tempo.time.tick, new Tempo((long)(oneMinuteInMicroseconds / tempo.bpm)));
+						tempoMapManager.SetTempo((long)tempo.time.tick, new Tempo((long)tempo.microsecondsPerQuarterNote));
 
 					}
 
