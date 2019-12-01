@@ -280,7 +280,7 @@ namespace NotReaper {
 			if (data.supportsBeatLength) {
 				data.beatLength = Constants.QuarterNoteDuration;
 			} else {
-				data.beatLength = new QNT_Duration(Constants.PulsesPerQuarterNote / 2);
+				data.beatLength = Constants.SixteenthNoteDuration;
 			}
 
 			switch (EditorInput.selectedVelocity) {
