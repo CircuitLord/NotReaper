@@ -1482,7 +1482,7 @@ namespace NotReaper {
 			string seconds = ((int) timeSeconds % 60).ToString("00");
 			if (seconds != prevTimeText) {
 				prevTimeText = seconds;
-				songTimestamp.text = minutes + ":" + seconds;
+				songTimestamp.text = "<mspace=.5em>" + minutes + "</mspace>" + "<mspace=.4em>:</mspace>" + "<mspace=.5em>" + seconds + "</mspace>";
 			}
 
 		}
@@ -1493,7 +1493,7 @@ namespace NotReaper {
 			string currentTick = time.tick.ToString();
 			if (currentTick != prevTickText) {
 				prevTickText = currentTick;
-				curTick.text = currentTick;
+				curTick.text = "<mspace=.5em>" + currentTick + "</mspace>";
 			}
 		}
 
