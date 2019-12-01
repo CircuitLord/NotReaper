@@ -11,12 +11,12 @@ namespace NotReaper.Timing {
         public static UInt64 OneMinuteInMicroseconds = 60000000;
         public static UInt64 SecondsToMicroseconds = 1000000;
 
-        public static float GetBPMFromMicrosecondsPerQuaterNote(UInt64 usPerQuarterNote) {
-            return OneMinuteInMicroseconds / usPerQuarterNote;
+        public static double GetBPMFromMicrosecondsPerQuaterNote(UInt64 microsecondsPerQuarterNote) {
+            return (double)OneMinuteInMicroseconds / microsecondsPerQuarterNote;
         }
 
         public static UInt64 MicrosecondsPerQuarterNoteFromBPM(double bpm) {
-            return (UInt64)Math.Round((float)OneMinuteInMicroseconds / bpm);
+            return (UInt64)Math.Round((double)OneMinuteInMicroseconds / bpm);
         }
 
         public static QNT_Duration DurationFromBeatSnap(uint beatSnap) {
@@ -37,18 +37,16 @@ namespace NotReaper.Timing {
 
     class Conversion {
        public static Relative_QNT ToQNT(float seconds, UInt64 microsecondsPerQuarterNote) {
-           
-
-           return new Relative_QNT((long)(Mathf.Round(seconds * Constants.SecondsToMicroseconds) * microsecondsPerQuarterNote * Constants.PulsesPerQuarterNote));
+           return new Relative_QNT((long)Mathf.Round((float)(Constants.SecondsToMicroseconds * seconds) / microsecondsPerQuarterNote * Constants.PulsesPerQuarterNote));
        }
 
        public static float FromQNT(Relative_QNT duration, UInt64 microsecondsPerQuarterNote) {
-        return ((float)microsecondsPerQuarterNote / Constants.SecondsToMicroseconds) * (duration.tick / (float)Constants.PulsesPerQuarterNote);
+        return (duration.tick * (long)microsecondsPerQuarterNote) / ((float)Constants.SecondsToMicroseconds * Constants.PulsesPerQuarterNote);
        }
 
        public static string MicrosecondsToString(UInt64 microseconds) {
            double bpm = (60.0 * ((double)Constants.SecondsToMicroseconds / microseconds));
-           return String.Format(bpm % 1 == 0 ? "{0:0}" : "{0:0.00}", bpm);
+           return String.Format(bpm == (UInt64)bpm ? "{0:0}" : "{0:0.00}", bpm);
 
            //UInt64 seconds = microseconds / Constants.MicrosecondsToSeconds;
            //StringBuilder sb = new StringBuilder();

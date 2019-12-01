@@ -34,9 +34,9 @@ public class DynamicBPMWindow : MonoBehaviour {
         gameObject.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
         gameObject.SetActive(true);
 
-        float existingBPM = timeline.GetBpmFromTime(Timeline.time);
+        double existingBPM = timeline.GetBpmFromTime(Timeline.time);
         if(existingBPM > 0) {
-            dynamicBpmInput.GetComponent<TMP_InputField>().text = existingBPM.ToString();
+            dynamicBpmInput.GetComponent<TMP_InputField>().text = String.Format("{0:0.###}", existingBPM);
         }
         else {
            dynamicBpmInput.GetComponent<TMP_InputField>().text = "";

@@ -922,8 +922,7 @@ namespace NotReaper {
 				var transform1 = timelineBPM.transform;
 				transform1.localPosition = new Vector3(tempo.time.ToBeatTime(), -0.5f, 0);
 
-				float bpm = Constants.GetBPMFromMicrosecondsPerQuaterNote(tempo.microsecondsPerQuarterNote);
-				timelineBPM.GetComponentInChildren<TextMesh>().text = Conversion.MicrosecondsToString(tempo.microsecondsPerQuarterNote);
+				timelineBPM.GetComponentInChildren<TextMesh>().text = String.Format("{0:0.##}", Constants.GetBPMFromMicrosecondsPerQuaterNote(tempo.microsecondsPerQuarterNote));
 				bpmMarkerObjects.Add(timelineBPM);
 			}
 
@@ -1034,13 +1033,13 @@ namespace NotReaper {
 			return -1;
 		}
 
-		public float GetBpmFromTime(QNT_Timestamp t) {
+		public double GetBpmFromTime(QNT_Timestamp t) {
 			int idx = GetCurrentBPMIndex(t);
 			if(idx != -1) {
 				return Constants.GetBPMFromMicrosecondsPerQuaterNote(tempoChanges[idx].microsecondsPerQuarterNote);
 			}
 			else {
-				return 1.0f;
+				return 120.0;
 			}
 		}
 
