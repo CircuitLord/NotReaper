@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Melanchall.DryWetMidi.Smf;
+using NAudio.Midi;
 using NotReaper.Targets;
 using NotReaper.Timing;
 

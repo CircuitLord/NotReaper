@@ -1,8 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Melanchall.DryWetMidi.Smf;
-using Melanchall.DryWetMidi.Smf.Interaction;
+using NAudio.Midi;
 using NotReaper.Models;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -29,13 +28,8 @@ namespace NotReaper.IO {
 
 			//We need to modify the BPM of the song.mid contained in the template audica to match whatever this is.
 			File.Delete(Path.Combine(workFolder, "song.mid"));
-			MidiFile songMidi = MidiFile.Read(Path.Combine(workFolder, "songtemplate.mid"));
-
-			float oneMinuteInMicroseconds = 60000000f;
-			songMidi.ReplaceTempoMap(TempoMap.Create(new Tempo((long)(oneMinuteInMicroseconds / bpm))));
-			songMidi.Write(Path.Combine(workFolder, "song.mid"), true, MidiFileFormat.MultiTrack);
-
-
+			File.Copy(Path.Combine(workFolder, "songtemplate.mid"), Path.Combine(workFolder, "song.mid"));
+			
 			//Generates the mogg into song.mogg, which is moved to the .AudicaTemplate
 			File.Delete(Path.Combine(workFolder, "song.mogg"));
 

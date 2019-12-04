@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using Melanchall.DryWetMidi.Smf.Interaction;
+using NAudio.Midi;
 using NotReaper.Grid;
 using NotReaper.IO;
 using NotReaper.Managers;
@@ -758,9 +758,14 @@ namespace NotReaper {
 			
 			// Get song BPM
 			if (audicaFile.song_mid != null) {
-				foreach (var tempo in audicaFile.song_mid.GetTempoMap().Tempo) {
-					QNT_Timestamp time = new QNT_Timestamp((UInt64)tempo.Time);
-					SetBPM(time, (UInt64)tempo.Value.MicrosecondsPerQuarterNote);
+				foreach(var eventList in audicaFile.song_mid.Events) {
+					foreach(var e in eventList) {
+						if(e is TempoEvent) {
+							TempoEvent tempo = (e as TempoEvent);
+							QNT_Timestamp time = new QNT_Timestamp((UInt64)tempo.AbsoluteTime);
+							SetBPM(time, (UInt64)tempo.MicrosecondsPerQuarterNote, false);
+				}
+			} 
 				}
 			} 
 

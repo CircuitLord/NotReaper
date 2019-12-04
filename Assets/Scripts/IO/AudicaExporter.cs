@@ -4,8 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Ionic.Zip;
-using Melanchall.DryWetMidi.Smf;
-using Melanchall.DryWetMidi.Smf.Interaction;
+using NAudio.Midi;
 using Newtonsoft.Json;
 using NotReaper.Models;
 using SharpCompress.Archives;
@@ -57,21 +56,34 @@ namespace NotReaper.IO {
 				File.WriteAllText($"{Application.dataPath}/.cache/song-new.desc", JsonUtility.ToJson(audicaFile.desc));
 
 				var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
-				MidiFile songMidi = MidiFile.Read(Path.Combine(workFolder, "songtemplate.mid"));
+				MidiFile songMidi = new MidiFile(Path.Combine(workFolder, "songtemplate.mid"));
 
-				using (var tempoMapManager = new TempoMapManager(new TicksPerQuarterNoteTimeDivision((short)Constants.PulsesPerQuarterNote)))
-				{
-					TempoMap tempoMap = tempoMapManager.TempoMap;
+				MidiEventCollection events = songMidi.Events;
 
-					foreach(var tempo in audicaFile.desc.tempoList) {
-						tempoMapManager.SetTempo((long)tempo.time.tick, new Tempo((long)tempo.microsecondsPerQuarterNote));
-
+				//First, remove all tempo events from the existing midi
+				foreach(var eventList in audicaFile.song_mid.Events) {
+					List<MidiEvent> tempoEvents = new List<MidiEvent>();
+					foreach(var e in eventList) {
+						if(e is TempoEvent) {
+							tempoEvents.Add(e);
+						}
 					}
 
-					songMidi.ReplaceTempoMap(tempoMap);
+					foreach(var e in tempoEvents) {
+						eventList.Remove(e);
+					}
 				}
 
-				songMidi.Write(Path.Combine(workFolder, $"{Application.dataPath}/.cache/song.mid"), true, MidiFileFormat.MultiTrack);
+				//Now add out tempo events
+				List<MidiEvent> newTempoEvents = new List<MidiEvent>();
+				foreach(var tempo in audicaFile.desc.tempoList) {
+					newTempoEvents.Add(new TempoEvent((int)tempo.microsecondsPerQuarterNote, (long)tempo.time.tick));
+				}
+
+				events.AddTrack(newTempoEvents);
+				events.PrepareForExport();
+
+				MidiFile.Export(Path.Combine(workFolder, $"{Application.dataPath}/.cache/song.mid"), events);
 
 				//Remove any files we'll be replacing
 				foreach (ZipArchiveEntry entry in archive.Entries) {

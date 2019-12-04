@@ -3,8 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using Ionic.Zip;
-using Melanchall.DryWetMidi.Smf;
-using Melanchall.DryWetMidi.Smf.Interaction;
+using NAudio.Midi;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -106,7 +105,7 @@ namespace NotReaper.IO {
 						File.SetAttributes(midiFiileName, FileAttributes.Normal);
 					}
 
-					audicaFile.song_mid = MidiFile.Read(midiFiileName);
+					audicaFile.song_mid = new MidiFile(midiFiileName);
 				}
 
 				temp.SetLength(0);
