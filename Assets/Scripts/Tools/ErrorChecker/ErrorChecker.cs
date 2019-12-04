@@ -516,20 +516,20 @@ namespace NotReaper.Tools.ErrorChecker
 
         private QNT_Duration SetRhythmLimit(int difficulty)
         {
-            QNT_Duration limit = Constants.QuarterNoteDuration;
+            QNT_Duration limit = Constants.SixteenthNoteDuration;
             switch (difficulty)
             {
                 case 1:
-                    limit = new QNT_Duration(Constants.PulsesPerQuarterNote);
+                    limit = Constants.SixteenthNoteDuration;
                     break;
                 case 2:
-                    limit = new QNT_Duration(Constants.PulsesPerQuarterNote * 2);
+                    limit = Constants.QuarterNoteDuration / 2;
                     break;
                 case 3:
-                    limit = new QNT_Duration(Constants.PulsesPerQuarterNote * 4);
+                    limit = Constants.QuarterNoteDuration;
                     break;
                 default:
-                    limit = new QNT_Duration(Constants.PulsesPerQuarterNote);
+                    limit = Constants.SixteenthNoteDuration;
                     break;
             }
             return limit;
