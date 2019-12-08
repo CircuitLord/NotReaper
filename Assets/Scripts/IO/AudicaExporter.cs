@@ -58,31 +58,12 @@ namespace NotReaper.IO {
 				var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
 				MidiFile songMidi = new MidiFile(Path.Combine(workFolder, "songtemplate.mid"));
 
-				MidiEventCollection events = songMidi.Events;
-
-				//First, remove all tempo events from the existing midi
-				foreach(var eventList in audicaFile.song_mid.Events) {
-					List<MidiEvent> tempoEvents = new List<MidiEvent>();
-					foreach(var e in eventList) {
-						if(e is TempoEvent) {
-							tempoEvents.Add(e);
-						}
-					}
-
-					foreach(var e in tempoEvents) {
-						eventList.Remove(e);
-					}
-				}
-
-				//Now add out tempo events
-				List<MidiEvent> newTempoEvents = new List<MidiEvent>();
+				MidiEventCollection events = new MidiEventCollection(0, (int)Constants.PulsesPerQuarterNote);
 				foreach(var tempo in audicaFile.desc.tempoList) {
-					newTempoEvents.Add(new TempoEvent((int)tempo.microsecondsPerQuarterNote, (long)tempo.time.tick));
+					events.AddEvent(new TempoEvent((int)tempo.microsecondsPerQuarterNote, (long)tempo.time.tick), 0);
 				}
 
-				events.AddTrack(newTempoEvents);
 				events.PrepareForExport();
-
 				MidiFile.Export(Path.Combine(workFolder, $"{Application.dataPath}/.cache/song.mid"), events);
 
 				//Remove any files we'll be replacing
