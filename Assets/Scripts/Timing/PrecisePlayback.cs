@@ -18,16 +18,22 @@ namespace NotReaper.Timing {
 		public float[] samples;
 		public int frequency;
 		public int channels;
-		public uint currentSample = 0;
+		public UInt64 currentSample = 0;
+		public uint scaledCurrentSample {
+			get { return (uint)(currentSample >> PrecisionShift); }
+		}
+
 		public float pan = 0.0f;
 
+		public const int PrecisionShift = 32;
+
 		public void SetSampleFromTime(double time) {
-			uint sample = (uint)(time * frequency);
-			currentSample = sample << 8;
+			UInt64 sample = (uint)(time * frequency);
+			currentSample = sample << PrecisionShift;
 		}
 
 		public double currentTime {
-			get { return (currentSample >> 8) / (double)frequency; }
+			get { return (currentSample >> PrecisionShift) / (double)frequency; }
 		}
 
 		public float length {
@@ -35,7 +41,8 @@ namespace NotReaper.Timing {
 		}
 
 		public void CopySampleIntoBuffer(CopyContext ctx) {
-			uint speed = (uint)frequency * 256 / (uint)ctx.bufferFreq;
+			UInt64 shiftNum = ((UInt64)1 << PrecisionShift);
+			UInt64 speed = (UInt64)frequency * shiftNum / (UInt64)ctx.bufferFreq;
 			float panClamp = Mathf.Clamp(pan, -1.0f, 1.0f);
 
 			int clipChannel = 0;
@@ -49,7 +56,7 @@ namespace NotReaper.Timing {
 					panAmount = Math.Max(-1.0f - panClamp, 1.0f);
 				}
 
-				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += samples[(currentSample >> 8) * channels + clipChannel] * ctx.volume * panAmount;
+				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += samples[(uint)(currentSample >> PrecisionShift) * channels + clipChannel] * ctx.volume * panAmount;
 
 				sourceChannel++;
 				clipChannel++;
@@ -172,8 +179,8 @@ namespace NotReaper.Timing {
 
 			uint sampleStart = (uint)((midTime - duration / 2) * song.frequency);
 			uint sampleEnd = (uint)((midTime + duration / 2) * song.frequency);
-			preview.currentSample = sampleStart << 8;
-			currentPreviewSongSampleEnd = sampleEnd << 8;
+			preview.currentSample = sampleStart << ClipData.PrecisionShift;
+			currentPreviewSongSampleEnd = sampleEnd << ClipData.PrecisionShift;
 			playPreview = true;
 		}
 
@@ -186,19 +193,19 @@ namespace NotReaper.Timing {
 			if(playPreview) {
 				int dataIndex = 0;
 
-				while(dataIndex < bufferData.Length / bufferChannels && (preview.currentSample < currentPreviewSongSampleEnd) && (preview.currentSample >> 8) < song.samples.Length) {
+				while(dataIndex < bufferData.Length / bufferChannels && (preview.currentSample < currentPreviewSongSampleEnd) && (preview.scaledCurrentSample) < song.samples.Length) {
 					ctx.index = dataIndex;
 					ctx.volume = volume;
 					preview.CopySampleIntoBuffer(ctx);
 					++dataIndex;
 				}
 
-				if(preview.currentSample >= currentPreviewSongSampleEnd || (preview.currentSample >> 8) >= song.samples.Length) {
+				if(preview.currentSample >= currentPreviewSongSampleEnd || (preview.scaledCurrentSample) >= song.samples.Length) {
 					playPreview = false;
 				}
 			}
 
-			if (paused || (song.currentSample >> 8) > song.samples.Length) {
+			if (paused || (song.scaledCurrentSample) > song.samples.Length) {
 				return;
 			}
 
