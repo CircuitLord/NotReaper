@@ -5,22 +5,81 @@ using System.Text;
 using UnityEngine;
 
 namespace NotReaper.Timing {
+	public struct CopyContext {
+		public float[] bufferData;
+		public int bufferChannels;
+		public int bufferFreq;
+		public int index;
+
+		public float volume;
+	}
+
+	public class ClipData {
+		public float[] samples;
+		public int frequency;
+		public int channels;
+		public uint currentSample = 0;
+		public float pan = 0.0f;
+
+		public void SetSampleFromTime(double time) {
+			uint sample = (uint)(time * frequency);
+			currentSample = sample << 8;
+		}
+
+		public double currentTime {
+			get { return (currentSample >> 8) / (double)frequency; }
+		}
+
+		public float length {
+			get { return (samples.Length / channels) / (float)frequency; }
+		}
+
+		public void CopySampleIntoBuffer(CopyContext ctx) {
+			uint speed = (uint)frequency * 256 / (uint)ctx.bufferFreq;
+			float panClamp = Mathf.Clamp(pan, -1.0f, 1.0f);
+
+			int clipChannel = 0;
+			int sourceChannel = 0;
+			while (sourceChannel < ctx.bufferChannels) {
+				float panAmount = 1.0f;
+				if(sourceChannel == 0) {
+					panAmount = Math.Max(1.0f - panClamp, 1.0f);
+				}
+				else if(sourceChannel == 1) {
+					panAmount = Math.Max(-1.0f - panClamp, 1.0f);
+				}
+
+				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += samples[(currentSample >> 8) * channels + clipChannel] * ctx.volume * panAmount;
+
+				sourceChannel++;
+				clipChannel++;
+				if (clipChannel == channels - 1) clipChannel = 0;
+			}
+
+			currentSample += speed;
+		}
+	};
+
 	[RequireComponent(typeof(AudioSource))]
 	public class PrecisePlayback : MonoBehaviour {
-		[SerializeField] private AudioSource source;
+		public ClipData song;
+		public ClipData preview;
+		public ClipData leftSustain;
+		public ClipData rightSustain;
+
+		public float leftSustainVolume = 0.0f;
+		public float rightSustainVolume = 0.0f;
+
+		public float speed = 1.0f;
+		public float volume = 1.0f;
 
 		private double dspStartTime = 0.0f;
 		private double songStartTime = 0.0f;
 
 		private int sampleRate = 1;
-		private int songFrequency;
-		private int songChannels;
-		private float[] songSamples;
-		private uint currentSongSample = 0;
 
 		//Preview
 		private bool playPreview = false;
-		private uint currentPreviewSongSample = 0;
 		private uint currentPreviewSongSampleEnd = 0;
 
 		//Metronome
@@ -30,20 +89,48 @@ namespace NotReaper.Timing {
 		private float nextMetronomeTick = 0;
 
 		private bool paused = true;
+		[SerializeField] private AudioSource source;
 
-		public Timeline timeline;
+		[SerializeField] private Timeline timeline;
 
 		private void Start() {
 			sampleRate = AudioSettings.outputSampleRate;
 			source.Play();
 		}
 
-		public void LoadAudioClip(AudioClip clip) {
-			songSamples = new float[clip.samples * clip.channels];
-			clip.GetData(songSamples, 0);
+		public enum LoadType {
+			MainSong,
+			LeftSustain,
+			RightSustain
+		}
 
-			songFrequency = clip.frequency;
-			songChannels = clip.channels;
+		public void LoadAudioClip(AudioClip clip, LoadType type) {
+			ClipData data = new ClipData();
+
+			data.samples = new float[clip.samples * clip.channels];
+			clip.GetData(data.samples, 0);
+
+			data.frequency = clip.frequency;
+			data.channels = clip.channels;
+
+			if(type == LoadType.MainSong) {
+				song = data;
+
+				preview = new ClipData();
+				preview.samples = song.samples;
+				preview.channels = song.channels;
+				preview.frequency = song.frequency;
+			}
+			else if(type == LoadType.LeftSustain) {
+				leftSustain = data;
+				leftSustainVolume = 0.0f;
+			}
+			else if(type == LoadType.RightSustain) {
+				rightSustain = data;
+				rightSustainVolume = 0.0f;
+			}
+
+			source.Play();
 		}
 
 		public double GetTime() {
@@ -52,7 +139,7 @@ namespace NotReaper.Timing {
 		}
 
 		public double GetTimeFromCurrentSample() {
-			return (currentSongSample >> 8) / (double)songFrequency;
+			return song.currentTime;
 		}
 
 		public void StartMetronome() {
@@ -66,8 +153,9 @@ namespace NotReaper.Timing {
 
 		public void Play(QNT_Timestamp time) {
 			songStartTime = timeline.TimestampToSeconds(time);
-			uint sample = (uint)(songStartTime * songFrequency);
-			currentSongSample = sample << 8;
+			song.SetSampleFromTime(songStartTime);
+			leftSustain.SetSampleFromTime(songStartTime);
+			rightSustain.SetSampleFromTime(songStartTime);
 			paused = false;
 			dspStartTime = AudioSettings.dspTime;
 		}
@@ -82,40 +170,35 @@ namespace NotReaper.Timing {
 			float duration = Conversion.FromQNT(new Relative_QNT((long)previewDuration.tick), timeline.GetTempoForTime(time).microsecondsPerQuarterNote);
 			duration = Math.Min(duration, 0.1f);
 
-			uint sampleStart = (uint)((midTime - duration / 2) * songFrequency);
-			uint sampleEnd = (uint)((midTime + duration / 2) * songFrequency);
-			currentPreviewSongSample = sampleStart << 8;
+			uint sampleStart = (uint)((midTime - duration / 2) * song.frequency);
+			uint sampleEnd = (uint)((midTime + duration / 2) * song.frequency);
+			preview.currentSample = sampleStart << 8;
 			currentPreviewSongSampleEnd = sampleEnd << 8;
 			playPreview = true;
 		}
 
 		void OnAudioFilterRead(float[] bufferData, int bufferChannels) {
-			uint speed = (uint)songFrequency * 256 / (uint)sampleRate;
+			CopyContext ctx;
+			ctx.bufferData = bufferData;
+			ctx.bufferChannels = bufferChannels;
+			ctx.bufferFreq = sampleRate;
 
 			if(playPreview) {
 				int dataIndex = 0;
 
-				while(dataIndex < bufferData.Length / bufferChannels && (currentPreviewSongSample < currentPreviewSongSampleEnd) && (currentPreviewSongSample >> 8) < songSamples.Length) {
-					int clipChannel = 0;
-					int sourceChannel = 0;
-					while (sourceChannel < bufferChannels) {
-						bufferData[dataIndex * bufferChannels + sourceChannel] += songSamples[(currentPreviewSongSample >> 8) * songChannels + clipChannel];
-
-						sourceChannel++;
-						clipChannel++;
-						if (clipChannel == songChannels - 1) clipChannel = 0;
-					}
-
-					currentPreviewSongSample += speed;
+				while(dataIndex < bufferData.Length / bufferChannels && (preview.currentSample < currentPreviewSongSampleEnd) && (preview.currentSample >> 8) < song.samples.Length) {
+					ctx.index = dataIndex;
+					ctx.volume = volume;
+					preview.CopySampleIntoBuffer(ctx);
 					++dataIndex;
 				}
 
-				if(currentPreviewSongSample >= currentPreviewSongSampleEnd || (currentPreviewSongSample >> 8) >= songSamples.Length) {
+				if(preview.currentSample >= currentPreviewSongSampleEnd || (preview.currentSample >> 8) >= song.samples.Length) {
 					playPreview = false;
 				}
 			}
 
-			if (paused || (currentSongSample >> 8) > songSamples.Length) {
+			if (paused || (song.currentSample >> 8) > song.samples.Length) {
 				return;
 			}
 
@@ -123,22 +206,24 @@ namespace NotReaper.Timing {
 
 			//double samplesPerTick = sampleRate * (GetTempoForTime(ShiftTick(new QNT_Timestamp(0), (float)currentTime)).microsecondsPerQuarterNote / 1000000.0);
 			//double sample = AudioSettings.dspTime * sampleRate;
-			//int startSample = (int)(currentTime * songFrequency * songChannels);
-			//int startSample = (int)(currentTime * sampleRate * songChannels);
+			//int startSample = (int)(currentTime * song.frequency * song.channels);
+			//int startSample = (int)(currentTime * sampleRate * song.channels);
 
 			for (int dataIndex = 0; dataIndex < bufferData.Length / bufferChannels; dataIndex++) {
+				ctx.volume = volume;
+				ctx.index = dataIndex;
+				song.CopySampleIntoBuffer(ctx);
 
-				int clipChannel = 0;
-				int sourceChannel = 0;
-				while (sourceChannel < bufferChannels) {
-					bufferData[dataIndex * bufferChannels + sourceChannel] += songSamples[(currentSongSample >> 8) * songChannels + clipChannel];
-
-					sourceChannel++;
-					clipChannel++;
-					if (clipChannel == songChannels - 1) clipChannel = 0;
+				if(leftSustain != null) {
+					ctx.volume = leftSustainVolume;
+					leftSustain.CopySampleIntoBuffer(ctx);
 				}
 
-				currentSongSample += speed;
+				if(rightSustain != null) {
+					ctx.volume = rightSustainVolume;
+					rightSustain.CopySampleIntoBuffer(ctx);
+				}
+
 				if(playMetronome) {
 					if(GetTimeFromCurrentSample() > nextMetronomeTick) {
 						metronomeSamplesLeft = (int)(sampleRate * metronomeTickLength);

@@ -284,7 +284,7 @@ namespace NotReaper.Timing {
 
         private static BpmMatchData[] bpmMatchDatas = new BpmMatchData[MAX_BPM - MIN_BPM + 1];
 
-        public static float Detect(AudioClip src, Timeline timeline, QNT_Timestamp start, QNT_Timestamp end) {
+        public static float Detect(ClipData src, Timeline timeline, QNT_Timestamp start, QNT_Timestamp end) {
              for (int i = 0; i < bpmMatchDatas.Length; i++) {
                 bpmMatchDatas[i].match = 0f;
             }
@@ -305,24 +305,21 @@ namespace NotReaper.Timing {
             int channels = src.channels;
             int frequency = src.frequency;
             uint numSamples = (uint)(frequency * (endTime - startTime) * channels);
-            
-            float[] allSamples = new float[numSamples];
-            src.GetData(allSamples, (int)(frequency * startTime));
 
             int splitFrameSize = BASE_SPLIT_SAMPLE_SIZE;
 
-            var volumeArr = new float[Mathf.CeilToInt((float)allSamples.Length / (float)splitFrameSize)];
+            var volumeArr = new float[Mathf.CeilToInt((float)src.samples.Length / (float)splitFrameSize)];
             int powerIndex = 0;
 
             // Sample data analysis start
-            for (int sampleIndex = 0; sampleIndex < allSamples.Length; sampleIndex += splitFrameSize) {
+            for (int sampleIndex = 0; sampleIndex < src.samples.Length; sampleIndex += splitFrameSize) {
                 float sum = 0f;
                 for (int frameIndex = sampleIndex; frameIndex < sampleIndex + splitFrameSize; frameIndex++) {
-                    if (allSamples.Length <= frameIndex) {
+                    if (src.samples.Length <= frameIndex) {
                         break;
                     }
                     // Use the absolute value, because left and right value is -1 to 1
-                    float absValue = Mathf.Abs(allSamples[frameIndex]);
+                    float absValue = Mathf.Abs(src.samples[frameIndex]);
                     if (absValue > 1f) {
                         continue;
                     }

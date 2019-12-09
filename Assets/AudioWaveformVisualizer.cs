@@ -20,7 +20,7 @@ public class AudioWaveformVisualizer : MonoBehaviour {
         public float end;
     };
 
-    public void GenerateWaveform(AudioSource aud, NotReaper.Timeline timeline) {
+    public void GenerateWaveform(ClipData aud, NotReaper.Timeline timeline) {
         foreach (Transform child in transform) {
             GameObject.Destroy(child.gameObject);
         }
@@ -39,17 +39,14 @@ public class AudioWaveformVisualizer : MonoBehaviour {
             lastTime = timeline.tempoChanges[i].time;
         }
 
-        float[] fullSamples = new float[aud.clip.samples * aud.clip.channels];
-        aud.clip.GetData(fullSamples, 0);
-
         var tempoChanges = timeline.tempoChanges;
         int nextTempoChange = 1;
 
         List<GenerationSections> sections = new List<GenerationSections>();
-        for(float t = 0; t < aud.clip.length;) {
+        for(float t = 0; t < aud.length;) {
             float endOfSection = t + SecondsPerTexture;
-            if(endOfSection > aud.clip.length) {
-                endOfSection = aud.clip.length;
+            if(endOfSection > aud.length) {
+                endOfSection = aud.length;
             }
 
             if(nextTempoChange < tempoChanges.Count) {
@@ -72,13 +69,13 @@ public class AudioWaveformVisualizer : MonoBehaviour {
         foreach(GenerationSections gen in sections) {
             GameObject obj = GameObject.Instantiate(waveformSegmentInstance, new Vector3(0,0,0), Quaternion.identity, gameObject.transform);
 
-            int sampleStart = (int)(gen.start * aud.clip.frequency * aud.clip.channels);
-            int sampleEnd = (int)(gen.end * aud.clip.frequency * aud.clip.channels);
+            int sampleStart = (int)(gen.start * aud.frequency * aud.channels);
+            int sampleEnd = (int)(gen.end * aud.frequency * aud.channels);
 
             QNT_Timestamp startTick = timeline.ShiftTick(new QNT_Timestamp(0), gen.start);
             UInt64 microsecondsPerQuarterNote = timeline.tempoChanges[timeline.GetCurrentBPMIndex(startTick)].microsecondsPerQuarterNote;
 
-            Texture2D tex = PaintWaveformSpectrum(fullSamples, sampleStart, sampleEnd - sampleStart, (int)(Conversion.ToQNT(gen.end - gen.start, microsecondsPerQuarterNote).ToBeatTime() * PixelsPerQuarterNote), 64, Color.yellow);
+            Texture2D tex = PaintWaveformSpectrum(aud.samples, sampleStart, sampleEnd - sampleStart, (int)(Conversion.ToQNT(gen.end - gen.start, microsecondsPerQuarterNote).ToBeatTime() * PixelsPerQuarterNote), 64, Color.yellow);
 
             QNT_Timestamp start = timeline.ShiftTick(new QNT_Timestamp(0), gen.start);
             QNT_Timestamp end = timeline.ShiftTick(new QNT_Timestamp(0), gen.end);

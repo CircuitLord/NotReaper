@@ -26677,12 +26677,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e3761f79c226394494a99b531bbcae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aud: {fileID: 1395334179}
-  previewAud: {fileID: 1395334178}
   leftSustainAud: {fileID: 1852465332}
   rightSustainAud: {fileID: 526556410}
   spectrogram: {fileID: 0}
-  metronomeTick: {fileID: 1151431940}
   miniTimeline: {fileID: 1450236233}
   songTimestamp: {fileID: 942452378}
   curTick: {fileID: 1904177394}
@@ -26963,7 +26960,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c45d0a1a42cff6e48b67457bdbc03937, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 1395334178}
+  speed: 1
+  volume: 1
+  source: {fileID: 1395334179}
   timeline: {fileID: 1395334176}
 --- !u!1 &1406753963
 GameObject:

@@ -35,14 +35,7 @@ namespace NotReaper {
 		[HideInInspector] public static SongDesc desc;
 
 		[Header("Audio Stuff")]
-
-		[SerializeField] private AudioSource aud;
-		[SerializeField] private AudioSource previewAud;
-		[SerializeField] private AudioSource leftSustainAud;
-		[SerializeField] private AudioSource rightSustainAud;
 		[SerializeField] private Transform spectrogram;
-
-		[SerializeField] private AudioSource metronomeTick;
 
 		[Header("UI Elements")]
 		[SerializeField] private MiniTimeline miniTimeline;
@@ -380,7 +373,7 @@ namespace NotReaper {
 		}
 
 		public float DetectBPM(QNT_Timestamp start, QNT_Timestamp end) {
-			return BPM.Detect(aud.clip, this, start, end);
+			return BPM.Detect(songPlayback.song, this, start, end);
 		}
 
         private void UpdateSustains() {
@@ -395,12 +388,11 @@ namespace NotReaper {
 
 							float panPos = (float) (note.data.x / 7.15);
 							if (note.data.handType == TargetHandType.Left) {
-								leftSustainAud.volume = sustainVolume;
-								leftSustainAud.panStereo = panPos;
-
+								songPlayback.leftSustainVolume = sustainVolume;
+								songPlayback.leftSustain.pan = panPos;
 							} else if (note.data.handType == TargetHandType.Right) {
-								rightSustainAud.volume = sustainVolume;
-								rightSustainAud.panStereo = panPos;
+								songPlayback.rightSustainVolume = sustainVolume;
+								songPlayback.rightSustain.pan = panPos;
 							}
 
 							var main = particles.main;
@@ -422,9 +414,9 @@ namespace NotReaper {
 						if (particles.isEmitting) {
 							particles.Stop();
 							if (note.data.handType == TargetHandType.Left) {
-								leftSustainAud.volume = 0.0f;
+								songPlayback.leftSustainVolume = 0.0f;
 							} else if (note.data.handType == TargetHandType.Right) {
-								rightSustainAud.volume = 0.0f;
+								songPlayback.rightSustainVolume = 0.0f;
 							}
 						}
 					}
@@ -698,13 +690,8 @@ namespace NotReaper {
 		public void LoadTimingMode(AudioClip clip) {
 			if (audicaLoaded) return;
 
+			songPlayback.LoadAudioClip(clip, PrecisePlayback.LoadType.MainSong);
 			inTimingMode = true;
-
-			aud.clip = clip;
-			previewAud.clip = null;
-			leftSustainAud.clip = null;
-			rightSustainAud.clip = null;
-
 			audioLoaded = true;
 		}
 
@@ -815,45 +802,7 @@ namespace NotReaper {
 					Debug.Log(www.error);
 				} else {
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
-					
-					/*
-					if(myClip.frequency != sampleRate) {
-						float[] clipSamples = new float[myClip.samples * myClip.channels];
-						myClip.GetData(clipSamples, 0);
-
-						UInt64 numSamples = ((UInt64)myClip.samples * (UInt64)myClip.channels) * (UInt64)sampleRate / (UInt64)myClip.frequency;
-						Debug.Log(numSamples);
-						Debug.Log(myClip.samples * myClip.channels);
-						songSamples = new float[numSamples];
-						for(int i = 0; i < (int)numSamples / myClip.channels; ++i) {
-							float p = (float)i / numSamples / myClip.channels;
-							int sampleIdx = (int)(p * myClip.samples);
-
-							for(int c = 0; c < myClip.channels; ++c) {
-								float interp = (p * myClip.samples) - sampleIdx;
-								float current = clipSamples[sampleIdx * myClip.channels + c];
-								float next = 0;
-
-								if(sampleIdx + 1 < myClip.samples) {
-									next = clipSamples[(sampleIdx + 1) * myClip.channels + c];
-								}
-								else {
-									next = current;
-								}
-
-								songSamples[i + c] = current * (1.0f - interp) + next * interp;
-							}
-						}
-					}
-					else {
-						songSamples = new float[myClip.samples * myClip.channels];
-						myClip.GetData(songSamples, 0);
-					}
-					*/
-
-					songPlayback.LoadAudioClip(myClip);
-					aud.clip = myClip;
-					//previewAud.clip = myClip;
+					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.MainSong);
 					
 					int zeroBPMIndex = GetCurrentBPMIndex(new QNT_Timestamp(0));
 					if(zeroBPMIndex == -1) {
@@ -873,7 +822,7 @@ namespace NotReaper {
 					//Load the preview start point
 					miniTimeline.SetPreviewStartPoint(ShiftTick(new QNT_Timestamp(0), (float)desc.previewStartSeconds));
 
-					waveformVisualizer.GenerateWaveform(aud, this);
+					waveformVisualizer.GenerateWaveform(songPlayback.song, this);
 
 					//Difficulty manager loads stuff now
 					//difficultyManager.LoadHighestDifficulty(false);
@@ -896,8 +845,7 @@ namespace NotReaper {
 					Debug.Log(www.error);
 				} else {
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
-					leftSustainAud.clip = myClip;
-					leftSustainAud.volume = 0f;
+					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.LeftSustain);
 				}
 			}
 		}
@@ -909,9 +857,7 @@ namespace NotReaper {
 					Debug.Log(www.error);
 				} else {
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
-					rightSustainAud.clip = myClip;
-					rightSustainAud.volume = 0f;
-
+					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.RightSustain);
 				}
 			}
 		}
@@ -920,20 +866,13 @@ namespace NotReaper {
 			if (!audioLoaded) return;
 
 			playbackSpeed = speed;
-			aud.pitch = speed;
-			previewAud.pitch = speed;
-			leftSustainAud.pitch = speed;
-			rightSustainAud.pitch = speed;
+			songPlayback.speed = speed;
 		}
 		
 		public void SetPlaybackSpeedFromSlider(Slider slider) {
 			if (!audioLoaded) return;
 
-			playbackSpeed = slider.value;
-			aud.pitch = slider.value;
-			previewAud.pitch = slider.value;
-			leftSustainAud.pitch = slider.value;
-			rightSustainAud.pitch = slider.value;
+			SetPlaybackSpeed(slider.value);
 		}
 
 		struct UpdateTiming {
@@ -1058,11 +997,11 @@ namespace NotReaper {
 				bpmMarkerObjects.Add(timelineBPM);
 			}
 
-			if(aud.clip == null) {
+			if(songPlayback.song == null) {
 				return;
 			}
 
-			QNT_Timestamp endOfAudio = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
+			QNT_Timestamp endOfAudio = ShiftTick(new QNT_Timestamp(0), songPlayback.song.length);
 			
 			List<Vector3> vertices = new List<Vector3>();
 			List<int> indices = new List<int>();
@@ -1126,7 +1065,7 @@ namespace NotReaper {
 			mesh.vertices = vertices.ToArray();
 			mesh.triangles = indices.ToArray();
 
-			waveformVisualizer.GenerateWaveform(aud, this);
+			waveformVisualizer.GenerateWaveform(songPlayback.song, this);
 		}
 
 		public void SetOffset(Relative_QNT newOffset) {
@@ -1362,9 +1301,6 @@ namespace NotReaper {
 				SafeSetTime();
 				if (paused) {
 					songPlayback.PlayPreview(time, Constants.DurationFromBeatSnap((uint)beatSnap));
-
-					previewAud.Play();
-					previewAud.SetScheduledEndTime(AudioSettings.dspTime + previewDuration);
 					checkForNearSustainsOnThisFrame = true;
 				}
 				else {
@@ -1384,7 +1320,7 @@ namespace NotReaper {
 				SetBeatTime(time);
 			}
 
-			previewAud.volume = aud.volume = musicVolume;
+			songPlayback.volume = musicVolume;
 
 			SetCurrentTime();
 			SetCurrentTick();
@@ -1397,14 +1333,14 @@ namespace NotReaper {
 
 		public double GetPercentPlayedFromSeconds(double seconds)
 		{
-			return seconds / aud.clip.length;
+			return seconds / songPlayback.song.length;
 		}
 
 
 		public void JumpToPercent(float percent) {
 			if (!audioLoaded) return;
 
-			time = ShiftTick(new QNT_Timestamp(0), aud.clip.length * percent);
+			time = ShiftTick(new QNT_Timestamp(0), songPlayback.song.length * percent);
 
 			SafeSetTime();
 			SetCurrentTime();
@@ -1439,30 +1375,18 @@ namespace NotReaper {
 				}
 
 				songPlayback.Play(time);
-
-				if (leftSustainAud.clip && TimestampToSeconds(time) < leftSustainAud.clip.length) {
-					leftSustainAud.Play();
-					rightSustainAud.Play();
-				}
-
 				paused = false;
 			} else {
 				//aud.Pause();
 				songPlayback.Stop();
-
-				if (leftSustainAud.clip != null) {
-					leftSustainAud.Pause();
-					rightSustainAud.Pause();
-
-				}
 				paused = true;
 
 				//Snap to the beat snap when we pause
 				time = GetClosestBeatSnapped(time, (uint)beatSnap);
 
 				float currentTimeSeconds = TimestampToSeconds(time);
-				if (currentTimeSeconds > aud.clip.length) {
-					time = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
+				if (currentTimeSeconds > songPlayback.song.length) {
+					time = ShiftTick(new QNT_Timestamp(0), songPlayback.song.length);
 				}
 
 				SetBeatTime(time);
@@ -1478,25 +1402,10 @@ namespace NotReaper {
 
 			float currentTimeSeconds = TimestampToSeconds(time);
 
-			if (currentTimeSeconds > aud.clip.length) {
-				time = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
-				currentTimeSeconds = aud.clip.length;
+			if (currentTimeSeconds > songPlayback.song.length) {
+				time = ShiftTick(new QNT_Timestamp(0), songPlayback.song.length);
+				currentTimeSeconds = songPlayback.song.length;
 			}
-			aud.time = currentTimeSeconds;
-
-			float previewOffset = 0; //Conversion.FromQNT(new Relative_QNT((long)Constants.PulsesPerQuarterNote / 16), tempoChanges[GetCurrentBPMIndex(time)].microsecondsPerQuarterNote);
-			previewAud.time = Math.Max(currentTimeSeconds - previewDuration + previewOffset, 0);
-
-			float tempTime = currentTimeSeconds;
-			if (leftSustainAud.clip && currentTimeSeconds > leftSustainAud.clip.length) {
-				tempTime = leftSustainAud.clip.length;
-			}
-			leftSustainAud.time = tempTime;
-
-			if (rightSustainAud.clip && currentTimeSeconds > rightSustainAud.clip.length) {
-				tempTime = rightSustainAud.clip.length;
-			}
-			rightSustainAud.time = tempTime;
 		}
 
 		public IEnumerator AnimateSetTime(QNT_Timestamp newTime) {
@@ -1505,26 +1414,9 @@ namespace NotReaper {
 
 			if (!audioLoaded) yield break;
 
-			if (TimestampToSeconds(newTime) > aud.clip.length) {
-				newTime = ShiftTick(new QNT_Timestamp(0), aud.clip.length);
+			if (TimestampToSeconds(newTime) > songPlayback.song.length) {
+				newTime = ShiftTick(new QNT_Timestamp(0), songPlayback.song.length);
 			}
-
-			float newTimeInSeconds = TimestampToSeconds(newTime);
-
-			aud.time = newTimeInSeconds;
-			float previewOffset = 0; //Conversion.FromQNT(new Relative_QNT((long)Constants.PulsesPerQuarterNote / 16), tempoChanges[GetCurrentBPMIndex(time)].microsecondsPerQuarterNote);
-			previewAud.time = Math.Max(newTimeInSeconds - previewDuration + previewOffset, 0);
-
-			float tempTime = newTimeInSeconds;
-			if (leftSustainAud.clip && newTimeInSeconds > leftSustainAud.clip.length) {
-				tempTime = leftSustainAud.clip.length;
-			}
-			leftSustainAud.time = tempTime;
-
-			if (rightSustainAud.clip && newTimeInSeconds > rightSustainAud.clip.length) {
-				tempTime = rightSustainAud.clip.length;
-			}
-			rightSustainAud.time = tempTime;
 
 			//DOTween.Play
 			DOTween.To(t => SetBeatTime(new QNT_Timestamp((UInt64)Math.Round(t))), time.tick, newTime.tick, 0.2f).SetEase(Ease.InOutCubic);
@@ -1573,8 +1465,8 @@ namespace NotReaper {
 		}
 
 		public float GetPercentagePlayed() {
-			if (aud.clip)
-				return (TimestampToSeconds(time) / aud.clip.length);
+			if (songPlayback.song != null)
+				return (TimestampToSeconds(time) / songPlayback.song.length);
 
 			else
 				return 0;
