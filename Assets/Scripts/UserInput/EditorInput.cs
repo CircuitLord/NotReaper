@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using NotReaper.Timing;
 
 namespace NotReaper.UserInput {
 
@@ -67,6 +68,8 @@ namespace NotReaper.UserInput {
 
 		bool isCTRLDown;
 		bool isShiftDown;
+
+		QNT_Timestamp? bpmStartTimestamp = null;
 
 		private void Start() {
 			InputManager.LoadHotkeys();
@@ -386,12 +389,29 @@ namespace NotReaper.UserInput {
 				}
 			}
 
+			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
+				isShiftDown = true;
+			} else {
+				isShiftDown = false;
+			}
+
 			if(Input.GetKeyDown(KeyCode.B)) {
-				if(bpmWindow.activeSelf) {
-					bpmWindow.GetComponent<DynamicBPMWindow>().Deactivate();
+				if(isShiftDown) {
+					if(bpmStartTimestamp == null) {
+						bpmStartTimestamp = Timeline.time;
+					}
+					else {
+						Debug.Log(timeline.DetectBPM(bpmStartTimestamp.Value, Timeline.time));
+						bpmStartTimestamp = null;
+					}
 				}
-				else if (!inUI) {
-					bpmWindow.GetComponent<DynamicBPMWindow>().Activate();
+				else {
+					if(bpmWindow.activeSelf) {
+						bpmWindow.GetComponent<DynamicBPMWindow>().Deactivate();
+					}
+					else if (!inUI) {
+						bpmWindow.GetComponent<DynamicBPMWindow>().Activate();
+					}
 				}
 			}
 
@@ -440,12 +460,6 @@ namespace NotReaper.UserInput {
 				isCTRLDown = true;
 			} else {
 				isCTRLDown = false;
-			}
-
-			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
-				isShiftDown = true;
-			} else {
-				isShiftDown = false;
 			}
 
 

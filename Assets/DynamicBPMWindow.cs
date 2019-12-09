@@ -54,7 +54,7 @@ public class DynamicBPMWindow : MonoBehaviour {
     public void AddDynamicBPM() {
         double dynamicBpm = 0.0f;
         if(Double.TryParse(dynamicBpmInput.text, out dynamicBpm)) {
-            timeline.SetBPM(Timeline.time, Constants.MicrosecondsPerQuarterNoteFromBPM(dynamicBpm));
+            timeline.SetBPM(Timeline.time, Constants.MicrosecondsPerQuarterNoteFromBPM(dynamicBpm), true);
             Deactivate();
         }
     }

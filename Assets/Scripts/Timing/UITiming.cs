@@ -23,10 +23,7 @@ namespace NotReaper.Timing {
 
         [Header("UI Elements")]
         public Button genAudicaButton;
-        public Button applyButton;
         public Button selectSongButton;
-        public TMP_InputField bpmInput;
-        public TMP_InputField offsetInput;
         public TextMeshProUGUI nameText;
         public TMP_InputField songNameInput;
         public TMP_InputField mapperInput;
@@ -40,18 +37,15 @@ namespace NotReaper.Timing {
 
         private AudioClip audioFile;
         public Timeline timeline;
-
-
-        public int offset = 0;
-        public double bpm = 0;
         public string loadedSong;
 
         public string songName = "";
         public string mapperName = "";
 
-
-        public bool skipOffset = false;
+        public bool skipOffset = true;
         public bool isMp3 = false;
+
+        const int DefaultBPM = 150;
 
 
         TrimAudio trimAudio = new TrimAudio();
@@ -79,15 +73,7 @@ namespace NotReaper.Timing {
 
         public void SkipOffset(bool yes) {
 
-	        if (yes) {
-		        offsetInput.interactable = false;
-	        }
-
-	        else {
-		        offsetInput.interactable = true;
-	        }
-
-	        skipOffset = yes;
+            skipOffset = yes;
 
         }
         
@@ -131,11 +117,7 @@ namespace NotReaper.Timing {
                 timeline.TogglePlayback();
             }
 
-            Double.TryParse(bpmInput.text, out bpm);
-            Int32.TryParse(offsetInput.text, out offset);
-
-            timeline.SetTimingModeStats(Constants.MicrosecondsPerQuarterNoteFromBPM(bpm), offset);
-            timeline.SetOffset(new Relative_QNT(offset));
+            timeline.SetTimingModeStats(Constants.MicrosecondsPerQuarterNoteFromBPM(DefaultBPM), 0);
 
             mapperName = RemoveSpecialCharacters(mapperInput.text);
             songName = RemoveSpecialCharacters(songNameInput.text);
@@ -145,35 +127,35 @@ namespace NotReaper.Timing {
         }
 
         public void GenerateOgg() {
+            ApplyValues();
+            if(!CheckAllUIFilled()) {
+                return;
+            }
+            
 
 	        string path;
 
 	        if (isMp3 || !skipOffset) {
-				trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), offset, bpm, skipOffset);
-				path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), songName, "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
+                trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), 0, DefaultBPM, skipOffset);
+                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), songName, "artist", DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0);
 		        
 	        }
 	        else {
-		        path = AudicaGenerator.Generate(loadedSong, (songName + "-" + mapperName), songName, "artist", bpm, "event:/song_end/song_end_C#", mapperName, 0);
+                path = AudicaGenerator.Generate(loadedSong, (songName + "-" + mapperName), songName, "artist", DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0);
 	        }
-	        
-		        
-
 	        
             timeline.LoadAudicaFile(false, path);
             editorInput.SelectMode(EditorMode.Compose);
 
-            applyButton.interactable = false;
-            genAudicaButton.interactable = false;
+            genAudicaButton.interactable = true;
             selectSongButton.interactable = false;
-
         }
 
-        public void CheckAllUIFilled() {
-            if (bpm != 0 && loadedSong != "" && mapperName != "" && songName != "") {
-                genAudicaButton.interactable = true;
+        public bool CheckAllUIFilled() {
+            if (loadedSong != "" && mapperName != "" && songName != "") {
+                return true;
             } else {
-                genAudicaButton.interactable = false;
+                return false;
             }
         }
 
@@ -217,10 +199,9 @@ namespace NotReaper.Timing {
                 } else {
                     audioFile = DownloadHandlerAudioClip.GetContent(www);
 
-                    Double.TryParse(bpmInput.text, out bpm);
-
                     timeline.LoadTimingMode(audioFile);
 
+                    ApplyValues();
 
                     yield break;
 
