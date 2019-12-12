@@ -405,6 +405,9 @@ namespace NotReaper.UserInput {
 						bpmStartTimestamp = null;
 					}
 				}
+				else if(Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.LeftAlt)) {
+					timeline.ShiftNextBPMToCurrentTime();
+				}
 				else {
 					if(bpmWindow.activeSelf) {
 						bpmWindow.GetComponent<DynamicBPMWindow>().Deactivate();

@@ -56,7 +56,13 @@ namespace NotReaper.Timing {
 					panAmount = Math.Max(-1.0f - panClamp, 1.0f);
 				}
 
-				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += samples[(uint)(currentSample >> PrecisionShift) * channels + clipChannel] * ctx.volume * panAmount;
+				float value = 0.0f;
+				long samplePos = (uint)(currentSample >> PrecisionShift) * channels + clipChannel;
+				if(samplePos < samples.Length) {
+					value = samples[samplePos];
+				}
+
+				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += value * ctx.volume * panAmount;
 
 				sourceChannel++;
 				clipChannel++;
@@ -87,7 +93,7 @@ namespace NotReaper.Timing {
 
 		//Preview
 		private bool playPreview = false;
-		private uint currentPreviewSongSampleEnd = 0;
+		private UInt64 currentPreviewSongSampleEnd = 0;
 
 		//Metronome
 		private bool playMetronome = false;
@@ -165,6 +171,7 @@ namespace NotReaper.Timing {
 			rightSustain.SetSampleFromTime(songStartTime);
 			paused = false;
 			dspStartTime = AudioSettings.dspTime;
+			source.Play();
 		}
 
 		public void Stop() {
@@ -177,11 +184,12 @@ namespace NotReaper.Timing {
 			float duration = Conversion.FromQNT(new Relative_QNT((long)previewDuration.tick), timeline.GetTempoForTime(time).microsecondsPerQuarterNote);
 			duration = Math.Min(duration, 0.1f);
 
-			uint sampleStart = (uint)((midTime - duration / 2) * song.frequency);
-			uint sampleEnd = (uint)((midTime + duration / 2) * song.frequency);
+			UInt64 sampleStart = (UInt64)((midTime - duration / 2) * song.frequency);
+			UInt64 sampleEnd = (UInt64)((midTime + duration / 2) * song.frequency);
 			preview.currentSample = sampleStart << ClipData.PrecisionShift;
 			currentPreviewSongSampleEnd = sampleEnd << ClipData.PrecisionShift;
 			playPreview = true;
+			source.Play();
 		}
 
 		void OnAudioFilterRead(float[] bufferData, int bufferChannels) {

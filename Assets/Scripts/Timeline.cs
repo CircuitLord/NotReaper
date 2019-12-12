@@ -880,12 +880,117 @@ namespace NotReaper {
 			public QNT_Timestamp newTime;
 		}
 
-		public void SetBPM(QNT_Timestamp time, UInt64 microsecondsPerQuarterNote, bool shiftFutureEvents) {
-			foreach(var bpm in bpmMarkerObjects) {
-				Destroy(bpm);
-			}
-			bpmMarkerObjects.Clear();
+		public void ShiftNotesByBPM(UInt64 prevMicrosecondPerQuarterNote, QNT_Timestamp time) {
+			int tempoIndex = GetCurrentBPMIndex(time);
+			var newTempo = tempoChanges[tempoIndex];
 
+			UInt64 newMicrosecondPerQuarterNote = newTempo.microsecondsPerQuarterNote;
+
+			if(prevMicrosecondPerQuarterNote == 0) {
+				if(tempoIndex > 0) {
+					prevMicrosecondPerQuarterNote = tempoChanges[tempoIndex - 1].microsecondsPerQuarterNote;
+				}
+				//We are at the beginning, but no previous bpm. We can't shift anything
+				else {
+					return;
+				}
+			}
+
+			float p = (float)prevMicrosecondPerQuarterNote / newMicrosecondPerQuarterNote;
+			List<UpdateTiming> updateTimings = new List<UpdateTiming>();
+
+			QNT_Timestamp recalcStart = time;
+			QNT_Timestamp recalcEnd = new QNT_Timestamp(UInt64.MaxValue);
+			if(tempoIndex + 1 < tempoChanges.Count) {
+				TempoChange nextChange = tempoChanges[tempoIndex + 1];
+				recalcEnd = nextChange.time;
+
+				QNT_Duration tempoTimeDifference = new QNT_Duration(tempoChanges[tempoIndex + 1].time.tick - recalcStart.tick);
+				Relative_QNT shift_duration = new Relative_QNT((long)(tempoTimeDifference.tick * p - tempoTimeDifference.tick));
+				
+				nextChange.time = recalcEnd + shift_duration;
+				tempoChanges[tempoIndex + 1] = nextChange;
+
+				//Shift everything after this tempo
+				for(int i = tempoIndex + 2; i < tempoChanges.Count; ++i) {
+					TempoChange change = tempoChanges[i];
+					change.time = change.time + shift_duration;
+					tempoChanges[i] = change;
+				}
+
+				for(int i = BinarySearchOrderedNotes(recalcEnd).index; i < orderedNotes.Count; ++i) {
+					UpdateTiming t;
+					t.data = orderedNotes[i].data;
+					t.newTime = orderedNotes[i].data.time + shift_duration;
+					updateTimings.Add(t);
+				}
+			}
+
+			//Recalc all notes in the zone
+			for(int i = BinarySearchOrderedNotes(recalcStart).index; i != -1 && i < orderedNotes.Count; ++i) {
+				if(orderedNotes[i].data.time >= recalcEnd) {
+					break;
+				}
+
+				QNT_Duration tempoTimeDifference = new QNT_Duration(orderedNotes[i].data.time.tick - recalcStart.tick);
+				QNT_Duration duration_from_start = new QNT_Duration((UInt64)(tempoTimeDifference.tick * p));
+
+				UpdateTiming t;
+				t.data = orderedNotes[i].data;
+				t.newTime = recalcStart + duration_from_start;
+				updateTimings.Add(t);
+			}
+
+			//Update all notes
+			foreach(var t in updateTimings) {
+				t.data.time = t.newTime;
+			}
+		}
+
+		public void ShiftNextBPMToCurrentTime() {
+			int tempoIndex = GetCurrentBPMIndex(time);
+			if(tempoIndex == -1 || tempoIndex + 1 >= tempoChanges.Count) {
+				return;
+			}
+
+			
+			var nextTempo = tempoChanges[tempoIndex + 1];
+
+			/*
+			QNT_Timestamp recalcStart = nextTempo.time;
+			QNT_Timestamp recalcEnd = new QNT_Timestamp(UInt64.MaxValue);
+			if(tempoIndex + 2 < tempoChanges.Count) {
+				recalcEnd = tempoChanges[tempoIndex + 2].time;
+			}
+			
+			QNT_Duration shift = new QNT_Duration(nextTempo.time.tick - time.tick);
+			List<UpdateTiming> updateTimings = new List<UpdateTiming>();
+			for(int i = BinarySearchOrderedNotes(recalcStart).index; i != -1 && i < orderedNotes.Count; ++i) {
+				if(orderedNotes[i].data.time >= recalcEnd) {
+					break;
+				}
+
+				UpdateTiming t;
+				t.data = orderedNotes[i].data;
+				t.newTime = t.data.time - shift;
+				updateTimings.Add(t);
+			}
+
+			//Update all notes
+			foreach(var t in updateTimings) {
+				t.data.time = t.newTime;
+			}
+			*/
+
+			nextTempo.time = time;
+			tempoChanges[tempoIndex + 1] = nextTempo;
+
+			ShiftNotesByBPM(tempoChanges[tempoIndex].microsecondsPerQuarterNote, time);
+
+			RegenerateBPMTimelineData();
+		}
+
+		public void SetBPM(QNT_Timestamp time, UInt64 microsecondsPerQuarterNote, bool shiftFutureEvents) {
 			TempoChange c = new TempoChange();
 			c.time = time;
 			c.microsecondsPerQuarterNote = microsecondsPerQuarterNote;
@@ -893,14 +998,12 @@ namespace NotReaper {
 			UInt64 prevMicrosecondPerQuarterNote = 0;
 
 			bool found = false;
-			bool removed = false;
 			for(int i = 0; i < tempoChanges.Count; ++i) {
 				if(tempoChanges[i].time == time) {
 					prevMicrosecondPerQuarterNote = tempoChanges[i].microsecondsPerQuarterNote;
 
 					tempoChanges[i] = c;
 					if(microsecondsPerQuarterNote == 0) {
-						removed = true;
 						tempoChanges.RemoveAt(i);
 					}
 					found = true;
@@ -916,78 +1019,22 @@ namespace NotReaper {
 			if (desc != null) {
 				desc.tempoList = tempoChanges;
 			}
-			SetScale(scale);
 
 			//Move all future targets back
 			if(shiftFutureEvents) {
-				int tempoIndex = GetCurrentBPMIndex(c.time);
-				var newTempo = tempoChanges[tempoIndex];
-
-				UInt64 newMicrosecondPerQuarterNote = newTempo.microsecondsPerQuarterNote;
-
-				if(prevMicrosecondPerQuarterNote == 0) {
-					if(tempoIndex > 0) {
-						prevMicrosecondPerQuarterNote = tempoChanges[tempoIndex - 1].microsecondsPerQuarterNote;
-					}
-					//We are at the beginning, but no previous bpm. We can't shift anything
-					else {
-						return;
-					}
-				}
-
-				float p = (float)prevMicrosecondPerQuarterNote / newMicrosecondPerQuarterNote;
-				List<UpdateTiming> updateTimings = new List<UpdateTiming>();
-
-				QNT_Timestamp recalcStart = c.time;
-				QNT_Timestamp recalcEnd = new QNT_Timestamp(UInt64.MaxValue);
-				if(tempoIndex + 1 < tempoChanges.Count) {
-					TempoChange nextChange = tempoChanges[tempoIndex + 1];
-					recalcEnd = nextChange.time;
-
-					QNT_Duration tempoTimeDifference = new QNT_Duration(tempoChanges[tempoIndex + 1].time.tick - recalcStart.tick);
-					Relative_QNT shift_duration = new Relative_QNT((long)(tempoTimeDifference.tick * p - tempoTimeDifference.tick));
-					
-					nextChange.time = recalcEnd + shift_duration;
-					tempoChanges[tempoIndex + 1] = nextChange;
-
-					//Shift everything after this tempo
-					for(int i = tempoIndex + 2; i < tempoChanges.Count; ++i) {
-						TempoChange change = tempoChanges[i];
-						change.time = change.time + shift_duration;
-						tempoChanges[i] = change;
-					}
-
-					for(int i = BinarySearchOrderedNotes(recalcEnd).index; i < orderedNotes.Count; ++i) {
-						//orderedNotes[i].data.time = orderedNotes[i].data.time - shift_duration;
-						
-						UpdateTiming t;
-						t.data = orderedNotes[i].data;
-						t.newTime = orderedNotes[i].data.time + shift_duration;
-						updateTimings.Add(t);
-					}
-				}
-
-				//Recalc all notes in the zone
-				for(int i = BinarySearchOrderedNotes(recalcStart).index; i != -1 && i < orderedNotes.Count; ++i) {
-					if(orderedNotes[i].data.time >= recalcEnd) {
-						break;
-					}
-
-					QNT_Duration tempoTimeDifference = new QNT_Duration(orderedNotes[i].data.time.tick - recalcStart.tick);
-					QNT_Duration duration_from_start = new QNT_Duration((UInt64)(tempoTimeDifference.tick * p));
-
-					UpdateTiming t;
-					t.data = orderedNotes[i].data;
-					t.newTime = recalcStart + duration_from_start;
-					updateTimings.Add(t);
-				}
-
-				//Update all notes
-				foreach(var t in updateTimings) {
-					t.data.time = t.newTime;
-				}
+				ShiftNotesByBPM(prevMicrosecondPerQuarterNote, time);
 			}
 
+			RegenerateBPMTimelineData();
+		}
+
+		public void RegenerateBPMTimelineData() {
+			foreach(var bpm in bpmMarkerObjects) {
+				Destroy(bpm);
+			}
+			bpmMarkerObjects.Clear();
+
+			SetScale(scale);
 			foreach(var tempo in tempoChanges) {
 				var timelineBPM = Instantiate(BPM_MarkerPrefab, timelineTransformParent);
 				var transform1 = timelineBPM.transform;
