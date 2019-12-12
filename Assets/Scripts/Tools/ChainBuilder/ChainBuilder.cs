@@ -283,6 +283,17 @@ namespace NotReaper.Tools.ChainBuilder {
 			data.pathBuilderData.OnFinishRecalculate();
 		}
 
+		public void BakePathFromSelectedNote() {
+			Target target = timeline.selectedNotes.First();
+			if(target == null || target.data.behavior != TargetBehavior.NR_Pathbuilder) {
+				return;
+			}
+
+			NRActionBakePath action = new NRActionBakePath();
+			action.data = target.data;
+			timeline.Tools.undoRedoManager.AddAction(action);
+		}
+
 		/// <summary>
 		/// Sets the tool to be in select mode.
 		/// </summary>

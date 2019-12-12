@@ -287,4 +287,32 @@ namespace NotReaper.Tools {
 			data.pathBuilderData = null;
 		}
 	}
+
+	public class NRActionBakePath : NRAction {
+		public TargetData data;
+
+		public override void DoAction(Timeline timeline) {
+			//Generate and create real notes
+			ChainBuilder.ChainBuilder.GenerateChainNotes(data);
+			foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
+				timeline.AddTargetFromAction(new TargetData(genData));
+			}
+
+			//Destroy the path builder note (and all the generated transient notes)
+			timeline.DeleteTargetFromAction(data);
+		}
+		public override void UndoAction(Timeline timeline) {
+			timeline.AddTargetFromAction(data);
+
+			//Recalculate the notes, and remove the "real" notes
+			ChainBuilder.ChainBuilder.CalculateChainNotes(data);
+			foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
+				var foundData = timeline.FindTargetData(genData.beatTime, genData.behavior, genData.handType);
+				if(foundData != null) {
+					timeline.DeleteTargetFromAction(foundData);
+				}
+			}
+			ChainBuilder.ChainBuilder.GenerateChainNotes(data);
+		}
+	}
 }
