@@ -246,7 +246,7 @@ namespace NotReaper.Targets {
 			if (!data.supportsBeatLength) return;
 			
 			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
-				ChainBuilder.CalculateChainNotes(data);
+				ChainBuilder.GenerateChainNotes(data);
 			}
 		}
 
