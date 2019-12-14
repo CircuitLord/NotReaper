@@ -93,6 +93,7 @@ public class AudioWaveformVisualizer : MonoBehaviour {
 
                     obj.GetComponent<MeshFilter>().mesh = CreateMesh(start.ToBeatTime(), new QNT_Duration((UInt64)(end.tick - start.tick)).ToBeatTime(), 1);
                     obj.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", tex);
+                    obj.GetComponent<MeshRenderer>().enabled = false;
                     obj.GetComponent<Transform>().localPosition = new Vector3(0, -0.5f ,0);
                     obj.GetComponent<Transform>().localScale = new Vector3(1.0f, 1, 1);
                 }
