@@ -12,6 +12,7 @@ namespace NotReaper.Timing {
 		public int index;
 
 		public float volume;
+		public float playbackSpeed;
 	}
 
 	public class ClipData {
@@ -43,6 +44,10 @@ namespace NotReaper.Timing {
 		public void CopySampleIntoBuffer(CopyContext ctx) {
 			UInt64 shiftNum = ((UInt64)1 << PrecisionShift);
 			UInt64 speed = (UInt64)frequency * shiftNum / (UInt64)ctx.bufferFreq;
+			if(ctx.playbackSpeed != 1.0f) {
+				speed = (UInt64)(speed * ctx.playbackSpeed);
+			}
+
 			float panClamp = Mathf.Clamp(pan, -1.0f, 1.0f);
 
 			int clipChannel = 0;
@@ -66,7 +71,7 @@ namespace NotReaper.Timing {
 
 				sourceChannel++;
 				clipChannel++;
-				if (clipChannel == channels - 1) clipChannel = 0;
+				if (clipChannel >= channels) clipChannel = 0;
 			}
 
 			currentSample += speed;
@@ -147,8 +152,7 @@ namespace NotReaper.Timing {
 		}
 
 		public double GetTime() {
-			double offsetFromStart = AudioSettings.dspTime - dspStartTime;
-			return songStartTime + offsetFromStart;
+			return song.currentTime;
 		}
 
 		public double GetTimeFromCurrentSample() {
@@ -167,8 +171,15 @@ namespace NotReaper.Timing {
 		public void Play(QNT_Timestamp time) {
 			songStartTime = timeline.TimestampToSeconds(time);
 			song.SetSampleFromTime(songStartTime);
-			leftSustain.SetSampleFromTime(songStartTime);
-			rightSustain.SetSampleFromTime(songStartTime);
+			
+			if(leftSustain != null) { 
+				leftSustain.SetSampleFromTime(songStartTime);
+			}
+
+			if(rightSustain != null) { 
+				rightSustain.SetSampleFromTime(songStartTime);
+			}
+
 			paused = false;
 			dspStartTime = AudioSettings.dspTime;
 			source.Play();
@@ -197,6 +208,7 @@ namespace NotReaper.Timing {
 			ctx.bufferData = bufferData;
 			ctx.bufferChannels = bufferChannels;
 			ctx.bufferFreq = sampleRate;
+			ctx.playbackSpeed = speed;
 
 			if(playPreview) {
 				int dataIndex = 0;
