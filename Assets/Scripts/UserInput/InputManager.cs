@@ -30,6 +30,7 @@ namespace NotReaper.UserInput {
 		public static KeyCode selectTool { get; set; }
 
 		public static KeyCode timelineTogglePlay { get; set; }
+		public static KeyCode timelineToggleWaveform { get; set; }
 
 		public static KeyCode undo { get; set; } = KeyCode.Z;
 
@@ -56,7 +57,7 @@ namespace NotReaper.UserInput {
 
 			selectTool = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectTool", "F"));
 			timelineTogglePlay = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("timelineTogglePlay", "Space"));
-			
+			timelineToggleWaveform = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("timelinetoggleWaveform", "F2"));
 		}
 
 	}

@@ -831,7 +831,7 @@ namespace NotReaper {
 
 					//spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
 
-
+					
 				}
 			}
 		}
@@ -1509,6 +1509,10 @@ namespace NotReaper {
 			newTime = GetClosestBeatSnapped(newTime, (uint)beatSnap);
 
 			StartCoroutine(AnimateSetTime(newTime));
+		}
+
+		public void ToggleWaveform() {
+			waveformVisualizer.visible = !waveformVisualizer.visible;
 		}
 
 

@@ -26677,8 +26677,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e3761f79c226394494a99b531bbcae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftSustainAud: {fileID: 1852465332}
-  rightSustainAud: {fileID: 526556410}
   spectrogram: {fileID: 0}
   miniTimeline: {fileID: 1450236233}
   songTimestamp: {fileID: 942452378}
@@ -26960,6 +26958,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c45d0a1a42cff6e48b67457bdbc03937, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  leftSustainVolume: 0
+  rightSustainVolume: 0
   speed: 1
   volume: 1
   source: {fileID: 1395334179}

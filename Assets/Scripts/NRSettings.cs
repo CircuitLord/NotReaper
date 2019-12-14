@@ -113,6 +113,7 @@ namespace NotReaper {
         public Color leftColor = new Color(0.0f, 0.5f, 1.0f, 1.0f);
         public Color rightColor = new Color(1.0f, 0.47f, 0.14f, 1.0f);
         public Color selectedHighlightColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        public Color waveformColor = new Color(0f, 255 / 255f, 178 / 255f, 1.0f);
 
         public float mainVol = 0.5f;
         public float noteVol = 0.5f;

@@ -519,6 +519,10 @@ namespace NotReaper.UserInput {
 				timeline.TogglePlayback();
 			}
 
+			if (Input.GetKeyDown(InputManager.timelineToggleWaveform)) {
+				timeline.ToggleWaveform();
+			}
+
 
 			if (Input.GetKeyDown(InputManager.selectStandard)) {
 
