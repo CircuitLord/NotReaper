@@ -875,12 +875,75 @@ namespace NotReaper {
 			SetPlaybackSpeed(slider.value);
 		}
 
+		public int FindFirstNoteAtTime(QNT_Timestamp time) {
+			var result = BinarySearchOrderedNotes(time);
+			if(result.found) {
+				return result.index;
+			}
+
+			for(int i = result.index; i > 0; --i) {
+				if(orderedNotes[i].data.time < time) {
+					return i + 1;
+				}
+			}
+
+			return 0;
+		}
+
 		struct UpdateTiming {
 			public TargetData data;
 			public QNT_Timestamp newTime;
 		}
 
-		public void ShiftNotesByBPM(UInt64 prevMicrosecondPerQuarterNote, QNT_Timestamp time) {
+		struct TempoFixup {
+			public int tempoId;
+			public float time;
+		}
+
+		//When we shift a previous tempo, we still need to keep the other tempo changes
+		// at the same point in time
+		List<TempoFixup> GatherTempoFixups(int tempoIndex) {
+			List<TempoFixup> tempoFixes = new List<TempoFixup>();
+			for(int i = tempoIndex + 1; i < tempoChanges.Count; ++i) {
+				TempoFixup fixup;
+				fixup.tempoId = i;
+				fixup.time = TimestampToSeconds(tempoChanges[i].time);
+				tempoFixes.Add(fixup);
+			}
+
+			return tempoFixes;
+		}
+
+		//Go through each future tempo, adjust it so that it is still at the same point in time, 
+		// then adjust all of the notes in that tempo so that they are still aligned
+		void FixupTempoTimings(List<TempoFixup> tempoFixes, List<UpdateTiming> updateTimings) {
+			foreach(TempoFixup fixup in tempoFixes) {
+				QNT_Timestamp newTime = ShiftTick(new QNT_Timestamp(0), fixup.time);
+				TempoChange change = tempoChanges[fixup.tempoId];
+				Relative_QNT changeOffset = newTime - change.time;
+
+				QNT_Timestamp endTime = new QNT_Timestamp(UInt64.MaxValue);
+				if(fixup.tempoId + 1 < tempoChanges.Count) {
+					endTime = tempoChanges[fixup.tempoId + 1].time;
+				}
+
+				for(int i = FindFirstNoteAtTime(change.time); i != -1 && i < orderedNotes.Count; ++i) {
+					if(orderedNotes[i].data.time >= endTime) {
+						break;
+					}
+
+					UpdateTiming t;
+					t.data = orderedNotes[i].data;
+					t.newTime = t.data.time + changeOffset;
+					updateTimings.Add(t);
+				}
+
+				change.time = newTime;
+				tempoChanges[fixup.tempoId] = change;
+			}
+		}
+
+		void ShiftNotesByBPM(UInt64 prevMicrosecondPerQuarterNote, QNT_Timestamp time, List<TempoFixup> tempoFixes) {
 			int tempoIndex = GetCurrentBPMIndex(time);
 			var newTempo = tempoChanges[tempoIndex];
 
@@ -902,32 +965,11 @@ namespace NotReaper {
 			QNT_Timestamp recalcStart = time;
 			QNT_Timestamp recalcEnd = new QNT_Timestamp(UInt64.MaxValue);
 			if(tempoIndex + 1 < tempoChanges.Count) {
-				TempoChange nextChange = tempoChanges[tempoIndex + 1];
-				recalcEnd = nextChange.time;
-
-				QNT_Duration tempoTimeDifference = new QNT_Duration(tempoChanges[tempoIndex + 1].time.tick - recalcStart.tick);
-				Relative_QNT shift_duration = new Relative_QNT((long)(tempoTimeDifference.tick * p - tempoTimeDifference.tick));
-				
-				nextChange.time = recalcEnd + shift_duration;
-				tempoChanges[tempoIndex + 1] = nextChange;
-
-				//Shift everything after this tempo
-				for(int i = tempoIndex + 2; i < tempoChanges.Count; ++i) {
-					TempoChange change = tempoChanges[i];
-					change.time = change.time + shift_duration;
-					tempoChanges[i] = change;
-				}
-
-				for(int i = BinarySearchOrderedNotes(recalcEnd).index; i < orderedNotes.Count; ++i) {
-					UpdateTiming t;
-					t.data = orderedNotes[i].data;
-					t.newTime = orderedNotes[i].data.time + shift_duration;
-					updateTimings.Add(t);
-				}
+				recalcEnd = tempoChanges[tempoIndex + 1].time;
 			}
 
 			//Recalc all notes in the zone
-			for(int i = BinarySearchOrderedNotes(recalcStart).index; i != -1 && i < orderedNotes.Count; ++i) {
+			for(int i = FindFirstNoteAtTime(recalcStart); i != -1 && i < orderedNotes.Count; ++i) {
 				if(orderedNotes[i].data.time >= recalcEnd) {
 					break;
 				}
@@ -941,51 +983,71 @@ namespace NotReaper {
 				updateTimings.Add(t);
 			}
 
+			FixupTempoTimings(tempoFixes, updateTimings);
+
 			//Update all notes
 			foreach(var t in updateTimings) {
 				t.data.time = t.newTime;
 			}
 		}
 
-		public void ShiftNextBPMToCurrentTime() {
+		public void ShiftNearestBPMToCurrentTime() {
 			int tempoIndex = GetCurrentBPMIndex(time);
-			if(tempoIndex == -1 || tempoIndex + 1 >= tempoChanges.Count) {
+			if(tempoIndex == -1) {
 				return;
 			}
 
-			
-			var nextTempo = tempoChanges[tempoIndex + 1];
+			Relative_QNT offset = time - tempoChanges[tempoIndex].time;
+			if(tempoIndex + 1 < tempoChanges.Count) {
+				Relative_QNT next = time - tempoChanges[tempoIndex + 1].time;
+				if(Math.Abs(next.tick) < Math.Abs(offset.tick)) {
+					tempoIndex += 1;
+					offset = next;
+				}
+			}
 
-			/*
+			//If we try to shift the first tempo marker, don't do that
+			if(tempoIndex == 0) {
+				var notif = new NRNotification("Cannot shift first bpm marker!");
+				notif.type = NRNotifType.Fail;
+				NotificationShower.AddNotifToQueue(notif);
+				return;
+			}
+
+			List<UpdateTiming> updateTimings = new List<UpdateTiming>();
+			
+			var nextTempo = tempoChanges[tempoIndex];
 			QNT_Timestamp recalcStart = nextTempo.time;
 			QNT_Timestamp recalcEnd = new QNT_Timestamp(UInt64.MaxValue);
-			if(tempoIndex + 2 < tempoChanges.Count) {
-				recalcEnd = tempoChanges[tempoIndex + 2].time;
+			if(tempoIndex + 1 < tempoChanges.Count) {
+				TempoChange nextChange = tempoChanges[tempoIndex + 1];
+				recalcEnd = nextChange.time;
 			}
-			
-			QNT_Duration shift = new QNT_Duration(nextTempo.time.tick - time.tick);
-			List<UpdateTiming> updateTimings = new List<UpdateTiming>();
-			for(int i = BinarySearchOrderedNotes(recalcStart).index; i != -1 && i < orderedNotes.Count; ++i) {
+
+			//Update the notes in the recalc area
+			for(int i = FindFirstNoteAtTime(recalcStart); i != -1 && i < orderedNotes.Count; ++i) {
 				if(orderedNotes[i].data.time >= recalcEnd) {
 					break;
 				}
 
 				UpdateTiming t;
 				t.data = orderedNotes[i].data;
-				t.newTime = t.data.time - shift;
+				t.newTime = t.data.time + offset;
 				updateTimings.Add(t);
 			}
+
+			List<TempoFixup> tempoFixes = GatherTempoFixups(tempoIndex);
+
+			//Change the tempo
+			nextTempo.time = time;
+			tempoChanges[tempoIndex] = nextTempo;
+
+			FixupTempoTimings(tempoFixes, updateTimings);
 
 			//Update all notes
 			foreach(var t in updateTimings) {
 				t.data.time = t.newTime;
 			}
-			*/
-
-			nextTempo.time = time;
-			tempoChanges[tempoIndex + 1] = nextTempo;
-
-			ShiftNotesByBPM(tempoChanges[tempoIndex].microsecondsPerQuarterNote, time);
 
 			RegenerateBPMTimelineData();
 		}
@@ -997,23 +1059,59 @@ namespace NotReaper {
 
 			UInt64 prevMicrosecondPerQuarterNote = 0;
 
-			bool found = false;
+			int foundIndex = -1;
 			for(int i = 0; i < tempoChanges.Count; ++i) {
 				if(tempoChanges[i].time == time) {
-					prevMicrosecondPerQuarterNote = tempoChanges[i].microsecondsPerQuarterNote;
-
-					tempoChanges[i] = c;
-					if(microsecondsPerQuarterNote == 0) {
-						tempoChanges.RemoveAt(i);
-					}
-					found = true;
+					foundIndex = i;
 					break;
 				}
 			}
-			
-			if(!found && microsecondsPerQuarterNote != 0) {
-				tempoChanges.Add(c);
+
+			//Never attempt to remove the first bpm marker
+			if(foundIndex == 0 && microsecondsPerQuarterNote == 0) {
+				var notif = new NRNotification("Cannot remove initial bpm!");
+				notif.type = NRNotifType.Fail;
+				NotificationShower.AddNotifToQueue(notif);
+				return;
 			}
+
+			List<TempoFixup> tempoFixes = new List<TempoFixup>();
+
+			//Found a bpm, set it to the new value
+			if(foundIndex != -1) {
+				prevMicrosecondPerQuarterNote = tempoChanges[foundIndex].microsecondsPerQuarterNote;
+
+				//Remove marker
+				if(microsecondsPerQuarterNote == 0) {
+					tempoFixes = GatherTempoFixups(foundIndex);
+					tempoChanges.RemoveAt(foundIndex);
+
+					//Fixup the indices, since they're off by 1 now
+					for(int i = 0; i < tempoFixes.Count; ++i) {
+						TempoFixup newFixup = tempoFixes[i];
+						newFixup.tempoId -= 1;
+						tempoFixes[i] = newFixup;
+					}
+				}
+				//Set to new tempo
+				else {
+					tempoFixes = GatherTempoFixups(foundIndex);
+					tempoChanges[foundIndex] = c;
+				}
+			}
+			else {
+				int index = GetCurrentBPMIndex(time);
+				tempoFixes = GatherTempoFixups(index);
+				tempoChanges.Add(c);
+
+				//Fixup the indices, since they're off by 1 now
+				for(int i = 0; i < tempoFixes.Count; ++i) {
+					TempoFixup newFixup = tempoFixes[i];
+					newFixup.tempoId += 1;
+					tempoFixes[i] = newFixup;
+				}
+			}
+
 			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time.tick).ToList();
 			
 			if (desc != null) {
@@ -1022,7 +1120,14 @@ namespace NotReaper {
 
 			//Move all future targets back
 			if(shiftFutureEvents) {
-				ShiftNotesByBPM(prevMicrosecondPerQuarterNote, time);
+				//ShiftNotesByBPM(prevMicrosecondPerQuarterNote, time, tempoFixes);
+				List<UpdateTiming> updateTimings = new List<UpdateTiming>();
+				FixupTempoTimings(tempoFixes, updateTimings);
+
+				//Update all notes
+				foreach(var t in updateTimings) {
+					t.data.time = t.newTime;
+				}
 			}
 
 			RegenerateBPMTimelineData();

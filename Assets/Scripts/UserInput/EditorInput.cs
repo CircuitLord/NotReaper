@@ -406,7 +406,7 @@ namespace NotReaper.UserInput {
 					}
 				}
 				else if(Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.LeftAlt)) {
-					timeline.ShiftNextBPMToCurrentTime();
+					timeline.ShiftNearestBPMToCurrentTime();
 				}
 				else {
 					if(bpmWindow.activeSelf) {
