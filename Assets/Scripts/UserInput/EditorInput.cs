@@ -52,6 +52,7 @@ namespace NotReaper.UserInput {
 
 		[SerializeField] private GameObject focusGrid;
 		[SerializeField] private GameObject bpmWindow;
+		[SerializeField] private GameObject bpmResultWindow;
 
 
 		public HoverTarget hover;
@@ -350,7 +351,7 @@ namespace NotReaper.UserInput {
 
 			}
 
-			if(bpmWindow.activeSelf) {
+			if(bpmWindow.activeSelf || bpmResultWindow.activeSelf) {
 				inUI = true;
 				return;
 			}
@@ -401,7 +402,7 @@ namespace NotReaper.UserInput {
 						bpmStartTimestamp = Timeline.time;
 					}
 					else {
-						Debug.Log(timeline.DetectBPM(bpmStartTimestamp.Value, Timeline.time));
+						bpmResultWindow.GetComponent<BPMListWindow>().Activate(timeline.DetectBPM(bpmStartTimestamp.Value, Timeline.time));
 						bpmStartTimestamp = null;
 					}
 				}
@@ -415,6 +416,12 @@ namespace NotReaper.UserInput {
 					else if (!inUI) {
 						bpmWindow.GetComponent<DynamicBPMWindow>().Activate();
 					}
+				}
+			}
+
+			if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift)) {
+				if (selectedSnappingMode != previousSnappingMode) {
+					SelectSnappingMode(previousSnappingMode);
 				}
 			}
 
@@ -451,11 +458,6 @@ namespace NotReaper.UserInput {
 					case SnappingMode.None:
 						SelectSnappingMode(selectedTool == EditorTool.Melee ? SnappingMode.Melee : SnappingMode.Grid);
 						break;
-				}
-			}
-			if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift)) {
-				if (selectedSnappingMode != previousSnappingMode) {
-					SelectSnappingMode(previousSnappingMode);
 				}
 			}
 

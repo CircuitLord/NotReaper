@@ -284,13 +284,13 @@ namespace NotReaper.Timing {
 
         private static BpmMatchData[] bpmMatchDatas = new BpmMatchData[MAX_BPM - MIN_BPM + 1];
 
-        public static float Detect(ClipData src, Timeline timeline, QNT_Timestamp start, QNT_Timestamp end) {
+        public static List<float> Detect(ClipData src, Timeline timeline, QNT_Timestamp start, QNT_Timestamp end) {
              for (int i = 0; i < bpmMatchDatas.Length; i++) {
                 bpmMatchDatas[i].match = 0f;
             }
 
             if(start == end) {
-                return 0;
+                return new List<float>();
             }
 
             if(end < start) {
@@ -374,11 +374,12 @@ namespace NotReaper.Timing {
             // Returns a high degree of coincidence BPM
             int matchIndex = Array.FindIndex(bpmMatchDatas, x => x.match == bpmMatchDatas.Max(y => y.match));
             var sort = bpmMatchDatas.OrderBy(x => x.match).Reverse().ToList();
+            List<float> results = new List<float>();
             for(int i = 0; i < 10; ++i) {
-                Debug.Log("BPM " + i + ": " + sort[i].bpm);
+                results.Add(sort[i].bpm);
             }
 
-            return bpmMatchDatas[matchIndex].bpm;
+            return results;
         }
     }
 }

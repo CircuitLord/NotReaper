@@ -372,7 +372,7 @@ namespace NotReaper {
 			return target;
 		}
 
-		public float DetectBPM(QNT_Timestamp start, QNT_Timestamp end) {
+		public List<float> DetectBPM(QNT_Timestamp start, QNT_Timestamp end) {
 			return BPM.Detect(songPlayback.song, this, start, end);
 		}
 
@@ -831,7 +831,7 @@ namespace NotReaper {
 
 					//spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
 
-					
+
 				}
 			}
 		}
