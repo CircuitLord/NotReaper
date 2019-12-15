@@ -1075,6 +1075,13 @@ namespace NotReaper {
 				return;
 			}
 
+			if(foundIndex == -1 && microsecondsPerQuarterNote == 0) {
+				var notif = new NRNotification("Cannot add 0 bpm!");
+				notif.type = NRNotifType.Fail;
+				NotificationShower.AddNotifToQueue(notif);
+				return;
+			}
+
 			List<TempoFixup> tempoFixes = new List<TempoFixup>();
 
 			//Found a bpm, set it to the new value
