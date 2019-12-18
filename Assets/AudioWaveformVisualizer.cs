@@ -85,7 +85,9 @@ public class AudioWaveformVisualizer : MonoBehaviour {
             QNT_Timestamp startTick = timeline.ShiftTick(new QNT_Timestamp(0), gen.start);
             UInt64 microsecondsPerQuarterNote = timeline.tempoChanges[timeline.GetCurrentBPMIndex(startTick)].microsecondsPerQuarterNote;
 
-            StartCoroutine(PaintWaveformSpectrum(aud.samples, sampleStart, sampleEnd - sampleStart, (int)(Conversion.ToQNT(gen.end - gen.start, microsecondsPerQuarterNote).ToBeatTime() * PixelsPerQuarterNote), 64, NRSettings.config.waveformColor,
+            float beatTime = Conversion.ToQNT(gen.end - gen.start, microsecondsPerQuarterNote).ToBeatTime();
+
+            StartCoroutine(PaintWaveformSpectrum(aud.samples, sampleStart, sampleEnd - sampleStart, (int)(beatTime * PixelsPerQuarterNote), 64, NRSettings.config.waveformColor,
                 delegate (Texture2D tex) {
                     GameObject obj = GameObject.Instantiate(waveformSegmentInstance, new Vector3(0,0,0), Quaternion.identity, gameObject.transform);
                     QNT_Timestamp start = timeline.ShiftTick(new QNT_Timestamp(0), gen.start);
@@ -155,7 +157,7 @@ public class AudioWaveformVisualizer : MonoBehaviour {
          resetColorArray[i] = resetColor;
      }
      tex.SetPixels32(resetColorArray);
-     int sampleIncr = sampleSection / width;
+     float sampleIncr = sampleSection / (float)width;
 
      const int PIXELS_PER_YIELD = 32; //Waits every 400,000 loop
      int loopCounter = 0;
@@ -164,7 +166,7 @@ public class AudioWaveformVisualizer : MonoBehaviour {
         float maxValue = 0;
         float avgValue = 0;
         for (int s = 0; s < sampleIncr; s++) {
-            float sampleVal = Math.Abs(samples[sampleStart + x * sampleIncr + s]);
+            float sampleVal = Math.Abs(samples[(int)(sampleStart + x * sampleIncr + s)]);
             avgValue += sampleVal * sampleVal;
             maxValue = Math.Max(maxValue, sampleVal * sampleVal);
         }
