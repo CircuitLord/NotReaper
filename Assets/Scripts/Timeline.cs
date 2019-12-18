@@ -887,6 +887,11 @@ namespace NotReaper {
 				}
 			}
 
+			//If we get the first note, and it's later than time, we didn't find a note
+			if(orderedNotes.Count == 0 || orderedNotes[0].data.time > time) {
+				return -1;
+			}
+
 			return 0;
 		}
 
@@ -1152,7 +1157,7 @@ namespace NotReaper {
 				var transform1 = timelineBPM.transform;
 				transform1.localPosition = new Vector3(tempo.time.ToBeatTime(), -0.5f, 0);
 
-				timelineBPM.GetComponentInChildren<TextMesh>().text = String.Format("{0:0.##}", Constants.GetBPMFromMicrosecondsPerQuaterNote(tempo.microsecondsPerQuarterNote));
+				timelineBPM.GetComponentInChildren<TextMesh>().text = Constants.DisplayBPMFromMicrosecondsPerQuaterNote(tempo.microsecondsPerQuarterNote);
 				bpmMarkerObjects.Add(timelineBPM);
 			}
 

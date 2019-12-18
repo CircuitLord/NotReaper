@@ -17,6 +17,17 @@ namespace NotReaper.Timing {
             return (double)OneMinuteInMicroseconds / microsecondsPerQuarterNote;
         }
 
+        public static string DisplayBPMFromMicrosecondsPerQuaterNote(UInt64 microsecondsPerQuarterNote) {
+            double bpm = GetBPMFromMicrosecondsPerQuaterNote(microsecondsPerQuarterNote);
+            
+            //If we get the same value from the rounded version, then precision is throwing us off, and we should just round it to a whole number
+            if(GetBPMFromMicrosecondsPerQuaterNote(MicrosecondsPerQuarterNoteFromBPM(Math.Round(bpm))) == bpm) {
+                return ((uint)Math.Round(bpm)).ToString();
+            }
+
+            return String.Format("{0:0.###}", bpm);
+        }
+
         public static UInt64 MicrosecondsPerQuarterNoteFromBPM(double bpm) {
             if(bpm == 0) { return 0; }
             return (UInt64)Math.Round((double)OneMinuteInMicroseconds / bpm);
