@@ -27570,6 +27570,12 @@ MonoBehaviour:
   volume: 1
   source: {fileID: 1395334179}
   timeline: {fileID: 1395334176}
+  KickClip: {fileID: 8300000, guid: 6305ae087be36a94c803537830a174de, type: 3}
+  SnareClip: {fileID: 8300000, guid: f95e2fc67fb2f054d9e592c0251808bf, type: 3}
+  PercussionClip: {fileID: 8300000, guid: 79c5030954b9bfc4bb9af1008b059afc, type: 3}
+  ChainStartClip: {fileID: 8300000, guid: 6f44599fcb0546c4e9b64c758f6b3c22, type: 3}
+  ChainNoteClip: {fileID: 8300000, guid: 0bb92c258526d764193a9209155a0254, type: 3}
+  MeleeClip: {fileID: 8300000, guid: 075bc10c2c138a74eb46ebb2f3b180f1, type: 3}
 --- !u!1 &1406753963
 GameObject:
   m_ObjectHideFlags: 0

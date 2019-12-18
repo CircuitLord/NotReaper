@@ -166,7 +166,9 @@ public class AudioWaveformVisualizer : MonoBehaviour {
         float maxValue = 0;
         float avgValue = 0;
         for (int s = 0; s < sampleIncr; s++) {
-            float sampleVal = Math.Abs(samples[(int)(sampleStart + x * sampleIncr + s)]);
+            float sampleIdx = sampleStart + x * sampleIncr + s;
+            int idx = Math.Min((int)sampleIdx, samples.Length - 1);
+            float sampleVal = Math.Abs(samples[idx]);
             avgValue += sampleVal * sampleVal;
             maxValue = Math.Max(maxValue, sampleVal * sampleVal);
         }

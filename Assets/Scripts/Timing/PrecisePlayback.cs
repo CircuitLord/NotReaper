@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NotReaper.Models;
+using NotReaper.Targets;
 using UnityEngine;
 
 namespace NotReaper.Timing {
@@ -85,6 +88,13 @@ namespace NotReaper.Timing {
 		public ClipData leftSustain;
 		public ClipData rightSustain;
 
+		private ClipData kick;
+		private ClipData snare;
+		private ClipData percussion;
+		private ClipData chainStart;
+		private ClipData chainNote;
+		private ClipData melee;
+
 		public float leftSustainVolume = 0.0f;
 		public float rightSustainVolume = 0.0f;
 
@@ -111,9 +121,33 @@ namespace NotReaper.Timing {
 
 		[SerializeField] private Timeline timeline;
 
+		[SerializeField] private AudioClip KickClip;
+		[SerializeField] private AudioClip SnareClip;
+		[SerializeField] private AudioClip PercussionClip;
+		[SerializeField] private AudioClip ChainStartClip;
+		[SerializeField] private AudioClip ChainNoteClip;
+		[SerializeField] private AudioClip MeleeClip;
+
 		private void Start() {
 			sampleRate = AudioSettings.outputSampleRate;
 			source.Play();
+			StartCoroutine(LoadHitsounds());
+		}
+
+		IEnumerator LoadHitsounds() {
+			while (KickClip.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (SnareClip.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (PercussionClip.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (ChainStartClip.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (ChainNoteClip.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (MeleeClip.loadState != AudioDataLoadState.Loaded) yield return null;
+
+			kick = FromAudioClip(KickClip);
+			snare = FromAudioClip(SnareClip);
+			percussion = FromAudioClip(PercussionClip);
+			chainStart = FromAudioClip(ChainStartClip);
+			chainNote = FromAudioClip(ChainNoteClip);
+			melee = FromAudioClip(MeleeClip);
 		}
 
 		public enum LoadType {
@@ -122,7 +156,7 @@ namespace NotReaper.Timing {
 			RightSustain
 		}
 
-		public void LoadAudioClip(AudioClip clip, LoadType type) {
+		private ClipData FromAudioClip(AudioClip clip) {
 			ClipData data = new ClipData();
 
 			data.samples = new float[clip.samples * clip.channels];
@@ -130,6 +164,12 @@ namespace NotReaper.Timing {
 
 			data.frequency = clip.frequency;
 			data.channels = clip.channels;
+
+			return data;
+		}
+
+		public void LoadAudioClip(AudioClip clip, LoadType type) {
+			ClipData data = FromAudioClip(clip);
 
 			if(type == LoadType.MainSong) {
 				song = data;
@@ -181,6 +221,7 @@ namespace NotReaper.Timing {
 			}
 
 			paused = false;
+			clearHitsounds = true;
 			dspStartTime = AudioSettings.dspTime;
 			source.Play();
 		}
@@ -190,9 +231,9 @@ namespace NotReaper.Timing {
 			StopMetronome();
 		}
 
-		public void PlayPreview(QNT_Timestamp time, QNT_Duration previewDuration) {
+		public void PlayPreview(QNT_Timestamp time, Relative_QNT previewDuration) {
 			float midTime = timeline.TimestampToSeconds(time);
-			float duration = Conversion.FromQNT(new Relative_QNT((long)previewDuration.tick), timeline.GetTempoForTime(time).microsecondsPerQuarterNote);
+			float duration = Conversion.FromQNT(new Relative_QNT(Math.Abs(previewDuration.tick)), timeline.GetTempoForTime(time).microsecondsPerQuarterNote);
 			duration = Math.Min(duration, 0.1f);
 
 			UInt64 sampleStart = (UInt64)((midTime - duration / 2) * song.frequency);
@@ -201,6 +242,140 @@ namespace NotReaper.Timing {
 			currentPreviewSongSampleEnd = sampleEnd << ClipData.PrecisionShift;
 			playPreview = true;
 			source.Play();
+
+			List<HitsoundEvent> previewHits = new List<HitsoundEvent>();
+			AddHitsoundEvents(previewHits, time, previewDuration.tick > 0 ? timeline.ShiftTick(time, duration) : time);
+			foreach(HitsoundEvent ev in previewHits) {
+				ev.waitSamples = 0;
+			}
+
+			newPreviewHitsoundEvents = previewHits;
+		}
+
+		public void PlayHitsound(QNT_Timestamp time) {
+			List<HitsoundEvent> previewHits = new List<HitsoundEvent>();
+			AddHitsoundEvents(previewHits, time, time);
+			foreach(HitsoundEvent ev in previewHits) {
+				ev.waitSamples = 0;
+			}
+
+			newPreviewHitsoundEvents = previewHits;
+		}
+
+		class HitsoundEvent {
+			public uint ID;
+			public TargetHandType hand;
+			public UInt64 waitSamples;
+			public UInt64 currentSample;
+			public ClipData sound;
+			public float pan;
+			public float volume = 1.0f;
+		};
+		List<HitsoundEvent> hitsoundEvents = new List<HitsoundEvent>();
+		bool clearHitsounds = false;
+
+		List<HitsoundEvent> newPreviewHitsoundEvents = null;
+		List<HitsoundEvent> previewHitsoundEvents = new List<HitsoundEvent>();
+
+		void AddHitsoundEvents(List<HitsoundEvent> events, QNT_Timestamp start, QNT_Timestamp end) {
+			if(Timeline.orderedNotes.Count == 0) {
+				return;
+			}
+
+			if(start > end) {
+				QNT_Timestamp temp = start;
+				start = end;
+				end = temp;
+			}
+
+			float startTime = timeline.TimestampToSeconds(start);
+
+			var result = timeline.FindFirstNoteAtTime(start);
+			for(int i = result; i != -1 && i < Timeline.orderedNotes.Count; ++i) {
+				TargetData data = Timeline.orderedNotes[i].data;
+				if(data.time < start) {
+					continue;
+				}
+				if(data.time > end) {
+					return;
+				}
+
+				bool added = false;
+				foreach(HitsoundEvent ev in events) {
+					if(ev.ID == data.ID) {
+						added = true;
+						break;
+					}
+				}
+
+				if(!added) {
+					HitsoundEvent ev = new HitsoundEvent();
+					ev.ID = data.ID;
+					ev.currentSample = 0;
+					ev.waitSamples = (uint)((timeline.TimestampToSeconds(data.time) - startTime) * sampleRate);
+					ev.sound = kick;
+					ev.hand = data.handType;
+					ev.pan = (data.x / 7.15f);
+
+					switch (data.velocity) {
+						case TargetVelocity.Standard:
+							ev.sound = kick;
+							break;
+
+						case TargetVelocity.Percussion:
+							ev.sound = percussion;
+							break;
+
+						case TargetVelocity.Snare:
+							ev.sound = snare;
+							break;
+
+						case TargetVelocity.Chain:
+							ev.sound = chainNote;
+							break;
+
+						case TargetVelocity.ChainStart:
+							ev.sound = chainStart;
+							break;
+
+						case TargetVelocity.Melee:
+							ev.sound = melee;
+							break;
+					}
+
+					//Only one hitsound at a time per point in time
+					for (int j = events.Count - 1; j >= 0; j--) {
+						if(events[j].sound == ev.sound) {
+							if(events[j].waitSamples == ev.waitSamples) {
+								events.RemoveAt(j);
+							}
+						}
+					}
+
+					events.Add(ev);
+				}
+			}
+		}
+
+		void PlayHitsounds(CopyContext ctx, List<HitsoundEvent> events) {
+			for (int i = events.Count - 1; i >= 0; i--) {
+				HitsoundEvent ev = events[i];
+				if(ev.waitSamples > 0) {
+					ev.waitSamples -= 1;
+				}
+				else {
+					ev.sound.currentSample = ev.currentSample;
+					ev.sound.pan = ev.pan;
+					ev.sound.CopySampleIntoBuffer(ctx);
+
+					if(ev.sound.scaledCurrentSample > ev.sound.samples.Length) {
+						events.RemoveAt(i);
+					}
+					else {
+						ev.currentSample = ev.sound.currentSample;
+					}
+				}
+			}
 		}
 
 		void OnAudioFilterRead(float[] bufferData, int bufferChannels) {
@@ -210,6 +385,19 @@ namespace NotReaper.Timing {
 			ctx.bufferFreq = sampleRate;
 			ctx.playbackSpeed = speed;
 
+			if(clearHitsounds) {
+				hitsoundEvents.Clear();
+				clearHitsounds = false;
+			}
+
+			if(newPreviewHitsoundEvents != null) {
+				List<HitsoundEvent> newPreview = newPreviewHitsoundEvents;
+				newPreviewHitsoundEvents = null;
+
+				previewHitsoundEvents.Clear();
+				previewHitsoundEvents = newPreview;
+			}
+
 			if(playPreview) {
 				int dataIndex = 0;
 
@@ -217,6 +405,10 @@ namespace NotReaper.Timing {
 					ctx.index = dataIndex;
 					ctx.volume = volume;
 					preview.CopySampleIntoBuffer(ctx);
+
+					ctx.playbackSpeed = 1.0f;
+					PlayHitsounds(ctx, previewHitsoundEvents);
+
 					++dataIndex;
 				}
 
@@ -226,21 +418,41 @@ namespace NotReaper.Timing {
 			}
 
 			if (paused || (song.scaledCurrentSample) > song.samples.Length) {
+				hitsoundEvents.Clear();
+
+				//Continue to flush the hitsounds
+				if(!playPreview && previewHitsoundEvents.Count > 0) {
+					int dataIndex = 0;
+
+					while(dataIndex < bufferData.Length / bufferChannels) {
+						ctx.index = dataIndex;
+						ctx.volume = volume;
+						ctx.playbackSpeed = 1.0f;
+						PlayHitsounds(ctx, previewHitsoundEvents);
+						++dataIndex;
+					}
+				}
+
 				return;
 			}
 
-			//double currentTime = AudioSettings.dspTime - dspStartTime;
-
-			//double samplesPerTick = sampleRate * (GetTempoForTime(ShiftTick(new QNT_Timestamp(0), (float)currentTime)).microsecondsPerQuarterNote / 1000000.0);
-			//double sample = AudioSettings.dspTime * sampleRate;
-			//int startSample = (int)(currentTime * song.frequency * song.channels);
-			//int startSample = (int)(currentTime * sampleRate * song.channels);
+			if(song != null) {
+				QNT_Timestamp timeStart = timeline.ShiftTick(new QNT_Timestamp(0), (float)song.currentTime);
+				QNT_Timestamp timeEnd = timeline.ShiftTick(new QNT_Timestamp(0), (float)(song.currentTime + (bufferData.Length / bufferChannels) / (float)song.frequency * (song.frequency / (float)sampleRate)));
+				AddHitsoundEvents(hitsoundEvents, timeStart, timeEnd);
+			}
 
 			for (int dataIndex = 0; dataIndex < bufferData.Length / bufferChannels; dataIndex++) {
 				ctx.volume = volume;
 				ctx.index = dataIndex;
+				ctx.playbackSpeed = speed;
 				song.CopySampleIntoBuffer(ctx);
 
+				//Play hitsounds (reverse iterate so we can remove)
+				PlayHitsounds(ctx, hitsoundEvents);
+
+				ctx.volume = volume;
+				ctx.playbackSpeed = speed;
 				if(leftSustain != null) {
 					ctx.volume = leftSustainVolume;
 					leftSustain.CopySampleIntoBuffer(ctx);
@@ -263,6 +475,7 @@ namespace NotReaper.Timing {
 					}
 				}
 
+				//Metronome
 				if(metronomeSamplesLeft > 0) {
 					const uint MetronomeTickFreq = 817;
 					const uint BigMetronomeTickFreq = 1024;

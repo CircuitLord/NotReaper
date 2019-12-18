@@ -324,9 +324,10 @@ namespace NotReaper {
 					break;
 			}
 
-
 			var action = new NRActionAddNote {targetData = data};
 			Tools.undoRedoManager.AddAction(action);
+
+			songPlayback.PlayHitsound(time);
 		}
 
 		//Adds a target directly to the timeline. targetData is kept as a reference NOT copied
@@ -881,14 +882,14 @@ namespace NotReaper {
 				return result.index;
 			}
 
-			for(int i = result.index; i > 0; --i) {
+			for(int i = result.index; i > 0 && i < orderedNotes.Count; --i) {
 				if(orderedNotes[i].data.time < time) {
 					return i + 1;
 				}
 			}
 
 			//If we get the first note, and it's later than time, we didn't find a note
-			if(orderedNotes.Count == 0 || orderedNotes[0].data.time > time) {
+			if(orderedNotes.Count == 0) {
 				return -1;
 			}
 
@@ -1441,30 +1442,28 @@ namespace NotReaper {
 			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f) {
 				if (!audioLoaded) return;
 
-				QNT_Duration jumpDuration = Constants.DurationFromBeatSnap((uint)beatSnap);
+				Relative_QNT jumpDuration = new Relative_QNT((long)Constants.DurationFromBeatSnap((uint)beatSnap).tick);
 
-				if(Input.mouseScrollDelta.y < -0.1f) {
-					if(!isCtrlDown || dragging) {
-						time = GetClosestBeatSnapped(time + jumpDuration, (uint)beatSnap);
-					}
-					else {
-						jumpDuration = new QNT_Duration(1);
-						time = time + jumpDuration;
-					}
+				bool moveTick = false;
+				if(isCtrlDown && !dragging) {
+					moveTick = true;
+					jumpDuration = new Relative_QNT(1);
+				}
+
+				if(Input.mouseScrollDelta.y >= -0.1f) {
+					jumpDuration.tick *= -1;
+				}
+
+				if(!moveTick) {
+					time = GetClosestBeatSnapped(time + jumpDuration, (uint)beatSnap);
 				}
 				else {
-					if(!isCtrlDown || dragging) {
-						time = GetClosestBeatSnapped(time - jumpDuration, (uint)beatSnap);
-					}
-					else {
-						jumpDuration = new QNT_Duration(1);
-						time = time - jumpDuration;
-					}
+					time = time + jumpDuration;
 				}
 
 				SafeSetTime();
 				if (paused) {
-					songPlayback.PlayPreview(time, Constants.DurationFromBeatSnap((uint)beatSnap));
+					songPlayback.PlayPreview(time, jumpDuration);
 					checkForNearSustainsOnThisFrame = true;
 				}
 				else {
@@ -1511,6 +1510,7 @@ namespace NotReaper {
 			SetCurrentTick();
 
 			SetBeatTime(time);
+			songPlayback.PlayPreview(time, new Relative_QNT((long)Constants.DurationFromBeatSnap((uint)beatSnap).tick));
 		}
 
 		public void JumpToX(float x) {
@@ -1600,6 +1600,7 @@ namespace NotReaper {
 			SetCurrentTime();
 			SetCurrentTick();
 
+			songPlayback.PlayPreview(time, new Relative_QNT((long)Constants.DurationFromBeatSnap((uint)beatSnap).tick));
 
 			yield break;
 
