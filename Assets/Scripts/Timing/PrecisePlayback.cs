@@ -16,6 +16,9 @@ namespace NotReaper.Timing {
 
 		public float volume;
 		public float playbackSpeed;
+
+		//Write value
+		public float outputValue;
 	}
 
 	public class ClipData {
@@ -28,6 +31,8 @@ namespace NotReaper.Timing {
 		}
 
 		public float pan = 0.0f;
+
+		public float duckVolume = 0.0f;
 
 		public const int PrecisionShift = 32;
 
@@ -55,6 +60,7 @@ namespace NotReaper.Timing {
 
 			int clipChannel = 0;
 			int sourceChannel = 0;
+			float maxValue = 0.0f;
 			while (sourceChannel < ctx.bufferChannels) {
 				float panAmount = 1.0f;
 				if(sourceChannel == 0) {
@@ -70,7 +76,9 @@ namespace NotReaper.Timing {
 					value = samples[samplePos];
 				}
 
-				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += value * ctx.volume * panAmount;
+				maxValue = Math.Max(value * ctx.volume * panAmount, maxValue);
+
+				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += value * ctx.volume * panAmount * (1.0f - duckVolume);
 
 				sourceChannel++;
 				clipChannel++;
@@ -78,6 +86,7 @@ namespace NotReaper.Timing {
 			}
 
 			currentSample += speed;
+			ctx.outputValue = maxValue;
 		}
 	};
 
@@ -100,6 +109,7 @@ namespace NotReaper.Timing {
 
 		public float speed = 1.0f;
 		public float volume = 1.0f;
+		public float hitSoundVolume = 1.0f;
 
 		private double dspStartTime = 0.0f;
 		private double songStartTime = 0.0f;
@@ -358,16 +368,26 @@ namespace NotReaper.Timing {
 		}
 
 		void PlayHitsounds(CopyContext ctx, List<HitsoundEvent> events) {
+			kick.duckVolume = 0.0f;
+			snare.duckVolume = 0.0f;
+			percussion.duckVolume = 0.0f;
+			chainStart.duckVolume = 0.0f;
+			chainNote.duckVolume = 0.0f;
+			melee.duckVolume = 0.0f;
+
 			for (int i = events.Count - 1; i >= 0; i--) {
 				HitsoundEvent ev = events[i];
 				if(ev.waitSamples > 0) {
 					ev.waitSamples -= 1;
 				}
 				else {
+					ctx.volume = hitSoundVolume * ev.volume;
 					ev.sound.currentSample = ev.currentSample;
 					ev.sound.pan = ev.pan;
 					ev.sound.CopySampleIntoBuffer(ctx);
 
+					ev.sound.duckVolume = Math.Min(ev.sound.duckVolume + ctx.outputValue, ev.sound.duckVolume);
+					
 					if(ev.sound.scaledCurrentSample > ev.sound.samples.Length) {
 						events.RemoveAt(i);
 					}
@@ -384,6 +404,7 @@ namespace NotReaper.Timing {
 			ctx.bufferChannels = bufferChannels;
 			ctx.bufferFreq = sampleRate;
 			ctx.playbackSpeed = speed;
+			ctx.outputValue = 0.0f;
 
 			if(clearHitsounds) {
 				hitsoundEvents.Clear();
@@ -426,7 +447,7 @@ namespace NotReaper.Timing {
 
 					while(dataIndex < bufferData.Length / bufferChannels) {
 						ctx.index = dataIndex;
-						ctx.volume = volume;
+						ctx.volume = hitSoundVolume;
 						ctx.playbackSpeed = 1.0f;
 						PlayHitsounds(ctx, previewHitsoundEvents);
 						++dataIndex;
@@ -449,9 +470,9 @@ namespace NotReaper.Timing {
 				song.CopySampleIntoBuffer(ctx);
 
 				//Play hitsounds (reverse iterate so we can remove)
+				ctx.volume = hitSoundVolume;
 				PlayHitsounds(ctx, hitsoundEvents);
 
-				ctx.volume = volume;
 				ctx.playbackSpeed = speed;
 				if(leftSustain != null) {
 					ctx.volume = leftSustainVolume;

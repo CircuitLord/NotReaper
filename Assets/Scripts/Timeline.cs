@@ -1484,6 +1484,7 @@ namespace NotReaper {
 			}
 
 			songPlayback.volume = musicVolume;
+			songPlayback.hitSoundVolume = NRSettings.config.noteVol;
 
 			SetCurrentTime();
 			SetCurrentTick();
