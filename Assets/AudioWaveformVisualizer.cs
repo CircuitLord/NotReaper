@@ -86,7 +86,6 @@ public class AudioWaveformVisualizer : MonoBehaviour {
             UInt64 microsecondsPerQuarterNote = timeline.tempoChanges[timeline.GetCurrentBPMIndex(startTick)].microsecondsPerQuarterNote;
 
             float beatTime = Conversion.ToQNT(gen.end - gen.start, microsecondsPerQuarterNote).ToBeatTime();
-
             StartCoroutine(PaintWaveformSpectrum(aud.samples, sampleStart, sampleEnd - sampleStart, (int)(beatTime * PixelsPerQuarterNote), 64, NRSettings.config.waveformColor,
                 delegate (Texture2D tex) {
                     GameObject obj = GameObject.Instantiate(waveformSegmentInstance, new Vector3(0,0,0), Quaternion.identity, gameObject.transform);
@@ -148,51 +147,55 @@ public class AudioWaveformVisualizer : MonoBehaviour {
     public delegate void TextureCallback(Texture2D data);
 
     IEnumerator PaintWaveformSpectrum(float[] samples, int sampleStart, int sampleSection, int width, int height, Color col, TextureCallback cb) {
-     Texture2D tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
-
-     //Set all to clear
-     Color32 resetColor = new Color32(255, 255, 255, 0);
-     Color32[] resetColorArray = tex.GetPixels32();
-     for (int i = 0; i < resetColorArray.Length; i++) {
-         resetColorArray[i] = resetColor;
-     }
-     tex.SetPixels32(resetColorArray);
-     float sampleIncr = sampleSection / (float)width;
-
-     const int PIXELS_PER_YIELD = 32; //Waits every 400,000 loop
-     int loopCounter = 0;
- 
-     for (int x = 0; x < width; x++) {
-        float maxValue = 0;
-        float avgValue = 0;
-        for (int s = 0; s < sampleIncr; s++) {
-            float sampleIdx = sampleStart + x * sampleIncr + s;
-            int idx = Math.Min((int)sampleIdx, samples.Length - 1);
-            float sampleVal = Math.Abs(samples[idx]);
-            avgValue += sampleVal * sampleVal;
-            maxValue = Math.Max(maxValue, sampleVal * sampleVal);
-        }
-        avgValue /= sampleIncr;
-        
-        //For sections with huge peaks, just use avg
-        if(maxValue > 0.5f) {
-            maxValue = avgValue;
+        if(width <= 0) {
+            yield break;
         }
 
-        float paintHeight  = Mathf.Sqrt(maxValue) * height;
-        for (int y = 0; y <= paintHeight; y++) {
-             tex.SetPixel(x, ( height / 2 ) + y, col);
-             tex.SetPixel(x, ( height / 2 ) - y, col);
-        }
+        Texture2D tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
 
-        ++loopCounter;
-        if(loopCounter % PIXELS_PER_YIELD == 0) {
-            yield return null;
+        //Set all to clear
+        Color32 resetColor = new Color32(255, 255, 255, 0);
+        Color32[] resetColorArray = tex.GetPixels32();
+        for (int i = 0; i < resetColorArray.Length; i++) {
+            resetColorArray[i] = resetColor;
         }
-     }
-     tex.Apply();
- 
-     cb(tex);
+        tex.SetPixels32(resetColorArray);
+        float sampleIncr = sampleSection / (float)width;
+
+        const int PIXELS_PER_YIELD = 32; //Waits every 400,000 loop
+        int loopCounter = 0;
+
+        for (int x = 0; x < width; x++) {
+            float maxValue = 0;
+            float avgValue = 0;
+            for (int s = 0; s < sampleIncr; s++) {
+                float sampleIdx = sampleStart + x * sampleIncr + s;
+                int idx = Math.Min((int)sampleIdx, samples.Length - 1);
+                float sampleVal = Math.Abs(samples[idx]);
+                avgValue += sampleVal * sampleVal;
+                maxValue = Math.Max(maxValue, sampleVal * sampleVal);
+            }
+            avgValue /= sampleIncr;
+            
+            //For sections with huge peaks, just use avg
+            if(maxValue > 0.5f) {
+                maxValue = avgValue;
+            }
+
+            float paintHeight  = Mathf.Sqrt(maxValue) * height;
+            for (int y = 0; y <= paintHeight; y++) {
+                tex.SetPixel(x, ( height / 2 ) + y, col);
+                tex.SetPixel(x, ( height / 2 ) - y, col);
+            }
+
+            ++loopCounter;
+            if(loopCounter % PIXELS_PER_YIELD == 0) {
+                yield return null;
+            }
+        }
+        tex.Apply();
+
+        cb(tex);
     }
 
 }
