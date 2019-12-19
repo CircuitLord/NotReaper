@@ -888,6 +888,10 @@ namespace NotReaper {
 				}
 			}
 
+			if(result.index >= orderedNotes.Count) {
+				return orderedNotes.Count - 1;
+			}
+
 			//If we get the first note, and it's later than time, we didn't find a note
 			if(orderedNotes.Count == 0) {
 				return -1;
@@ -947,6 +951,8 @@ namespace NotReaper {
 				change.time = newTime;
 				tempoChanges[fixup.tempoId] = change;
 			}
+
+			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time.tick).ToList();
 		}
 
 		void ShiftNotesByBPM(UInt64 prevMicrosecondPerQuarterNote, QNT_Timestamp time, List<TempoFixup> tempoFixes) {
