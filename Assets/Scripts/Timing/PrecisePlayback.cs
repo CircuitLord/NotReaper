@@ -76,9 +76,10 @@ namespace NotReaper.Timing {
 					value = samples[samplePos];
 				}
 
-				maxValue = Math.Max(value * ctx.volume * panAmount, maxValue);
+				float duckValue = Mathf.Clamp(1.0f - duckVolume, 0.0f, 1.0f);
+				maxValue = Math.Max(value * ctx.volume * duckValue, maxValue);
 
-				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += value * ctx.volume * panAmount * (1.0f - duckVolume);
+				ctx.bufferData[ctx.index * ctx.bufferChannels + sourceChannel] += value * ctx.volume * panAmount * duckValue;
 
 				sourceChannel++;
 				clipChannel++;
@@ -86,7 +87,7 @@ namespace NotReaper.Timing {
 			}
 
 			currentSample += speed;
-			ctx.outputValue = maxValue;
+			ctx.outputValue = Math.Abs(maxValue);
 		}
 	};
 
@@ -255,8 +256,10 @@ namespace NotReaper.Timing {
 
 			List<HitsoundEvent> previewHits = new List<HitsoundEvent>();
 			AddHitsoundEvents(previewHits, time, previewDuration.tick > 0 ? timeline.ShiftTick(time, duration) : time);
-			foreach(HitsoundEvent ev in previewHits) {
+			for(int i = 0; i < previewHits.Count; ++i) {
+				HitsoundEvent ev = previewHits[i];
 				ev.waitSamples = 0;
+				previewHits[i] = ev;
 			}
 
 			newPreviewHitsoundEvents = previewHits;
@@ -265,27 +268,31 @@ namespace NotReaper.Timing {
 		public void PlayHitsound(QNT_Timestamp time) {
 			List<HitsoundEvent> previewHits = new List<HitsoundEvent>();
 			AddHitsoundEvents(previewHits, time, time);
-			foreach(HitsoundEvent ev in previewHits) {
+			for(int i = 0; i < previewHits.Count; ++i) {
+				HitsoundEvent ev = previewHits[i];
 				ev.waitSamples = 0;
+				previewHits[i] = ev;
 			}
 
 			newPreviewHitsoundEvents = previewHits;
 		}
 
-		class HitsoundEvent {
+		struct HitsoundEvent {
 			public uint ID;
-			public TargetHandType hand;
+			public QNT_Timestamp time;
 			public UInt64 waitSamples;
 			public UInt64 currentSample;
 			public ClipData sound;
 			public float pan;
-			public float volume = 1.0f;
+			public float volume;
 		};
 		List<HitsoundEvent> hitsoundEvents = new List<HitsoundEvent>();
 		bool clearHitsounds = false;
 
 		List<HitsoundEvent> newPreviewHitsoundEvents = null;
 		List<HitsoundEvent> previewHitsoundEvents = new List<HitsoundEvent>();
+
+		QNT_Timestamp hitSoundEnd = new QNT_Timestamp(0);
 
 		void AddHitsoundEvents(List<HitsoundEvent> events, QNT_Timestamp start, QNT_Timestamp end) {
 			if(Timeline.orderedNotes.Count == 0) {
@@ -319,13 +326,14 @@ namespace NotReaper.Timing {
 				}
 
 				if(!added) {
-					HitsoundEvent ev = new HitsoundEvent();
+					HitsoundEvent ev;
 					ev.ID = data.ID;
 					ev.currentSample = 0;
 					ev.waitSamples = (uint)((timeline.TimestampToSeconds(data.time) - startTime) * sampleRate);
 					ev.sound = kick;
-					ev.hand = data.handType;
+					ev.time = data.time;
 					ev.pan = (data.x / 7.15f);
+					ev.volume = 1.0f;
 
 					switch (data.velocity) {
 						case TargetVelocity.Standard:
@@ -377,6 +385,8 @@ namespace NotReaper.Timing {
 
 			for (int i = events.Count - 1; i >= 0; i--) {
 				HitsoundEvent ev = events[i];
+				bool valid = true;
+
 				if(ev.waitSamples > 0) {
 					ev.waitSamples -= 1;
 				}
@@ -386,14 +396,19 @@ namespace NotReaper.Timing {
 					ev.sound.pan = ev.pan;
 					ev.sound.CopySampleIntoBuffer(ctx);
 
-					ev.sound.duckVolume = Math.Min(ev.sound.duckVolume + ctx.outputValue, ev.sound.duckVolume);
-					
+					ev.sound.duckVolume = Mathf.Clamp(ev.sound.duckVolume + 0.25f, 0.0f, 1.0f);
+
 					if(ev.sound.scaledCurrentSample > ev.sound.samples.Length) {
 						events.RemoveAt(i);
+						valid = false;
 					}
 					else {
 						ev.currentSample = ev.sound.currentSample;
 					}
+				}
+
+				if(valid) {
+					events[i] = ev;
 				}
 			}
 		}
@@ -408,6 +423,7 @@ namespace NotReaper.Timing {
 
 			if(clearHitsounds) {
 				hitsoundEvents.Clear();
+				hitSoundEnd = new QNT_Timestamp(0);
 				clearHitsounds = false;
 			}
 
@@ -460,7 +476,11 @@ namespace NotReaper.Timing {
 			if(song != null) {
 				QNT_Timestamp timeStart = timeline.ShiftTick(new QNT_Timestamp(0), (float)song.currentTime);
 				QNT_Timestamp timeEnd = timeline.ShiftTick(new QNT_Timestamp(0), (float)(song.currentTime + (bufferData.Length / bufferChannels) / (float)song.frequency * (song.frequency / (float)sampleRate)));
-				AddHitsoundEvents(hitsoundEvents, timeStart, timeEnd);
+
+				if(timeEnd > hitSoundEnd) {
+					hitSoundEnd = timeStart + Constants.QuarterNoteDuration;
+					AddHitsoundEvents(hitsoundEvents, timeStart, hitSoundEnd);
+				}
 			}
 
 			for (int dataIndex = 0; dataIndex < bufferData.Length / bufferChannels; dataIndex++) {
