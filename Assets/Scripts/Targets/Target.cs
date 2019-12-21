@@ -3,6 +3,8 @@ using UnityEngine;
 using NotReaper.Models;
 using NotReaper.Tools.ChainBuilder;
 using NotReaper.Timing;
+using DG.Tweening;
+using System.Collections.Generic;
 
 namespace NotReaper.Targets {
 
@@ -149,24 +151,6 @@ namespace NotReaper.Targets {
 
 		public void DisableSustainButtons() {
 			gridTargetIcon.sustainButtons.SetActive(false);
-		}
-
-		public void EnableColliders() {
-			gridTargetIcon.sphereCollider.enabled = true;
-			timelineTargetIcon.sphereCollider.enabled = true;
-		}
-
-		public void DisableColliders() {
-			gridTargetIcon.sphereCollider.enabled = false;
-			timelineTargetIcon.sphereCollider.enabled = false;
-		}
-
-		public void EnableGridColliders() {
-			gridTargetIcon.sphereCollider.enabled = true;
-		}
-
-		public void DisableGridColliders() {
-			gridTargetIcon.sphereCollider.enabled = false;
 		}
 
 		private void OnGridPositionChanged(float x, float y) {
@@ -316,7 +300,30 @@ namespace NotReaper.Targets {
 
 			gridTargetIcon.UpdatePathInitialAngle(data.pathBuilderData.initialAngle);
 		}
+
+		public void OnNoteHit() {
+			DOTween.To((float scale) => {
+				gridTargetIcon.transform.localScale = new Vector3(scale, scale, 1f);
+			}, NRSettings.config.noteHitScale, 1f, 0.3f).SetEase(Ease.OutCubic);
+		}
+
+		public void AddTargetIconsCloseToPointAtTime(List<TargetIcon> icons, QNT_Timestamp time, Vector2 point) {
+			if(gridTargetIcon.IsInValidTime(time) && gridTargetIcon.IsCloseToPoint(point)) {
+				icons.Add(gridTargetIcon);
+			}
+
+			if(timelineTargetIcon.IsInValidTime(time) && timelineTargetIcon.IsCloseToPoint(point)) {
+				icons.Add(timelineTargetIcon);
+			}
+		}
+
+		public bool IsInsideRectAtTime(QNT_Timestamp time, Rect rect) {
+			return (gridTargetIcon.IsInValidTime(time) && gridTargetIcon.IsInsideRect(rect)) || 
+				(timelineTargetIcon.IsInValidTime(time) && timelineTargetIcon.IsInsideRect(rect));
+		}
+
+		public bool IsTimelineInsideRect(Rect rect) {
+			return timelineTargetIcon.IsInsideRect(rect);
+		}
 	}
-
-
 }

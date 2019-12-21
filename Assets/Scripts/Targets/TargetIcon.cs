@@ -34,12 +34,14 @@ namespace NotReaper.Targets {
         public SpriteRenderer chainOutline;
         public SpriteRenderer meleeOutline;
         public SpriteRenderer pathBuilderOutline;
-        public SphereCollider sphereCollider;
 
         public TargetData data;
         public Target target;
 
         public float sustainDirection = 0.6f;
+
+        private float collisionRadius = 0.5f;
+
         public bool isSelected = false;
         public TargetIconLocation location;
 
@@ -261,9 +263,8 @@ namespace NotReaper.Targets {
                 line.SetActive(data.supportsBeatLength);
             }
 
-            sphereCollider.radius = 0.5f;
             if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline) {
-                sphereCollider.radius = 0.25f;
+                collisionRadius = 0.25f;
             }
 
             if(behavior == TargetBehavior.NR_Pathbuilder) {
@@ -319,6 +320,31 @@ namespace NotReaper.Targets {
             transform.localRotation = Quaternion.Euler(0, 0, 180 - angle);
             
             UpdatePath();
+        }
+
+        public bool IsCloseToPoint(Vector2 point) {
+            float collisionRad = collisionRadius * transform.localScale.x;
+            return (point - new Vector2(transform.position.x, transform.position.y)).sqrMagnitude < collisionRad * collisionRad;
+        }
+
+        public bool IsInsideRect(Rect rect) {
+            Vector2 center = new Vector2(transform.position.x, transform.position.y);
+
+            Vector2 closestPoint = center;
+            closestPoint.x = Mathf.Clamp(closestPoint.x, rect.min.x, rect.max.x);
+            closestPoint.y = Mathf.Clamp(closestPoint.y, rect.min.y, rect.max.y);
+
+            float collisionRad = collisionRadius * transform.localScale.x;
+            return (closestPoint - center).sqrMagnitude < collisionRad * collisionRad;
+        }
+
+        public bool IsInValidTime(QNT_Timestamp time) {
+            QNT_Duration loadedDuration = Constants.QuarterNoteDuration + Constants.EighthNoteDuration;
+            if(location == TargetIconLocation.Grid && Math.Abs((time - target.data.time).tick) > (long)loadedDuration.tick) {
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -17,8 +17,13 @@ namespace NotReaper.Tools {
 		public LayerMask notesLayer;
 
 		private bool activated = false;
+
 		private bool isDraggingTimeline = false;
+		private List<Target> dragTimelineSelectedTargets = new List<Target>();
+
 		private bool isDraggingGrid = false;
+		private List<Target> dragGridSelectedTarget = new List<Target>();
+
 		private bool isDraggingNotesOnGrid = false;
 		private bool isDraggingNotesOnTimeline = false;
 
@@ -62,7 +67,7 @@ namespace NotReaper.Tools {
 		public TargetIcon[] iconsUnderMouse {
 			get {
 				return _iconsUnderMouse = _iconsUnderMouse == null
-					? MouseUtil.IconsUnderMouse(notesLayer)
+					? MouseUtil.IconsUnderMouse(timeline)
 					: _iconsUnderMouse;
 			}
 			set { _iconsUnderMouse = value; }
@@ -115,13 +120,53 @@ namespace NotReaper.Tools {
 			dragSelectTimeline.localPosition = new Vector3(dragSelectTimeline.transform.localPosition.x, 0.03f, 0);
 			dragSelectTimeline.gameObject.SetActive(true);
 			isDraggingTimeline = true;
+			dragTimelineSelectedTargets = new List<Target>();
 		}
 
 		private void UpdateTimelineSelection() {
 			float diff = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - dragSelectTimeline.position.x;
 			float timelineScaleMulti = Timeline.scale / 20f;
-			dragSelectTimeline.localScale =
-				new Vector3(diff * timelineScaleMulti, 1.1f, 1);
+			dragSelectTimeline.localScale = new Vector3(diff * timelineScaleMulti, 1.1f, 1);
+
+			Vector2 topLeft = new Vector2(dragSelectTimeline.transform.position.x, dragSelectTimeline.transform.position.y);
+			Vector2 size = new Vector2(dragSelectTimeline.transform.localScale.x, dragSelectTimeline.transform.localScale.y);
+
+			Vector2 center = new Vector2(topLeft.x + size.x / 2, topLeft.y - size.y / 2);
+
+			float minX = Math.Min(center.x - size.x / 2, center.x + size.x / 2);
+			float maxX = Math.Max(center.x - size.x / 2, center.x + size.x / 2);
+			float minY = Math.Min(center.y - size.y / 2, center.y + size.y / 2);
+			float maxY = Math.Max(center.y - size.y / 2, center.y + size.y / 2);
+
+			Rect selectionRect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+
+			QNT_Timestamp start = Timeline.time + Relative_QNT.FromBeatTime(dragSelectTimeline.position.x - 1.0f);
+			QNT_Timestamp end = start + Relative_QNT.FromBeatTime((diff + 1.0f) * timelineScaleMulti);
+			if(start > end) {
+				QNT_Timestamp temp = start;
+				start = end;
+				end = temp;
+			}
+
+			List<Target> newSelectedTargets = new List<Target>();
+			for(int i = timeline.FindFirstNoteAtTime(start); i != -1 && i < Timeline.orderedNotes.Count; ++i) {
+				Target target = Timeline.orderedNotes[i];
+				if(target.IsTimelineInsideRect(selectionRect)) {
+					newSelectedTargets.Add(target);
+				}
+			}
+
+			var deselectedTargets = dragTimelineSelectedTargets.Except(newSelectedTargets);
+			foreach(Target t in deselectedTargets) {
+				t.MakeTimelineDeselectTarget();
+			}
+
+			var selectedTargets = newSelectedTargets.Except(dragTimelineSelectedTargets);
+			foreach(Target t in selectedTargets) {
+				t.MakeTimelineSelectTarget();
+			}
+
+			dragTimelineSelectedTargets = newSelectedTargets;
 		}
 
 		private void EndTimelineSelection() {
@@ -137,12 +182,43 @@ namespace NotReaper.Tools {
 			dragSelectGrid.transform.localScale = new Vector3(0, 0, 1f);
 			dragSelectGrid.SetActive(true);
 			isDraggingGrid = true;
+			dragGridSelectedTarget = new List<Target>();
 		}
 
 		private void UpdateGridSelection() {
 			Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) -
 			               dragSelectGrid.transform.position;
 			dragSelectGrid.transform.localScale = new Vector3(diff.x, diff.y * -1, 1f);
+
+			Vector2 topLeft = new Vector2(dragSelectGrid.transform.position.x, dragSelectGrid.transform.position.y);
+			Vector2 size = new Vector2(dragSelectGrid.transform.localScale.x, dragSelectGrid.transform.localScale.y);
+
+			Vector2 center = new Vector2(topLeft.x + size.x / 2, topLeft.y - size.y / 2);
+
+			float minX = Math.Min(center.x - size.x / 2, center.x + size.x / 2);
+			float maxX = Math.Max(center.x - size.x / 2, center.x + size.x / 2);
+			float minY = Math.Min(center.y - size.y / 2, center.y + size.y / 2);
+			float maxY = Math.Max(center.y - size.y / 2, center.y + size.y / 2);
+
+			Rect selectionRect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+			List<Target> newSelectedTargets = new List<Target>();
+			foreach(Target t in Timeline.loadedNotes) {
+				if(t.IsInsideRectAtTime(Timeline.time, selectionRect)) {
+					newSelectedTargets.Add(t);
+				}
+			}
+
+			var deselectedTargets = dragGridSelectedTarget.Except(newSelectedTargets);
+			foreach(Target t in deselectedTargets) {
+				t.MakeTimelineDeselectTarget();
+			}
+
+			var selectedTargets = newSelectedTargets.Except(dragGridSelectedTarget);
+			foreach(Target t in selectedTargets) {
+				t.MakeTimelineSelectTarget();
+			}
+
+			dragGridSelectedTarget = newSelectedTargets;
 		}
 
 		private void EndGridSelection() {

@@ -1025,7 +1025,6 @@ MonoBehaviour:
   endMarkerPrefab: {fileID: 0}
   endMarker: {fileID: 0}
   sustainButtons: {fileID: 0}
-  sustainLength: 480
 --- !u!1 &2747846123840155805
 GameObject:
   m_ObjectHideFlags: 0
@@ -1751,8 +1750,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5012048490355646076}
   - component: {fileID: 7738343387274863048}
-  - component: {fileID: 4976088772993325799}
-  - component: {fileID: 6525666492889427867}
   m_Layer: 9
   m_Name: GridTargetIcon
   m_TagString: Untagged
@@ -1814,41 +1811,12 @@ MonoBehaviour:
   chainOutline: {fileID: 6339655823115515879}
   meleeOutline: {fileID: 5586345778017159694}
   pathBuilderOutline: {fileID: 7275078264146685581}
-  sphereCollider: {fileID: 4976088772993325799}
+  sphereCollider: {fileID: 0}
   sustainDirection: 0.6
   isSelected: 0
   location: 0
   holdParticles: {fileID: 6070676427362410163}
   sustainButtons: {fileID: 8241085319949938974}
---- !u!135 &4976088772993325799
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4317571393865384872}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &6525666492889427867
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4317571393865384872}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &4440669226093902584
 GameObject:
   m_ObjectHideFlags: 0
@@ -2856,7 +2824,6 @@ MonoBehaviour:
   endMarkerPrefab: {fileID: 4440669226093902584}
   endMarker: {fileID: 0}
   sustainButtons: {fileID: 0}
-  sustainLength: 480
 --- !u!199 &8994708956538940186
 ParticleSystemRenderer:
   serializedVersion: 6

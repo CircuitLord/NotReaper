@@ -8,6 +8,7 @@ namespace NotReaper.Timing {
     class Constants {
         public static UInt64 PulsesPerQuarterNote = 480;
         public static QNT_Duration QuarterNoteDuration = new QNT_Duration(PulsesPerQuarterNote);
+        public static QNT_Duration EighthNoteDuration = new QNT_Duration(PulsesPerQuarterNote / 2);
         public static QNT_Duration SixteenthNoteDuration = new QNT_Duration(PulsesPerQuarterNote / 4);
 
         public static UInt64 OneMinuteInMicroseconds = 60000000;
@@ -164,6 +165,10 @@ namespace NotReaper.Timing {
 
         public float ToBeatTime() {
             return tick / (float)Constants.PulsesPerQuarterNote;
+        }
+
+        public static Relative_QNT FromBeatTime(float beatTime) {
+            return new Relative_QNT((Int64)Mathf.Round(beatTime * (float)Constants.PulsesPerQuarterNote));
         }
 
         public int CompareTo(Relative_QNT other) {

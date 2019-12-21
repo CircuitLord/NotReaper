@@ -152,8 +152,6 @@ namespace NotReaper {
 				NRSettings.SaveSettingsJson();
 			});
 
-			StartCoroutine(CalculateNoteCollidersEnabled());
-
 			Physics.autoSyncTransforms = false;
 
 			ChainBuilder.timeline = this;
@@ -1341,52 +1339,6 @@ namespace NotReaper {
 			liner.SetPositions(positions);
 		}
 
-		IEnumerator CalculateNoteCollidersEnabled() {
-
-			int framesToSplitOver = 50;
-
-			int amtToCalc = Mathf.RoundToInt(orderedNotes.Count / framesToSplitOver);
-
-			int j = 0;
-
-			for (int i = 0; i < framesToSplitOver; i++) {
-
-				while (j < orderedNotes.Count) {
-					
-					float targetPos = orderedNotes[j].GetRelativeBeatTime();
-
-					if (targetPos > -20 && targetPos < 20) {
-						orderedNotes[j].EnableColliders();
-					} else {
-						orderedNotes[j].EnableColliders();
-					}
-
-
-					if (j > amtToCalc * (i + 1)) break;
-
-					j++;
-				}
-
-
-				yield return null;
-
-			}
-
-			while (j < orderedNotes.Count) {
-				float targetPos = orderedNotes[j].GetRelativeBeatTime();
-
-				if (targetPos > -20 && targetPos < 20) {
-					orderedNotes[j].EnableGridColliders();
-				} else {
-					orderedNotes[j].DisableGridColliders();
-				}
-				j++;
-			}
-			StartCoroutine(CalculateNoteCollidersEnabled());
-
-		}
-
-
 		public void EnableNearSustainButtons() {
 			foreach (Target target in loadedNotes) {
 				if (!target.data.supportsBeatLength) continue;
@@ -1407,7 +1359,8 @@ namespace NotReaper {
 
 		bool checkForNearSustainsOnThisFrame = false;
 		public void Update() {
-			
+			QNT_Timestamp startTime = time;
+
 			UpdateSustains();
 
 			if (!paused) {
@@ -1499,6 +1452,39 @@ namespace NotReaper {
 
 
 			EnableNearSustainButtons();
+
+			List<Target> newLoadedNotes = new List<Target>();
+			QNT_Timestamp loadStart = Timeline.time - Relative_QNT.FromBeatTime(10.0f);
+			QNT_Timestamp loadEnd = Timeline.time + Relative_QNT.FromBeatTime(10.0f);
+			for(int i = FindFirstNoteAtTime(loadStart); i != -1 && i < orderedNotes.Count; ++i) {
+				Target t = orderedNotes[i];
+				if(t.data.time > loadEnd) {
+					break;
+				}
+				newLoadedNotes.Add(t);
+			}
+
+			loadedNotes = newLoadedNotes;
+
+			if(startTime != time) {
+				QNT_Timestamp start = startTime;
+				QNT_Timestamp end = time;
+
+				if(start > end) {
+					QNT_Timestamp temp = start;
+					start = end;
+					end = temp;
+				}
+
+				for(int i = FindFirstNoteAtTime(start); i != -1 && i < orderedNotes.Count; ++i) {
+					Target t = orderedNotes[i];
+					if(t.data.time > end) {
+						break;
+					}
+
+					t.OnNoteHit();
+				}
+			}
 		}
 
 		public double GetPercentPlayedFromSeconds(double seconds)

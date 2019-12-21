@@ -36,7 +36,7 @@ namespace NotReaper.Tools.ChainBuilder {
 		public TargetIcon[] iconsUnderMouse {
 			get {
 				return _iconsUnderMouse = _iconsUnderMouse == null
-					? MouseUtil.IconsUnderMouse(notesLayer)
+					? MouseUtil.IconsUnderMouse(timeline)
 					: _iconsUnderMouse;
 			}
 			set { _iconsUnderMouse = value; }
