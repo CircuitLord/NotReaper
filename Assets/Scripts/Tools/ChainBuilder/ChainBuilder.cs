@@ -265,7 +265,7 @@ namespace NotReaper.Tools.ChainBuilder {
 				generatedVelocity = TargetVelocity.Chain;
 			}
 
-			for(int i = 1; i <= (data.beatLength.tick / Constants.QuarterNoteDuration.tick) * (data.pathBuilderData.interval / 4.0f); ++i) {
+			for(int i = 1; i <= (data.beatLength.tick / (float)Constants.PulsesPerQuarterNote) * (data.pathBuilderData.interval / 4.0f); ++i) {
 				currentPos += currentDir * currentStep;
 				currentDir = currentDir.Rotate(currentAngle);
 
