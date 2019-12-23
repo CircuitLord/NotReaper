@@ -15,9 +15,6 @@ namespace NotReaper.Tools {
 		public LayerMask notesLayer;
 		public NoteGridSnap noteSnap;
 
-		
-
-
 		public void TryPlaceNote() {
 			if (!EditorInput.isOverGrid || EditorInput.inUI) return;
 			
@@ -26,33 +23,11 @@ namespace NotReaper.Tools {
 		}
 
 		public void TryRemoveNote() {
-			//if (EventSystem.current.IsPointerOverGameObject())
-				//return;
-
-			TargetIcon targetIcon = IconUnderMouse();
+			var iconsUnderMouse = MouseUtil.IconsUnderMouse(timeline);
+			TargetIcon targetIcon = iconsUnderMouse.Length > 0 ? iconsUnderMouse[0] : null;
 			if (targetIcon) {
 				targetIcon.OnTryRemove();
 			}
 		}
-
-
-
-
-		private TargetIcon IconUnderMouse() {
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1.7f);
-			ray.direction = Vector3.forward;
-			Debug.DrawRay(ray.origin, ray.direction);
-			if (Physics.Raycast(ray, out hit, 3.4f, notesLayer)) {
-				Transform objectHit = hit.transform;
-
-				TargetIcon targetIcon = objectHit.GetComponent<TargetIcon>();
-
-				return targetIcon;
-			}
-			return null;
-		}
-
 	}
 }

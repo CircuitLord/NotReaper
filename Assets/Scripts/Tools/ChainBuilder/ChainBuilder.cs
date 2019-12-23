@@ -472,23 +472,5 @@ namespace NotReaper.Tools.ChainBuilder {
 
 			return points;
 		}
-
-		private Transform FindLinePointUnderMouse() {
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			ray.origin = new Vector3(ray.origin.x, ray.origin.y, -1.25f);
-			ray.direction = Vector3.forward;
-			Debug.DrawRay(ray.origin, ray.direction);
-			if (Physics.Raycast(ray, out hit, 2.5f, chainBuilderLayer)) {
-				Transform objectHit = hit.transform;
-				
-				return objectHit;
-			}
-			return null;
-		}
-
-
 	}
-
-
 }
