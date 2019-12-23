@@ -307,7 +307,7 @@ namespace NotReaper.Tools {
 			//Recalculate the notes, and remove the "real" notes
 			ChainBuilder.ChainBuilder.CalculateChainNotes(data);
 			foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
-				var foundData = timeline.FindTargetData(genData.beatTime, genData.behavior, genData.handType);
+				var foundData = timeline.FindTargetData(genData.time, genData.behavior, genData.handType);
 				if(foundData != null) {
 					timeline.DeleteTargetFromAction(foundData);
 				}
