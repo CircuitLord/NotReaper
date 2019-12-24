@@ -1510,7 +1510,7 @@ namespace NotReaper {
 			StopCoroutine(AnimateSetTime(new QNT_Timestamp(0)));
 
 			float posX = Math.Abs(timelineTransformParent.position.x) + x;
-			QNT_Timestamp newTime = new QNT_Timestamp(0) + QNT_Duration.FromBeatTime(posX);
+			QNT_Timestamp newTime = new QNT_Timestamp(0) + QNT_Duration.FromBeatTime(posX * (scale / 20f));
 			newTime = GetClosestBeatSnapped(newTime, (uint)beatSnap);
 
 			StartCoroutine(AnimateSetTime(newTime));

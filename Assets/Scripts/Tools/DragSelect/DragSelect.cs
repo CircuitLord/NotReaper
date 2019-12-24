@@ -128,8 +128,8 @@ namespace NotReaper.Tools {
 			float timelineScaleMulti = Timeline.scale / 20f;
 			dragSelectTimeline.localScale = new Vector3(diff * timelineScaleMulti, 1.1f, 1);
 
-			Vector2 topLeft = new Vector2(dragSelectTimeline.transform.position.x, dragSelectTimeline.transform.position.y);
-			Vector2 size = new Vector2(dragSelectTimeline.transform.localScale.x, dragSelectTimeline.transform.localScale.y);
+			Vector2 topLeft = dragSelectTimeline.transform.TransformPoint(0, 0, 0);
+			Vector2 size = dragSelectTimeline.transform.TransformVector(1, 1, 1);
 
 			Vector2 center = new Vector2(topLeft.x + size.x / 2, topLeft.y - size.y / 2);
 
@@ -140,8 +140,8 @@ namespace NotReaper.Tools {
 
 			Rect selectionRect = Rect.MinMaxRect(minX, minY, maxX, maxY);
 
-			QNT_Timestamp start = Timeline.time + Relative_QNT.FromBeatTime(dragSelectTimeline.position.x - 1.0f);
-			QNT_Timestamp end = start + Relative_QNT.FromBeatTime((diff + 1.0f) * timelineScaleMulti);
+			QNT_Timestamp start = Timeline.time + Relative_QNT.FromBeatTime((minX - 1.0f) * timelineScaleMulti);
+			QNT_Timestamp end = Timeline.time + Relative_QNT.FromBeatTime((maxX + 1.0f) * timelineScaleMulti);
 			if(start > end) {
 				QNT_Timestamp temp = start;
 				start = end;
@@ -151,6 +151,10 @@ namespace NotReaper.Tools {
 			List<Target> newSelectedTargets = new List<Target>();
 			for(int i = timeline.FindFirstNoteAtTime(start); i != -1 && i < Timeline.orderedNotes.Count; ++i) {
 				Target target = Timeline.orderedNotes[i];
+				if(target.data.time >= end) {
+					break;
+				}
+
 				if(target.IsTimelineInsideRect(selectionRect)) {
 					newSelectedTargets.Add(target);
 				}

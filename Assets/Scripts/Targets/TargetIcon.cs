@@ -323,18 +323,19 @@ namespace NotReaper.Targets {
         }
 
         public bool IsCloseToPoint(Vector2 point) {
-            float collisionRad = collisionRadius * transform.localScale.x;
-            return (point - new Vector2(transform.position.x, transform.position.y)).sqrMagnitude < collisionRad * collisionRad;
+            Vector2 center = transform.TransformPoint(0,0,0);
+            float collisionRad = transform.TransformVector(collisionRadius, 0, 0).x;
+            return (point - center).sqrMagnitude < collisionRad * collisionRad;
         }
 
         public bool IsInsideRect(Rect rect) {
-            Vector2 center = new Vector2(transform.position.x, transform.position.y);
+            Vector2 center = transform.TransformPoint(0,0,0);
 
             Vector2 closestPoint = center;
             closestPoint.x = Mathf.Clamp(closestPoint.x, rect.min.x, rect.max.x);
             closestPoint.y = Mathf.Clamp(closestPoint.y, rect.min.y, rect.max.y);
 
-            float collisionRad = collisionRadius * transform.localScale.x;
+            float collisionRad = transform.TransformVector(collisionRadius, 0, 0).x;
             return (closestPoint - center).sqrMagnitude < collisionRad * collisionRad;
         }
 
