@@ -451,6 +451,7 @@ namespace NotReaper.Timing {
 				while(dataIndex < bufferData.Length / bufferChannels && (preview.currentSample < currentPreviewSongSampleEnd) && (preview.scaledCurrentSample) < song.samples.Length) {
 					ctx.index = dataIndex;
 					ctx.volume = volume;
+					ctx.playbackSpeed = speed;
 					preview.CopySampleIntoBuffer(ctx);
 
 					ctx.playbackSpeed = 1.0f;
