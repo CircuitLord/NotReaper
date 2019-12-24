@@ -329,7 +329,7 @@ namespace NotReaper.Timing {
 					HitsoundEvent ev;
 					ev.ID = data.ID;
 					ev.currentSample = 0;
-					ev.waitSamples = (uint)((timeline.TimestampToSeconds(data.time) - startTime) * sampleRate);
+					ev.waitSamples = (UInt64)((timeline.TimestampToSeconds(data.time) - startTime) * sampleRate) << ClipData.PrecisionShift;
 					ev.sound = kick;
 					ev.time = data.time;
 					ev.pan = (data.x / 7.15f);
@@ -383,12 +383,22 @@ namespace NotReaper.Timing {
 			chainNote.duckVolume = 0.0f;
 			melee.duckVolume = 0.0f;
 
+			UInt64 waitSpeed = (UInt64)1 << ClipData.PrecisionShift;
+			if(ctx.playbackSpeed != 1.0f) {
+				waitSpeed = (UInt64)(waitSpeed * ctx.playbackSpeed);
+			}
+
 			for (int i = events.Count - 1; i >= 0; i--) {
 				HitsoundEvent ev = events[i];
 				bool valid = true;
 
 				if(ev.waitSamples > 0) {
-					ev.waitSamples -= 1;
+					if(waitSpeed > ev.waitSamples) {
+						ev.waitSamples = 0;
+					}
+					else {
+						ev.waitSamples -= waitSpeed;
+					}
 				}
 				else {
 					ctx.volume = hitSoundVolume * ev.volume;
