@@ -359,6 +359,9 @@ namespace NotReaper.Timing {
 						case TargetVelocity.Melee:
 							ev.sound = melee;
 							break;
+
+						default:
+							continue;
 					}
 
 					//Only one hitsound at a time per point in time
