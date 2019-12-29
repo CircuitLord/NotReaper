@@ -523,6 +523,10 @@ namespace NotReaper.Timing {
 					rightSustain.CopySampleIntoBuffer(ctx);
 				}
 
+				QNT_Timestamp currentTick = timeline.ShiftTick(new QNT_Timestamp(0), (float)GetTimeFromCurrentSample());
+				TempoChange currentTempo = timeline.GetTempoForTime(currentTick);
+				QNT_Duration timeSignatureDuration = new QNT_Duration(Constants.PulsesPerWholeNote / currentTempo.timeSignature.Denominator);
+
 				if(playMetronome) {
 					if(GetTimeFromCurrentSample() > nextMetronomeTick) {
 						metronomeSamplesLeft = (int)(sampleRate * metronomeTickLength);
@@ -530,7 +534,7 @@ namespace NotReaper.Timing {
 					}
 
 					if(nextMetronomeTick == 0) {
-						QNT_Timestamp nextBeat = timeline.GetClosestBeatSnapped(timeline.ShiftTick(new QNT_Timestamp(0), (float)GetTimeFromCurrentSample()) + Constants.QuarterNoteDuration, 4);
+						QNT_Timestamp nextBeat = timeline.GetClosestBeatSnapped(timeline.ShiftTick(new QNT_Timestamp(0), (float)GetTimeFromCurrentSample()) + timeSignatureDuration, currentTempo.timeSignature.Denominator);
 						nextMetronomeTick = timeline.TimestampToSeconds(nextBeat);
 					}
 				}
@@ -540,10 +544,13 @@ namespace NotReaper.Timing {
 					const uint MetronomeTickFreq = 817;
 					const uint BigMetronomeTickFreq = 1024;
 
+					QNT_Timestamp tempoStart = currentTempo.time;
+
 					uint tickFreq = 0;
-					QNT_Timestamp thisBeat = timeline.GetClosestBeatSnapped(timeline.ShiftTick(new QNT_Timestamp(0), (float)GetTimeFromCurrentSample()), 4);
-					QNT_Timestamp wholeBeat = timeline.GetClosestBeatSnapped(timeline.ShiftTick(new QNT_Timestamp(0), (float)GetTimeFromCurrentSample()), 1);
-					if(thisBeat.tick == wholeBeat.tick) {
+
+					UInt64 currentBeatInBar = ((currentTick.tick - tempoStart.tick) / timeSignatureDuration.tick) % currentTempo.timeSignature.Numerator;
+
+					if(currentBeatInBar == 0) {
 						tickFreq = BigMetronomeTickFreq;
 					}
 					else {

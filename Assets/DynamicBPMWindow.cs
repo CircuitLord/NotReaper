@@ -8,9 +8,12 @@ using UnityEngine;
 using NotReaper.UserInput;
 using UnityEngine.EventSystems;
 using NotReaper.Timing;
+using NotReaper.Models;
 
 public class DynamicBPMWindow : MonoBehaviour {
     public TMP_InputField dynamicBpmInput;
+    public TMP_InputField timeSignatureNumerator;
+    public TMP_InputField timeSignatureDenomerator;
 
     [SerializeField] private Timeline timeline;
 
@@ -23,7 +26,8 @@ public class DynamicBPMWindow : MonoBehaviour {
         gameObject.GetComponent<CanvasGroup>().alpha = 0.0f;
         gameObject.SetActive(false);
         dynamicBpmInput.GetComponent<TMP_InputField>().onSubmit.AddListener(delegate {AddDynamicBPM(); });
-        //dynamicBpmInput.GetComponent<TMP_InputField>().onEndEdit.AddListener(delegate {Deactivate(); });
+        timeSignatureNumerator.GetComponent<TMP_InputField>().onSubmit.AddListener(delegate {AddDynamicBPM(); });
+        timeSignatureDenomerator.GetComponent<TMP_InputField>().onSubmit.AddListener(delegate {AddDynamicBPM(); });
     }
 
     public void Activate() {
@@ -34,13 +38,10 @@ public class DynamicBPMWindow : MonoBehaviour {
         gameObject.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
         gameObject.SetActive(true);
 
-        double existingBPM = timeline.GetBpmFromTime(Timeline.time);
-        if(existingBPM > 0) {
-            dynamicBpmInput.GetComponent<TMP_InputField>().text = String.Format("{0:0.###}", existingBPM);
-        }
-        else {
-           dynamicBpmInput.GetComponent<TMP_InputField>().text = "";
-        }
+        TempoChange tempo = timeline.GetTempoForTime(Timeline.time);
+        dynamicBpmInput.GetComponent<TMP_InputField>().text = Constants.DisplayBPMFromMicrosecondsPerQuaterNote(tempo.microsecondsPerQuarterNote);
+        timeSignatureNumerator.GetComponent<TMP_InputField>().text = tempo.timeSignature.Numerator.ToString();
+        timeSignatureDenomerator.GetComponent<TMP_InputField>().text = tempo.timeSignature.Denominator.ToString();
 
         dynamicBpmInput.ActivateInputField();
     }
@@ -53,8 +54,16 @@ public class DynamicBPMWindow : MonoBehaviour {
 
     public void AddDynamicBPM() {
         double dynamicBpm = 0.0f;
+        TimeSignature timeSignature = new TimeSignature(4,4);
         if(Double.TryParse(dynamicBpmInput.text, out dynamicBpm)) {
-            timeline.SetBPM(Timeline.time, Constants.MicrosecondsPerQuarterNoteFromBPM(dynamicBpm), true);
+
+            uint numer = 4;
+            uint denom = 4;
+            if(uint.TryParse(timeSignatureNumerator.text, out numer) && uint.TryParse(timeSignatureDenomerator.text, out denom)) {
+                timeSignature = new TimeSignature(numer, denom);
+            }
+
+            timeline.SetBPM(Timeline.time, Constants.MicrosecondsPerQuarterNoteFromBPM(dynamicBpm), true, timeSignature);
             Deactivate();
         }
     }

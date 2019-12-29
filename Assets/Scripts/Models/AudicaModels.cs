@@ -9,6 +9,7 @@ namespace NotReaper.Models {
 	public struct TempoChange {
 		public QNT_Timestamp time;
 		public UInt64 microsecondsPerQuarterNote;
+		public TimeSignature timeSignature;
 	}
 
 	//KEEP IN MIND, almost all the song references are to the moggsong, not the mogg.

@@ -61,6 +61,7 @@ namespace NotReaper.IO {
 				MidiEventCollection events = new MidiEventCollection(0, (int)Constants.PulsesPerQuarterNote);
 				foreach(var tempo in audicaFile.desc.tempoList) {
 					events.AddEvent(new TempoEvent((int)tempo.microsecondsPerQuarterNote, (long)tempo.time.tick), 0);
+					events.AddEvent(new TimeSignatureEvent((long)tempo.time.tick, (int)tempo.timeSignature.Numerator, (int)TimeSignature.GetMIDIDenominator(tempo.timeSignature.Denominator), 0, 8), 0);
 				}
 
 				events.PrepareForExport();

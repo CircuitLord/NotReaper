@@ -716,6 +716,7 @@ namespace NotReaper {
 		}
 
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
+			readyToRegenerate = false;
 
 			inTimingMode = false;
 			SetOffset(new Relative_QNT(0));
@@ -761,11 +762,43 @@ namespace NotReaper {
 						}
 					}
 				}
+
+				//Now, try to match up time signatures with existing tempo markers
+				foreach(var eventList in audicaFile.song_mid.Events) {
+					foreach(var e in eventList) {
+						if(e is TimeSignatureEvent) {
+							TimeSignatureEvent timeSignatureEvent = (e as TimeSignatureEvent);
+							QNT_Timestamp time = new QNT_Timestamp((UInt64)timeSignatureEvent.AbsoluteTime);
+							TimeSignature signature = new TimeSignature((uint)timeSignatureEvent.Numerator, (uint)(1 << timeSignatureEvent.Denominator));
+
+							bool found = false;
+							for(int i = 0; i < tempoChanges.Count; ++i) {
+								if(tempoChanges[i].time == time) {
+									TempoChange change = tempoChanges[i];
+									change.timeSignature = signature;
+									tempoChanges[i] = change;
+									found = true;
+									break;
+								}
+							}
+
+							//If there is no tempo change with this time signature, add whatever the current tempo was at that point
+							if(!found) {
+								SetBPM(time, GetTempoForTime(time).microsecondsPerQuarterNote, false, signature);
+							}
+						}
+					}
+				}
 			} 
+
+			//If we didn't load any bpm, set it from the song desc
+			int zeroBPMIndex = GetCurrentBPMIndex(new QNT_Timestamp(0));
+			if(zeroBPMIndex == -1) {
+				SetBPM(new QNT_Timestamp(0), Constants.MicrosecondsPerQuarterNoteFromBPM(desc.tempo), false);
+			}
 
 			//Update our discord presence
 			nrDiscordPresence.UpdatePresenceSongName(desc.title);
-
 
 			//Loads all the sounds.
 			StartCoroutine(GetAudioClip($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg"));
@@ -803,34 +836,14 @@ namespace NotReaper {
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
 					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.MainSong);
 					
-					int zeroBPMIndex = GetCurrentBPMIndex(new QNT_Timestamp(0));
-					if(zeroBPMIndex == -1) {
-						SetBPM(new QNT_Timestamp(0), Constants.MicrosecondsPerQuarterNoteFromBPM(desc.tempo), false);
-					}
-
-					//We modify the list, so we need to copy it
-					var cloneList = desc.tempoList.ToList();
-					foreach(var tempo in cloneList) {
-						SetBPM(tempo.time, tempo.microsecondsPerQuarterNote, false);
-					}
-					desc.tempoList = tempoChanges;
-					
 					audioLoaded = true;
 					audicaLoaded = true;
 					
 					//Load the preview start point
 					miniTimeline.SetPreviewStartPoint(ShiftTick(new QNT_Timestamp(0), (float)desc.previewStartSeconds));
 
-					waveformVisualizer.GenerateWaveform(songPlayback.song, this);
-
-					//Difficulty manager loads stuff now
-					//difficultyManager.LoadHighestDifficulty(false);
-					//SetScale(20);
-					//Resources.FindObjectsOfTypeAll<OptionsMenu>().First().Init(bpm, offset, beatSnap, songid, songtitle, songartist, songendevent, songpreroll, songauthor);
-
-					//spectrogram.GetComponentInChildren<AudioWaveformVisualizer>().Init();
-
-
+					readyToRegenerate = true;
+					RegenerateBPMTimelineData();
 				}
 			}
 		}
@@ -1062,10 +1075,13 @@ namespace NotReaper {
 			RegenerateBPMTimelineData();
 		}
 
-		public void SetBPM(QNT_Timestamp time, UInt64 microsecondsPerQuarterNote, bool shiftFutureEvents) {
+		public void SetBPM(QNT_Timestamp time, UInt64 microsecondsPerQuarterNote, bool shiftFutureEvents, TimeSignature? signatureArg = null) {
+			TimeSignature signature = signatureArg ?? new TimeSignature(4,4);
+
 			TempoChange c = new TempoChange();
 			c.time = time;
 			c.microsecondsPerQuarterNote = microsecondsPerQuarterNote;
+			c.timeSignature = signature;
 
 			UInt64 prevMicrosecondPerQuarterNote = 0;
 
@@ -1150,7 +1166,13 @@ namespace NotReaper {
 			RegenerateBPMTimelineData();
 		}
 
+
+		bool readyToRegenerate = false;
 		public void RegenerateBPMTimelineData() {
+			if(!readyToRegenerate) {
+				return;
+			}
+
 			foreach(var bpm in bpmMarkerObjects) {
 				Destroy(bpm);
 			}
@@ -1162,7 +1184,10 @@ namespace NotReaper {
 				var transform1 = timelineBPM.transform;
 				transform1.localPosition = new Vector3(tempo.time.ToBeatTime(), -0.5f, 0);
 
-				timelineBPM.GetComponentInChildren<TextMesh>().text = Constants.DisplayBPMFromMicrosecondsPerQuaterNote(tempo.microsecondsPerQuarterNote);
+				string bpm = Constants.DisplayBPMFromMicrosecondsPerQuaterNote(tempo.microsecondsPerQuarterNote);
+				string timeSignature = tempo.timeSignature.ToString();
+
+				timelineBPM.GetComponentInChildren<TextMesh>().text = bpm + "\n" + timeSignature;
 				bpmMarkerObjects.Add(timelineBPM);
 			}
 
@@ -1175,9 +1200,12 @@ namespace NotReaper {
 			List<Vector3> vertices = new List<Vector3>();
 			List<int> indices = new List<int>();
 
+			TempoChange currentTempo = tempoChanges[0];
+
 			uint barLengthIncr = 0;
-			UInt64 increment = Constants.PulsesPerQuarterNote;
-			for(UInt64 t = 0; t < endOfAudio.tick;) {
+			for(float t = 0; t < endOfAudio.tick;) {
+				float increment = Constants.PulsesPerWholeNote / currentTempo.timeSignature.Denominator;
+
 				int indexStart = vertices.Count;
 
 				const float width = 0.025f;
@@ -1190,11 +1218,15 @@ namespace NotReaper {
 				if(barLengthIncr == 0) {
 					height = maxHeight;
 				}
-				else if(barLengthIncr == 2) {
-					height = maxHeight / 2;
-				}
-				else if(barLengthIncr == 1 || barLengthIncr == 3) {
+				else {
 					height = maxHeight / 4;
+				}
+
+				//For 4/4 time, set the halfway heights
+				if(currentTempo.timeSignature.Numerator == 4 && currentTempo.timeSignature.Denominator == 4) {
+					if(barLengthIncr == 2) {
+						height = maxHeight / 2;
+					}
 				}
 
 				vertices.Add(new Vector3(start, -0.5f, zIndex));
@@ -1211,13 +1243,14 @@ namespace NotReaper {
 				indices.Add(indexStart + 0);
 
 				barLengthIncr++;
-				barLengthIncr = barLengthIncr % 4;
+				barLengthIncr = barLengthIncr % currentTempo.timeSignature.Numerator;
 				
 				bool newTempo = false;
 				foreach(TempoChange tempoChange in tempoChanges) {
 					if(t < tempoChange.time.tick && t + increment >= tempoChange.time.tick) {
 						barLengthIncr = 0;
 						t = tempoChange.time.tick;
+						currentTempo = tempoChange;
 						newTempo = true;
 						break;
 					}
@@ -1276,6 +1309,7 @@ namespace NotReaper {
 				TempoChange change;
 				change.time = t;
 				change.microsecondsPerQuarterNote = Constants.OneMinuteInMicroseconds / 60;
+				change.timeSignature = new TimeSignature(4,4);
 				return change;
 			}
 

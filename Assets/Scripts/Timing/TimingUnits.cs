@@ -7,6 +7,7 @@ using UnityEngine;
 namespace NotReaper.Timing {
     class Constants {
         public static UInt64 PulsesPerQuarterNote = 480;
+        public static UInt64 PulsesPerWholeNote = PulsesPerQuarterNote * 4;
         public static QNT_Duration QuarterNoteDuration = new QNT_Duration(PulsesPerQuarterNote);
         public static QNT_Duration EighthNoteDuration = new QNT_Duration(PulsesPerQuarterNote / 2);
         public static QNT_Duration SixteenthNoteDuration = new QNT_Duration(PulsesPerQuarterNote / 4);
@@ -39,7 +40,7 @@ namespace NotReaper.Timing {
 
             //Since we use PPQN, anything a quarter note or smaller is a division of the time
 			if(beatSnap >= 4) {
-				duration /= (beatSnap / 4);
+                duration.tick = (UInt64)(duration.tick / (beatSnap / 4.0f));
 			}
 			//Otherwise, it is a multiplication
 			else {
@@ -396,6 +397,36 @@ namespace NotReaper.Timing {
             }
 
             return results;
+        }
+    }
+
+
+    //Represents a musical time signature (i.e 4/4)
+    public struct TimeSignature {
+        public TimeSignature(uint numer, uint denom) {
+            Numerator = numer;
+            Denominator = denom;
+        }
+
+        public uint Numerator;
+        public uint Denominator;
+
+        public static uint GetMIDIDenominator(uint denom) {
+            if(denom == 0) {
+                return 0;
+            }
+
+            uint ret = 0;
+            while (denom != 1) {
+                denom = denom >> 1;
+                ret += 1;
+            }
+
+            return ret;
+        }
+
+        public override string ToString() {
+            return Numerator.ToString() + "/" + Denominator.ToString();
         }
     }
 }
