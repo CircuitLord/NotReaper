@@ -386,10 +386,15 @@ namespace NotReaper.Timing {
 			chainNote.duckVolume = 0.0f;
 			melee.duckVolume = 0.0f;
 
+			float oldSpeed = ctx.playbackSpeed;
+
 			UInt64 waitSpeed = (UInt64)1 << ClipData.PrecisionShift;
-			if(ctx.playbackSpeed != 1.0f) {
-				waitSpeed = (UInt64)(waitSpeed * ctx.playbackSpeed);
+			if(oldSpeed != 1.0f) {
+				waitSpeed = (UInt64)(waitSpeed * oldSpeed);
 			}
+
+			//Always play hitsounds at full speed
+			ctx.playbackSpeed = 1.0f;
 
 			for (int i = events.Count - 1; i >= 0; i--) {
 				HitsoundEvent ev = events[i];
@@ -424,6 +429,8 @@ namespace NotReaper.Timing {
 					events[i] = ev;
 				}
 			}
+
+			ctx.playbackSpeed = 1.0f;
 		}
 
 		void OnAudioFilterRead(float[] bufferData, int bufferChannels) {
@@ -457,7 +464,6 @@ namespace NotReaper.Timing {
 					ctx.playbackSpeed = speed;
 					preview.CopySampleIntoBuffer(ctx);
 
-					ctx.playbackSpeed = 1.0f;
 					PlayHitsounds(ctx, previewHitsoundEvents);
 
 					++dataIndex;
@@ -478,7 +484,6 @@ namespace NotReaper.Timing {
 					while(dataIndex < bufferData.Length / bufferChannels) {
 						ctx.index = dataIndex;
 						ctx.volume = hitSoundVolume;
-						ctx.playbackSpeed = 1.0f;
 						PlayHitsounds(ctx, previewHitsoundEvents);
 						++dataIndex;
 					}
