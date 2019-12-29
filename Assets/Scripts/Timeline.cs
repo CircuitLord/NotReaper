@@ -667,7 +667,8 @@ namespace NotReaper {
 
 			audicaFile.desc = desc;
 
-
+			desc.tempoList = tempoChanges;
+			
 			AudicaExporter.ExportToAudicaFile(audicaFile);
 
 			NotificationShower.AddNotifToQueue(new NRNotification("Map saved successfully!"));
@@ -1146,10 +1147,6 @@ namespace NotReaper {
 			}
 
 			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time.tick).ToList();
-			
-			if (desc != null) {
-				desc.tempoList = tempoChanges;
-			}
 
 			//Move all future targets back
 			if(shiftFutureEvents) {
