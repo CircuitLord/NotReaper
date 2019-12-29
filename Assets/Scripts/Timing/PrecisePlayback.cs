@@ -64,10 +64,10 @@ namespace NotReaper.Timing {
 			while (sourceChannel < ctx.bufferChannels) {
 				float panAmount = 1.0f;
 				if(sourceChannel == 0) {
-					panAmount = Math.Max(1.0f - panClamp, 1.0f);
+					panAmount = Math.Min(1.0f - panClamp, 1.0f);
 				}
 				else if(sourceChannel == 1) {
-					panAmount = Math.Max(-1.0f - panClamp, 1.0f);
+					panAmount = Math.Min(1.0f + panClamp, 1.0f);
 				}
 
 				float value = 0.0f;
