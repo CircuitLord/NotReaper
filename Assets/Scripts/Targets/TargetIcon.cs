@@ -236,16 +236,9 @@ namespace NotReaper.Targets {
                     continue;
                 }
 
-                if (beatLength >= Constants.QuarterNoteDuration) {
-                    l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
-                    l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
-                    l.SetPosition(2, new Vector3((beatLength.ToBeatTime() / 0.7f) * scale, sustainDirection, 0.0f));
-                }
-                else {
-                    l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
-                    l.SetPosition(1, new Vector3(0.0f, 0.0f, 0.0f));
-                    l.SetPosition(2, new Vector3(0.0f, 0.0f, 0.0f));
-                }
+                l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
+                l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
+                l.SetPosition(2, new Vector3((beatLength.ToBeatTime() / 0.7f) * scale, sustainDirection, 0.0f));
             }
         }
 

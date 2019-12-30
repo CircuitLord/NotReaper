@@ -7,6 +7,7 @@ using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using NotReaper.Managers;
+using NotReaper.Timing;
 
 namespace NotReaper.Tools {
 
@@ -267,6 +268,7 @@ namespace NotReaper.Tools {
 
 	public class NRActionConvertNoteToPathbuilder : NRAction {
 		public TargetData data;
+		public QNT_Duration oldBeatLength;
 		public PathBuilderData pathBuilderData = new PathBuilderData();
 
 		public override void DoAction(Timeline timeline) {
@@ -274,6 +276,12 @@ namespace NotReaper.Tools {
 			pathBuilderData.velocity = data.velocity;
 			pathBuilderData.handType = data.handType;
 			data.pathBuilderData = pathBuilderData;
+
+			//Ensure the path builder always starts with a quarter note of build time
+			oldBeatLength = data.beatLength;
+			if(data.beatLength < Constants.QuarterNoteDuration) {
+				data.beatLength = Constants.QuarterNoteDuration;
+			}
 
 			data.behavior = TargetBehavior.NR_Pathbuilder;
 			ChainBuilder.ChainBuilder.GenerateChainNotes(data);
@@ -284,6 +292,7 @@ namespace NotReaper.Tools {
 			data.behavior = data.pathBuilderData.behavior;
 			data.velocity = data.pathBuilderData.velocity;
 			data.handType = data.pathBuilderData.handType;
+			data.beatLength = oldBeatLength;
 			data.pathBuilderData = null;
 		}
 	}
