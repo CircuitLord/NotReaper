@@ -60,7 +60,9 @@ public class DynamicBPMWindow : MonoBehaviour {
             uint numer = 4;
             uint denom = 4;
             if(uint.TryParse(timeSignatureNumerator.text, out numer) && uint.TryParse(timeSignatureDenomerator.text, out denom)) {
-                timeSignature = new TimeSignature(numer, denom);
+                if(numer != 0 && denom != 0) {
+                    timeSignature = new TimeSignature(numer, denom);
+                }
             }
 
             timeline.SetBPM(Timeline.time, Constants.MicrosecondsPerQuarterNoteFromBPM(dynamicBpm), true, timeSignature);
