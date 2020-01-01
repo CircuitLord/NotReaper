@@ -229,6 +229,11 @@ namespace NotReaper.Tools.ChainBuilder {
 				data.pathBuilderData.createdNotes = false;
 			}
 
+			//No notes can be generated
+			if(data.beatLength.tick == 0) {
+				return;
+			}
+
 			data.pathBuilderData.generatedNotes = new List<TargetData>();
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

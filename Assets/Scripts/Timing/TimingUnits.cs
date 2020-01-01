@@ -278,8 +278,13 @@ namespace NotReaper.Timing {
         public static QNT_Duration operator +(QNT_Duration a, QNT_Duration b)
             => new QNT_Duration(a.tick + b.tick);
 
-        public static QNT_Duration operator -(QNT_Duration a, QNT_Duration b)
-            => new QNT_Duration(a.tick - b.tick);
+        public static QNT_Duration operator -(QNT_Duration a, QNT_Duration b) {
+            if(b.tick > a.tick) {
+                return new QNT_Duration(0);
+            }
+
+            return new QNT_Duration(a.tick - b.tick);
+        }
 
         public static QNT_Duration operator *(QNT_Duration a, UInt64 b)
             => new QNT_Duration(a.tick * b);
