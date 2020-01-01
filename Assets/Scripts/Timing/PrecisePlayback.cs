@@ -105,6 +105,11 @@ namespace NotReaper.Timing {
 		private ClipData chainNote;
 		private ClipData melee;
 
+		private ClipData hihat_hit;
+		private ClipData hihat_hit2;
+		private ClipData hihat_hit3;
+		private ClipData hihat_open;
+
 		public float leftSustainVolume = 0.0f;
 		public float rightSustainVolume = 0.0f;
 
@@ -127,6 +132,10 @@ namespace NotReaper.Timing {
 		private float metronomeTickLength = 0.01f;
 		private float nextMetronomeTick = 0;
 
+		private bool playClickTrack = false;
+		private QNT_Timestamp clickTrackEndTime;
+		private float clickTrackNextTick = 0;
+
 		private bool paused = true;
 		[SerializeField] private AudioSource source;
 
@@ -138,6 +147,11 @@ namespace NotReaper.Timing {
 		[SerializeField] private AudioClip ChainStartClip;
 		[SerializeField] private AudioClip ChainNoteClip;
 		[SerializeField] private AudioClip MeleeClip;
+
+		[SerializeField] private AudioClip HiHat_Hit;
+		[SerializeField] private AudioClip HiHat_Hit2;
+		[SerializeField] private AudioClip HiHat_Hit3;
+		[SerializeField] private AudioClip HiHat_Open;
 
 		private void Start() {
 			sampleRate = AudioSettings.outputSampleRate;
@@ -153,12 +167,22 @@ namespace NotReaper.Timing {
 			while (ChainNoteClip.loadState != AudioDataLoadState.Loaded) yield return null;
 			while (MeleeClip.loadState != AudioDataLoadState.Loaded) yield return null;
 
+			while (HiHat_Hit.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (HiHat_Hit2.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (HiHat_Open.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (HiHat_Hit3.loadState != AudioDataLoadState.Loaded) yield return null;
+
 			kick = FromAudioClip(KickClip);
 			snare = FromAudioClip(SnareClip);
 			percussion = FromAudioClip(PercussionClip);
 			chainStart = FromAudioClip(ChainStartClip);
 			chainNote = FromAudioClip(ChainNoteClip);
 			melee = FromAudioClip(MeleeClip);
+
+			hihat_hit = FromAudioClip(HiHat_Hit);
+			hihat_hit2 = FromAudioClip(HiHat_Hit2);
+			hihat_hit3 = FromAudioClip(HiHat_Hit3);
+			hihat_open = FromAudioClip(HiHat_Open);
 		}
 
 		public enum LoadType {
@@ -233,13 +257,52 @@ namespace NotReaper.Timing {
 
 			paused = false;
 			clearHitsounds = true;
+			clearClicksounds = true;
 			dspStartTime = AudioSettings.dspTime;
 			source.Play();
+		}
+
+		public void PlayClickTrack(QNT_Timestamp endTime) {
+			playClickTrack = true;
+			clickTrackEndTime = endTime;
+			clickTrackNextTick = 0;
+		}
+
+		public AudioClip GenerateClickTrack(QNT_Timestamp endTime) {
+			int numSamples = (int)(sampleRate * timeline.TimestampToSeconds(endTime));
+			clickTrackEvents.Clear();
+
+			AudioClip clip = AudioClip.Create("click_track", numSamples, 2, sampleRate, false);
+			float[] audioData = new float[numSamples * 2];
+			ClickTrackPCMReaderCallback(audioData);
+			clip.SetData(audioData, 0);
+
+			return clip;
+		}
+
+		void ClickTrackPCMReaderCallback(float[] data) {
+			CopyContext ctx;
+			ctx.bufferData = data;
+			ctx.bufferChannels = 2;
+			ctx.bufferFreq = sampleRate;
+			ctx.playbackSpeed = 1.0f;
+			ctx.outputValue = 0.0f;
+			ctx.volume = volume;
+
+			for (int dataIndex = 0; dataIndex < data.Length / 2; dataIndex++) {
+				ctx.index = dataIndex;
+
+				QNT_Timestamp currentTick = timeline.ShiftTick(new QNT_Timestamp(0), (float)((dataIndex) / (float)sampleRate));
+				TempoChange currentTempo = timeline.GetTempoForTime(currentTick);
+				QNT_Duration timeSignatureDuration = new QNT_Duration(Constants.PulsesPerWholeNote / currentTempo.timeSignature.Denominator);
+				GenerateClickTrackSamples(ctx, currentTick, currentTempo, timeSignatureDuration);
+			}
 		}
 
 		public void Stop() {
 			paused = true;
 			StopMetronome();
+			playClickTrack = false;
 		}
 
 		public void PlayPreview(QNT_Timestamp time, Relative_QNT previewDuration) {
@@ -433,6 +496,36 @@ namespace NotReaper.Timing {
 			ctx.playbackSpeed = 1.0f;
 		}
 
+
+		struct ClickTrackEvent {
+			public QNT_Timestamp time;
+			public ClipData clip;
+			public UInt64 currentSample;
+		};
+
+		List<ClickTrackEvent> clickTrackEvents = new List<ClickTrackEvent>();
+		bool clearClicksounds = false;
+
+		void TryAddClickEvent(QNT_Timestamp current, QNT_Timestamp beat, ClipData clip) {
+			if(current == beat) {
+				bool addedSound = false;
+				foreach(ClickTrackEvent ev in clickTrackEvents) {
+					if(ev.time == current) {
+						addedSound = true;
+						break;
+					}
+				}
+
+				if(!addedSound) {
+					ClickTrackEvent ev;
+					ev.clip = clip;
+					ev.currentSample = 0;
+					ev.time = current;
+					clickTrackEvents.Add(ev);
+				}
+			}
+		}
+
 		void OnAudioFilterRead(float[] bufferData, int bufferChannels) {
 			CopyContext ctx;
 			ctx.bufferData = bufferData;
@@ -445,6 +538,11 @@ namespace NotReaper.Timing {
 				hitsoundEvents.Clear();
 				hitSoundEnd = new QNT_Timestamp(0);
 				clearHitsounds = false;
+			}
+
+			if(clearClicksounds) {
+				clickTrackEvents.Clear();
+				clearClicksounds = false;
 			}
 
 			if(newPreviewHitsoundEvents != null) {
@@ -563,6 +661,44 @@ namespace NotReaper.Timing {
 						bufferData[dataIndex * bufferChannels + c] = Mathf.Clamp(bufferData[dataIndex * bufferChannels + c] + metro, -1.0f, 1.0f);
 					}
 					metronomeSamplesLeft -= 1;
+				}
+
+				
+				if(playClickTrack && currentTick < clickTrackEndTime) {
+					ctx.volume = volume;
+					ctx.index = dataIndex;
+					ctx.playbackSpeed = 1.0f;
+					GenerateClickTrackSamples(ctx, currentTick, currentTempo, timeSignatureDuration);
+				}
+			}
+		}
+
+		void GenerateClickTrackSamples(CopyContext ctx, QNT_Timestamp currentTick, TempoChange currentTempo, QNT_Duration timeSignatureDuration) {
+			QNT_Timestamp tempoStart = currentTempo.time;
+			QNT_Timestamp nextBeat = timeline.GetClosestBeatSnapped(currentTick, currentTempo.timeSignature.Denominator);
+			UInt64 currentBeatInBar = ((currentTick.tick - tempoStart.tick) / timeSignatureDuration.tick) % currentTempo.timeSignature.Numerator;
+
+			if(currentBeatInBar != 1) {
+				TryAddClickEvent(currentTick, nextBeat, hihat_hit);
+			}
+			else {
+				TryAddClickEvent(currentTick, nextBeat, hihat_hit3);
+			}
+
+			TryAddClickEvent(currentTick, nextBeat + Constants.SixteenthNoteDuration, hihat_hit2);
+			TryAddClickEvent(currentTick, nextBeat + Constants.EighthNoteDuration, hihat_open);
+
+			for (int i = clickTrackEvents.Count - 1; i >= 0; i--) {
+				ClickTrackEvent ev = clickTrackEvents[i];
+				ev.clip.currentSample = ev.currentSample;
+				ev.clip.CopySampleIntoBuffer(ctx);
+				ev.currentSample = ev.clip.currentSample;
+
+				if(ev.clip.scaledCurrentSample > ev.clip.samples.Length) {
+					clickTrackEvents.RemoveAt(i);
+				}
+				else {
+					clickTrackEvents[i] = ev;
 				}
 			}
 		}

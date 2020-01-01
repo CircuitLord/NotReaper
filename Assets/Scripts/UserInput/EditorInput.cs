@@ -53,6 +53,7 @@ namespace NotReaper.UserInput {
 		[SerializeField] private GameObject focusGrid;
 		[SerializeField] private GameObject bpmWindow;
 		[SerializeField] private GameObject bpmResultWindow;
+		[SerializeField] private CountInWindow countInWindow;
 
 
 		public HoverTarget hover;
@@ -351,7 +352,7 @@ namespace NotReaper.UserInput {
 
 			}
 
-			if(bpmWindow.activeSelf || bpmResultWindow.activeSelf) {
+			if(bpmWindow.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf) {
 				inUI = true;
 				return;
 			}
@@ -359,7 +360,7 @@ namespace NotReaper.UserInput {
 
 		private void Update() {
 
-			if (Timeline.inTimingMode && inUI) {
+			if ((Timeline.inTimingMode || countInWindow.gameObject.activeSelf) && inUI) {
 				if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
 					timeline.TogglePlayback();
 				}
@@ -383,6 +384,9 @@ namespace NotReaper.UserInput {
 
 					if(bpmWindow.activeSelf) {
 						bpmWindow.GetComponent<DynamicBPMWindow>().Deactivate();
+					}
+					else if(countInWindow.gameObject.activeSelf) {
+						countInWindow.Deactivate();
 					}
 					else {
 						pauseMenu.OpenPauseMenu();
@@ -425,6 +429,12 @@ namespace NotReaper.UserInput {
 				}
 			}
 
+			if(Input.GetKeyDown(KeyCode.F3)) {
+				if(countInWindow.gameObject.activeSelf) {
+					countInWindow.Deactivate();
+				}
+			}
+
 			bool wasInUI = inUI;
 			FigureOutIsInUI();
 
@@ -436,6 +446,12 @@ namespace NotReaper.UserInput {
 
 			if (Input.GetKeyUp(KeyCode.F1)) {
 				shortcutMenu.hide();
+			}
+
+			if(Input.GetKeyDown(KeyCode.F3)) {
+				if(!countInWindow.gameObject.activeSelf) {
+					countInWindow.Activate();
+				}
 			}
 
 			if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) {

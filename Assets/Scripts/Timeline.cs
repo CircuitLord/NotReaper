@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +23,8 @@ using UnityEngine.UI;
 using Application = UnityEngine.Application;
 using NotReaper.Timing;
 
+using SharpCompress.Archives;
+using SharpCompress.Archives.Zip;
 
 namespace NotReaper {
 
@@ -137,7 +139,7 @@ namespace NotReaper {
 			Physics.autoSyncTransforms = false;
 
 			ChainBuilder.timeline = this;
-				
+
 			musicVolumeSlider.onValueChanged.AddListener(val => {
 				musicVolume = val;
 				NRSettings.config.mainVol = musicVolume;
@@ -148,12 +150,12 @@ namespace NotReaper {
 				sustainVolume = NRSettings.config.sustainVol;
 				musicVolume = NRSettings.config.mainVol;
 				musicVolumeSlider.value = musicVolume;
-
+				
 				SetAudioDSP();
 
 				if (NRSettings.config.clearCacheOnStartup) {
 					HandleCache.ClearCache();
-		}
+				}
 			});
 		}
 
@@ -478,7 +480,7 @@ namespace NotReaper {
 				if (target.data.beatLength < increment) target.data.beatLength = new QNT_Duration(0);
 				target.data.beatLength += increment;
 			} else {
-				target.data.beatLength =new QNT_Duration(Math.Max((target.data.beatLength - increment).tick, minimum.tick));
+				target.data.beatLength -= increment;
 			}
 
 			target.UpdatePath();
@@ -1748,6 +1750,82 @@ namespace NotReaper {
 			var configuration = AudioSettings.GetConfiguration();
 			configuration.dspBufferSize = NRSettings.config.audioDSP;
 			AudioSettings.Reset(configuration);
+		}
+
+
+
+		public void PreviewCountIn(uint beats) {
+			if(!paused) {
+				TogglePlayback();
+			}
+
+			time = new QNT_Timestamp(0);
+			SafeSetTime();
+
+			TempoChange first = tempoChanges[0];
+			QNT_Duration timeSignatureDuration = new QNT_Duration(Constants.PulsesPerWholeNote / first.timeSignature.Denominator) * beats;
+			songPlayback.PlayClickTrack(new QNT_Timestamp(0) + timeSignatureDuration);
+			if(paused) {
+				TogglePlayback();
+			}
+		}
+
+		public void GenerateCountIn(uint beats) {
+			TempoChange first = tempoChanges[0];
+			QNT_Duration timeSignatureDuration = new QNT_Duration(Constants.PulsesPerWholeNote / first.timeSignature.Denominator) * beats;
+			string appPath = Application.dataPath;
+			string wavPath = $"{appPath}/.cache/" + "clickTrack.wav";
+			string oggPath = $"{appPath}/.cache/" + "clickTrack.ogg";
+
+			string moggName = "song_extras.mogg";
+			string moggPath = $"{appPath}/.cache/" + moggName;
+			SavWav.Save(wavPath, songPlayback.GenerateClickTrack(new QNT_Timestamp(0) + timeSignatureDuration));
+
+			//Convert wav to ogg
+			System.Diagnostics.Process ffmpeg = new System.Diagnostics.Process();
+			string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg.exe");
+			ffmpeg.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+			ffmpeg.StartInfo.FileName = ffmpegPath;
+			ffmpeg.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+			ffmpeg.StartInfo.UseShellExecute = false;
+			ffmpeg.StartInfo.RedirectStandardOutput = true;
+
+			ffmpeg.StartInfo.Arguments = String.Format("-y -i \"{0}\" \"{1}\"", wavPath, oggPath);
+			ffmpeg.Start();
+			Debug.Log(ffmpeg.StandardOutput.ReadToEnd());
+			ffmpeg.WaitForExit();
+
+			//Convert ogg to mogg
+			var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
+
+			System.Diagnostics.Process ogg2mogg = new System.Diagnostics.Process();
+			System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+			startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+			startInfo.FileName = Path.Combine(workFolder, "ogg2mogg.exe");
+			startInfo.RedirectStandardOutput = true;
+			
+			string args = $"\"{oggPath}\" \"{moggPath}\"";
+			startInfo.Arguments = args;
+			startInfo.UseShellExecute = false;
+
+			ogg2mogg.StartInfo = startInfo;
+			ogg2mogg.Start();
+			Debug.Log(ogg2mogg.StandardOutput.ReadToEnd());
+			ogg2mogg.WaitForExit();
+
+			//Add extra to zip archive
+			using(var archive = ZipArchive.Open(audicaFile.filepath)) {
+				foreach(ZipArchiveEntry entry in archive.Entries) {
+					if (entry.ToString() == moggName) {
+						archive.RemoveEntry(entry);
+					}
+				}
+				archive.AddEntry(moggName, moggPath);
+				archive.SaveTo(audicaFile.filepath + ".temp", SharpCompress.Common.CompressionType.None);
+				archive.Dispose();
+			}
+			File.Delete(audicaFile.filepath);
+			File.Move(audicaFile.filepath + ".temp", audicaFile.filepath);
 		}
 	}
 }
