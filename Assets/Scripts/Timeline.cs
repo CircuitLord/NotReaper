@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -134,27 +134,27 @@ namespace NotReaper {
 			gridNotesStatic = gridTransformParent;
 			timelineNotesStatic = timelineTransformParent;
 
-			NRSettings.OnLoad(() => {
-				sustainVolume = NRSettings.config.sustainVol;
-				musicVolume = NRSettings.config.mainVol;
-				musicVolumeSlider.value = musicVolume;
+			Physics.autoSyncTransforms = false;
 
-				if (NRSettings.config.clearCacheOnStartup) {
-					HandleCache.ClearCache();
-				}
+			ChainBuilder.timeline = this;
 				
-				SetAudioDSP();
-			});
-
 			musicVolumeSlider.onValueChanged.AddListener(val => {
 				musicVolume = val;
 				NRSettings.config.mainVol = musicVolume;
 				NRSettings.SaveSettingsJson();
 			});
 
-			Physics.autoSyncTransforms = false;
+			NRSettings.OnLoad(() => {
+				sustainVolume = NRSettings.config.sustainVol;
+				musicVolume = NRSettings.config.mainVol;
+				musicVolumeSlider.value = musicVolume;
 
-			ChainBuilder.timeline = this;
+				SetAudioDSP();
+
+				if (NRSettings.config.clearCacheOnStartup) {
+					HandleCache.ClearCache();
+		}
+			});
 		}
 
 		public void UpdateUIColors() {
