@@ -303,7 +303,15 @@ namespace NotReaper.Tools {
 
 		private void TryToggleSelection() {
 			if (EditorInput.selectedTool != EditorTool.DragSelect) return;
-				
+
+			if(NRSettings.config.singleSelectCtrl) {
+				bool addToSelection = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+
+				if(!addToSelection) {
+					timeline.DeselectAllTargets();
+				}
+			}
+			
 			if (iconUnderMouse && iconUnderMouse.isSelected) {
 				iconUnderMouse.TryDeselect();
 			}
