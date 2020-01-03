@@ -162,6 +162,10 @@ namespace NotReaper.Timing {
             this.tick = tick;
         }
 
+        public override string ToString() {
+            return tick.ToString();
+        }
+
         public Int64 tick;
 
         public float ToBeatTime() {
@@ -225,6 +229,10 @@ namespace NotReaper.Timing {
     public struct QNT_Duration {
         public QNT_Duration(UInt64 tick) {
             this.tick = tick;
+        }
+
+        public override string ToString() {
+            return tick.ToString();
         }
 
         public UInt64 tick;
