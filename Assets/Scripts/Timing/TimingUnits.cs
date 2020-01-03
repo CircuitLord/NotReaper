@@ -243,6 +243,11 @@ namespace NotReaper.Timing {
         }
 
         public static QNT_Duration FromBeatTime(float beatTime) {
+            //No negative beat-time
+            if(beatTime < 0.0f) {
+                beatTime = 0.0f;
+            }
+
             return new QNT_Duration((UInt64)Mathf.Round(beatTime * (float)Constants.PulsesPerQuarterNote));
         }
 
