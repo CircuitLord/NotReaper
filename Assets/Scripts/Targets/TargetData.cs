@@ -115,14 +115,87 @@ namespace NotReaper.Targets {
 		}
 	}
 
-	public class TargetData {
+	internal class TargetDataInternal {
 		private static uint TargetDataId = 0;
 
 		public static uint GetNextId() { return TargetDataId++; }
-		public uint ID {get; private set; }
+
+		public TargetDataInternal() {
+			InternalId = GetNextId();
+		}
+
+		public uint InternalId {get; private set; }
+
+		private float _x;
+		private float _y;
+		private QNT_Timestamp _time;
+		private QNT_Duration _beatLength;
+		private TargetVelocity _velocity;
+		private TargetHandType _handType;
+		private TargetBehavior _behavior;
+		
+		public float x
+		{
+			get { return _x; }
+			set { _x = value; if(PositionChangeEvent != null) PositionChangeEvent(x, y); }
+		}
+
+		public float y
+		{
+			get { return _y; }
+			set { _y = value; if(PositionChangeEvent != null) PositionChangeEvent(x, y); }
+		}
+
+		public Vector2 position {
+			get { return new Vector2(x, y); }
+			set { _x = value.x; _y = value.y; if(PositionChangeEvent != null) PositionChangeEvent(x, y); }
+		}
+
+		public QNT_Timestamp time
+		{
+			get { return _time; }
+			set { _time = value; if(TickChangeEvent != null) TickChangeEvent(time); }
+		}
+
+		public QNT_Duration beatLength
+		{
+			get { return _beatLength; }
+			set { _beatLength = value; if(BeatLengthChangeEvent != null) BeatLengthChangeEvent(beatLength); }
+		}
+
+		public TargetVelocity velocity
+		{
+			get { return _velocity; }
+			set { _velocity = value; if(VelocityChangeEvent != null) VelocityChangeEvent(velocity); }
+		}
+		public TargetHandType handType
+		{
+			get { return _handType; }
+			set { _handType = value; if(HandTypeChangeEvent != null) HandTypeChangeEvent(handType); }
+		}
+		public TargetBehavior behavior
+		{
+			get { return _behavior; }
+			set { var prevBehavior = _behavior; _behavior = value; if(BehaviourChangeEvent != null) BehaviourChangeEvent(prevBehavior, behavior); }
+		}
+
+
+		public Action<float, float> PositionChangeEvent;
+		public Action<QNT_Timestamp> TickChangeEvent;
+		public Action<QNT_Duration> BeatLengthChangeEvent;
+		public Action<TargetVelocity> VelocityChangeEvent;
+		public Action<TargetHandType> HandTypeChangeEvent;
+		public Action<TargetBehavior, TargetBehavior> BehaviourChangeEvent;
+	}
+
+	public class TargetData {
+		internal TargetDataInternal data;
+
+		public uint ID {get; protected set;}
 
 		public TargetData() {
-			ID = GetNextId();
+			ID = TargetDataInternal.GetNextId();
+			data = new TargetDataInternal();
 
 			beatLength = Constants.SixteenthNoteDuration;
 			velocity = TargetVelocity.Standard;
@@ -131,7 +204,8 @@ namespace NotReaper.Targets {
 		}
 
 		public TargetData(Cue cue) {
-			ID = GetNextId();
+			ID = TargetDataInternal.GetNextId();
+			data = new TargetDataInternal();
 
 			Vector2 pos = NotePosCalc.PitchToPos(cue);
 			x = pos.x;
@@ -142,11 +216,10 @@ namespace NotReaper.Targets {
 			handType = cue.handType;
 			behavior = cue.behavior;
 		}
-		
-		public TargetData(TargetData data) {
-			ID = GetNextId();
 
-			Copy(data);
+		public TargetData(TargetData other) {
+			ID = TargetDataInternal.GetNextId();
+			data = other.data;
 		}
 
 		public void Copy(TargetData data) {
@@ -159,61 +232,52 @@ namespace NotReaper.Targets {
 			behavior = data.behavior;
 		}
 
-		private float _x;
-		private float _y;
-		private QNT_Timestamp _time;
-		private QNT_Duration _beatLength;
-		private TargetVelocity _velocity;
-		private TargetHandType _handType;
-		private TargetBehavior _behavior;
-
 		public PathBuilderData pathBuilderData;
-		
+
 		public float x
 		{
-			get { return _x; }
-			set { _x = value; PositionChangeEvent(x, y); }
+			get { return data.x; }
+			set { data.x = value; }
 		}
 
 		public float y
 		{
-			get { return _y; }
-			set { _y = value; PositionChangeEvent(x, y); }
+			get { return data.y; }
+			set { data.y = value; }
 		}
 
 		public Vector2 position {
-			get { return new Vector2(x, y); }
-			set { _x = value.x; _y = value.y; PositionChangeEvent(x, y); }
+			get { return data.position; }
+			set { data.position = value; }
 		}
 
-		public QNT_Timestamp time
+		public virtual QNT_Timestamp time
 		{
-			get { return _time; }
-			set { _time = value; TickChangeEvent(time); }
+			get { return data.time; }
+			set { data.time = value; }
 		}
 
 		public QNT_Duration beatLength
 		{
-			get { return _beatLength; }
-			set { _beatLength = value; BeatLengthChangeEvent(beatLength); }
+			get { return data.beatLength; }
+			set { data.beatLength = value; }
 		}
 
 		public TargetVelocity velocity
 		{
-			get { return _velocity; }
-			set { _velocity = value; VelocityChangeEvent(velocity); }
+			get { return data.velocity; }
+			set { data.velocity = value; }
 		}
 		public TargetHandType handType
 		{
-			get { return _handType; }
-			set { _handType = value; HandTypeChangeEvent(handType); }
+			get { return data.handType; }
+			set { data.handType = value; }
 		}
 		public TargetBehavior behavior
 		{
-			get { return _behavior; }
-			set { var prevBehavior = _behavior; _behavior = value; BehaviourChangeEvent(prevBehavior, behavior); }
+			get { return data.behavior; }
+			set { data.behavior = value; }
 		}
-
 
 		public bool supportsBeatLength
 		{
@@ -224,11 +288,62 @@ namespace NotReaper.Targets {
 			return behavior == TargetBehavior.Hold || behavior == TargetBehavior.NR_Pathbuilder;
 		}
 
-		public event Action<float, float> PositionChangeEvent = delegate {};
-		public event Action<QNT_Timestamp> TickChangeEvent = delegate {};
-		public event Action<QNT_Duration> BeatLengthChangeEvent = delegate {};
-		public event Action<TargetVelocity> VelocityChangeEvent = delegate {};
-		public event Action<TargetHandType> HandTypeChangeEvent = delegate {};
-		public event Action<TargetBehavior, TargetBehavior> BehaviourChangeEvent = delegate {};
+		public event Action<float, float> PositionChangeEvent {
+			add { data.PositionChangeEvent += value; }
+			remove {data.PositionChangeEvent -= value; }
+		}
+		public virtual event Action<QNT_Timestamp> TickChangeEvent {
+			add { data.TickChangeEvent += value; }
+			remove {data.TickChangeEvent -= value; }
+		}
+		public event Action<QNT_Duration> BeatLengthChangeEvent {
+			add { data.BeatLengthChangeEvent += value; }
+			remove {data.BeatLengthChangeEvent -= value; }
+		}
+		public event Action<TargetVelocity> VelocityChangeEvent {
+			add { data.VelocityChangeEvent += value; }
+			remove {data.VelocityChangeEvent -= value; }
+		}
+		public event Action<TargetHandType> HandTypeChangeEvent {
+			add { data.HandTypeChangeEvent += value; }
+			remove {data.HandTypeChangeEvent -= value; }
+		}
+		public event Action<TargetBehavior, TargetBehavior> BehaviourChangeEvent {
+			add { data.BehaviourChangeEvent += value; }
+			remove {data.BehaviourChangeEvent -= value; }
+		}
+	}
+
+
+	public class RelativeTargetData : TargetData {
+		public RelativeTargetData(TargetData data, QNT_Duration offset) {
+			ID = TargetDataInternal.GetNextId();
+			this.offset = offset;
+			this.data = data.data;
+			data.TickChangeEvent += InvokeBeatTimeChangeEvent;
+		}
+
+		~RelativeTargetData() {
+			data.TickChangeEvent -= InvokeBeatTimeChangeEvent;
+		}
+
+		QNT_Duration offset = new QNT_Duration(0);
+
+		private Action<QNT_Timestamp> RelativeBeatTimeChangeEvent;
+
+		public override event Action<QNT_Timestamp> TickChangeEvent {
+			add { RelativeBeatTimeChangeEvent += value; }
+			remove { RelativeBeatTimeChangeEvent -= value; }
+		}
+
+		public override QNT_Timestamp time
+		{
+			get { return data.time + offset; }
+			set { data.time = value - offset;}
+		}
+
+		void InvokeBeatTimeChangeEvent(QNT_Timestamp newTime) {
+			if(RelativeBeatTimeChangeEvent != null) RelativeBeatTimeChangeEvent(newTime + offset);
+		}
 	}
 }

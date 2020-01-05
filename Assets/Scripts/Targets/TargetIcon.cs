@@ -115,6 +115,18 @@ namespace NotReaper.Targets {
             data.TickChangeEvent -= OnTickChanged;
         }
 
+        public void ReplaceData(TargetData newData) {
+            data.HandTypeChangeEvent -= OnHandTypeChanged;
+            data.BehaviourChangeEvent -= OnBehaviorChanged;
+            data.BeatLengthChangeEvent -= OnSustainLengthChanged;
+            
+            data = newData;
+
+            newData.HandTypeChangeEvent += OnHandTypeChanged;
+            newData.BehaviourChangeEvent += OnBehaviorChanged;
+            newData.BeatLengthChangeEvent += OnSustainLengthChanged;
+        }
+
         public void EnableSelected(TargetBehavior behavior) {
             standardOutline.enabled = (behavior == TargetBehavior.Standard);
             holdOutline.enabled = (behavior == TargetBehavior.Hold);

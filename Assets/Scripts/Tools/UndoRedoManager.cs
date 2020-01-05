@@ -86,45 +86,69 @@ namespace NotReaper.Tools {
 
 	public class NRActionAddNote : NRAction {
 		public TargetData targetData;
+		public List<TargetData> repeaterData;
 
 		public override void DoAction(Timeline timeline) {
 			timeline.AddTargetFromAction(targetData);
+			if(repeaterData == null) {
+				repeaterData = timeline.GenerateRepeaterTargets(targetData);
+			}
+			repeaterData.ForEach(data => { timeline.AddTargetFromAction(data); });
 		}
 		public override void UndoAction(Timeline timeline) {
 			timeline.DeleteTargetFromAction(targetData);
+			repeaterData.ForEach(data => { timeline.DeleteTargetFromAction(data); });
 		}
 	}
 
 	public class NRActionMultiAddNote : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
+		public List<NRActionAddNote> actions;
 
 		public override void DoAction(Timeline timeline) {
-			affectedTargets.ForEach(targetData => { timeline.AddTargetFromAction(targetData); });
+			if(actions == null) {
+				actions = affectedTargets.Select(targetData => { var action = new NRActionAddNote(); action.targetData = targetData; return action; }).ToList();
+				affectedTargets = null;
+			}
+
+			actions.ForEach(action => { action.DoAction(timeline); });
 		}
 		public override void UndoAction(Timeline timeline) {
-			affectedTargets.ForEach(targetData => { timeline.DeleteTargetFromAction(targetData); });
+			actions.ForEach(action => { action.UndoAction(timeline); });
 		}
 	}
 	
 	public class NRActionRemoveNote : NRAction {
 		public TargetData targetData;
+		public List<TargetData> repeaterData;
 
 		public override void DoAction(Timeline timeline) {
+			if(repeaterData == null) {
+				repeaterData = timeline.FindRepeaterTargets(targetData);
+			}
 			timeline.DeleteTargetFromAction(targetData);
+			repeaterData.ForEach(data => { timeline.DeleteTargetFromAction(data); });
 		}
 		public override void UndoAction(Timeline timeline) {
 			timeline.AddTargetFromAction(targetData);
+			repeaterData.ForEach(data => { timeline.AddTargetFromAction(data); });
 		}
 	}
 	
 	public class NRActionMultiRemoveNote : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
+		public List<NRActionRemoveNote> actions;
 
 		public override void DoAction(Timeline timeline) {
-			affectedTargets.ForEach(targetData => { timeline.DeleteTargetFromAction(targetData); });
+			if(actions == null) {
+				actions = affectedTargets.Select(targetData => { var action = new NRActionRemoveNote(); action.targetData = targetData; return action; }).ToList();
+				affectedTargets = null;
+			}
+
+			actions.ForEach(action => { action.DoAction(timeline); });
 		}
 		public override void UndoAction(Timeline timeline) {
-			affectedTargets.ForEach(targetData => { timeline.AddTargetFromAction(targetData); });
+			actions.ForEach(action => { action.UndoAction(timeline); });
 		}
 	}
 
@@ -148,13 +172,27 @@ namespace NotReaper.Tools {
 
 		public override void DoAction(Timeline timeline) {
 			targetTimelineMoveIntents.ForEach(intent => {
-				intent.target.time = intent.intendedTick;
+				intent.startRepeaterSiblings.ForEach(data => { timeline.DeleteTargetFromAction(data); });
+
+				if(intent.endTargetData.ID != intent.startTargetData.ID) {
+					timeline.FindNote(intent.startTargetData).ReplaceData(intent.endTargetData);
+				}
+				intent.endTargetData.time = intent.intendedTick;
+				
+				intent.endRepeaterSiblings.ForEach(data => { timeline.AddTargetFromAction(data); });
 			});
 			timeline.SortOrderedList();
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetTimelineMoveIntents.ForEach(intent => {
-				intent.target.time = intent.startTick;
+				intent.endRepeaterSiblings.ForEach(data => { timeline.DeleteTargetFromAction(data); });
+
+				if(intent.startTargetData.ID != intent.endTargetData.ID) {
+					timeline.FindNote(intent.endTargetData).ReplaceData(intent.startTargetData);
+				}
+				intent.startTargetData.time = intent.startTick;
+
+				intent.startRepeaterSiblings.ForEach(data => { timeline.AddTargetFromAction(data); });
 			});
 			timeline.SortOrderedList();
 		}

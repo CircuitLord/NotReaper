@@ -60,6 +60,8 @@ namespace NotReaper.Targets {
 		public Target(TargetData targetData, TargetIcon timelineIcon, TargetIcon gridIcon, bool transient) {
 			timelineTargetIcon = timelineIcon;
 			gridTargetIcon = gridIcon;
+			//timelineTargetIcon.target = this;
+			//gridTargetIcon.target = this;
 
 			data = targetData;
 			data.PositionChangeEvent += OnGridPositionChanged;
@@ -139,6 +141,22 @@ namespace NotReaper.Targets {
 
 				data.pathBuilderData.DeleteCreatedNotes(timeline);
 			}
+		}
+
+		public void ReplaceData(TargetData newData) {
+			data.PositionChangeEvent -= OnGridPositionChanged;
+			data.HandTypeChangeEvent -= OnHandTypeChanged;
+			data.TickChangeEvent -= OnTickChanged;
+			data.BeatLengthChangeEvent -= OnBeatLengthChanged;
+
+			data = newData;
+			gridTargetIcon.ReplaceData(newData);
+			timelineTargetIcon.ReplaceData(newData);
+
+			newData.PositionChangeEvent += OnGridPositionChanged;
+			newData.HandTypeChangeEvent += OnHandTypeChanged;
+			newData.TickChangeEvent += OnTickChanged;
+			newData.BeatLengthChangeEvent += OnBeatLengthChanged;
 		}
 
 		public float GetRelativeBeatTime() {

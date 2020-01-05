@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using NotReaper.Timing;
+using System.Collections.Generic;
 
 namespace NotReaper.Targets {
 	public class TargetGridMoveIntent {
@@ -20,12 +21,22 @@ namespace NotReaper.Targets {
 		public TargetTimelineMoveIntent() {}
 
 		public TargetTimelineMoveIntent(TargetTimelineMoveIntent other) {
-			target = other.target;
 			startTick = other.startTick;
 			intendedTick = other.intendedTick;
+
+			startTargetData = other.startTargetData;
+			startRepeaterSiblings = other.startRepeaterSiblings;
+			
+			endTargetData = other.endTargetData;
+			endRepeaterSiblings = other.endRepeaterSiblings;
 		}
-		public TargetData target;
+
+		public TargetData startTargetData;
+		public List<TargetData> startRepeaterSiblings = new List<TargetData>();
 		public QNT_Timestamp startTick;
+		
+		public TargetData endTargetData;
+		public List<TargetData> endRepeaterSiblings = new List<TargetData>();
 		public QNT_Timestamp intendedTick;
 	}
 }

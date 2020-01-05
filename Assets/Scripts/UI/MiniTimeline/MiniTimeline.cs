@@ -20,6 +20,8 @@ namespace NotReaper.UI {
 		public Transform bar;
 
 		public Timeline timeline;
+		public GameObject repeaterSectionPrefab;
+
 
 		public Transform bookmarksParent;
 
@@ -30,6 +32,7 @@ namespace NotReaper.UI {
 
 		[HideInInspector] public bool isMouseOver = false;
 
+		private List<GameObject> repeaterSections = new List<GameObject>();
 
 		private void Start() {
 			_mainCamera = Camera.main;
@@ -135,6 +138,16 @@ namespace NotReaper.UI {
 		    bookmarks[i].GetComponent<Bookmark>().percentBookmark = percent;
 		}
 		*/
+        public void AddRepeaterSection(RepeaterSection newSection) {
+            var sectionObject = Instantiate(repeaterSectionPrefab, new Vector3(0, 0, 0), Quaternion.identity, transform);
+            sectionObject.transform.localPosition = new Vector3((float)(barLength * timeline.GetPercentPlayedFromSeconds(timeline.TimestampToSeconds(newSection.startTime)) - (barLength / 2.0f)), 0, -1.0f);
+            var lineRenderer = sectionObject.GetComponent<LineRenderer>();
+            
+            lineRenderer.startWidth = lineRenderer.endWidth = 0.5f;
+            lineRenderer.SetPosition(1, new Vector3((float)(barLength * timeline.GetPercentPlayedFromSeconds(timeline.TimestampToSeconds(newSection.endTime) - timeline.TimestampToSeconds(newSection.startTime))), 0, 0));
+
+            repeaterSections.Add(sectionObject);
+        }
 
 		public void SetBookmark(float miniXPos, float topXPos,  TargetHandType newType, bool useTopXPos, bool addToAudicaFile = false) {
 			Bookmark bookmarkMini = Instantiate(bookmarkPrefab, new Vector3(0, 0, 0), Quaternion.identity, bookmarksParent).GetComponent<Bookmark>();
