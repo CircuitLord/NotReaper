@@ -140,8 +140,9 @@ namespace NotReaper.Tools {
 
 			Rect selectionRect = Rect.MinMaxRect(minX, minY, maxX, maxY);
 
-			QNT_Timestamp start = Timeline.time + Relative_QNT.FromBeatTime((minX - 1.0f) * timelineScaleMulti);
-			QNT_Timestamp end = Timeline.time + Relative_QNT.FromBeatTime((maxX + 1.0f) * timelineScaleMulti);
+			float offscreenOffset = timelineNotes.parent.position.x;
+			QNT_Timestamp start = Timeline.time + Relative_QNT.FromBeatTime((minX - offscreenOffset - 1.0f) * timelineScaleMulti);
+			QNT_Timestamp end = Timeline.time + Relative_QNT.FromBeatTime((maxX - offscreenOffset + 1.0f) * timelineScaleMulti);
 			if(start > end) {
 				QNT_Timestamp temp = start;
 				start = end;
@@ -284,6 +285,7 @@ namespace NotReaper.Tools {
 				Relative_QNT offsetFromDragPoint = intent.startTick - startTimelineMoveTime;
 				var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 				mousePos.x /= Timeline.scaleTransform;
+				mousePos.x -= timelineNotes.parent.position.x;
 				QNT_Timestamp newTime = SnapToBeat(mousePos.x);
 
 				newTime += offsetFromDragPoint;
