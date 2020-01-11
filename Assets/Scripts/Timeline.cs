@@ -507,10 +507,7 @@ namespace NotReaper {
 
 				if(data.behavior == TargetBehavior.NR_Pathbuilder) {
 					data.pathBuilderData = new PathBuilderData();
-					var note = FindNote(copyData);
-					if(note != null) {
-						data.pathBuilderData.Copy(note.data.pathBuilderData);
-					}
+					data.pathBuilderData.Copy(copyData.pathBuilderData);
 				}
 
 				return data;
