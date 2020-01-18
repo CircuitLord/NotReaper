@@ -254,7 +254,15 @@ namespace NotReaper.Targets {
 		public virtual QNT_Timestamp time
 		{
 			get { return data.time; }
-			set { data.time = value; }
+			protected set { data.time = value; }
+		}
+
+		public virtual void SetTimeFromAction(QNT_Timestamp time) {
+			this.time = time;
+		}
+
+		public virtual void MoveTimeFromAction(QNT_Timestamp newTime) {
+			time = newTime;
 		}
 
 		public QNT_Duration beatLength
@@ -315,19 +323,19 @@ namespace NotReaper.Targets {
 	}
 
 
-	public class RelativeTargetData : TargetData {
-		public RelativeTargetData(TargetData data, QNT_Duration offset) {
+	public class RepeaterTargetData : TargetData {
+		public RepeaterTargetData(TargetData data, QNT_Timestamp time) {
 			ID = TargetDataInternal.GetNextId();
-			this.offset = offset;
+			this._time = time;
 			this.data = data.data;
 			data.TickChangeEvent += InvokeBeatTimeChangeEvent;
 		}
 
-		~RelativeTargetData() {
+		~RepeaterTargetData() {
 			data.TickChangeEvent -= InvokeBeatTimeChangeEvent;
 		}
 
-		QNT_Duration offset = new QNT_Duration(0);
+		QNT_Timestamp _time = new QNT_Timestamp(0);
 
 		private Action<QNT_Timestamp> RelativeBeatTimeChangeEvent;
 
@@ -338,12 +346,21 @@ namespace NotReaper.Targets {
 
 		public override QNT_Timestamp time
 		{
-			get { return data.time + offset; }
-			set { data.time = value - offset;}
+			get { return _time; }
+			
+			protected set { _time = value; }
+		}
+
+		public override void SetTimeFromAction(QNT_Timestamp time) {
+			this.time = time;
+		}
+
+		public override void MoveTimeFromAction(QNT_Timestamp newTime) {
+			time = newTime;
 		}
 
 		void InvokeBeatTimeChangeEvent(QNT_Timestamp newTime) {
-			if(RelativeBeatTimeChangeEvent != null) RelativeBeatTimeChangeEvent(newTime + offset);
+			if(RelativeBeatTimeChangeEvent != null) RelativeBeatTimeChangeEvent(_time);
 		}
 	}
 }

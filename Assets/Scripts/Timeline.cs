@@ -139,7 +139,6 @@ namespace NotReaper {
 		public uint ID;
 		public QNT_Timestamp startTime; //Time when this section starts
 		public QNT_Timestamp endTime; //Time when this section ends
-		public QNT_Duration relativeTime; //Offset of this repeater relative to the Master repeater
 	}
 
 
@@ -415,7 +414,7 @@ namespace NotReaper {
 		//When loading from cues, use this.
 		public TargetData GetTargetDataForCue(Cue cue) {
 			TargetData data = new TargetData(cue);
-			if (data.time.tick == 0) data.time = new QNT_Timestamp(120);
+			if (data.time.tick == 0) data.SetTimeFromAction(new QNT_Timestamp(120));
 			return data;
 		}
 
@@ -438,7 +437,7 @@ namespace NotReaper {
 				if (target.data.time ==  tempTime && (target.data.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee) && (EditorInput.selectedTool != EditorTool.Mine)) return;
 			}
 
-			data.time = GetClosestBeatSnapped(time, (uint)beatSnap);
+			data.SetTimeFromAction(GetClosestBeatSnapped(time, (uint)beatSnap));
 
 			//Default sustains length should be more than 0.
 			if (data.supportsBeatLength) {
@@ -558,9 +557,9 @@ namespace NotReaper {
 			//First, gather all other repeaters with the same id
 			List<RepeaterSection> siblingSections = repeaterSections.Where(section => { return section.ID == newSection.ID; }).ToList();
 			if(siblingSections.Count != 0) {
-				//Find the master section, or if we are the new master
+				//Find the section with the largest length
 				int index = -1;
-				QNT_Duration maxLength = (newSection.endTime - newSection.startTime).ToDuration();
+				QNT_Duration maxLength = new QNT_Duration(0);
 
 				for(int i = 0; i < siblingSections.Count; ++i) {
 					RepeaterSection section = siblingSections[i];
@@ -571,7 +570,7 @@ namespace NotReaper {
 					}
 				}
 
-				//We found master
+				//We found another repeater, add all of their notes to us
 				if(index != -1) {
 					List<TargetData> sectionNotes = new List<TargetData>();
 					RepeaterSection masterSection = siblingSections[index];
@@ -591,15 +590,10 @@ namespace NotReaper {
 						sectionNotes.Add(note.data);
 					}
 
+					Relative_QNT offset = (newSection.startTime - masterSection.startTime);
 					sectionNotes.ForEach(data => {
-						AddTargetFromAction(new RelativeTargetData(data, (newSection.startTime - masterSection.startTime).ToDuration()));
+						AddTargetFromAction(new RepeaterTargetData(data, data.time + offset));
 					});
-
-					newSection.relativeTime = (newSection.startTime - masterSection.startTime).ToDuration();
-				}
-				//We are new master
-				else {
-					//@TODO
 				}
 			}
 
@@ -637,7 +631,8 @@ namespace NotReaper {
 					var section = repeaterSections[i];
 
 					if(section.ID == targetSection?.ID && section.startTime != targetSection?.startTime) {
-						newTargets.Add(new RelativeTargetData(data, (section.startTime - targetSection.Value.startTime).ToDuration()));
+						Relative_QNT offset = (section.startTime - targetSection.Value.startTime);
+						newTargets.Add(new RepeaterTargetData(data, data.time + offset));
 					}
 				}
 			}
@@ -655,13 +650,14 @@ namespace NotReaper {
 
 					if(section.ID == targetSection?.ID && section.startTime != targetSection?.startTime) {
 						//Find the note in the sibling section by offsetting our time
-						QNT_Timestamp searchTime = data.time + section.relativeTime;
+						Relative_QNT offset = (section.startTime - targetSection.Value.startTime);
+						QNT_Timestamp searchTime = data.time + offset;
 						var result = BinarySearchOrderedNotes(searchTime);
 						if(result.found) {
 							int idx = result.index;
 							for(int noteIdx = idx; noteIdx < orderedNotes.Count; ++noteIdx) {
 								Target t = orderedNotes[noteIdx];
-								if(t.data.time == searchTime) {
+								if(t.data.time > searchTime) {
 									break;
 								}
 								if(t.data.data.InternalId == data.data.InternalId) {
@@ -833,7 +829,7 @@ namespace NotReaper {
 								int idx = result.index;
 								for(int noteIdx = idx; noteIdx < orderedNotes.Count; ++noteIdx) {
 									Target t = orderedNotes[noteIdx];
-									if(t.data.time == searchTime) {
+									if(t.data.time > searchTime) {
 										break;
 									}
 									if(t.data.data.InternalId == intent.startTargetData.data.InternalId) {
@@ -848,7 +844,8 @@ namespace NotReaper {
 									intent.endRepeaterSiblings.Add(new TargetData(intent.startTargetData));
 								}
 								else {
-									intent.endRepeaterSiblings.Add(new RelativeTargetData(intent.startTargetData, (section.startTime - firstSectionTime).ToDuration()));
+									Relative_QNT offset = (section.startTime - firstSectionTime);
+									intent.endRepeaterSiblings.Add(new RepeaterTargetData(intent.startTargetData, intent.startTargetData.time + offset));
 								}
 							}
 						}
@@ -897,21 +894,23 @@ namespace NotReaper {
 					//If we are the first section
 					if(firstSection.startTime == endSection?.startTime) {
 						//Convert ourself if necessary
-						if(intent.endTargetData is RelativeTargetData) {
+						if(intent.endTargetData is RepeaterTargetData) {
 							intent.endTargetData = new TargetData(intent.endTargetData);
 						}
 
 						//Add our new siblings from the other sections
 						repeaterSections.ForEach(section => {
 							if(section.ID == firstSection.ID && section.startTime != firstSection.startTime) {
-								intent.endRepeaterSiblings.Add(new RelativeTargetData(intent.endTargetData, (section.startTime - firstSection.startTime).ToDuration()));
+								Relative_QNT offset = (section.startTime - firstSection.startTime);
+								intent.endRepeaterSiblings.Add(new RepeaterTargetData(intent.endTargetData, intent.endTargetData.time + offset));
 							}
 						});
 					}
 					else {
 						//If we are non-relative, convert to relative
-						if(!(intent.endTargetData is RelativeTargetData)) {
-							intent.endTargetData = new RelativeTargetData(intent.endTargetData, (endSection.Value.startTime - firstSection.startTime).ToDuration());
+						if(!(intent.endTargetData is RepeaterTargetData)) {
+							Relative_QNT offset = (endSection.Value.startTime - firstSection.startTime);
+							intent.endTargetData = new RepeaterTargetData(intent.endTargetData, intent.endTargetData.time + offset);
 						}
 
 						//Add the sibling that is in the first section
@@ -920,7 +919,8 @@ namespace NotReaper {
 						//Add all the other siblings, except for me and the first
 						repeaterSections.ForEach(section => {
 							if(section.ID == endSection?.ID && section.startTime != endSection?.startTime && section.startTime != firstSection.startTime) {
-								intent.endRepeaterSiblings.Add(new RelativeTargetData(intent.endTargetData, (section.startTime - firstSection.startTime).ToDuration()));
+								Relative_QNT offset = (section.startTime - firstSection.startTime);
+								intent.endRepeaterSiblings.Add(new RepeaterTargetData(intent.endTargetData, intent.endTargetData.time + offset));
 							}
 						});
 					}
@@ -957,7 +957,7 @@ namespace NotReaper {
 			// shift all by the amount needed to move the earliest note to now
 			Relative_QNT diff = pasteBeatTime - earliestTargetBeatTime;
 			foreach (TargetData data in targetDataList) {
-				data.time += diff;
+				data.SetTimeFromAction(data.time + diff);
 			}
 
 			var action = new NRActionMultiAddNote();
@@ -1315,7 +1315,6 @@ namespace NotReaper {
 			section.ID = 0;
 			section.startTime = new QNT_Timestamp(Constants.PulsesPerWholeNote);
 			section.endTime = new QNT_Timestamp(Constants.PulsesPerWholeNote * 10);
-			section.relativeTime = new QNT_Duration(0);
 			AddRepeaterSection(section);
 
 			time = new QNT_Timestamp(section.startTime.tick + Constants.PulsesPerQuarterNote);
@@ -1340,7 +1339,6 @@ namespace NotReaper {
 			section2.ID = 0;
 			section2.startTime = new QNT_Timestamp(Constants.PulsesPerWholeNote * 20);
 			section2.endTime = section2.startTime + new QNT_Duration(Constants.PulsesPerWholeNote * 5);
-			section2.relativeTime = new QNT_Duration(0);
 			AddRepeaterSection(section2);
 
 			time = new QNT_Timestamp(0);
@@ -1551,7 +1549,7 @@ namespace NotReaper {
 
 			//Update all notes
 			foreach(var t in updateTimings) {
-				t.data.time = t.newTime;
+				t.data.SetTimeFromAction(t.newTime);
 			}
 		}
 
@@ -1609,7 +1607,7 @@ namespace NotReaper {
 
 			//Update all notes
 			foreach(var t in updateTimings) {
-				t.data.time = t.newTime;
+				t.data.SetTimeFromAction(t.newTime);
 			}
 
 			RegenerateBPMTimelineData();
@@ -1696,7 +1694,7 @@ namespace NotReaper {
 
 				//Update all notes
 				foreach(var t in updateTimings) {
-					t.data.time = t.newTime;
+					t.data.SetTimeFromAction(t.newTime);
 				}
 			}
 

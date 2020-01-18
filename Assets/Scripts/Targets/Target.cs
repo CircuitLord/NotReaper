@@ -244,7 +244,8 @@ namespace NotReaper.Targets {
 				var delta = firstNote.time - newTime;
 
 				foreach(TargetData note in data.pathBuilderData.generatedNotes) {
-					note.time -= delta;
+					//Force set the time, since these transient notes will get generated for all pathbuilders in repeaters
+					note.SetTimeFromAction(note.time - delta);
 				}
 			}
 		}

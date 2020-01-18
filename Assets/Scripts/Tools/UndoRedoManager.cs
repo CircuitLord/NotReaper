@@ -177,7 +177,7 @@ namespace NotReaper.Tools {
 				if(intent.endTargetData.ID != intent.startTargetData.ID) {
 					timeline.FindNote(intent.startTargetData).ReplaceData(intent.endTargetData);
 				}
-				intent.endTargetData.time = intent.intendedTick;
+				intent.endTargetData.MoveTimeFromAction(intent.intendedTick);
 				
 				intent.endRepeaterSiblings.ForEach(data => { timeline.AddTargetFromAction(data); });
 			});
@@ -190,7 +190,7 @@ namespace NotReaper.Tools {
 				if(intent.startTargetData.ID != intent.endTargetData.ID) {
 					timeline.FindNote(intent.endTargetData).ReplaceData(intent.startTargetData);
 				}
-				intent.startTargetData.time = intent.startTick;
+				intent.startTargetData.MoveTimeFromAction(intent.startTick);
 
 				intent.startRepeaterSiblings.ForEach(data => { timeline.AddTargetFromAction(data); });
 			});

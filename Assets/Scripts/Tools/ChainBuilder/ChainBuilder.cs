@@ -247,7 +247,10 @@ namespace NotReaper.Tools.ChainBuilder {
 			firstData.behavior = data.pathBuilderData.behavior;
 			firstData.velocity = data.pathBuilderData.velocity;
 			firstData.handType = data.pathBuilderData.handType;
-			firstData.time = data.time;
+
+			//Force set the time, since these transient notes will get generated for all pathbuilders in repeaters
+			firstData.SetTimeFromAction(data.time);
+
 			firstData.position = data.position;
 			data.pathBuilderData.generatedNotes.Add(firstData);
 
@@ -281,7 +284,10 @@ namespace NotReaper.Tools.ChainBuilder {
 				newData.behavior = generatedBehavior;
 				newData.velocity = generatedVelocity;
 				newData.handType = data.pathBuilderData.handType;
-				newData.time = data.time + QNT_Duration.FromBeatTime(i * (4.0f / data.pathBuilderData.interval));
+
+				//Force set the time, since these transient notes will get generated for all pathbuilders in repeaters
+				newData.SetTimeFromAction(data.time + QNT_Duration.FromBeatTime(i * (4.0f / data.pathBuilderData.interval)));
+				
 				newData.position = currentPos;
 				data.pathBuilderData.generatedNotes.Add(newData);
 			}
