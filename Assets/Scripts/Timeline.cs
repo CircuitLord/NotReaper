@@ -63,6 +63,7 @@ namespace NotReaper {
 		[SerializeField] private Renderer timelineBG;
 		
 		public Slider musicVolumeSlider;
+		public Slider hitSoundVolumeSlider;
 
 		[Header("Configuration")]
 		public float playbackSpeed = 1f;
@@ -146,10 +147,16 @@ namespace NotReaper {
 				NRSettings.SaveSettingsJson();
 			});
 
+			hitSoundVolumeSlider.onValueChanged.AddListener(val => {
+				NRSettings.config.noteVol = val;
+				NRSettings.SaveSettingsJson();
+			});
+
 			NRSettings.OnLoad(() => {
 				sustainVolume = NRSettings.config.sustainVol;
 				musicVolume = NRSettings.config.mainVol;
 				musicVolumeSlider.value = musicVolume;
+				hitSoundVolumeSlider.value = NRSettings.config.noteVol;
 				
 				SetAudioDSP();
 
@@ -1472,7 +1479,7 @@ namespace NotReaper {
 				SetBeatTime(time);
 			}
 
-			songPlayback.volume = musicVolume;
+			songPlayback.volume = NRSettings.config.mainVol;
 			songPlayback.hitSoundVolume = NRSettings.config.noteVol;
 
 			SetCurrentTime();

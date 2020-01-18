@@ -28316,6 +28316,7 @@ MonoBehaviour:
   gridTransformParent: {fileID: 312348744}
   timelineBG: {fileID: 1052582752}
   musicVolumeSlider: {fileID: 2098098317}
+  hitSoundVolumeSlider: {fileID: 643110668}
   playbackSpeed: 1
   musicVolume: 0.5
   sustainVolume: 0.5
