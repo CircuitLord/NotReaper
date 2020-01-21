@@ -1861,6 +1861,9 @@ namespace NotReaper {
 			}
 			File.Delete(audicaFile.filepath);
 			File.Move(audicaFile.filepath + ".temp", audicaFile.filepath);
+
+			//Load the generated extra sounds
+			StartCoroutine(LoadExtraAudio($"file://{oggPath}"));
 		}
 
 		public void ShiftEverythingByTime(Relative_QNT shift_amount) {
