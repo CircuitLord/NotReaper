@@ -251,7 +251,7 @@ namespace NotReaper.Timing {
 		public void Play(QNT_Timestamp time) {
 			songStartTime = timeline.TimestampToSeconds(time);
 			song.SetSampleFromTime(songStartTime);
-			
+
 			if(songExtra != null) {
 				songExtra.SetSampleFromTime(songStartTime);
 			}
@@ -316,7 +316,7 @@ namespace NotReaper.Timing {
 
 		public void PlayPreview(QNT_Timestamp time, Relative_QNT previewDuration) {
 			float midTime = timeline.TimestampToSeconds(time);
-			float duration = Conversion.FromQNT(new Relative_QNT(Math.Abs(previewDuration.tick)), timeline.GetTempoForTime(time).microsecondsPerQuarterNote);
+			float duration = (float)Conversion.FromQNT(new Relative_QNT(Math.Abs(previewDuration.tick)), timeline.GetTempoForTime(time).microsecondsPerQuarterNote);
 			duration = Math.Min(duration, 0.1f);
 
 			UInt64 sampleStart = (UInt64)((midTime - duration / 2) * song.frequency);
@@ -614,6 +614,10 @@ namespace NotReaper.Timing {
 				ctx.index = dataIndex;
 				ctx.playbackSpeed = speed;
 				song.CopySampleIntoBuffer(ctx);
+
+				if(songExtra != null) {
+					songExtra.CopySampleIntoBuffer(ctx);
+				}
 
 				//Play hitsounds (reverse iterate so we can remove)
 				ctx.volume = hitSoundVolume;

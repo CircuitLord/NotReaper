@@ -44,8 +44,33 @@ public static class SavWav
     private const uint HeaderSize = 44;
     private const float RescaleFactor = 32767; //to convert float to Int16
 
-    public static void Save(string filename, AudioClip clip, bool trim = false)
+    public class AudioClipData {
+        public float[] samples;
+        public uint frequency;
+        public ushort channels;
+    }
+
+    public class WavModificationOptions {
+        public uint trimSamples = 0;
+        public uint silenceSamples = 0;
+    }
+
+    public static void Save(string filename, AudioClip clip, WavModificationOptions optionsParam = null)
     {
+        AudioClipData data = new AudioClipData();
+        data.samples = new float[clip.samples * clip.channels];
+        clip.GetData(data.samples, 0);
+        
+        data.frequency = (uint)clip.frequency;
+        data.channels = (ushort)clip.channels;
+
+        Save(filename, data, optionsParam);
+    }
+
+    public static void Save(string filename, AudioClipData clipData, WavModificationOptions optionsParam = null)
+    {
+        WavModificationOptions options = optionsParam != null ? optionsParam : new WavModificationOptions();
+
         if (!filename.ToLower().EndsWith(".wav"))
         {
             filename += ".wav";
@@ -59,55 +84,48 @@ public static class SavWav
         using (var fileStream = new FileStream(filepath, FileMode.Create))
         using (var writer = new BinaryWriter(fileStream))
         {
-            var wav = GetWav(clip, out var length, trim);
+            var wav = GetWav(clipData, out var length, options);
             writer.Write(wav, 0, (int)length);
         }
     }
 
-    public static byte[] GetWav(AudioClip clip, out uint length, bool trim = false)
+    public static byte[] GetWav(AudioClipData clipData, out uint length, WavModificationOptions options)
     {
-        var data = ConvertAndWrite(clip, out length, out var samples, trim);
+        var data = ConvertAndWrite(clipData.samples, out length, out var samples, options);
 
-        WriteHeader(data, clip, length, samples);
+        WriteHeader(data, clipData.frequency, clipData.channels, length, samples);
 
         return data;
     }
 
-    private static byte[] ConvertAndWrite(AudioClip clip, out uint length, out uint samplesAfterTrimming, bool trim)
+    private static byte[] ConvertAndWrite(float[] samples, out uint length, out uint samplesAfterTrimming, WavModificationOptions options)
     {
-        var samples = new float[clip.samples * clip.channels];
-
-        clip.GetData(samples, 0);
-
         var sampleCount = samples.Length;
 
         var start = 0;
         var end = sampleCount - 1;
 
-        if (trim)
+        if (options.trimSamples > 0)
         {
-            for (var i = 0; i < sampleCount; i++)
-            {
-                if ((short)(samples[i] * RescaleFactor) == 0)
-                    continue;
+            start = (int)options.trimSamples;
+        }
 
-                start = i;
-                break;
-            }
-
-            for (var i = sampleCount -1; i >= 0; i--)
-            {
-                if ((short)(samples[i] * RescaleFactor) == 0)
-                    continue;
-
-                end = i;
-                break;
-            }
+        if(options.silenceSamples > 0) {
+            sampleCount += (int)options.silenceSamples;
         }
 
         var buffer = new byte[(sampleCount * 2) + HeaderSize];
 
         var p = HeaderSize;
+
+        //Write out silence samples
+        if(options.silenceSamples > 0) {
+            for(uint i = 0; i < options.silenceSamples; ++i) {
+                buffer[p++] = 0;
+                buffer[p++] = 0;
+            }
+        }
+
         for (var i = start; i <= end; i++)
         {
             var value = (short) (samples[i] * RescaleFactor);
@@ -116,7 +134,7 @@ public static class SavWav
         }
 
         length = p;
-        samplesAfterTrimming = (uint) (end - start + 1);
+        samplesAfterTrimming = (uint) (end - start + 1) + options.silenceSamples;
         return buffer;
     }
 
@@ -128,11 +146,7 @@ public static class SavWav
         }
     }
 
-    private static void WriteHeader(byte[] stream, AudioClip clip, uint length, uint samples)
-    {
-        var hz = (uint)clip.frequency;
-        var channels = (ushort)clip.channels;
-
+    private static void WriteHeader(byte[] stream, uint hz, ushort channels, uint length, uint samples) {
         var offset = 0u;
 
         var riff = Encoding.UTF8.GetBytes("RIFF");

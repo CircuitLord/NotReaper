@@ -54,6 +54,7 @@ namespace NotReaper.UserInput {
 		[SerializeField] private GameObject bpmWindow;
 		[SerializeField] private GameObject bpmResultWindow;
 		[SerializeField] private CountInWindow countInWindow;
+		[SerializeField] private AddOrTrimAudioWindow addOrTrimAudioWindow;
 
 
 		public HoverTarget hover;
@@ -352,7 +353,7 @@ namespace NotReaper.UserInput {
 
 			}
 
-			if(bpmWindow.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf) {
+			if(bpmWindow.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf || addOrTrimAudioWindow.gameObject.activeSelf) {
 				inUI = true;
 				return;
 			}
@@ -387,6 +388,9 @@ namespace NotReaper.UserInput {
 					}
 					else if(countInWindow.gameObject.activeSelf) {
 						countInWindow.Deactivate();
+					}
+					else if(addOrTrimAudioWindow.gameObject.activeSelf) {
+						addOrTrimAudioWindow.Deactivate();
 					}
 					else {
 						pauseMenu.OpenPauseMenu();
@@ -435,6 +439,12 @@ namespace NotReaper.UserInput {
 				}
 			}
 
+			if(Input.GetKeyDown(KeyCode.F5)) {
+				if(addOrTrimAudioWindow.gameObject.activeSelf) {
+					addOrTrimAudioWindow.Deactivate();
+				}
+			}
+
 			bool wasInUI = inUI;
 			FigureOutIsInUI();
 
@@ -451,6 +461,12 @@ namespace NotReaper.UserInput {
 			if(Input.GetKeyDown(KeyCode.F3)) {
 				if(!countInWindow.gameObject.activeSelf) {
 					countInWindow.Activate();
+				}
+			}
+
+			if(Input.GetKeyDown(KeyCode.F5)) {
+				if(!addOrTrimAudioWindow.gameObject.activeSelf) {
+					addOrTrimAudioWindow.Activate();
 				}
 			}
 

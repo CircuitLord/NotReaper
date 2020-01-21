@@ -56,8 +56,8 @@ namespace NotReaper.Timing {
            return new Relative_QNT((long)Mathf.Round((float)(Constants.SecondsToMicroseconds * seconds) / microsecondsPerQuarterNote * Constants.PulsesPerQuarterNote));
        }
 
-       public static float FromQNT(Relative_QNT duration, UInt64 microsecondsPerQuarterNote) {
-        return (duration.tick * (long)microsecondsPerQuarterNote) / ((float)Constants.SecondsToMicroseconds * Constants.PulsesPerQuarterNote);
+       public static double FromQNT(Relative_QNT duration, UInt64 microsecondsPerQuarterNote) {
+        return (duration.tick * (long)microsecondsPerQuarterNote) / ((double)Constants.SecondsToMicroseconds * Constants.PulsesPerQuarterNote);
        }
     };
 
