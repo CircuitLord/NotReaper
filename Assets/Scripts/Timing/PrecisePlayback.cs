@@ -94,6 +94,7 @@ namespace NotReaper.Timing {
 	[RequireComponent(typeof(AudioSource))]
 	public class PrecisePlayback : MonoBehaviour {
 		public ClipData song;
+		public ClipData songExtra;
 		public ClipData preview;
 		public ClipData leftSustain;
 		public ClipData rightSustain;
@@ -188,7 +189,8 @@ namespace NotReaper.Timing {
 		public enum LoadType {
 			MainSong,
 			LeftSustain,
-			RightSustain
+			RightSustain,
+			Extra
 		}
 
 		private ClipData FromAudioClip(AudioClip clip) {
@@ -222,6 +224,9 @@ namespace NotReaper.Timing {
 				rightSustain = data;
 				rightSustainVolume = 0.0f;
 			}
+			else if(type == LoadType.Extra) {
+				songExtra = data;
+			}
 
 			source.Play();
 		}
@@ -246,6 +251,10 @@ namespace NotReaper.Timing {
 		public void Play(QNT_Timestamp time) {
 			songStartTime = timeline.TimestampToSeconds(time);
 			song.SetSampleFromTime(songStartTime);
+			
+			if(songExtra != null) {
+				songExtra.SetSampleFromTime(songStartTime);
+			}
 			
 			if(leftSustain != null) { 
 				leftSustain.SetSampleFromTime(songStartTime);

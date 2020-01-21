@@ -55,6 +55,11 @@ namespace NotReaper.Models {
 
 		public string fxSong = "";
 		public string moggFxSong = "";
+		public string cachedFxSong {
+			get {
+				return $"{this.songID}_extra";
+			}
+		}
 
 		public float tempo = 120.0f;
 		public string songEndEvent = "";

@@ -91,6 +91,10 @@ namespace NotReaper.IO {
 				} else if (entry.FileName == audicaFile.desc.sustainSongRight) {
 					entry.Extract(temp);
 					audicaFile.desc.moggSustainSongRight = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray())) [0];
+
+				} else if (entry.FileName == audicaFile.desc.fxSong) {
+					entry.Extract(temp);
+					audicaFile.desc.moggFxSong = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray())) [0];
 					
 				} else if (entry.FileName == "song.mid" || entry.FileName == audicaFile.desc.midiFile) {
 					string midiFiileName = $"{appPath}/.cache/song.mid";
@@ -113,7 +117,7 @@ namespace NotReaper.IO {
 			}
 
 
-			bool mainSongCached = false, sustainRightCached = false, sustainLeftCached = false;
+			bool mainSongCached = false, sustainRightCached = false, sustainLeftCached = false, extraSongCached = false;
 
 			if (File.Exists($"{appPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg"))
 				mainSongCached = true;
@@ -123,6 +127,9 @@ namespace NotReaper.IO {
 
 			if (File.Exists($"{appPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg"))
 				sustainLeftCached = true;
+
+			if (File.Exists($"{appPath}/.cache/{audicaFile.desc.cachedFxSong}.ogg"))
+				extraSongCached = true;
 
 
 			//If all the songs were already cached, skip this and go to the finish.
@@ -150,6 +157,10 @@ namespace NotReaper.IO {
 					entry.Extract(tempMogg);
 					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedSustainSongLeft);
 
+				}
+				else if (!extraSongCached && entry.FileName == audicaFile.desc.moggFxSong) {
+					entry.Extract(tempMogg);
+					MoggToOgg(tempMogg.ToArray(), audicaFile.desc.cachedFxSong);
 				}
 
 				tempMogg.SetLength(0);

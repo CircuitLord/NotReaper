@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -811,6 +811,7 @@ namespace NotReaper {
 			StartCoroutine(GetAudioClip($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg"));
 			StartCoroutine(LoadLeftSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg"));
 			StartCoroutine(LoadRightSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg"));
+			StartCoroutine(LoadExtraAudio($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedFxSong}.ogg"));
 
 			//foreach (Cue cue in audicaFile.diffs.expert.cues) {
 			//AddTarget(cue);
@@ -877,6 +878,19 @@ namespace NotReaper {
 				} else {
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
 					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.RightSustain);
+				}
+			}
+		}
+		
+		IEnumerator LoadExtraAudio(string uri) {
+			using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
+				yield return www.SendWebRequest();
+
+				if (www.isNetworkError) {
+					Debug.Log(www.error);
+				} else {
+					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.Extra);
 				}
 			}
 		}
