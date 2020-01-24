@@ -21,6 +21,8 @@ namespace NotReaper.Grid {
 
         private void Update() {
             Vector3 cameraPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            cameraPoint.x -= transform.position.x;
+            cameraPoint.y -= transform.position.y;
             cameraPoint.z = 0;
             if(gridRect.Contains(cameraPoint)) {
                 EditorInput.isOverGrid = true;
