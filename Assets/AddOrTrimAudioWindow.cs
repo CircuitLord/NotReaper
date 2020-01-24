@@ -40,12 +40,16 @@ public class AddOrTrimAudioWindow : MonoBehaviour {
     Relative_QNT? GetTimeFromLabels() {
         float beatValue = 0;
         if(float.TryParse(beatLengthInput.text, out beatValue)) {
-            return new Relative_QNT((long)Math.Round(Constants.PulsesPerQuarterNote * beatValue));
+            if(beatValue > 0.0f) {
+                return new Relative_QNT((long)Math.Round(Constants.PulsesPerQuarterNote * beatValue));
+            }
         }
 
         float timeValue = 0.0f;
         if(float.TryParse(timeLengthInput.text, out timeValue)) {
-            return Conversion.ToQNT(timeValue, timeline.tempoChanges[0].microsecondsPerQuarterNote);
+            if(timeValue > 0.0f) {
+                return Conversion.ToQNT(timeValue, timeline.tempoChanges[0].microsecondsPerQuarterNote);
+            }
         }
 
         return null;
@@ -54,6 +58,10 @@ public class AddOrTrimAudioWindow : MonoBehaviour {
     public void AddSilence() {
         var duration = GetTimeFromLabels();
         if(duration == null) {
+            return;
+        }
+
+        if(duration.Value.tick < 0) {
             return;
         }
 
