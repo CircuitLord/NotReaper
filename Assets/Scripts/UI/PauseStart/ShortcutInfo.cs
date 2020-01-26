@@ -4,6 +4,8 @@ using NotReaper;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
+using NotReaper.UserInput;
 
 public class ShortcutInfo : MonoBehaviour {
 
@@ -12,6 +14,7 @@ public class ShortcutInfo : MonoBehaviour {
     public GameObject version;
     public GameObject readme;
     public Image readmeUnderline;
+    public bool isOpened = false;
 
     // Start is called before the first frame update
     void Start() {
@@ -33,13 +36,17 @@ public class ShortcutInfo : MonoBehaviour {
     }
 
     public void show() {
-        BG.gameObject.SetActive(true);
-        window.gameObject.SetActive(true);
+        gameObject.SetActive(true);
+        gameObject.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
+        window.gameObject.transform.DOMove(new Vector3(0,6,0), 1.0f).SetEase(Ease.OutQuint);
+        isOpened = true;
     }
 
     public void hide() {
-        BG.gameObject.SetActive(false);
-        window.gameObject.SetActive(false);
+        gameObject.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
+        gameObject.SetActive(false);
+        isOpened = false;
+        window.gameObject.transform.DOMove(new Vector3(0,-5,0), 1.0f);
     }
     
     public void LoadUIColors() {

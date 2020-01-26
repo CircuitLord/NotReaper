@@ -1451,6 +1451,7 @@ namespace NotReaper {
 
 			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f) {
 				if (!audioLoaded) return;
+				if (EditorInput.inUI) return;
 
 				Relative_QNT jumpDuration = new Relative_QNT((long)Constants.DurationFromBeatSnap((uint)beatSnap).tick);
 
