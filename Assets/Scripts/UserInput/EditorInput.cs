@@ -17,7 +17,7 @@ using NotReaper.Timing;
 namespace NotReaper.UserInput {
 
 
-	public enum EditorTool { Standard, Hold, Horizontal, Vertical, ChainStart, ChainNode, Melee, DragSelect, ChainBuilder, None }
+	public enum EditorTool { Standard, Hold, Horizontal, Vertical, ChainStart, ChainNode, Melee, Mine, DragSelect, ChainBuilder, None }
 
 
 	public class EditorInput : MonoBehaviour {
@@ -290,6 +290,15 @@ namespace NotReaper.UserInput {
 
 				case EditorTool.Melee:
 					selectedBehavior = TargetBehavior.Melee;
+					previousHand = selectedHand;
+					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
+					SelectVelocity(UITargetVelocity.Melee);
+					SelectSnappingMode(SnappingMode.Melee);
+					SelectHand(TargetHandType.Either);
+					break;
+				
+				case EditorTool.Mine:
+					selectedBehavior = TargetBehavior.Mine:
 					previousHand = selectedHand;
 					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
 					SelectVelocity(UITargetVelocity.Melee);
@@ -580,6 +589,9 @@ namespace NotReaper.UserInput {
 			}
 			if (Input.GetKeyDown(InputManager.selectMelee)) {
 				SelectTool(EditorTool.Melee);
+			}
+			if (Input.GetKeyDown(InputManager.selectMine)) {
+				SelectTool(EditorTool.Mine);
 			}
 			
 			//Toggles the chain builder state

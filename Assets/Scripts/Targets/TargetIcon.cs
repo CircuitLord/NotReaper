@@ -22,6 +22,7 @@ namespace NotReaper.Targets {
         public GameObject chainStart;
         public GameObject chain;
         public GameObject melee;
+        public GameObject mine;
         public GameObject line;
         public GameObject pathBuilder;
         public GameObject pathBuilderArrow;
@@ -33,6 +34,7 @@ namespace NotReaper.Targets {
         public SpriteRenderer chainStartOutline;
         public SpriteRenderer chainOutline;
         public SpriteRenderer meleeOutline;
+        public SpriteRenderer mineOutline;
         public SpriteRenderer pathBuilderOutline;
 
         public TargetData data;
@@ -50,7 +52,7 @@ namespace NotReaper.Targets {
         public GameObject sustainButtons;
 
         /// <summary>
-        /// For when the note is right clicked on. Bool is for if it should gen an undo action
+        /// For when the note is right clicked on.
         /// </summary>
         public event Action OnTryRemoveEvent;
 
@@ -130,6 +132,7 @@ namespace NotReaper.Targets {
             chainStartOutline.enabled = false;
             chainOutline.enabled = false;
             meleeOutline.enabled = false;
+            mineOutline.enabled = false;
             pathBuilderOutline.enabled = false;
             if(pathBuilderArrow != null) pathBuilderArrow.SetActive(false);
 
@@ -150,6 +153,7 @@ namespace NotReaper.Targets {
             chainStartOutline.color = color;
             chainOutline.color = color;
             meleeOutline.color = color;
+            mineOutline.color = color;
             pathBuilderOutline.color = color;
         }
 
@@ -250,6 +254,7 @@ namespace NotReaper.Targets {
             chainStart.SetActive(behavior == TargetBehavior.ChainStart);
             chain.SetActive(behavior == TargetBehavior.Chain);
             melee.SetActive(behavior == TargetBehavior.Melee);
+            mine.SetActive(behavior == TargetBehavior.Mine);
             pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
 
             if(location == TargetIconLocation.Timeline) {

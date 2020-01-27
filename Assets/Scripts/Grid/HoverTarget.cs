@@ -23,6 +23,7 @@ namespace NotReaper.Grid {
         public GameObject chainStart;
         public GameObject chainNode;
         public GameObject melee;
+        public GameObject mine;
 
         private SpriteRenderer srstandard;
         private SpriteRenderer srhold;
@@ -31,6 +32,7 @@ namespace NotReaper.Grid {
         private SpriteRenderer srchainstart;
         private SpriteRenderer srchainnode;
         private SpriteRenderer srmelee;
+        private SpriteRenderer srmine;
 
 
         private void Start() {
@@ -41,6 +43,7 @@ namespace NotReaper.Grid {
             srchainstart= chainStart.GetComponent<SpriteRenderer>();
             srchainnode = chainNode.GetComponent<SpriteRenderer>();
             srmelee = melee.GetComponent<SpriteRenderer>();
+            srmine = mine.GetComponent<SpriteRenderer>();
         }
 
 
@@ -110,6 +113,7 @@ namespace NotReaper.Grid {
             srchainstart.DOColor(color, animColorSpeed);
             srchainnode.DOColor(color, animColorSpeed);
             srmelee.DOColor(color, animColorSpeed);
+            srmine.DOColor(color, animColorSpeed);
             cursorTint.DOColor(color, animColorSpeed);
         }
 
@@ -128,6 +132,7 @@ namespace NotReaper.Grid {
             chainStart.SetActive(tool == EditorTool.ChainStart);
             chainNode.SetActive(tool == EditorTool.ChainNode);
             melee.SetActive(tool == EditorTool.Melee);
+            mine.SetActive(tool == EditorTool.Mine);
         }
 
 

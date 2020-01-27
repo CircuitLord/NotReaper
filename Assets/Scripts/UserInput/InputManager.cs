@@ -19,6 +19,7 @@ namespace NotReaper.UserInput {
 		public static KeyCode selectChainStart { get; set; }
 		public static KeyCode selectChainNode { get; set; }
 		public static KeyCode selectMelee { get; set; }
+		public static KeyCode selectMine { get; set; }
 		public static KeyCode toggleColor { get; set; }
 		public static KeyCode selectSoundKick { get; set; }
 		public static KeyCode selectSoundSnare { get; set; }
@@ -44,7 +45,8 @@ namespace NotReaper.UserInput {
 			selectVert = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectVert", "Alpha4"));
 			selectChainStart = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectChainStart", "Alpha5"));
 			selectChainNode = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectChainNode", "Alpha6"));
-			selectMelee = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectChainNode", "Alpha7"));
+			selectMelee = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectMelee", "Alpha7"));
+			selectMine = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("selectMine", "Alpha8"));
 
 			toggleColor = (KeyCode) System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("toggleColor", "S"));
 
