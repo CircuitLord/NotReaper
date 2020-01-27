@@ -297,7 +297,7 @@ namespace NotReaper {
 			QNT_Timestamp tempTime = GetClosestBeatSnapped(time, (uint)beatSnap);
 
 			foreach (Target target in loadedNotes) {
-				if (target.data.time ==  tempTime && (target.data.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee)) return;
+				if (target.data.time ==  tempTime && (target.data.handType == EditorInput.selectedHand) && (EditorInput.selectedTool != EditorTool.Melee) && (EditorInput.selectedTool != EditorTool.Mine)) return;
 			}
 
 			data.time = GetClosestBeatSnapped(time, (uint)beatSnap);

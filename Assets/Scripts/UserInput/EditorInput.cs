@@ -243,6 +243,8 @@ namespace NotReaper.UserInput {
 
 			if (previousTool == EditorTool.Melee && selectedHand == TargetHandType.Either) {
 				SelectHand(previousHand);
+			} else if (previousTool == EditorTool.Mine && selectedHand == TargetHandType.Either) {
+				SelectHand(previousHand);
 			}
 
 			//Update the UI based on the tool:
@@ -538,6 +540,7 @@ namespace NotReaper.UserInput {
 					case EditorTool.ChainStart:
 					case EditorTool.ChainNode:
 					case EditorTool.Melee:
+					case EditorTool.Mine:
 						Tools.placeNote.TryPlaceNote();
 						break;
 
@@ -562,6 +565,7 @@ namespace NotReaper.UserInput {
 					case EditorTool.ChainStart:
 					case EditorTool.ChainNode:
 					case EditorTool.Melee:
+					case EditorTool.Mine:
 						Tools.placeNote.TryRemoveNote();
 						break;
 
