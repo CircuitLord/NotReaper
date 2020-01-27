@@ -1225,8 +1225,8 @@ namespace NotReaper {
 
 				int indexStart = vertices.Count;
 
-				const float width = 0.025f;
-				const float maxHeight = 1.025f;
+				const float width = 0.020f;
+				const float maxHeight = 0.4f;
 				const float zIndex = 3;
 				float start = t / (float)Constants.PulsesPerQuarterNote;
 				start -= width / 2;
