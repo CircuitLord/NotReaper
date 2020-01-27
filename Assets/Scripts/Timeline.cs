@@ -31,6 +31,8 @@ namespace NotReaper {
 
 	public class Timeline : MonoBehaviour {
 
+		public static Timeline instance;
+		
 		//Hidden public values
 		[HideInInspector] public static AudicaFile audicaFile;
 
@@ -128,6 +130,9 @@ namespace NotReaper {
 
 		//Tools
 		private void Start() {
+
+			instance = this;
+			
 			//Load the config file
 			NRSettings.LoadSettingsJson();
 
