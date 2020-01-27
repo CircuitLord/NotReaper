@@ -703,7 +703,7 @@ namespace NotReaper {
 
 		public void CopyTimestampToClipboard() {
 			string timestamp = songTimestamp.text;
-			GUIUtility.systemCopyBuffer = "**" + timestamp + "**" + " - ";
+			GUIUtility.systemCopyBuffer = "**" + time.tick.ToString() + "**" + " - ";
 		}
 
 		public void SetTimingModeStats(UInt64 microsecondsPerQuarterNote, int tickOffset) {
