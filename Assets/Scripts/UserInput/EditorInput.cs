@@ -301,7 +301,7 @@ namespace NotReaper.UserInput {
 					break;
 				
 				case EditorTool.Mine:
-					selectedBehavior = TargetBehavior.Mine:
+					selectedBehavior = TargetBehavior.Mine;
 					previousHand = selectedHand;
 					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
 					SelectVelocity(UITargetVelocity.Melee);
