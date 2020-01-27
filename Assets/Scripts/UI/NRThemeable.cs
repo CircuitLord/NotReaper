@@ -26,36 +26,45 @@ namespace NotReaper.UI {
             NRSettings.OnLoad(() => {
 
                 var img = transform.GetComponent<Image>();
+                SpriteRenderer sr = GetComponent<SpriteRenderer>();
 
-                if (img) {
+                Color newColor = GenerateColorForType(type);
 
-                    Color newColor;
-                    
-                    if (type == NRThemeableType.Left) newColor = NRSettings.config.leftColor;
-                    else if (type == NRThemeableType.Right) newColor = NRSettings.config.rightColor;
-                    else newColor = NRSettings.config.selectedHighlightColor;
-                    
-                    
-                    
-                    float h, s, v;
-                    Color.RGBToHSV(newColor, out h, out s, out v);
-
-                    h += hueModifier;
-                    s += saturationModifier;
-                    v += valueModifier;
-
-                    newColor = Color.HSVToRGB(h, s, v);
-
-                    img.color = new Color(newColor.r, newColor.g, newColor.b, alpha);
-
-
-
-                }
+                if (img) img.color = newColor;
+                
+                else if (sr) sr.color = newColor;
 
             });
         }
 
+
+        private Color GenerateColorForType(NRThemeableType typeToGen) {
+            Color newColor;
+                    
+            if (typeToGen == NRThemeableType.Left) newColor = NRSettings.config.leftColor;
+            else if (typeToGen == NRThemeableType.Right) newColor = NRSettings.config.rightColor;
+            else newColor = NRSettings.config.selectedHighlightColor;
+                    
+                    
+                    
+            float h, s, v;
+            Color.RGBToHSV(newColor, out h, out s, out v);
+
+            h += hueModifier;
+            s += saturationModifier;
+            v += valueModifier;
+
+            newColor = Color.HSVToRGB(h, s, v);
+
+            return new Color(newColor.r, newColor.g, newColor.b, alpha);
+        }
+        
+
     }
+    
+    
+    
+    
 
 
 
