@@ -110,6 +110,11 @@ namespace NotReaper.Timing {
             }
         }
 
+        public void Cancel() {
+            Timeline.inTimingMode = false;
+            editorInput.SelectMode(EditorMode.Compose);
+        }
+        
 
         public void ApplyValues() {
 

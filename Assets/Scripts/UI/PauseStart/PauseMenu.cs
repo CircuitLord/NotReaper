@@ -33,7 +33,7 @@ namespace NotReaper.UI {
             editorInput.SelectMode(EditorMode.Timing);
             Timeline.inTimingMode = true;
 
-            newAudicaButton.interactable = false;
+            //newAudicaButton.interactable = false;
             
         }
 
@@ -59,6 +59,8 @@ namespace NotReaper.UI {
                 saveButton.interactable = false;
             }
 
+            newAudicaButton.interactable = !Timeline.audicaLoaded;
+            
             BG.gameObject.SetActive(true);
             window.gameObject.SetActive(true);
 
