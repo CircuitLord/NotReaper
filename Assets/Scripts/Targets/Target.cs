@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using NotReaper.Models;
 using NotReaper.Tools.ChainBuilder;
@@ -13,6 +14,8 @@ namespace NotReaper.Targets {
 
 		private TargetIcon gridTargetIcon;
 		private TargetIcon timelineTargetIcon;
+
+		private bool noteIsAnimating = false;
 
 		public TargetData data;
 		public bool transient;
@@ -294,9 +297,21 @@ namespace NotReaper.Targets {
 		}
 
 		public void OnNoteHit() {
+
+			if (noteIsAnimating) return;
+			noteIsAnimating = true;
+
+			Timeline.instance.StartCoroutine(AnimateNoteBounce());
+
+		}
+
+		private IEnumerator AnimateNoteBounce() {
 			DOTween.To((float scale) => {
 				gridTargetIcon.transform.localScale = new Vector3(scale, scale, 1f);
 			}, NRSettings.config.noteHitScale, 1f, 0.3f).SetEase(Ease.OutCubic);
+			
+			yield return new WaitForSeconds(0.3f);
+			noteIsAnimating = false;
 		}
 
 		public void AddTargetIconsCloseToPointAtTime(List<TargetIcon> icons, QNT_Timestamp time, Vector2 point) {

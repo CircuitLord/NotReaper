@@ -119,7 +119,7 @@ namespace NotReaper {
         public float noteVol = 0.5f;
         public float sustainVol = 0.5f;
         public int audioDSP = 480;
-        public float noteHitScale = 0.5f;
+        public float noteHitScale = 0.8f;
 
         public bool useAutoZOffsetWith360 = true;
 
