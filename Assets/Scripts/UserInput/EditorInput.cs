@@ -22,6 +22,7 @@ namespace NotReaper.UserInput {
 
 	public class EditorInput : MonoBehaviour {
 
+		public static EditorInput I;
 		public static EditorTool selectedTool = EditorTool.Standard;
 		public static EditorTool previousTool = EditorTool.Standard;
 		public static TargetHandType selectedHand = TargetHandType.Left;
@@ -41,6 +42,7 @@ namespace NotReaper.UserInput {
 		[SerializeField] private NRDiscordPresence nrDiscordPresence;
 
 		public PauseMenu pauseMenu;
+
 		public ShortcutInfo shortcutMenu;
 		public SoundSelect soundSelect;
 		[SerializeField] private Timeline timeline;
@@ -77,6 +79,7 @@ namespace NotReaper.UserInput {
 		private void Start() {
 			InputManager.LoadHotkeys();
 			NRSettings.OnLoad(SetUserColors);
+			I = this;
 		}
 
 		private void SetUserColors() {
@@ -349,6 +352,11 @@ namespace NotReaper.UserInput {
 				return;
 			}
 
+			 if (shortcutMenu.isOpened) {
+				inUI = true;
+				return;
+			}
+
 			switch (selectedMode) {
 				case EditorMode.Compose:
 					inUI = false;
@@ -361,6 +369,8 @@ namespace NotReaper.UserInput {
 					break;
 
 			}
+
+			
 
 			if(bpmWindow.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf || addOrTrimAudioWindow.gameObject.activeSelf) {
 				inUI = true;
@@ -454,22 +464,26 @@ namespace NotReaper.UserInput {
 				}
 			}
 
+			if(Input.GetKeyDown(KeyCode.F1)) {
+				if(shortcutMenu.isOpened) {
+					shortcutMenu.hide();
+				}
+			}
+
 			bool wasInUI = inUI;
 			FigureOutIsInUI();
 
 			if (wasInUI || inUI) return;
 
-			if (Input.GetKeyDown(KeyCode.F1)) {
-				shortcutMenu.show();
-			}
-
-			if (Input.GetKeyUp(KeyCode.F1)) {
-				shortcutMenu.hide();
-			}
-
 			if(Input.GetKeyDown(KeyCode.F3)) {
 				if(!countInWindow.gameObject.activeSelf) {
 					countInWindow.Activate();
+				}
+			}
+
+			if(Input.GetKeyDown(KeyCode.F1)) {
+				if(!shortcutMenu.isOpened) {
+					shortcutMenu.show();
 				}
 			}
 
