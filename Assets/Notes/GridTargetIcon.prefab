@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 696241273037832321}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.2}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_Children: []
   m_Father: {fileID: 7716854660699706798}
   m_RootOrder: 0
@@ -1610,7 +1610,7 @@ Transform:
   m_GameObject: {fileID: 3445916055037311558}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_Children:
   - {fileID: 5876244829077423850}
   m_Father: {fileID: 7716854660699706798}
@@ -1641,7 +1641,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c8677bdac22d02742ac1d332bb521672, type: 2}
+  - {fileID: 2100000, guid: 94316585d5afc53428e903642130cd18, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8137,8 +8137,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.01, y: 0.01, z: 1}
   m_Children:
-  - {fileID: 2898566248224154114}
-  - {fileID: 2542318307303889870}
+  - {fileID: 3108100515956081301}
+  - {fileID: 2329442176385235801}
   m_Father: {fileID: 5012048490355646076}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -8929,7 +8929,7 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
---- !u!224 &2542318307303889870 stripped
+--- !u!224 &2329442176385235801 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
     type: 3}
@@ -9095,7 +9095,7 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
---- !u!224 &2898566248224154114 stripped
+--- !u!224 &3108100515956081301 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
     type: 3}
