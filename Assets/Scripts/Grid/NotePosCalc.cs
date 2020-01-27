@@ -62,12 +62,6 @@ namespace NotReaper.Grid {
 				offsetX = -offsetX / NotePosCalc.xSize / 4;
 				offsetY = -offsetY / NotePosCalc.ySize / 4;
 				
-				
-
-				Debug.Log(offsetX);
-
-				
-
 
 			} else {
 
@@ -91,8 +85,12 @@ namespace NotReaper.Grid {
 				velocity = target.data.velocity,
 				gridOffset = new Cue.GridOffset { x = (float) Math.Round(offsetX, 2), y = (float) Math.Round(offsetY, 2) },
 				handType = target.data.handType,
-				behavior = target.data.behavior
+				behavior = target.data.behavior,
 			};
+
+			if (NRSettings.config.useAutoZOffsetWith360) {
+				cue.zOffset = GetZOffsetForX(target.data.x);
+			}
 
 
 			return cue;
@@ -139,6 +137,18 @@ namespace NotReaper.Grid {
 			return new Vector2(x, y);
 		}
 
+
+
+		private static float GetZOffsetForX(float x) {
+			if (x < 0f) x *= -1f;
+
+			if (x < 5.5f) return 0f;
+			
+			var zOffset = Mathf.Clamp(Mathf.Abs(x) - 5.5f, 0f, 2.5f) / 5f;
+
+			return zOffset;
+		}
+		
 
 	}
 }

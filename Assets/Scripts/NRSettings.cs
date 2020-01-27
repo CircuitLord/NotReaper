@@ -121,6 +121,8 @@ namespace NotReaper {
         public int audioDSP = 480;
         public float noteHitScale = 0.5f;
 
+        public bool useAutoZOffsetWith360 = true;
+
         public double UIFadeDuration = 1.0f;
 
         public bool useDiscordRichPresence = true;
