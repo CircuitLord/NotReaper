@@ -333,6 +333,10 @@ namespace NotReaper {
 				case UITargetVelocity.Melee:
 					data.velocity = TargetVelocity.Melee;
 					break;
+				
+				case UITargetVelocity.Mine:
+					data.velocity = TargetVelocity.Mine;
+					break;
 
 				default:
 					data.velocity = TargetVelocity.Standard;

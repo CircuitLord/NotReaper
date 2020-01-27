@@ -105,6 +105,7 @@ namespace NotReaper.Timing {
 		private ClipData chainStart;
 		private ClipData chainNote;
 		private ClipData melee;
+		private ClipData mine;
 
 		private ClipData hihat_hit;
 		private ClipData hihat_hit2;
@@ -148,6 +149,7 @@ namespace NotReaper.Timing {
 		[SerializeField] private AudioClip ChainStartClip;
 		[SerializeField] private AudioClip ChainNoteClip;
 		[SerializeField] private AudioClip MeleeClip;
+		[SerializeField] private AudioClip MineClip;
 
 		[SerializeField] private AudioClip HiHat_Hit;
 		[SerializeField] private AudioClip HiHat_Hit2;
@@ -167,6 +169,7 @@ namespace NotReaper.Timing {
 			while (ChainStartClip.loadState != AudioDataLoadState.Loaded) yield return null;
 			while (ChainNoteClip.loadState != AudioDataLoadState.Loaded) yield return null;
 			while (MeleeClip.loadState != AudioDataLoadState.Loaded) yield return null;
+			while (MineClip.loadState != AudioDataLoadState.Loaded) yield return null;
 
 			while (HiHat_Hit.loadState != AudioDataLoadState.Loaded) yield return null;
 			while (HiHat_Hit2.loadState != AudioDataLoadState.Loaded) yield return null;
@@ -179,6 +182,7 @@ namespace NotReaper.Timing {
 			chainStart = FromAudioClip(ChainStartClip);
 			chainNote = FromAudioClip(ChainNoteClip);
 			melee = FromAudioClip(MeleeClip);
+			mine = FromAudioClip(MineClip);
 
 			hihat_hit = FromAudioClip(HiHat_Hit);
 			hihat_hit2 = FromAudioClip(HiHat_Hit2);
@@ -431,6 +435,10 @@ namespace NotReaper.Timing {
 						case TargetVelocity.Melee:
 							ev.sound = melee;
 							break;
+						
+						case TargetVelocity.Mine:
+							ev.sound = mine;
+							break;
 
 						default:
 							continue;
@@ -457,6 +465,7 @@ namespace NotReaper.Timing {
 			chainStart.duckVolume = 0.0f;
 			chainNote.duckVolume = 0.0f;
 			melee.duckVolume = 0.0f;
+			mine.duckVolume = 0.0f;
 
 			float oldSpeed = ctx.playbackSpeed;
 

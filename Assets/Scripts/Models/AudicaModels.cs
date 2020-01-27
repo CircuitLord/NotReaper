@@ -157,7 +157,7 @@ namespace NotReaper.Models {
 	public enum Difficulty { Expert = 0, Advanced = 1, Standard = 2, Easy = 3 }
 	public enum TargetHandType { Either = 0, Right = 1, Left = 2, None = 3 }
 	public enum TargetBehavior { Standard = 0, Vertical = 1, Horizontal = 2, Hold = 3, ChainStart = 4, Chain = 5, Melee = 6, Mine = 7, None = 8, Metronome = 9, NR_Pathbuilder = 101 }
-	public enum TargetVelocity { Standard = 20, Vertical = 20, Horizontal = 20, Hold = 20, Snare = 127, Percussion = 60, ChainStart = 1, Chain = 2, Melee = 3, Metronome = 100, None = 0 }
+	public enum TargetVelocity { Standard = 20, Vertical = 20, Horizontal = 20, Hold = 20, Snare = 127, Percussion = 60, ChainStart = 1, Chain = 2, Melee = 3, Mine = 4, Metronome = 100, None = 0 }
 
 	[Serializable]
 	public class Cue {

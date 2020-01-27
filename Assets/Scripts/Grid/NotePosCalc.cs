@@ -29,7 +29,7 @@ namespace NotReaper.Grid {
 			Vector2 pitch101 = new Vector2(NotePosCalc.xSize * 2f, NotePosCalc.ySize);
 
 			//If it's a melee note.
-			if (target.data.behavior == TargetBehavior.Melee) {
+			if (target.data.behavior == TargetBehavior.Melee || target.data.behavior == TargetBehavior.Mine) {
 				pitch = 98;
 				if (target.data.x > 0) pitch += 1;
 				if (target.data.y > 0) pitch += 2;
@@ -101,7 +101,7 @@ namespace NotReaper.Grid {
 
 			float x = 0, y = 0;
 
-			if (cue.behavior == TargetBehavior.Melee) {
+			if (cue.behavior == TargetBehavior.Melee || cue.behavior == TargetBehavior.Mine) {
 				switch (cue.pitch) {
 					case 98:
 						x = -2f * xSize;

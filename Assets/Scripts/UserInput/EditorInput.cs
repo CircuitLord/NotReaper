@@ -305,8 +305,8 @@ namespace NotReaper.UserInput {
 				case EditorTool.Mine:
 					selectedBehavior = TargetBehavior.Mine;
 					previousHand = selectedHand;
-					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
-					SelectVelocity(UITargetVelocity.Melee);
+					//soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Melee);
+					SelectVelocity(UITargetVelocity.Mine);
 					SelectSnappingMode(SnappingMode.Melee);
 					SelectHand(TargetHandType.Either);
 					break;

@@ -37856,6 +37856,7 @@ MonoBehaviour:
   ChainStartClip: {fileID: 8300000, guid: 6f44599fcb0546c4e9b64c758f6b3c22, type: 3}
   ChainNoteClip: {fileID: 8300000, guid: 0bb92c258526d764193a9209155a0254, type: 3}
   MeleeClip: {fileID: 8300000, guid: 075bc10c2c138a74eb46ebb2f3b180f1, type: 3}
+  MineClip: {fileID: 8300000, guid: 7af43a452a11c3b4a9ab47e1f892d742, type: 3}
   HiHat_Hit: {fileID: 8300000, guid: 062b8a9940bf02f4aa1dd1dbdc9e75f2, type: 3}
   HiHat_Hit2: {fileID: 8300000, guid: cff30be34e3ae5b47aa232f63ea10560, type: 3}
   HiHat_Hit3: {fileID: 8300000, guid: 8b4c397a46b067c41b005fe512dfb438, type: 3}
