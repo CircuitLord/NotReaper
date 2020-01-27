@@ -46166,7 +46166,7 @@ PrefabInstance:
     - target: {fileID: 114180244358464768, guid: a7f6fce2117a1d0419a238b750d744f8,
         type: 3}
       propertyPath: m_text
-      value: Song TItle
+      value: Song Title
       objectReference: {fileID: 0}
     - target: {fileID: 114180244358464768, guid: a7f6fce2117a1d0419a238b750d744f8,
         type: 3}
