@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using NotReaper;
 using UnityEngine;
+using UnityEditor;
 
 public class UISettings : MonoBehaviour
 {
@@ -32,6 +33,11 @@ public class UISettings : MonoBehaviour
    public void OpenSettingsFile()
    {
       System.Diagnostics.Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "CircuitCubed", "NotReaper", "NRConfig.txt"));
+   }
+
+   public void OpenSettingsFolder()
+   {
+      EditorUtility.RevealInFinder(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "CircuitCubed", "NotReaper", "NRConfig.txt"));
    }
 
    public void RegenConfig()
