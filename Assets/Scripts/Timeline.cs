@@ -122,6 +122,9 @@ namespace NotReaper {
 
 		[SerializeField]
 		private AudioWaveformVisualizer waveformVisualizer;
+		
+		public bool areNotesSelected => selectedNotes.Count > 0;
+		
 
 		//Tools
 		private void Start() {
