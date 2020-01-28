@@ -37,6 +37,11 @@ namespace NotReaper.UI {
             bar.localPosition = new Vector3((float)x, 0, 0);
         }
 
+
+        public void SetPreviewStartPointToCurrent() {
+            SetPreviewStartPoint(Timeline.time);
+        }
+        
         public void SetPreviewStartPoint(QNT_Timestamp timestamp)
         {
             Timeline.desc.previewStartSeconds = timeline.TimestampToSeconds(timestamp);
