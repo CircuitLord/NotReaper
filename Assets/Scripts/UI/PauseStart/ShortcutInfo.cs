@@ -38,16 +38,27 @@ public class ShortcutInfo : MonoBehaviour {
     public void show() {
         gameObject.SetActive(true);
         gameObject.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
-        window.gameObject.transform.DOMove(new Vector3(0,6,0), 1.0f).SetEase(Ease.OutQuint);
+        
+        Transform camTrans = Camera.main.transform;
+
+        window.transform.position = new Vector3(camTrans.position.x, camTrans.position.y, transform.position.z);
+        
+        window.transform.DOMove(new Vector3(transform.position.x,camTrans.position.y + 5.5f, transform.position.z), 1.0f).SetEase(Ease.OutQuint);
         isOpened = true;
     }
 
+
+
     public void hide() {
-        gameObject.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
+
         gameObject.SetActive(false);
+
+
         isOpened = false;
-        window.gameObject.transform.DOMove(new Vector3(0,-5,0), 1.0f);
     }
+
+
+
     
     public void LoadUIColors() {
         

@@ -57,8 +57,9 @@ namespace NotReaper.UI {
             ChangeSelectedDifficulty(difficultyManager.loadedIndex);
         }
 
-        public void ApplyValues()
-        {
+        public void ApplyValues() {
+            if (Timeline.desc == null) return;
+            
             Timeline.desc.title = titleField.text;
             Timeline.desc.artist = artistField.text;
             Timeline.desc.author = mapperField.text;
@@ -159,6 +160,9 @@ namespace NotReaper.UI {
         public IEnumerator FadeOut() {
             BG.gameObject.SetActive(false);
             window.gameObject.SetActive(false);
+            
+            ApplyValues();
+            
             yield break;
         }
 

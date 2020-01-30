@@ -841,7 +841,7 @@ namespace NotReaper {
 			//Loaded successfully
 
 			NotificationShower.AddNotifToQueue(new NRNotification("Map loaded successfully!"));
-			NotificationShower.AddNotifToQueue(new NRNotification("Hold F1 to view shortcuts"));
+			NotificationShower.AddNotifToQueue(new NRNotification("Press F1 to view shortcuts"));
 			return true;
 		}
 

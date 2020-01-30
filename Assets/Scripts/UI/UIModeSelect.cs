@@ -123,6 +123,7 @@ namespace NotReaper.UI {
 
         private void DOSliderToButton(int index, Color colorChange) {
            float final = startOffset + (index * indexOffset);
+           
 
            //selectedSlider.transform.(new Vector3(0f, finalY, 0f), 1f).SetEase(Ease.InOutCubic);
            DOTween.To(SetSliderPosX, sliderRTrans.anchoredPosition.x, final, 0.3f).SetEase(Ease.InOutCubic);

@@ -66,7 +66,6 @@ namespace NotReaper.UI {
                 prevX = x;
             }
             //x -= transform.position.x;
-
             //-4.7 to 4.7
             //9.4 length
             x += mouseClickAreaLength / 2;
