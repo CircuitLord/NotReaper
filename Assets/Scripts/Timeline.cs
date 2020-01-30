@@ -756,9 +756,26 @@ namespace NotReaper {
 
 			} else {
 
-				string[] paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Path.Combine(Application.persistentDataPath), "audica", false);
+
+				string prevDir = PlayerPrefs.GetString("recentDir", "");
+
+				string[] paths;
+				
+				if (prevDir != "") {
+					paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", prevDir, "audica", false);
+					
+				}
+				else {
+					paths = StandaloneFileBrowser.OpenFilePanel("Audica File (Not OST)", Application.dataPath, "audica", false);
+				}
+				
+				
+				
 
 				if (paths.Length == 0) return false;
+				
+				
+				PlayerPrefs.SetString("recentDir", Path.GetDirectoryName(paths[0]));
 				
 				audicaFile = null;
 				
