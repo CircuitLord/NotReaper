@@ -640,15 +640,7 @@ namespace NotReaper.UserInput {
 
 
 			if (Input.GetKeyDown(InputManager.toggleColor)) {
-
-				if (selectedHand == TargetHandType.Left) {
-					SelectHand(TargetHandType.Right);
-				} else if (selectedHand == TargetHandType.Right) {
-					SelectHand(TargetHandType.Left);
-				} else {
-					SelectHand(TargetHandType.Left);
-				}
-
+				ToggleHandColor();
 			}
 
 			if (Input.GetKeyDown(InputManager.selectSoundKick)) {
@@ -678,6 +670,17 @@ namespace NotReaper.UserInput {
 			
 		}
 
+		public void ToggleHandColor() {
+			if (selectedHand == TargetHandType.Left) {
+				SelectHand(TargetHandType.Right);
+			}
+			else if (selectedHand == TargetHandType.Right) {
+				SelectHand(TargetHandType.Left);
+			}
+			else {
+				SelectHand(TargetHandType.Left);
+			}
+		}
 	}
 
 
