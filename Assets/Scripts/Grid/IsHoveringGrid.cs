@@ -19,7 +19,7 @@ namespace NotReaper.Grid {
             foreach(Renderer renderer in transforms) {
                 gridRect.Encapsulate(renderer.bounds);
             }
-            gridRect.size *= 1.1f;
+            gridRect.size *= 1.05f;
             
             _camera = Camera.main;
         }

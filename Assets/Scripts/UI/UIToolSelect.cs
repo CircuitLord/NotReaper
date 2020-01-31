@@ -17,13 +17,13 @@ namespace NotReaper.UI {
 
 
         [Header("Tool Sprites")]
-        [SerializeField] private Image srstandard;
-        [SerializeField] private Image srhold;
-        [SerializeField] private Image srhorizontal;
-        [SerializeField] private Image srvertical;
-        [SerializeField] private Image srchainstart;
-        [SerializeField] private Image srchainnode;
-        [SerializeField] private Image srmelee;
+        [SerializeField] private SpriteRenderer srstandard;
+        [SerializeField] private SpriteRenderer srhold;
+        [SerializeField] private SpriteRenderer srhorizontal;
+        [SerializeField] private SpriteRenderer srvertical;
+        [SerializeField] private SpriteRenderer srchainstart;
+        [SerializeField] private SpriteRenderer srchainnode;
+        [SerializeField] private SpriteRenderer srmelee;
 
         [SerializeField] private Image imgDragSelect;
         [SerializeField] private Image imgChainBuilder;
