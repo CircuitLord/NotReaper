@@ -1,7 +1,7 @@
 {
     "latestVersion" : "1.3.3",
     "downloadLink" : "https://github.com/CircuitLord/NotReaper/raw/master/updateOnly.zip",
-    "changelog" : "Autoupdate is fixed. Everything should be in sync now.",
+    "changelog" : "Don't download this update without getting the updated NotReaperInstaller pinned in #editor-development",
     "forced" : false
 
 
