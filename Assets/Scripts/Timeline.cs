@@ -105,7 +105,7 @@ namespace NotReaper {
 		public static float scaleTransform;
 		private float targetScale = 0.7f;
 		private float scaleOffset = 0;
-		private static Relative_QNT offset = new Relative_QNT(0);
+		public static Relative_QNT offset = new Relative_QNT(0);
 
 		/// <summary>
 		/// If the timeline is currently being moved by an animation.
@@ -667,7 +667,7 @@ namespace NotReaper {
 				
 				if (target.data.behavior == TargetBehavior.Metronome) continue;
 				
-				var cue = NotePosCalc.ToCue(target, offset, false);
+				var cue = NotePosCalc.ToCue(target, offset);
 
 				if(target.data.behavior == TargetBehavior.NR_Pathbuilder) {
 					export.NRCueData.pathBuilderNoteCues.Add(cue);
@@ -1569,7 +1569,7 @@ namespace NotReaper {
 
 				for(int i = FindFirstNoteAtTime(start); i != -1 && i < orderedNotes.Count; ++i) {
 					Target t = orderedNotes[i];
-					if(t.data.time > end) {
+					if(t.data.time > end || start > t.data.time) {
 						break;
 					}
 
