@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using NotReaper.Models;
 using NotReaper.Targets;
@@ -11,15 +12,19 @@ namespace NotReaper.Managers {
 
     public class DifficultyManager : MonoBehaviour {
 
-
+        public static DifficultyManager I;
+        
         [HideInInspector] public int loadedIndex = -1;
 
         [SerializeField] private NRDiscordPresence nrDiscordPresence;
 
         [SerializeField] private TextMeshProUGUI curSongName;
 		[SerializeField] private TextMeshProUGUI curSongDiff;
-        
 
+
+        private void Start() {
+            I = this;
+        }
 
 
         public Timeline timeline;

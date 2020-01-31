@@ -120,6 +120,7 @@ namespace NotReaper {
         public float sustainVol = 0.5f;
         public int audioDSP = 480;
         public float noteHitScale = 0.8f;
+        public float bgMoveMultiplier = 1.0f;
 
         public bool useAutoZOffsetWith360 = true;
 
@@ -132,6 +133,8 @@ namespace NotReaper {
         public bool saveOnLoadNew = true;
 
         public bool singleSelectCtrl = false;
+
+        public string cuesSavePath = "";
 
         public string bgImagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "CircuitCubed", "NotReaper", "BG1.png");
     }
