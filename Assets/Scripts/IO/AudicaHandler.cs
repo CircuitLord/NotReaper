@@ -16,6 +16,7 @@ namespace NotReaper.IO {
 
 			AudicaFile audicaFile = new AudicaFile();
 			ZipFile audicaZip = ZipFile.Read(path);
+			
 
 			string appPath = Application.dataPath;
 			bool easy = false, standard = false, advanced = false, expert = false;

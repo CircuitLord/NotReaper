@@ -69,14 +69,14 @@ namespace NotReaper.IO {
 				archive.AddEntry("song.mogg", Path.Combine(workFolder, "song.mogg"));
 				
 				
-				archive.SaveTo(Path.Combine(Application.dataPath, "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
+				archive.SaveTo(Path.Combine(Application.dataPath, @"../", "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
 			}
 
-			return Path.Combine(Application.dataPath, "saves", songID + ".audica");
+			return Path.Combine(Application.dataPath, @"../", "saves", songID + ".audica");
 			
 		/*
 		
-			HandleCache.CheckSaveFolderValid();
+			HandleCache.CheckSaveFolderValid(); 59.6, 57.8
 
 			System.Diagnostics.Process myProcess = new System.Diagnostics.Process();
 			ProcessStartInfo startInfo = new ProcessStartInfo();
