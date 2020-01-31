@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,12 +28,17 @@ namespace NotReaper.UI {
 
                 var img = transform.GetComponent<Image>();
                 SpriteRenderer sr = GetComponent<SpriteRenderer>();
+                TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
 
                 Color newColor = GenerateColorForType(type);
 
                 if (img) img.color = newColor;
                 
                 else if (sr) sr.color = newColor;
+                
+                else if (text) {
+                    text.color = newColor;
+                }
 
             });
         }
@@ -58,8 +64,6 @@ namespace NotReaper.UI {
 
             return new Color(newColor.r, newColor.g, newColor.b, alpha);
         }
-        
-
     }
     
     
