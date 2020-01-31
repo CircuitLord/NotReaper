@@ -33,7 +33,7 @@ namespace NotReaper.UI {
         private void Update() {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            Vector2 bgPos = new Vector2(mousePos.x * -0.8f, mousePos.y * -0.8f);
+            Vector2 bgPos = new Vector2(mousePos.x * -0.8f * NRSettings.config.bgMoveMultiplier, mousePos.y * -0.8f * NRSettings.config.bgMoveMultiplier);
 
             bgImage.DOLocalMove(new Vector3(bgPos.x, bgPos.y, 52f), 0.1f).SetEase(Ease.InOutQuad);
         }
