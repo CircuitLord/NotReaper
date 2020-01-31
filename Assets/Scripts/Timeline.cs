@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using NAudio.Midi;
@@ -135,6 +136,9 @@ namespace NotReaper {
 			
 			//Load the config file
 			NRSettings.LoadSettingsJson();
+			
+			//Initialize autoupdating:
+			HandleAutoupdater();
 
 
 			notes = new List<Target>();
@@ -174,6 +178,12 @@ namespace NotReaper {
 			});
 		}
 
+
+		private void HandleAutoupdater() {
+
+
+		}
+		
 		public void UpdateUIColors() {
 			curDiffText.color = NRSettings.config.rightColor;
 			leftColor = NRSettings.config.leftColor;
