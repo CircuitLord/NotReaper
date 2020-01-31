@@ -59,6 +59,8 @@ namespace NotReaper.UI {
 
         public void ApplyValues() {
             if (Timeline.desc == null) return;
+
+            if (String.IsNullOrEmpty(titleField.text)) return; 
             
             Timeline.desc.title = titleField.text;
             Timeline.desc.artist = artistField.text;
