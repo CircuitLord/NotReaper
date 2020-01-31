@@ -12603,7 +12603,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: 0.06951904}
+  m_AnchoredPosition: {x: 0, y: 0.06951904}
   m_SizeDelta: {x: -0.010009766, y: 50.123505}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &481782460
@@ -40051,6 +40051,7 @@ MonoBehaviour:
   HiHat_Hit2: {fileID: 8300000, guid: cff30be34e3ae5b47aa232f63ea10560, type: 3}
   HiHat_Hit3: {fileID: 8300000, guid: 8b4c397a46b067c41b005fe512dfb438, type: 3}
   HiHat_Open: {fileID: 8300000, guid: 80e6220988d84184e833b49d69b7b025, type: 3}
+  mainCameraTrans: {fileID: 320480407}
 --- !u!1 &1399264318
 GameObject:
   m_ObjectHideFlags: 0
@@ -41594,7 +41595,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.0051879883, y: -51.19998}
+  m_AnchoredPosition: {x: 0.005126953, y: -51.19995}
   m_SizeDelta: {x: 221.88, y: 44.77}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1427177074

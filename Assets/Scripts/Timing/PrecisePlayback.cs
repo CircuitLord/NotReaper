@@ -93,6 +93,7 @@ namespace NotReaper.Timing {
 
 	[RequireComponent(typeof(AudioSource))]
 	public class PrecisePlayback : MonoBehaviour {
+		
 		public ClipData song;
 		public ClipData songExtra;
 		public ClipData preview;
@@ -155,11 +156,18 @@ namespace NotReaper.Timing {
 		[SerializeField] private AudioClip HiHat_Hit2;
 		[SerializeField] private AudioClip HiHat_Hit3;
 		[SerializeField] private AudioClip HiHat_Open;
+		
+		public Transform mainCameraTrans;
+		private float mainCameraX;
 
 		private void Start() {
 			sampleRate = AudioSettings.outputSampleRate;
 			source.Play();
 			StartCoroutine(LoadHitsounds());
+		}
+
+		private void Update() {
+			mainCameraX = mainCameraTrans.position.x;
 		}
 
 		IEnumerator LoadHitsounds() {
@@ -361,6 +369,7 @@ namespace NotReaper.Timing {
 			public ClipData sound;
 			public float pan;
 			public float volume;
+			public float xPos;
 		};
 		List<HitsoundEvent> hitsoundEvents = new List<HitsoundEvent>();
 		bool clearHitsounds = false;
@@ -410,6 +419,7 @@ namespace NotReaper.Timing {
 					ev.time = data.time;
 					ev.pan = (data.x / 7.15f);
 					ev.volume = 1.0f;
+					ev.xPos = data.x;
 
 					switch (data.velocity) {
 						case TargetVelocity.Standard:
@@ -505,6 +515,12 @@ namespace NotReaper.Timing {
 						ev.currentSample = ev.sound.currentSample;
 					}
 				}
+				
+				//Update the pan:
+
+				ev.pan = (ev.xPos - mainCameraX) / 7.15f;
+
+				
 
 				if(valid) {
 					events[i] = ev;
