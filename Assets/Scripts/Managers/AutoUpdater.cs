@@ -114,9 +114,7 @@ namespace NotReaper.Managers {
 			else {
 
 				updateData = JsonUtility.FromJson<AutoUpdaterJSON>(www.downloadHandler.text);
-				
-				yield return new WaitForSeconds(5f);
-				
+
 				HandleUpdate(updateData);
 			}
 			
@@ -151,13 +149,17 @@ namespace NotReaper.Managers {
 			Version newVer = Version.Parse(data.latestVersion);
 			
 			Version currentVer = Version.Parse(Application.version);
+
+
+			if (newVer.Build > currentVer.Build && newVer.Minor > currentVer.Minor && newVer.Major > currentVer.Major) {
+				return true;
+			}
 			
+			else if (newVer.Minor > currentVer.Minor && newVer.Major > currentVer.Major) return true;
+			
+			else if (newVer.Major > currentVer.Major) return true;
 
-			if (newVer.Major > currentVer.Major) return true;
 
-			if (newVer.Minor > currentVer.Minor) return true;
-
-			if (newVer.Build > currentVer.Build) return true;
 			
 			return false;
 
