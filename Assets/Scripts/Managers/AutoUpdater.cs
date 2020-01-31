@@ -150,8 +150,6 @@ namespace NotReaper.Managers {
 			
 			Version currentVer = Version.Parse(Application.version);
 			
-			
-
 
 			if (newVer.Build > currentVer.Build && newVer.Minor >= currentVer.Minor && newVer.Major >= currentVer.Major) {
 				return true;
