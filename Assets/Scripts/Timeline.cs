@@ -487,6 +487,8 @@ namespace NotReaper {
 		public void DeselectAllTargets() {
 			if (!audicaLoaded) return;
 
+			Camera.main.farClipPlane = 50;
+
 			foreach (Target target in selectedNotes) {
 				DeselectTarget(target, true);
 			}
@@ -1532,6 +1534,17 @@ namespace NotReaper {
 			if (!paused && !animatingTimeline) {
 				SetBeatTime(time);
 			}
+
+
+			if (Input.GetKeyDown(KeyCode.A) && isCtrlDown) {
+
+				Camera.main.farClipPlane = 1000;
+				
+				foreach (Target target in orderedNotes) {
+					target.MakeTimelineSelectTarget();
+				}
+			}
+			
 
 			songPlayback.volume = NRSettings.config.mainVol;
 			songPlayback.hitSoundVolume = NRSettings.config.noteVol;
