@@ -121,7 +121,7 @@ PlayerSettings:
     5:4: 0
     16:10: 0
     16:9: 1
-    Others: 1
+    Others: 0
   bundleVersion: 1.3.0
   preloadedAssets: []
   metroInputSource: 0

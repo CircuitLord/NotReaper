@@ -22815,7 +22815,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -0.0049743652, y: 25.299988}
+  m_AnchoredPosition: {x: -0.005004883, y: 25.299988}
   m_SizeDelta: {x: 212.01001, y: 48.399994}
   m_Pivot: {x: 1, y: 0}
 --- !u!223 &869613411
@@ -40402,7 +40402,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 5.6722713, y: 0, z: -87.70296, w: 0}
+  m_margin: {x: 5.6722713, y: 0, z: -179.30336, w: 0}
   m_textInfo:
     textComponent: {fileID: 1407266733}
     characterCount: 21
@@ -45198,7 +45198,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1538149485}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_RenderMode: 2
   m_Camera: {fileID: 0}
