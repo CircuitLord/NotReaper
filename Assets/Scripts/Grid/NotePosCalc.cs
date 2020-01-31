@@ -16,7 +16,7 @@ namespace NotReaper.Grid {
 
 
 		//Gets the cue status based on a target.
-		public static Cue ToCue(Target target, Relative_QNT offset, bool includeGridOffset) {
+		public static Cue ToCue(Target target, Relative_QNT offset) {
 
 			int pitch = 0;
 			Vector2 tempPos = new Vector2();
