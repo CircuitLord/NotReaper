@@ -109,7 +109,7 @@ namespace NotReaper.UI {
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
                     imgChainBuilder.DOFade(fadeAmount, fadeDuration);
-                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+                    //imgDragSelect.DOFade(fadeAmount, fadeDuration);
                 
                     break;
 
@@ -135,7 +135,7 @@ namespace NotReaper.UI {
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
                     imgChainBuilder.DOFade(fadeAmount, fadeDuration);
-                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+                    //imgDragSelect.DOFade(fadeAmount, fadeDuration);
 
                     break;
 
@@ -161,7 +161,7 @@ namespace NotReaper.UI {
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
                     imgChainBuilder.DOFade(fadeAmount, fadeDuration);
-                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+                    //imgDragSelect.DOFade(fadeAmount, fadeDuration);
 
                     break;
 
@@ -187,7 +187,7 @@ namespace NotReaper.UI {
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
                     imgChainBuilder.DOFade(fadeAmount, fadeDuration);
-                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+                    //imgDragSelect.DOFade(fadeAmount, fadeDuration);
 
                     break;
                 case EditorTool.ChainStart:
@@ -212,7 +212,7 @@ namespace NotReaper.UI {
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
                     imgChainBuilder.DOFade(fadeAmount, fadeDuration);
-                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+                    //imgDragSelect.DOFade(fadeAmount, fadeDuration);
 
                     break;
                 case EditorTool.ChainNode:
@@ -237,7 +237,7 @@ namespace NotReaper.UI {
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
                     imgChainBuilder.DOFade(fadeAmount, fadeDuration);
-                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+                    //imgDragSelect.DOFade(fadeAmount, fadeDuration);
 
                     break;
                 case EditorTool.Melee:
@@ -264,7 +264,7 @@ namespace NotReaper.UI {
                     srchainnode.DOFade(fadeAmount, fadeDuration);
 
                     imgChainBuilder.DOFade(fadeAmount, fadeDuration);
-                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+                    //imgDragSelect.DOFade(fadeAmount, fadeDuration);
 
                     break;
 
@@ -274,7 +274,7 @@ namespace NotReaper.UI {
                     //DOSliderToNote(6, Color.white);
 
                     //Fade in the button
-                    imgDragSelect.DOFade(1f, fadeDuration);
+                    //imgDragSelect.DOFade(1f, fadeDuration);
 
 
                     //Fade out the slider
@@ -333,7 +333,7 @@ namespace NotReaper.UI {
                     srchainnode.DOFade(fadeAmount, fadeDuration);
                     srmelee.DOFade(fadeAmount, fadeDuration);
 
-                    imgDragSelect.DOFade(fadeAmount, fadeDuration);
+                    //imgDragSelect.DOFade(fadeAmount, fadeDuration);
 
                     
 

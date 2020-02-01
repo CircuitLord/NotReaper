@@ -106,6 +106,7 @@ namespace NotReaper.Grid {
 
         public float animColorSpeed = 0.3f;
         public void UpdateUIHandColor(Color color) {
+
             srstandard.DOColor(color, animColorSpeed);
             srhold.DOColor(color, animColorSpeed);
             srhorizontal.DOColor(color, animColorSpeed);
