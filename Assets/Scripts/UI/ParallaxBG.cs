@@ -66,7 +66,7 @@ namespace NotReaper.UI {
             
             DOTween.To((float scale) => {
                 bgImage.localScale = new Vector3(scale, scale, 1f);
-            }, 0.98f, 1f, 0.3f).SetEase(Ease.OutCubic);
+            }, 0.99f, 1f, 0.3f).SetEase(Ease.OutCubic);
         }
 
     }
