@@ -61,6 +61,9 @@ namespace NotReaper.UI {
         }
 
         public void OnPlaceNote() {
+
+            if (!NRSettings.config.bounceOnPlaceNote) return;
+            
             DOTween.To((float scale) => {
                 bgImage.localScale = new Vector3(scale, scale, 1f);
             }, 0.98f, 1f, 0.3f).SetEase(Ease.OutCubic);

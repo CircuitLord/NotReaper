@@ -121,6 +121,7 @@ namespace NotReaper {
         public int audioDSP = 480;
         public float noteHitScale = 0.8f;
         public float bgMoveMultiplier = 1.0f;
+        public bool bounceOnPlaceNote = true;
 
         public bool useAutoZOffsetWith360 = true;
 
