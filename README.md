@@ -82,9 +82,9 @@ Get bored of staring at the same UI over and over? Make NotReaper more like home
 
 
 <h1>How the heck do I use this thing</h1>
-https://www.youtube.com/watch?v=FNIHvo8Nsm4 Full tutorial here.
+https://www.youtube.com/watch?v=4MIahCZRkUg Full tutorial here.
 
-I ask myself that question everyday. For a comprehensive list of the default hotkeys, hit F1 in-game to pull up a neat page with words on it. Or, if you don't like in-game helpers, go [here](https://github.com/CircuitLord/NotReaper#controls) for a list of hotkeys.
+I ask myself that question everyday. For a comprehensive list of the default hotkeys, hit F1 in-game to pull up a neat page with words and animations on it.
 
 For help with using the tool itself, join the [Audica Modding Discord](https://discord.gg/cakQUt5)!
 
