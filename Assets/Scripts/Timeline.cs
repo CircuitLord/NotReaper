@@ -64,6 +64,8 @@ namespace NotReaper {
 		public static Transform gridNotesStatic;
 		public static Transform timelineNotesStatic;
 		[SerializeField] private Renderer timelineBG;
+		[SerializeField] private TextMeshProUGUI beatSnapWarningText;
+		
 		
 		public Slider musicVolumeSlider;
 		public Slider hitSoundVolumeSlider;
@@ -176,6 +178,9 @@ namespace NotReaper {
 					HandleCache.ClearCache();
 				}
 			});
+
+
+			beatSnapWarningText.DOFade(0f, 0f);
 		}
 
 
@@ -1342,11 +1347,22 @@ namespace NotReaper {
 		public void SetSnap(int newSnap) {
 			beatSnap = newSnap;
 		}
+
+		private bool isBeatSnapWarningActive = false;
 		public void BeatSnapChanged() {
 			string temp = beatSnapSelector.elements[beatSnapSelector.index];
 			int snap = 4;
 			int.TryParse(temp.Substring(2), out snap);
 			beatSnap = snap;
+
+			if (snap >= 32 && !isBeatSnapWarningActive) {
+				beatSnapWarningText.DOFade(1f, 0.5f);
+				isBeatSnapWarningActive = true;
+			}
+			else if (isBeatSnapWarningActive) {
+				beatSnapWarningText.DOFade(0f, 0.5f);
+				isBeatSnapWarningActive = false;
+			}
 		}
 
 		public int GetCurrentBPMIndex(QNT_Timestamp t) {
