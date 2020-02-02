@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NotReaper.Models;
@@ -25,11 +26,17 @@ namespace NotReaper.UI {
 
         public GameObject bookmarkPrefab;
 
+        private Camera _mainCamera;
+
         [HideInInspector] public GameObject[] bookmarks = new GameObject[10];
 
 
         [HideInInspector] public bool isMouseOver = false;
 
+
+        private void Start() {
+            _mainCamera = Camera.main;
+        }
 
         public void SetPercentagePlayed(double percent) {
             double x = barLength * percent;
@@ -58,7 +65,9 @@ namespace NotReaper.UI {
 
         float prevX = 0f;
         private void OnMouseDrag() {
-            var x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
+            var x = _mainCamera.ScreenToWorldPoint(Input.mousePosition).x;
+            
+            x -= _mainCamera.transform.position.x;
 
             if (x == prevX) {
                 return;
