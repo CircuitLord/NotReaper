@@ -422,10 +422,10 @@ namespace NotReaper {
 							particles.Play();
 
 							float panPos = (float) (note.data.x / 7.15);
-							if (note.data.handType == TargetHandType.Left) {
+							if (audicaFile.usesLeftSustain && note.data.handType == TargetHandType.Left) {
 								songPlayback.leftSustainVolume = sustainVolume;
 								songPlayback.leftSustain.pan = panPos;
-							} else if (note.data.handType == TargetHandType.Right) {
+							} else if (audicaFile.usesRightSustain && note.data.handType == TargetHandType.Right) {
 								songPlayback.rightSustainVolume = sustainVolume;
 								songPlayback.rightSustain.pan = panPos;
 							}
@@ -855,8 +855,8 @@ namespace NotReaper {
 
 			//Loads all the sounds.
 			StartCoroutine(GetAudioClip($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedMainSong}.ogg"));
-			StartCoroutine(LoadLeftSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg"));
-			StartCoroutine(LoadRightSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg"));
+			if (audicaFile.desc.sustainSongLeft != "") StartCoroutine(LoadLeftSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongLeft}.ogg"));
+			if (audicaFile.desc.sustainSongRight != "") StartCoroutine(LoadRightSustain($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedSustainSongRight}.ogg"));
 			StartCoroutine(LoadExtraAudio($"file://{Application.dataPath}/.cache/{audicaFile.desc.cachedFxSong}.ogg"));
 
 			//foreach (Cue cue in audicaFile.diffs.expert.cues) {
@@ -910,6 +910,7 @@ namespace NotReaper {
 				if (www.isNetworkError) {
 					Debug.Log(www.error);
 				} else {
+					audicaFile.usesLeftSustain = true;
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
 					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.LeftSustain);
 				}
@@ -922,6 +923,7 @@ namespace NotReaper {
 				if (www.isNetworkError) {
 					Debug.Log(www.error);
 				} else {
+					audicaFile.usesRightSustain = true;
 					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
 					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.RightSustain);
 				}
