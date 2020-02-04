@@ -59,7 +59,7 @@ namespace NotReaper {
 		[SerializeField] private NRDiscordPresence nrDiscordPresence;
 		[SerializeField] private DifficultyManager difficultyManager;
 		[SerializeField] public EditorToolkit Tools;
-		[SerializeField] private Transform timelineTransformParent;
+		[SerializeField] public Transform timelineTransformParent;
 		[SerializeField] private Transform gridTransformParent;
 		public static Transform gridNotesStatic;
 		public static Transform timelineNotesStatic;
@@ -757,6 +757,10 @@ namespace NotReaper {
 			inTimingMode = false;
 			SetOffset(new Relative_QNT(0));
 
+			if (audicaLoaded) {
+				miniTimeline.ClearBookmarks(false);
+			}
+			
 			if (audicaLoaded && NRSettings.config.saveOnLoadNew) {
 				Export();
 			}
@@ -870,7 +874,14 @@ namespace NotReaper {
 			generateAudicaButton.interactable = false;
 			loadAudioFileTiming.interactable = false;
 
-			
+			//Load bookmarks
+
+			if (audicaFile.desc.bookmarks != null) {
+				foreach (BookmarkData data in audicaFile.desc.bookmarks) {
+					miniTimeline.SetBookmark(data.xPosMini, data.xPosTop, data.type, true, false);
+				}
+				
+			}
 
 			//Loaded successfully
 

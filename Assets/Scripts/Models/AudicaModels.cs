@@ -4,6 +4,7 @@ using UnityEngine;
 using NAudio.Midi;
 using NotReaper.Targets;
 using NotReaper.Timing;
+using NotReaper.UI;
 
 namespace NotReaper.Models {
 	public struct TempoChange {
@@ -70,6 +71,7 @@ namespace NotReaper.Models {
 		public int offset = 0;
 		public double previewStartSeconds = 0.0d;
 		public List<TempoChange> tempoList;
+		public List<BookmarkData> bookmarks = new List<BookmarkData>();
 	}
 
 	public class SafeDesc {
