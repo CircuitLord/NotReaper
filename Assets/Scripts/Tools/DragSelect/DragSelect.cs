@@ -150,12 +150,7 @@ namespace NotReaper.Tools {
 			}
 
 			List<Target> newSelectedTargets = new List<Target>();
-			for(int i = timeline.FindFirstNoteAtTime(start); i != -1 && i < Timeline.orderedNotes.Count; ++i) {
-				Target target = Timeline.orderedNotes[i];
-				if(target.data.time >= end) {
-					break;
-				}
-
+			foreach(Target target in new NoteEnumerator(start, end)) {
 				if(target.IsTimelineInsideRect(selectionRect)) {
 					newSelectedTargets.Add(target);
 				}

@@ -392,9 +392,8 @@ namespace NotReaper.Timing {
 
 			float startTime = timeline.TimestampToSeconds(start);
 
-			var result = timeline.FindFirstNoteAtTime(start);
-			for(int i = result; i != -1 && i < Timeline.orderedNotes.Count; ++i) {
-				TargetData data = Timeline.orderedNotes[i].data;
+			foreach(Target t in new NoteEnumerator(start, end)) {
+				TargetData data = t.data;
 				if(data.time < start) {
 					continue;
 				}

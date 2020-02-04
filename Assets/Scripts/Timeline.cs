@@ -29,6 +29,85 @@ using SharpCompress.Archives.Zip;
 
 namespace NotReaper {
 
+	public class NoteEnumerator : IEnumerable<Target> {
+		public NoteEnumerator(QNT_Timestamp start, QNT_Timestamp end) {
+			this.start = start;
+			this.end = end;
+		}
+
+		public QNT_Timestamp start;
+		public QNT_Timestamp end;
+
+		public bool startInclusive = true;
+		public bool endInclusive = true;
+
+		public IEnumerator<Target> GetEnumerator() {
+			if(Timeline.orderedNotes.Count == 0) {
+				yield break;
+			}
+
+			var result = Timeline.BinarySearchOrderedNotes(start);
+			int index = result.index;
+
+			//Invalid index? No iteration
+			if(index >= Timeline.orderedNotes.Count) {
+				yield break;
+			}
+
+			//We didn't find an exact result, so search for the nearest
+			if(!result.found) {
+
+				//Go back until we find a note with a time less then the start
+				while(index >= 0) {
+					QNT_Timestamp time = Timeline.orderedNotes[index].data.time;
+					if(time < start) {
+						break;
+					}
+
+					--index;
+				}
+
+				if(index < 0) {
+					index = 0;
+				}
+
+				//Increment up to and including start
+				while(Timeline.orderedNotes[index].data.time < start) {
+					++index;
+				}
+			}
+
+			//Invalid index? No iteration
+			if(index >= Timeline.orderedNotes.Count) {
+				yield break;
+			}
+
+			//If we are not inclusive to starting time, then move up until we get a time after the start
+			if(!startInclusive) {
+				while(Timeline.orderedNotes[index].data.time <= start) {
+					++index;
+				}
+			}
+
+			//Iterate over the valid notes
+			for(int i = index; i < Timeline.orderedNotes.Count; ++i) {
+				if(Timeline.orderedNotes[i].data.time > end) {
+					yield break;
+				}
+				
+				if(!endInclusive && Timeline.orderedNotes[i].data.time == end) {
+					yield break;
+				}
+
+				yield return Timeline.orderedNotes[i];
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			throw new NotImplementedException();
+		}
+	}
+
 
 	public class Timeline : MonoBehaviour {
 
@@ -967,30 +1046,6 @@ namespace NotReaper {
 			SetPlaybackSpeed(slider.value);
 		}
 
-		public int FindFirstNoteAtTime(QNT_Timestamp time) {
-			var result = BinarySearchOrderedNotes(time);
-			if(result.found) {
-				return result.index;
-			}
-
-			for(int i = result.index; i > 0 && i < orderedNotes.Count; --i) {
-				if(orderedNotes[i].data.time < time) {
-					return i + 1;
-				}
-			}
-
-			if(result.index >= orderedNotes.Count) {
-				return orderedNotes.Count - 1;
-			}
-
-			//If we get the first note, and it's later than time, we didn't find a note
-			if(orderedNotes.Count == 0) {
-				return -1;
-			}
-
-			return 0;
-		}
-
 		struct UpdateTiming {
 			public TargetData data;
 			public QNT_Timestamp newTime;
@@ -1028,13 +1083,12 @@ namespace NotReaper {
 					endTime = tempoChanges[fixup.tempoId + 1].time;
 				}
 
-				for(int i = FindFirstNoteAtTime(change.time); i != -1 && i < orderedNotes.Count; ++i) {
-					if(orderedNotes[i].data.time >= endTime) {
-						break;
-					}
+				var enumerator = new NoteEnumerator(change.time, endTime);
+				enumerator.endInclusive = false;
 
+				foreach(Target target in enumerator) {
 					UpdateTiming t;
-					t.data = orderedNotes[i].data;
+					t.data = target.data;
 					t.newTime = t.data.time + changeOffset;
 					updateTimings.Add(t);
 				}
@@ -1072,16 +1126,15 @@ namespace NotReaper {
 			}
 
 			//Recalc all notes in the zone
-			for(int i = FindFirstNoteAtTime(recalcStart); i != -1 && i < orderedNotes.Count; ++i) {
-				if(orderedNotes[i].data.time >= recalcEnd) {
-					break;
-				}
+			var enumerator = new NoteEnumerator(recalcStart, recalcEnd);
+			enumerator.endInclusive = false;
 
-				QNT_Duration tempoTimeDifference = new QNT_Duration(orderedNotes[i].data.time.tick - recalcStart.tick);
+			foreach(Target target in enumerator) {
+				QNT_Duration tempoTimeDifference = new QNT_Duration(target.data.time.tick - recalcStart.tick);
 				QNT_Duration duration_from_start = new QNT_Duration((UInt64)(tempoTimeDifference.tick * p));
 
 				UpdateTiming t;
-				t.data = orderedNotes[i].data;
+				t.data = target.data;
 				t.newTime = recalcStart + duration_from_start;
 				updateTimings.Add(t);
 			}
@@ -1128,13 +1181,12 @@ namespace NotReaper {
 			}
 
 			//Update the notes in the recalc area
-			for(int i = FindFirstNoteAtTime(recalcStart); i != -1 && i < orderedNotes.Count; ++i) {
-				if(orderedNotes[i].data.time >= recalcEnd) {
-					break;
-				}
+			var enumerator = new NoteEnumerator(recalcStart, recalcEnd);
+			enumerator.endInclusive = false;
 
+			foreach(Target target in enumerator) {
 				UpdateTiming t;
-				t.data = orderedNotes[i].data;
+				t.data = target.data;
 				t.newTime = t.data.time + offset;
 				updateTimings.Add(t);
 			}
@@ -1589,14 +1641,10 @@ namespace NotReaper {
 			List<Target> newLoadedNotes = new List<Target>();
 			QNT_Timestamp loadStart = Timeline.time - Relative_QNT.FromBeatTime(10.0f);
 			QNT_Timestamp loadEnd = Timeline.time + Relative_QNT.FromBeatTime(10.0f);
-			for(int i = FindFirstNoteAtTime(loadStart); i != -1 && i < orderedNotes.Count; ++i) {
-				Target t = orderedNotes[i];
-				if(t.data.time > loadEnd) {
-					break;
-				}
+			
+			foreach(Target t in new NoteEnumerator(loadStart, loadEnd)) {
 				newLoadedNotes.Add(t);
 			}
-
 			loadedNotes = newLoadedNotes;
 
 			if(startTime != time) {
@@ -1609,12 +1657,7 @@ namespace NotReaper {
 					end = temp;
 				}
 
-				for(int i = FindFirstNoteAtTime(start); i != -1 && i < orderedNotes.Count; ++i) {
-					Target t = orderedNotes[i];
-					if(t.data.time > end || start > t.data.time) {
-						break;
-					}
-
+				foreach(Target t in new NoteEnumerator(start, end)) {
 					t.OnNoteHit();
 				}
 			}
