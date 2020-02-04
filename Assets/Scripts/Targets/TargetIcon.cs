@@ -51,6 +51,8 @@ namespace NotReaper.Targets {
 
         public GameObject sustainButtons;
 
+        public Transform holdEndTrans;
+
         /// <summary>
         /// For when the note is right clicked on.
         /// </summary>

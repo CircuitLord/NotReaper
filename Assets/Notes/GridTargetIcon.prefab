@@ -2136,6 +2136,7 @@ MonoBehaviour:
   location: 0
   holdParticles: {fileID: 6070676427362410163}
   sustainButtons: {fileID: 8241085319949938974}
+  holdEndTrans: {fileID: 0}
 --- !u!1 &4440669226093902584
 GameObject:
   m_ObjectHideFlags: 0
@@ -8137,8 +8138,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.01, y: 0.01, z: 1}
   m_Children:
-  - {fileID: 3108100515956081301}
-  - {fileID: 2329442176385235801}
+  - {fileID: 2898566248224154114}
+  - {fileID: 2542318307303889870}
   m_Father: {fileID: 5012048490355646076}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -8929,7 +8930,7 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
---- !u!224 &2329442176385235801 stripped
+--- !u!224 &2542318307303889870 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
     type: 3}
@@ -9095,7 +9096,7 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8103067a880c7b7409a24decfafc5617, type: 3}
---- !u!224 &3108100515956081301 stripped
+--- !u!224 &2898566248224154114 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224043458205264114, guid: 8103067a880c7b7409a24decfafc5617,
     type: 3}

@@ -301,8 +301,53 @@ namespace NotReaper.Targets {
 			if (noteIsAnimating) return;
 			noteIsAnimating = true;
 
-			Timeline.instance.StartCoroutine(AnimateNoteBounce());
 
+			if (data.behavior == TargetBehavior.Hold) {
+				Timeline.instance.StartCoroutine(AnimateHoldSpin());
+			}
+			else {
+				
+				Timeline.instance.StartCoroutine(AnimateNoteBounce());
+			}
+			
+
+		}
+
+		private IEnumerator AnimateHoldSpin() {
+
+			if (Timeline.instance.paused) yield break;
+			
+			noteIsAnimating = true;
+
+
+			float time = (float)(data.beatLength.tick * (60 / (Timeline.instance.GetBpmFromTime(data.time) * 480)));
+
+			time /= Timeline.instance.playbackSpeed;
+
+			//float time = (float)(data.beatLength.tick / (480f * Timeline.instance.GetBpmFromTime(data.time)));
+			
+			float extensionTime = (float)(745 * (60 / (Timeline.instance.GetBpmFromTime(data.time + data.beatLength) * 480)));
+
+			extensionTime /= Timeline.instance.playbackSpeed;
+
+
+			gridTargetIcon.transform.DOLocalRotate(new Vector3(0.0f, 0.0f, 1080), time + extensionTime).SetRelative().SetEase(Ease.InSine);
+			gridTargetIcon.transform.DOScale(0.8f, time + extensionTime).SetEase(Ease.Linear);
+
+			gridTargetIcon.holdEndTrans.DOLocalRotate(new Vector3(0.0f, 0.0f, 1080), time + extensionTime).SetRelative().SetEase(Ease.InSine);
+			gridTargetIcon.holdEndTrans.DOScale(0.8f, time + extensionTime).SetEase(Ease.Linear);
+			
+			yield return new WaitForSeconds(time + extensionTime);
+
+			if (gridTargetIcon != null) {
+				gridTargetIcon.transform.DOScale(Vector3.one, 0.1f).SetEase(Ease.InOutCubic);
+				gridTargetIcon.holdEndTrans.DOScale(Vector3.one, 0.1f).SetEase(Ease.InOutCubic);
+			}
+
+
+			noteIsAnimating = false;
+			yield break;
+			//yield return new WaitForSeconds();
 		}
 
 		private IEnumerator AnimateNoteBounce() {
