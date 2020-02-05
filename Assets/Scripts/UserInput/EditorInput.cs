@@ -501,7 +501,9 @@ namespace NotReaper.UserInput {
 			}
 			if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl)) {
 				Tools.dragSelect.EndAllDragStuff();
-				RevertTool();
+				if(selectedTool == EditorTool.DragSelect) {
+					RevertTool();
+				}
 				SelectSnappingMode(previousSnappingMode);
 			}
 			

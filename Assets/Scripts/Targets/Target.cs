@@ -241,17 +241,58 @@ namespace NotReaper.Targets {
 
 		private void OnBehaviorChanged(TargetBehavior oldBehavior, TargetBehavior newBehavior) {
 			if (data.supportsBeatLength) {
-				var gridHoldTargetManager = gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
 
-				gridHoldTargetManager.sustainLength = data.beatLength;
-				gridHoldTargetManager.LoadSustainController();
+				if(!TargetData.BehaviorSupportsBeatLength(oldBehavior)) {
+					var gridHoldTargetManager = gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
 
-				gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength;
+					gridHoldTargetManager.sustainLength = data.beatLength;
+					gridHoldTargetManager.LoadSustainController();
+
+					gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength;
+				}
+
+				if(data.beatLength < Constants.QuarterNoteDuration) {
+					data.beatLength = Constants.QuarterNoteDuration;
+				}
 
 				gridTargetIcon.UpdatePath();
 			}
 			else {
 				DisableSustainButtons();
+
+				if(TargetData.BehaviorSupportsBeatLength(oldBehavior)) {
+					var gridHoldTargetManager = gridTargetIcon.GetComponentInChildren<HoldTargetManager>(true);
+					if(gridHoldTargetManager != null) {
+						gridHoldTargetManager.UnloadSustainController();
+						gridHoldTargetManager.OnTryChangeSustainEvent -= MakeTimelineUpdateSustainLength;
+					}
+				}
+			}
+
+			//Update hitsound
+			if(data.behavior == TargetBehavior.ChainStart) {
+				data.velocity = TargetVelocity.ChainStart;
+			}
+			else if(data.behavior == TargetBehavior.Chain) {
+				data.velocity = TargetVelocity.Chain;
+			}
+			else if(data.behavior == TargetBehavior.Melee) {
+				data.velocity = TargetVelocity.Melee;
+				data.handType = TargetHandType.Either;
+			}
+			else if(data.behavior == TargetBehavior.Mine) {
+				data.velocity = TargetVelocity.Mine;
+			}
+			else if(data.behavior == TargetBehavior.Standard ||
+					data.behavior == TargetBehavior.Hold ||
+					data.behavior == TargetBehavior.Horizontal ||
+					data.behavior == TargetBehavior.Vertical) {
+				data.velocity = TargetVelocity.Standard;
+			}
+
+			//Fixup hand type when coming from melee
+			if(oldBehavior == TargetBehavior.Melee) {
+				data.handType = TargetHandType.Left;
 			}
 
 			if(data.behavior == TargetBehavior.NR_Pathbuilder) {

@@ -266,6 +266,34 @@ namespace NotReaper.Tools {
 		}
 	}
 
+	public class NRActionSetTargetBehavior : NRAction {
+		public List<TargetData> affectedTargets = new List<TargetData>();
+		public TargetBehavior newBehavior;
+		
+		List<TargetBehavior> oldBehavior = new List<TargetBehavior>();
+		List<TargetHandType> oldHandTypes = new List<TargetHandType>();
+		List<TargetVelocity> oldVelocities = new List<TargetVelocity>();
+
+		public override void DoAction(Timeline timeline) {
+			oldBehavior = new List<TargetBehavior>();
+
+			affectedTargets.ForEach(targetData => {
+				oldBehavior.Add(targetData.behavior);
+				oldHandTypes.Add(targetData.handType);
+				oldVelocities.Add(targetData.velocity);
+
+				targetData.behavior = newBehavior;
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			for(int i = 0; i < affectedTargets.Count; ++i) {
+				affectedTargets[i].behavior = oldBehavior[i];
+				affectedTargets[i].handType = oldHandTypes[i];
+				affectedTargets[i].velocity = oldVelocities[i];
+			}
+		}
+	}
+
 	public class NRActionConvertNoteToPathbuilder : NRAction {
 		public TargetData data;
 		public QNT_Duration oldBeatLength;

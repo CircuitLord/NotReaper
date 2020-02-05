@@ -48,6 +48,9 @@ namespace NotReaper.Tools {
 		private bool frameIntentSetHitSoundChain = false;
 		private bool frameIntentSetHitSoundMelee = false;
 
+		//Change note behavior
+		private TargetBehavior frameIntentSetBehavior = TargetBehavior.None;
+
 		private bool hasInputDragMovedOutOfClickBounds = false;
 		private bool dragStarted = false;
 
@@ -335,6 +338,16 @@ namespace NotReaper.Tools {
 			timeline.SetTargetHitsounds(targetSetHitsoundIntents);
 		}
 
+		private void SetBehaviorAction(TargetBehavior behavior) {
+			NRActionSetTargetBehavior setBehaviorAction = new NRActionSetTargetBehavior();
+			setBehaviorAction.newBehavior = behavior;
+			timeline.selectedNotes.ForEach(target => {
+				setBehaviorAction.affectedTargets.Add(target.data);
+			});
+
+			timeline.SetTargetBehaviors(setBehaviorAction);
+		}
+
 		// Capture raw input and set the state of frame intents 
 		private void CaptureInput() {
 			// TODO: Move these intents to a new input manager
@@ -354,6 +367,7 @@ namespace NotReaper.Tools {
 			frameIntentSwapColors = false;
 			frameIntentFlipTargetsHorizontally = false;
 			frameIntentFlipTargetsVertically = false;
+			frameIntentSetBehavior = TargetBehavior.None;
 
 			// Keyboard input
 			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) primaryModifierHeld = true;
@@ -366,6 +380,31 @@ namespace NotReaper.Tools {
 				frameIntentCopy = Input.GetKeyDown(KeyCode.C);
 				frameIntentPaste = Input.GetKeyDown(KeyCode.V);
 				frameIntentDeselectAll = Input.GetKeyDown(KeyCode.D);
+
+				if(Input.GetKeyDown(InputManager.selectStandard)) {
+					frameIntentSetBehavior = TargetBehavior.Standard;
+				}
+				else if(Input.GetKeyDown(InputManager.selectChainNode)) {
+					frameIntentSetBehavior = TargetBehavior.Chain;
+				}
+				else if(Input.GetKeyDown(InputManager.selectChainStart)) {
+					frameIntentSetBehavior = TargetBehavior.ChainStart;
+				}
+				else if(Input.GetKeyDown(InputManager.selectHold)) {
+					frameIntentSetBehavior = TargetBehavior.Hold;
+				}
+				else if(Input.GetKeyDown(InputManager.selectHorz)) {
+					frameIntentSetBehavior = TargetBehavior.Horizontal;
+				}
+				else if(Input.GetKeyDown(InputManager.selectMelee)) {
+					frameIntentSetBehavior = TargetBehavior.Melee;
+				}
+				else if(Input.GetKeyDown(InputManager.selectMine)) {
+					frameIntentSetBehavior = TargetBehavior.Mine;
+				}
+				else if(Input.GetKeyDown(InputManager.selectVert)) {
+					frameIntentSetBehavior = TargetBehavior.Vertical;
+				}
 			}
 			else if (secondaryModifierHeld) {
 				frameIntentFlipTargetsVertically = Input.GetKeyDown(KeyCode.F);
@@ -452,6 +491,10 @@ namespace NotReaper.Tools {
 			if (frameIntentSetHitSoundChain) SetHitsoundAction(TargetVelocity.Chain);
 			if (frameIntentSetHitSoundChainStart) SetHitsoundAction(TargetVelocity.ChainStart);
 			if (frameIntentSetHitSoundMelee) SetHitsoundAction(TargetVelocity.Melee);
+
+			if(frameIntentSetBehavior != TargetBehavior.None) {
+				SetBehaviorAction(frameIntentSetBehavior);
+			}
 
 			/** Cut Copy Paste Delete **/
 			if (frameIntentCut) {

@@ -47,6 +47,16 @@ namespace NotReaper.Targets {
             }
         }
 
+        public void UnloadSustainController() {
+            if(endMarker != null) {
+                Destroy(endMarker);
+            }
+
+            if(endMarkerTl != null) {
+                Destroy(endMarkerTl);
+            }
+        }
+
 
         public void ApplyNewLineScale() {
 

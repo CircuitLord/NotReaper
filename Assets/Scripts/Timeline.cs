@@ -676,7 +676,11 @@ namespace NotReaper {
 			var action = new NRActionSetTargetHitsound();
 			action.targetSetHitsoundIntents = intents.Select(intent => new TargetSetHitsoundIntent(intent)).ToList();
 			Tools.undoRedoManager.AddAction(action);
-	}
+		}
+
+		public void SetTargetBehaviors(NRActionSetTargetBehavior action) {
+			Tools.undoRedoManager.AddAction(action);
+		}
 
 		public void DeleteTarget(Target target) {
 			var action = new NRActionRemoveNote();
