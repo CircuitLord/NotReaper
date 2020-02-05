@@ -297,7 +297,7 @@ namespace NotReaper {
 
 			int min = 0;
 			int max = orderedNotes.Count - 1;
-				while (min <=max) {
+			while (min <= max) {
 				int mid = (min + max) / 2;
 				QNT_Timestamp midCueTime = orderedNotes[mid].data.time;
 				if (cueTime == midCueTime) {
