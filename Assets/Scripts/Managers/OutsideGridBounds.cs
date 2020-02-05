@@ -24,7 +24,7 @@ namespace NotReaper.Managers
 
 		public float fadeSpeed = 0.3f;
 		private float xModifier = 8.8f;
-		private float yModifier = 2.7f;
+		private float yModifier = 3.6f;
 
 		private List<MeshRenderer> gridOutlineLines = new List<MeshRenderer>();
 
