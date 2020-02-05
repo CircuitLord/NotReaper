@@ -62,12 +62,43 @@ namespace NotReaper.UI {
 
         public void OnPlaceNote() {
 
-            if (!NRSettings.config.bounceOnPlaceNote) return;
+            if (!NRSettings.config.useBouncyAnimations) return;
             
             DOTween.To((float scale) => {
                 bgImage.localScale = new Vector3(scale, scale, 1f);
-            }, 0.99f, 1f, 0.3f).SetEase(Ease.OutCubic);
+            }, 0.98f, 1f, 0.3f).SetEase(Ease.OutCubic);
         }
+
+        public void OnMeleeHit(float x) {
+            
+            if (!NRSettings.config.useBouncyAnimations) return;
+            
+            if (x > 0) {
+                bgImage.transform.localPosition = new Vector3(-9f, bgImage.transform.localPosition.y, bgImage.transform.localPosition.z);
+            }
+            else {
+                bgImage.transform.localPosition = new Vector3(9f, bgImage.transform.localPosition.y, bgImage.transform.localPosition.z);
+            }
+            
+            DOTween.To((float scale) => {
+                bgImage.localScale = new Vector3(scale, scale, 1f);
+            }, 0.95f, 1f, 0.2f).SetEase(Ease.OutCubic);
+
+            bgImage.DOLocalMoveX(0f, 0.2f).SetEase(Ease.OutCubic);
+
+        }
+
+        /*public IEnumerator OnSustainHit(float time) {
+            
+            DOTween.To((float scale) => {
+                bgImage.localScale = new Vector3(scale, scale, 1f);
+            }, 1f, 1.2f, time).SetEase(Ease.Linear);
+            
+            yield return new WaitForSeconds(time);
+
+            bgImage.DOScale(1f, 0.3f).SetEase(Ease.InOutCubic);
+
+        }*/
 
     }
 

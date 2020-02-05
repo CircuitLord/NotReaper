@@ -6,6 +6,7 @@ using NotReaper.Tools.ChainBuilder;
 using NotReaper.Timing;
 using DG.Tweening;
 using System.Collections.Generic;
+using NotReaper.UI;
 
 namespace NotReaper.Targets {
 
@@ -298,8 +299,16 @@ namespace NotReaper.Targets {
 
 		public void OnNoteHit() {
 
+			if (Timeline.instance.paused) return;
+			
 			if (noteIsAnimating) return;
 			noteIsAnimating = true;
+
+
+			if (data.behavior == TargetBehavior.Melee) {
+				
+				if (ParallaxBG.I != null) ParallaxBG.I.OnMeleeHit(data.x);
+			}
 
 
 			if (data.behavior == TargetBehavior.Hold) {
@@ -315,11 +324,6 @@ namespace NotReaper.Targets {
 
 		private IEnumerator AnimateHoldSpin() {
 
-			if (Timeline.instance.paused) yield break;
-			
-			noteIsAnimating = true;
-
-
 			float time = (float)(data.beatLength.tick * (60 / (Timeline.instance.GetBpmFromTime(data.time) * 480)));
 
 			time /= Timeline.instance.playbackSpeed;
@@ -332,10 +336,10 @@ namespace NotReaper.Targets {
 
 
 			gridTargetIcon.transform.DOLocalRotate(new Vector3(0.0f, 0.0f, 1080), time + extensionTime).SetRelative().SetEase(Ease.InSine);
-			gridTargetIcon.transform.DOScale(0.8f, time + extensionTime).SetEase(Ease.Linear);
+			gridTargetIcon.transform.DOScale(0.75f, time + extensionTime).SetEase(Ease.Linear);
 
 			gridTargetIcon.holdEndTrans.DOLocalRotate(new Vector3(0.0f, 0.0f, 1080), time + extensionTime).SetRelative().SetEase(Ease.InSine);
-			gridTargetIcon.holdEndTrans.DOScale(0.8f, time + extensionTime).SetEase(Ease.Linear);
+			gridTargetIcon.holdEndTrans.DOScale(0.75f, time + extensionTime).SetEase(Ease.Linear);
 			
 			yield return new WaitForSeconds(time + extensionTime);
 
