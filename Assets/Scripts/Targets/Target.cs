@@ -269,32 +269,6 @@ namespace NotReaper.Targets {
 				}
 			}
 
-			//Update hitsound
-			if(data.behavior == TargetBehavior.ChainStart) {
-				data.velocity = TargetVelocity.ChainStart;
-			}
-			else if(data.behavior == TargetBehavior.Chain) {
-				data.velocity = TargetVelocity.Chain;
-			}
-			else if(data.behavior == TargetBehavior.Melee) {
-				data.velocity = TargetVelocity.Melee;
-				data.handType = TargetHandType.Either;
-			}
-			else if(data.behavior == TargetBehavior.Mine) {
-				data.velocity = TargetVelocity.Mine;
-			}
-			else if(data.behavior == TargetBehavior.Standard ||
-					data.behavior == TargetBehavior.Hold ||
-					data.behavior == TargetBehavior.Horizontal ||
-					data.behavior == TargetBehavior.Vertical) {
-				data.velocity = TargetVelocity.Standard;
-			}
-
-			//Fixup hand type when coming from melee
-			if(oldBehavior == TargetBehavior.Melee) {
-				data.handType = TargetHandType.Left;
-			}
-
 			if(data.behavior == TargetBehavior.NR_Pathbuilder) {
 				data.pathBuilderData.InitialAngleChangedEvent += UpdatePathInitialAngle;
 				data.pathBuilderData.RecalculateEvent += RecalculatePathbuilderData;

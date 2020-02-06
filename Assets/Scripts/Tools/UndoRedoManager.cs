@@ -278,18 +278,80 @@ namespace NotReaper.Tools {
 			oldBehavior = new List<TargetBehavior>();
 
 			affectedTargets.ForEach(targetData => {
-				oldBehavior.Add(targetData.behavior);
-				oldHandTypes.Add(targetData.handType);
-				oldVelocities.Add(targetData.velocity);
+				TargetVelocity velocity = TargetVelocity.None;
 
-				targetData.behavior = newBehavior;
+				if(newBehavior == TargetBehavior.ChainStart) {
+					velocity = TargetVelocity.ChainStart;
+				}
+				else if(newBehavior == TargetBehavior.Chain) {
+					velocity = TargetVelocity.Chain;
+				}
+				else if(newBehavior == TargetBehavior.Melee) {
+					velocity = TargetVelocity.Melee;
+				}
+				else if(newBehavior == TargetBehavior.Mine) {
+					velocity = TargetVelocity.Mine;
+				}
+				else if(newBehavior == TargetBehavior.Standard ||
+						newBehavior == TargetBehavior.Hold ||
+						newBehavior == TargetBehavior.Horizontal ||
+						newBehavior == TargetBehavior.Vertical) {
+					velocity = TargetVelocity.Standard;
+				}
+
+				if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+					oldBehavior.Add(targetData.pathBuilderData.behavior);
+					oldHandTypes.Add(targetData.pathBuilderData.handType);
+					oldVelocities.Add(targetData.pathBuilderData.velocity);
+					
+					targetData.pathBuilderData.behavior = newBehavior;
+					if(velocity != TargetVelocity.None) targetData.pathBuilderData.velocity = velocity;
+
+					//Fix hand type when going to melee
+					if(newBehavior == TargetBehavior.Melee) {
+						targetData.pathBuilderData.handType = TargetHandType.Either;
+					}
+
+					//Fixup hand type when coming from melee
+					if(oldBehavior.Last() == TargetBehavior.Melee) {
+						targetData.pathBuilderData.handType = targetData.handType;
+					}
+
+					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+				}
+				else {
+					oldBehavior.Add(targetData.behavior);
+					oldHandTypes.Add(targetData.handType);
+					oldVelocities.Add(targetData.velocity);
+
+					targetData.behavior = newBehavior;
+					if(velocity != TargetVelocity.None) targetData.velocity = velocity;
+
+					//Fix hand type when going to melee
+					if(newBehavior == TargetBehavior.Melee) {
+						targetData.handType = TargetHandType.Either;
+					}
+
+					//Fixup hand type when coming from melee
+					if(oldBehavior.Last() == TargetBehavior.Melee) {
+						targetData.handType = TargetHandType.Left;
+					}
+				}
 			});
 		}
 		public override void UndoAction(Timeline timeline) {
 			for(int i = 0; i < affectedTargets.Count; ++i) {
-				affectedTargets[i].behavior = oldBehavior[i];
-				affectedTargets[i].handType = oldHandTypes[i];
-				affectedTargets[i].velocity = oldVelocities[i];
+				if(affectedTargets[i].behavior == TargetBehavior.NR_Pathbuilder) {
+					affectedTargets[i].pathBuilderData.behavior = oldBehavior[i];
+					affectedTargets[i].pathBuilderData.velocity = oldVelocities[i];
+					affectedTargets[i].pathBuilderData.handType = oldHandTypes[i];
+				}
+				else {
+					affectedTargets[i].behavior = oldBehavior[i];
+					affectedTargets[i].handType = oldHandTypes[i];
+					affectedTargets[i].velocity = oldVelocities[i];
+				}
+
 			}
 		}
 	}
