@@ -273,6 +273,7 @@ namespace NotReaper.Tools {
 		List<TargetBehavior> oldBehavior = new List<TargetBehavior>();
 		List<TargetHandType> oldHandTypes = new List<TargetHandType>();
 		List<TargetVelocity> oldVelocities = new List<TargetVelocity>();
+		List<QNT_Duration> oldBeatLength = new List<QNT_Duration>();
 
 		public override void DoAction(Timeline timeline) {
 			oldBehavior = new List<TargetBehavior>();
@@ -298,6 +299,9 @@ namespace NotReaper.Tools {
 						newBehavior == TargetBehavior.Vertical) {
 					velocity = TargetVelocity.Standard;
 				}
+
+				//Path notes and regular notes both use the same beat length
+				oldBeatLength.Add(targetData.beatLength);
 
 				if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
 					oldBehavior.Add(targetData.pathBuilderData.behavior);
@@ -336,6 +340,10 @@ namespace NotReaper.Tools {
 					if(oldBehavior.Last() == TargetBehavior.Melee) {
 						targetData.handType = TargetHandType.Left;
 					}
+					
+					if(TargetData.BehaviorSupportsBeatLength(newBehavior) && targetData.beatLength < Constants.QuarterNoteDuration) {
+						targetData.beatLength = Constants.QuarterNoteDuration;
+					}
 				}
 			});
 		}
@@ -352,6 +360,7 @@ namespace NotReaper.Tools {
 					affectedTargets[i].velocity = oldVelocities[i];
 				}
 
+				affectedTargets[i].beatLength = oldBeatLength[i];
 			}
 		}
 	}

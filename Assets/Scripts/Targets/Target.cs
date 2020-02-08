@@ -251,10 +251,6 @@ namespace NotReaper.Targets {
 					gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength;
 				}
 
-				if(data.beatLength < Constants.QuarterNoteDuration) {
-					data.beatLength = Constants.QuarterNoteDuration;
-				}
-
 				gridTargetIcon.UpdatePath();
 			}
 			else {
