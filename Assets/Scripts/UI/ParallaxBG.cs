@@ -74,17 +74,17 @@ namespace NotReaper.UI {
             if (!NRSettings.config.useBouncyAnimations) return;
             
             if (x > 0) {
-                bgImage.transform.localPosition = new Vector3(-9f, bgImage.transform.localPosition.y, bgImage.transform.localPosition.z);
+                bgImage.transform.localPosition = new Vector3(-4f, bgImage.transform.localPosition.y, bgImage.transform.localPosition.z);
             }
             else {
-                bgImage.transform.localPosition = new Vector3(9f, bgImage.transform.localPosition.y, bgImage.transform.localPosition.z);
+                bgImage.transform.localPosition = new Vector3(4f, bgImage.transform.localPosition.y, bgImage.transform.localPosition.z);
             }
             
             DOTween.To((float scale) => {
                 bgImage.localScale = new Vector3(scale, scale, 1f);
-            }, 0.95f, 1f, 0.2f).SetEase(Ease.OutCubic);
+            }, 0.97f, 1f, 0.35f).SetEase(Ease.OutCubic);
 
-            bgImage.DOLocalMoveX(0f, 0.2f).SetEase(Ease.OutCubic);
+            bgImage.DOLocalMoveX(0f, 0.35f).SetEase(Ease.OutCubic);
 
         }
 
