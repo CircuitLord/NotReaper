@@ -35430,6 +35430,7 @@ MonoBehaviour:
   meleeGrid: {fileID: 581584942}
   editorMode: {fileID: 956048723}
   bgImage: {fileID: 1478235772}
+  normalGridDisabledColor: {r: 0.10502351, g: 0.94509804, b: 0.10196078, a: 1}
 --- !u!114 &1258393252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62798,6 +62799,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702433884980903792, guid: d73cf6f5fb0536e45b90dad1e2601dab,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702433884980903792, guid: d73cf6f5fb0536e45b90dad1e2601dab,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702433884980903792, guid: d73cf6f5fb0536e45b90dad1e2601dab,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d73cf6f5fb0536e45b90dad1e2601dab, type: 3}
