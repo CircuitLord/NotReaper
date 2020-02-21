@@ -71,6 +71,8 @@ namespace NotReaper.UserInput {
 
 		public Image bgImage;
 
+		public Color normalGridDisabledColor;
+
 		bool isCTRLDown;
 		bool isShiftDown;
 
@@ -155,12 +157,18 @@ namespace NotReaper.UserInput {
 			switch (mode) {
 				case SnappingMode.Grid:
 					normalGrid.SetActive(true);
+
+					normalGrid.GetComponent<SpriteRenderer>().color = Color.white;
+					
 					noGrid.SetActive(false);
 					meleeGrid.SetActive(false);
 					break;
 				case SnappingMode.None:
-					normalGrid.SetActive(false);
-					noGrid.SetActive(true);
+					normalGrid.SetActive(true);
+					normalGrid.GetComponent<SpriteRenderer>().color = normalGridDisabledColor;
+					
+					
+					noGrid.SetActive(false);
 					meleeGrid.SetActive(false);
 					break;
 				case SnappingMode.Melee:
