@@ -1,7 +1,7 @@
 {
-    "latestVersion" : "1.3.9",
+    "latestVersion" : "1.3.10",
     "downloadLink" : "https://github.com/CircuitLord/NotReaper/raw/master/updateOnly.zip",
-    "changelog" : "1.3.9 HOTFIX: Path builder fixes.\n1.3.8: fixed (Mettra) added note swapping, works the same as hitsound swapping.\n(Circuit) Tweaked melee hit animation.\nBugfixes.",
+    "changelog" : "As requested by Cin ;)\nThe grid no longer hides when disabled, and stays so you can line stuff up better.",
     "forced" : false
 
 
