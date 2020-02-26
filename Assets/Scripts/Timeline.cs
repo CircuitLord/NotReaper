@@ -115,13 +115,15 @@ namespace NotReaper {
 					while(endIndex < Timeline.orderedNotes.Count && Timeline.orderedNotes[endIndex].data.time <= end) {
 						++endIndex;
 					}
+
+					--endIndex;
 				}
 
 				if(endIndex >= Timeline.orderedNotes.Count) {
 					endIndex = Timeline.orderedNotes.Count - 1;
 				}
 
-				for(int i = endIndex; i > index; --i) {
+				for(int i = endIndex; i >= index; --i) {
 					yield return Timeline.orderedNotes[i];
 				}
 			}
@@ -232,7 +234,11 @@ namespace NotReaper {
 		private AudioWaveformVisualizer waveformVisualizer;
 		
 		public bool areNotesSelected => selectedNotes.Count > 0;
-		
+
+
+		[SerializeField] public LineRenderer leftHandTraceLine; 
+		[SerializeField] public LineRenderer rightHandTraceLine; 
+		[SerializeField] public LineRenderer dualNoteTraceLine; 
 
 		//Tools
 		private void Start() {
@@ -749,7 +755,7 @@ namespace NotReaper {
 			Tools.undoRedoManager.ClearActions();
 			tempoChanges.Clear();
 		}
-		
+
 		public void Export()
 		{
 
@@ -1687,6 +1693,138 @@ namespace NotReaper {
 
 				foreach(Target t in new NoteEnumerator(start, end)) {
 					t.OnNoteHit();
+				}
+			}
+
+
+			//Update trace lines
+			UpdateTraceLine(leftHandTraceLine, TargetHandType.Left, NRSettings.config.leftColor);
+			UpdateTraceLine(rightHandTraceLine, TargetHandType.Right, NRSettings.config.rightColor);
+
+			dualNoteTraceLine.enabled = false;
+			var backIt = new NoteEnumerator(Timeline.time, Timeline.time + Relative_QNT.FromBeatTime(1.7f));
+			Target lastTarget = null;
+			foreach(Target t in backIt) {
+				if(lastTarget != null && 
+					t.data.behavior != TargetBehavior.Chain && lastTarget.data.behavior != TargetBehavior.Chain &&
+					t.data.handType != TargetHandType.Either && t.data.handType != TargetHandType.None && 
+					lastTarget.data.handType != TargetHandType.Either && lastTarget.data.handType != TargetHandType.None
+					) {
+					TargetHandType expected = TargetHandType.Left;
+					if(lastTarget.data.handType == expected) {
+						expected = TargetHandType.Right;
+					}
+
+					if(t.data.time == lastTarget.data.time && t.data.handType == expected) {
+						dualNoteTraceLine.enabled = true;
+
+						float distPercent = 1.0f - ((t.data.time - Timeline.time).ToBeatTime() / 1.7f);
+
+						Vector2 leftPos = t.data.position;
+						Vector2 rightPos = lastTarget.data.position;
+						if(t.data.handType == TargetHandType.Right) {
+							Vector2 temp = rightPos;
+							rightPos = leftPos;
+							leftPos = temp;
+						}
+
+						Vector3[] positions = new Vector3[2];
+						positions[0] = new Vector3(leftPos.x, leftPos.y, 0.0f);
+						positions[1] = new Vector3(rightPos.x, rightPos.y, 0.0f);
+						dualNoteTraceLine.positionCount = positions.Length;
+						dualNoteTraceLine.SetPositions(positions);
+
+						Gradient gradient = new Gradient();
+						gradient.SetKeys(
+							new GradientColorKey[] { new GradientColorKey(NRSettings.config.leftColor, 0.0f), new GradientColorKey(NRSettings.config.rightColor, 1.0f) },
+							new GradientAlphaKey[] { new GradientAlphaKey(distPercent, 0.0f), new GradientAlphaKey(distPercent, 1.0f) }
+						);
+						dualNoteTraceLine.colorGradient = gradient;
+
+						break;
+					}
+				}
+
+				lastTarget = t;
+			}
+		}
+
+		public void UpdateTraceLine(LineRenderer renderer, TargetHandType handType, Color color) {
+			float TraceAheadTime = 1f;
+
+			renderer.enabled = false;
+			if(paused) { return; }
+
+			var startTime = Timeline.time + Relative_QNT.FromBeatTime(TraceAheadTime);
+
+			Target nextTarget = null;
+			foreach(Target t in new NoteEnumerator(startTime, startTime + Relative_QNT.FromBeatTime(1))) {
+				if(t.data.behavior == TargetBehavior.Chain || t.data.behavior == TargetBehavior.Melee) continue;
+
+				if(t.data.handType == handType) {
+					nextTarget = t;
+					break;
+				}
+			}
+
+			if(nextTarget == null) {
+				return;
+			}
+
+			var backIt = new NoteEnumerator(nextTarget.data.time - Relative_QNT.FromBeatTime(2), nextTarget.data.time);
+			backIt.reverse = true;
+
+			Target closest = null;
+			Target startTarget = null;
+			foreach(Target t in backIt) {
+				if(t == nextTarget || t.data.behavior == TargetBehavior.Chain || t.data.behavior == TargetBehavior.Melee) continue;
+
+				if(t.data.handType == handType) {
+					startTarget = t;
+					break;
+				}
+
+				if(closest == null) {
+					closest = t;
+				}
+			}
+
+			if(startTarget == null) {
+				if(closest == null) {
+					return;
+				}
+
+				startTarget = closest;
+			}
+
+			if(nextTarget != null) {
+				float NoteFadeInTime = 1.0f;
+				float dist = (nextTarget.data.time - startTarget.data.time).ToBeatTime();
+				float travelTime = (nextTarget.data.time - startTime).ToBeatTime();
+				if(dist <= 2f && travelTime < dist && travelTime > 0.0 && travelTime < NoteFadeInTime) {
+					float totalTime = Math.Min(NoteFadeInTime, dist);
+					float percent = 1.0f - ((travelTime) / totalTime);
+
+					renderer.enabled = true;
+
+					Vector2 start = startTarget.data.position + (nextTarget.data.position - startTarget.data.position) * Easings.Linear(percent);
+
+					//We want to arrive before the note hits
+					percent = Mathf.Clamp(percent, 0.0f, 0.55f) / 0.55f;
+					Vector2 end = startTarget.data.position + (nextTarget.data.position - startTarget.data.position) * Easings.Linear(percent);
+
+					Vector3[] positions = new Vector3[2];
+					positions[0] = new Vector3(start.x, start.y, 0.0f);
+					positions[1] = new Vector3(end.x, end.y, 0.0f);
+					renderer.positionCount = positions.Length;
+					renderer.SetPositions(positions);
+
+					Gradient gradient = new Gradient();
+					gradient.SetKeys(
+						new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(color, 0.25f), new GradientColorKey(color, 1.0f) },
+						new GradientAlphaKey[] { new GradientAlphaKey(0.1f, 0.0f), new GradientAlphaKey(0.25f, 0.25f), new GradientAlphaKey(0.5f, 1.0f) }
+					);
+					renderer.colorGradient = gradient;
 				}
 			}
 		}
