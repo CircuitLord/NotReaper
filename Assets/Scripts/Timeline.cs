@@ -40,6 +40,7 @@ namespace NotReaper {
 
 		public bool startInclusive = true;
 		public bool endInclusive = true;
+		public bool reverse = false;
 
 		public IEnumerator<Target> GetEnumerator() {
 			if(Timeline.orderedNotes.Count == 0) {
@@ -90,16 +91,39 @@ namespace NotReaper {
 			}
 
 			//Iterate over the valid notes
-			for(int i = index; i < Timeline.orderedNotes.Count; ++i) {
-				if(Timeline.orderedNotes[i].data.time > end) {
-					yield break;
+			if(!reverse) {
+				for(int i = index; i < Timeline.orderedNotes.Count; ++i) {
+					if(Timeline.orderedNotes[i].data.time > end) {
+						yield break;
+					}
+					
+					if(!endInclusive && Timeline.orderedNotes[i].data.time == end) {
+						yield break;
+					}
+
+					yield return Timeline.orderedNotes[i];
 				}
-				
-				if(!endInclusive && Timeline.orderedNotes[i].data.time == end) {
-					yield break;
+			}
+			else {
+				int endIndex = index;
+
+				while(endIndex < Timeline.orderedNotes.Count && Timeline.orderedNotes[endIndex].data.time < end) {
+					++endIndex;
 				}
 
-				yield return Timeline.orderedNotes[i];
+				if(endInclusive) {
+					while(endIndex < Timeline.orderedNotes.Count && Timeline.orderedNotes[endIndex].data.time <= end) {
+						++endIndex;
+					}
+				}
+
+				if(endIndex >= Timeline.orderedNotes.Count) {
+					endIndex = Timeline.orderedNotes.Count - 1;
+				}
+
+				for(int i = endIndex; i > index; --i) {
+					yield return Timeline.orderedNotes[i];
+				}
 			}
 		}
 
@@ -548,6 +572,7 @@ namespace NotReaper {
 		}
 
 
+
 		public void SelectTarget(Target target) {
 			if (!selectedNotes.Contains(target)) {
 				selectedNotes.Add(target);
@@ -724,8 +749,7 @@ namespace NotReaper {
 			Tools.undoRedoManager.ClearActions();
 			tempoChanges.Clear();
 		}
-
-
+		
 		public void Export()
 		{
 

@@ -3,7 +3,10 @@
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
-		_FadeThreshold("Fade In Distance", Float) = 2
+		_FadeThreshold("Fade In Distance", Float) = 1.7
+		_OpaqueDuration("Opaque Duration", Float) = 1
+		_FadeOutThreshold("Fade Out Distance", Float) = 0.5
+		_WorldPosOffset("World Position Offset", Float) = 0
 		_Tint("Tint", Color) = (1,1,1,1)
 		_GrayscaleStrength("Grayscale Strength", Float) = 0.5
 
@@ -41,6 +44,9 @@
 				float4 _MainTex_ST;
 				float4 _Tint;
 				float _FadeThreshold;
+				float _OpaqueDuration;
+				float _FadeOutThreshold;
+				float _WorldPosOffset;
 				float _GrayscaleStrength;
 
 				v2f vert(appdata v)
@@ -60,10 +66,13 @@
 					//if (_IsTimelineNote == 1f) return col;
 					//if (_IsTimelineNote == 1) return col;
 
-					float a = clamp((_FadeThreshold - abs(i.worldPos.z) )/ _FadeThreshold, 0, 1);
+					float worldPos = i.worldPos.z + _WorldPosOffset;
+					float fadeIn = (1.0 - smoothstep(0, _FadeThreshold, worldPos)) * ((1.0 - step(_FadeThreshold, worldPos)) - (1.0 - step(-_OpaqueDuration, worldPos)));
+					float fadeOut = (1.0 - smoothstep(-_OpaqueDuration, -_FadeOutThreshold - _OpaqueDuration, worldPos)) * (1.0 - step(-_OpaqueDuration, worldPos));
+
+					float a = clamp(fadeIn + fadeOut, 0, 1);
 					col.a *= a;
 
-					
 					if (i.worldPos.z < -0.1) {
 						col.rgb = lerp(col.rgb, dot(col.rgb, float3(0.3, 0.59, 0.11)), _GrayscaleStrength);
 					}

@@ -95,14 +95,24 @@ namespace NotReaper.Targets {
             data.HandTypeChangeEvent += OnHandTypeChanged;
             data.BehaviourChangeEvent += OnBehaviorChanged;
             data.BeatLengthChangeEvent += OnSustainLengthChanged;
+            data.TickChangeEvent += OnTickChanged;
 
             this.target = target;
+
+            foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true)) {
+                r.material.SetFloat("_FadeThreshold", 1.7f);
+                r.material.SetFloat("_OpaqueDuration", 0f);
+                r.material.SetFloat("_FadeOutThreshold", 0.5f);
+            }
+
+            SetupFade();
         }
 
         public void OnDestroy() {
             data.HandTypeChangeEvent -= OnHandTypeChanged;
             data.BehaviourChangeEvent -= OnBehaviorChanged;
             data.BeatLengthChangeEvent -= OnSustainLengthChanged;
+            data.TickChangeEvent -= OnTickChanged;
         }
 
         public void EnableSelected(TargetBehavior behavior) {
@@ -269,6 +279,31 @@ namespace NotReaper.Targets {
 
             if(behavior == TargetBehavior.NR_Pathbuilder) {
                 data.velocity = TargetVelocity.None;
+            }
+        }
+
+        private void OnTickChanged(QNT_Timestamp newTime) {
+            SetupFade();
+        }
+
+        private void SetupFade() {
+            if(location != TargetIconLocation.Grid) return;
+
+            if(data.behavior == TargetBehavior.Chain) {
+                NoteEnumerator iter = new NoteEnumerator(new QNT_Timestamp(0), data.time);
+                iter.reverse = true;
+                
+                foreach(Target t in iter) {
+                    if(t.data.behavior == TargetBehavior.ChainStart && t.data.handType == data.handType) {
+                        foreach (Renderer r in gameObject.GetComponentsInChildren<Renderer>(true)) {
+                            float offset = t.data.time.ToBeatTime() - data.time.ToBeatTime();
+                            r.material.SetFloat("_WorldPosOffset", offset);
+                            r.material.SetFloat("_OpaqueDuration", -offset);
+                        }
+
+                        break;
+                    }
+                }
             }
         }
 
