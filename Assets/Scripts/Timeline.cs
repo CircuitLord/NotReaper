@@ -1759,7 +1759,7 @@ namespace NotReaper {
 
 			Target nextTarget = null;
 			foreach(Target t in new NoteEnumerator(startTime, startTime + Relative_QNT.FromBeatTime(1))) {
-				if(t.data.behavior == TargetBehavior.Chain || t.data.behavior == TargetBehavior.Melee) continue;
+				if(t.data.behavior == TargetBehavior.Melee || t.data.behavior == TargetBehavior.Chain) continue;
 
 				if(t.data.handType == handType) {
 					nextTarget = t;
@@ -1777,7 +1777,7 @@ namespace NotReaper {
 			Target closest = null;
 			Target startTarget = null;
 			foreach(Target t in backIt) {
-				if(t == nextTarget || t.data.behavior == TargetBehavior.Chain || t.data.behavior == TargetBehavior.Melee) continue;
+				if(t == nextTarget || t.data.behavior == TargetBehavior.Melee || t.data.behavior == TargetBehavior.Chain) continue;
 
 				if(t.data.handType == handType) {
 					startTarget = t;
@@ -1808,10 +1808,7 @@ namespace NotReaper {
 					renderer.enabled = true;
 
 					Vector2 start = startTarget.data.position + (nextTarget.data.position - startTarget.data.position) * Easings.Linear(percent);
-
-					//We want to arrive before the note hits
-					percent = Mathf.Clamp(percent, 0.0f, 0.55f) / 0.55f;
-					Vector2 end = startTarget.data.position + (nextTarget.data.position - startTarget.data.position) * Easings.Linear(percent);
+					Vector2 end = startTarget.data.position + (nextTarget.data.position - startTarget.data.position);
 
 					Vector3[] positions = new Vector3[2];
 					positions[0] = new Vector3(start.x, start.y, 0.0f);
