@@ -123,6 +123,7 @@ namespace NotReaper.Targets {
             chainStartOutline.enabled = (behavior == TargetBehavior.ChainStart);
             chainOutline.enabled = (behavior == TargetBehavior.Chain);
             meleeOutline.enabled = (behavior == TargetBehavior.Melee);
+            mineOutline.enabled = (behavior == TargetBehavior.Mine);
             pathBuilderOutline.enabled = (behavior == TargetBehavior.NR_Pathbuilder);
             if(pathBuilderArrow != null) pathBuilderArrow.SetActive((behavior == TargetBehavior.NR_Pathbuilder));
 
