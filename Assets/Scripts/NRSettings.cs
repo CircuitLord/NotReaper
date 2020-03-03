@@ -135,6 +135,10 @@ namespace NotReaper {
 
         public bool singleSelectCtrl = false;
 
+        public bool enableTraceLines = true;
+
+        public bool enableDualines = true;
+
         public string cuesSavePath = "";
 
         public string bgImagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "CircuitCubed", "NotReaper", "BG1.png");

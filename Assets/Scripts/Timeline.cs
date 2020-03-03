@@ -1700,63 +1700,67 @@ namespace NotReaper {
 
 
 			//Update trace lines
-			UpdateTraceLine(leftHandTraceLine, TargetHandType.Left, NRSettings.config.leftColor);
-			UpdateTraceLine(rightHandTraceLine, TargetHandType.Right, NRSettings.config.rightColor);
-
-			foreach(var line in dualNoteTraceLines) {
-				line.enabled = false;
+			if(NRSettings.config.enableTraceLines) {
+				UpdateTraceLine(leftHandTraceLine, TargetHandType.Left, NRSettings.config.leftColor);
+				UpdateTraceLine(rightHandTraceLine, TargetHandType.Right, NRSettings.config.rightColor);
 			}
 
-			int index = 0;
-			var backIt = new NoteEnumerator(Timeline.time - Relative_QNT.FromBeatTime(0.3f), Timeline.time + Relative_QNT.FromBeatTime(1.7f));
-			Target lastTarget = null;
-			foreach(Target t in backIt) {
-				if(lastTarget != null && 
-					t.data.behavior != TargetBehavior.Chain && lastTarget.data.behavior != TargetBehavior.Chain &&
-					t.data.handType != TargetHandType.Either && t.data.handType != TargetHandType.None && 
-					lastTarget.data.handType != TargetHandType.Either && lastTarget.data.handType != TargetHandType.None
-					) {
-					TargetHandType expected = TargetHandType.Left;
-					if(lastTarget.data.handType == expected) {
-						expected = TargetHandType.Right;
-					}
-
-					if(t.data.time == lastTarget.data.time && t.data.handType == expected) {
-						var dualNoteTraceLine = GetOrCreateDualLine(index++);
-						dualNoteTraceLine.enabled = true;
-
-						float alphaVal = 0.0f;
-						if(Timeline.time > t.data.time) {
-							alphaVal = 1.0f - ((Timeline.time - t.data.time).ToBeatTime() / 0.3f);
-						}
-						else {
-							alphaVal = 1.0f - ((t.data.time - Timeline.time).ToBeatTime() / 1.7f);
-						}
-
-						Vector2 leftPos = t.data.position;
-						Vector2 rightPos = lastTarget.data.position;
-						if(t.data.handType == TargetHandType.Right) {
-							Vector2 temp = rightPos;
-							rightPos = leftPos;
-							leftPos = temp;
-						}
-
-						Vector3[] positions = new Vector3[2];
-						positions[0] = new Vector3(leftPos.x, leftPos.y, 0.05f);
-						positions[1] = new Vector3(rightPos.x, rightPos.y, 0.05f);
-						dualNoteTraceLine.positionCount = positions.Length;
-						dualNoteTraceLine.SetPositions(positions);
-
-						Gradient gradient = new Gradient();
-						gradient.SetKeys(
-							new GradientColorKey[] { new GradientColorKey(NRSettings.config.leftColor, 0.0f), new GradientColorKey(NRSettings.config.rightColor, 1.0f) },
-							new GradientAlphaKey[] { new GradientAlphaKey(alphaVal, 0.0f), new GradientAlphaKey(alphaVal, 1.0f) }
-						);
-						dualNoteTraceLine.colorGradient = gradient;
-					}
+			if(NRSettings.config.enableDualines) {
+				foreach(var line in dualNoteTraceLines) {
+					line.enabled = false;
 				}
 
-				lastTarget = t;
+				int index = 0;
+				var backIt = new NoteEnumerator(Timeline.time - Relative_QNT.FromBeatTime(0.3f), Timeline.time + Relative_QNT.FromBeatTime(1.7f));
+				Target lastTarget = null;
+				foreach(Target t in backIt) {
+					if(lastTarget != null && 
+						t.data.behavior != TargetBehavior.Chain && lastTarget.data.behavior != TargetBehavior.Chain &&
+						t.data.handType != TargetHandType.Either && t.data.handType != TargetHandType.None && 
+						lastTarget.data.handType != TargetHandType.Either && lastTarget.data.handType != TargetHandType.None
+						) {
+						TargetHandType expected = TargetHandType.Left;
+						if(lastTarget.data.handType == expected) {
+							expected = TargetHandType.Right;
+						}
+
+						if(t.data.time == lastTarget.data.time && t.data.handType == expected) {
+							var dualNoteTraceLine = GetOrCreateDualLine(index++);
+							dualNoteTraceLine.enabled = true;
+
+							float alphaVal = 0.0f;
+							if(Timeline.time > t.data.time) {
+								alphaVal = 1.0f - ((Timeline.time - t.data.time).ToBeatTime() / 0.3f);
+							}
+							else {
+								alphaVal = 1.0f - ((t.data.time - Timeline.time).ToBeatTime() / 1.7f);
+							}
+
+							Vector2 leftPos = t.data.position;
+							Vector2 rightPos = lastTarget.data.position;
+							if(t.data.handType == TargetHandType.Right) {
+								Vector2 temp = rightPos;
+								rightPos = leftPos;
+								leftPos = temp;
+							}
+
+							Vector3[] positions = new Vector3[2];
+							positions[0] = new Vector3(leftPos.x, leftPos.y, 0.05f);
+							positions[1] = new Vector3(rightPos.x, rightPos.y, 0.05f);
+							dualNoteTraceLine.positionCount = positions.Length;
+							dualNoteTraceLine.SetPositions(positions);
+
+							Gradient gradient = new Gradient();
+							gradient.SetKeys(
+								new GradientColorKey[] { new GradientColorKey(NRSettings.config.leftColor, 0.0f), new GradientColorKey(NRSettings.config.rightColor, 1.0f) },
+								new GradientAlphaKey[] { new GradientAlphaKey(alphaVal, 0.0f), new GradientAlphaKey(alphaVal, 1.0f) }
+							);
+							dualNoteTraceLine.colorGradient = gradient;
+						}
+					}
+
+					lastTarget = t;
+				}
 			}
 		}
 
