@@ -238,7 +238,9 @@ namespace NotReaper {
 
 		[SerializeField] public LineRenderer leftHandTraceLine; 
 		[SerializeField] public LineRenderer rightHandTraceLine; 
-		[SerializeField] public LineRenderer dualNoteTraceLine; 
+		[SerializeField] public GameObject dualNoteTraceLinePrefab; 
+
+		List<LineRenderer> dualNoteTraceLines = new List<LineRenderer>();
 
 		//Tools
 		private void Start() {
@@ -1701,8 +1703,12 @@ namespace NotReaper {
 			UpdateTraceLine(leftHandTraceLine, TargetHandType.Left, NRSettings.config.leftColor);
 			UpdateTraceLine(rightHandTraceLine, TargetHandType.Right, NRSettings.config.rightColor);
 
-			dualNoteTraceLine.enabled = false;
-			var backIt = new NoteEnumerator(Timeline.time, Timeline.time + Relative_QNT.FromBeatTime(1.7f));
+			foreach(var line in dualNoteTraceLines) {
+				line.enabled = false;
+			}
+
+			int index = 0;
+			var backIt = new NoteEnumerator(Timeline.time - Relative_QNT.FromBeatTime(0.3f), Timeline.time + Relative_QNT.FromBeatTime(1.7f));
 			Target lastTarget = null;
 			foreach(Target t in backIt) {
 				if(lastTarget != null && 
@@ -1716,9 +1722,16 @@ namespace NotReaper {
 					}
 
 					if(t.data.time == lastTarget.data.time && t.data.handType == expected) {
+						var dualNoteTraceLine = GetOrCreateDualLine(index++);
 						dualNoteTraceLine.enabled = true;
 
-						float distPercent = 1.0f - ((t.data.time - Timeline.time).ToBeatTime() / 1.7f);
+						float alphaVal = 0.0f;
+						if(Timeline.time > t.data.time) {
+							alphaVal = 1.0f - ((Timeline.time - t.data.time).ToBeatTime() / 0.3f);
+						}
+						else {
+							alphaVal = 1.0f - ((t.data.time - Timeline.time).ToBeatTime() / 1.7f);
+						}
 
 						Vector2 leftPos = t.data.position;
 						Vector2 rightPos = lastTarget.data.position;
@@ -1729,19 +1742,17 @@ namespace NotReaper {
 						}
 
 						Vector3[] positions = new Vector3[2];
-						positions[0] = new Vector3(leftPos.x, leftPos.y, 0.0f);
-						positions[1] = new Vector3(rightPos.x, rightPos.y, 0.0f);
+						positions[0] = new Vector3(leftPos.x, leftPos.y, 0.05f);
+						positions[1] = new Vector3(rightPos.x, rightPos.y, 0.05f);
 						dualNoteTraceLine.positionCount = positions.Length;
 						dualNoteTraceLine.SetPositions(positions);
 
 						Gradient gradient = new Gradient();
 						gradient.SetKeys(
 							new GradientColorKey[] { new GradientColorKey(NRSettings.config.leftColor, 0.0f), new GradientColorKey(NRSettings.config.rightColor, 1.0f) },
-							new GradientAlphaKey[] { new GradientAlphaKey(distPercent, 0.0f), new GradientAlphaKey(distPercent, 1.0f) }
+							new GradientAlphaKey[] { new GradientAlphaKey(alphaVal, 0.0f), new GradientAlphaKey(alphaVal, 1.0f) }
 						);
 						dualNoteTraceLine.colorGradient = gradient;
-
-						break;
 					}
 				}
 
@@ -1749,7 +1760,18 @@ namespace NotReaper {
 			}
 		}
 
-		public void UpdateTraceLine(LineRenderer renderer, TargetHandType handType, Color color) {
+		private LineRenderer GetOrCreateDualLine(int index) {
+			while(dualNoteTraceLines.Count <= index) {
+				GameObject inst = GameObject.Instantiate(dualNoteTraceLinePrefab);
+				var renderer = inst.GetComponent<LineRenderer>();
+				renderer.enabled = false;
+				dualNoteTraceLines.Add(renderer);
+			}
+
+			return dualNoteTraceLines.ElementAt(index);
+		}
+
+		private void UpdateTraceLine(LineRenderer renderer, TargetHandType handType, Color color) {
 			float TraceAheadTime = 1f;
 
 			renderer.enabled = false;
