@@ -48391,6 +48391,8 @@ MonoBehaviour:
     type: 3}
   BPM_MarkerPrefab: {fileID: 2050054871550149472, guid: f23d8bd13562b9e40b04fb145e4b4f95,
     type: 3}
+  repeaterSectionPrefab: {fileID: 8186405857866715866, guid: 1e589fe02e200e14681ee8966147a2cd,
+    type: 3}
   nrDiscordPresence: {fileID: 664541462}
   difficultyManager: {fileID: 1258393249}
   Tools: {fileID: 1258393250}
@@ -48404,6 +48406,7 @@ MonoBehaviour:
   musicVolume: 0.5
   sustainVolume: 0.5
   previewDuration: 0.1
+  repeaterSectionTimelineMarkers: []
   hover: 0
   paused: 1
   generateAudicaButton: {fileID: 774794037}
@@ -51398,6 +51401,8 @@ MonoBehaviour:
   barLength: 555
   bar: {fileID: 1302957932}
   timeline: {fileID: 1395334176}
+  repeaterSectionPrefab: {fileID: 8186405857866715866, guid: 1e589fe02e200e14681ee8966147a2cd,
+    type: 3}
   bookmarksParent: {fileID: 119738079}
   bookmarkPrefab: {fileID: 2684526917971357899, guid: b16d15d1bc8fbec499313e7d06a33441,
     type: 3}
