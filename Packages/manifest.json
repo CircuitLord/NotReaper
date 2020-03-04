@@ -10,6 +10,7 @@
     "com.unity.postprocessing": "2.3.0",
     "com.unity.render-pipelines.lightweight": "8.1.0",
     "com.unity.shadergraph": "8.1.0",
+    "com.unity.test-framework": "1.0.18",
     "com.unity.textmeshpro": "3.0.1",
     "com.unity.timeline": "1.3.5",
     "com.unity.vectorgraphics": "2.0.0-preview.12",

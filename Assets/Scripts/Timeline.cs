@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -2841,5 +2841,28 @@ namespace NotReaper {
 				}
 			}
 		}
+
+
+#if UNITY_EDITOR
+
+	public void SetupBlankTest() {
+		readyToRegenerate = false;
+
+		SetBPM(new QNT_Timestamp(0), Constants.MicrosecondsPerQuarterNoteFromBPM(100), false);
+
+		int sampleRate = 44100;
+		float lengthSeconds = 100;
+		AudioClip blankClip = AudioClip.Create("TestClip", (int)(sampleRate * lengthSeconds * 2), 2, sampleRate, false);
+		songPlayback.LoadAudioClip(blankClip, PrecisePlayback.LoadType.MainSong);
+
+		audioLoaded = true;
+		audicaLoaded = true;
+
+		readyToRegenerate = true;
+		RegenerateBPMTimelineData();
+	}
+
+#endif
+
 	}
 }
