@@ -257,6 +257,8 @@ namespace NotReaper.Targets {
 			protected set { data.time = value; }
 		}
 
+		//These should only be used when you need to set time directly, and are handling repeaters yourself.
+		//In all other cases, NRActionTimelineMoveNotes should be used
 		public virtual void SetTimeFromAction(QNT_Timestamp time) {
 			this.time = time;
 		}
