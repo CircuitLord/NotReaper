@@ -21,7 +21,7 @@ namespace NotReaper.IO {
 			var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
 
 			
-			string audicaTemplate = Path.Combine(workFolder, ".AudicaTemplate/");
+			string audicaTemplate = Path.Combine(workFolder, "AudicaTemplate/");
 
 			Encoding encoding = Encoding.GetEncoding("UTF-8");
 
@@ -30,13 +30,20 @@ namespace NotReaper.IO {
 			File.Delete(Path.Combine(workFolder, "song.mid"));
 			File.Copy(Path.Combine(workFolder, "songtemplate.mid"), Path.Combine(workFolder, "song.mid"));
 			
-			//Generates the mogg into song.mogg, which is moved to the .AudicaTemplate
+			//Generates the mogg into song.mogg, which is moved to the AudicaTemplate
 			File.Delete(Path.Combine(workFolder, "song.mogg"));
 
 			Process ogg2mogg = new Process();
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+
 			startInfo.FileName = Path.Combine(workFolder, "ogg2mogg.exe");
+
+			if ((Application.platform == RuntimePlatform.LinuxEditor) ^ (Application.platform == RuntimePlatform.LinuxPlayer))
+				startInfo.FileName = Path.Combine(workFolder, "ogg2mogg");
+
+			if ((Application.platform == RuntimePlatform.OSXEditor) ^ (Application.platform == RuntimePlatform.OSXPlayer))
+                startInfo.FileName = Path.Combine(workFolder, "ogg2moggOSX");
 			
 			string args = $"\"{oggPath}\" \"{workFolder}/song.mogg\"";
 			startInfo.Arguments = args;

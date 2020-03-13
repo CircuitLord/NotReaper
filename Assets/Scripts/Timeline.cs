@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -2105,7 +2105,15 @@ namespace NotReaper {
 
 		bool convertWavToOgg(string wavPath, string oggPath) {
 			System.Diagnostics.Process ffmpeg = new System.Diagnostics.Process();
-			string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg.exe");
+
+            string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg.exe");
+
+            if ((Application.platform == RuntimePlatform.LinuxEditor) ^ (Application.platform == RuntimePlatform.LinuxPlayer))
+                ffmpegPath = Path.Combine("/usr/bin/ffmpeg");
+
+            if ((Application.platform == RuntimePlatform.OSXEditor) ^ (Application.platform == RuntimePlatform.OSXPlayer))
+                ffmpegPath = Path.Combine("/usr/local/bin/ffmpeg");
+
 			ffmpeg.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
 			ffmpeg.StartInfo.FileName = ffmpegPath;
 			ffmpeg.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
@@ -2128,7 +2136,15 @@ namespace NotReaper {
 			System.Diagnostics.Process ogg2mogg = new System.Diagnostics.Process();
 			System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
 			startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+
 			startInfo.FileName = Path.Combine(workFolder, "ogg2mogg.exe");
+
+			if ((Application.platform == RuntimePlatform.LinuxEditor) ^ (Application.platform == RuntimePlatform.LinuxPlayer))
+				startInfo.FileName = Path.Combine(workFolder, "ogg2mogg");
+
+			if ((Application.platform == RuntimePlatform.OSXEditor) ^ (Application.platform == RuntimePlatform.OSXPlayer))
+                startInfo.FileName = Path.Combine(workFolder, "ogg2moggOSX");
+
 			startInfo.RedirectStandardOutput = true;
 			startInfo.RedirectStandardError = true;
 			

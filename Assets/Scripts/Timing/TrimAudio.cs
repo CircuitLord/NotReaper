@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +24,13 @@ namespace NotReaper.Timing {
 
         public TrimAudio() {
             string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg.exe");
+
+            if ((Application.platform == RuntimePlatform.LinuxEditor) ^ (Application.platform == RuntimePlatform.LinuxPlayer))
+                ffmpegPath = Path.Combine("/usr/bin/ffmpeg");
+
+            if ((Application.platform == RuntimePlatform.OSXEditor) ^ (Application.platform == RuntimePlatform.OSXPlayer))
+                ffmpegPath = Path.Combine("/usr/local/bin/ffmpeg");
+
 			ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
 			ffmpeg.StartInfo.FileName = ffmpegPath;
             ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
