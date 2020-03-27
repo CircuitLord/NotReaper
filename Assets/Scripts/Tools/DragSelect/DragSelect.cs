@@ -41,6 +41,8 @@ namespace NotReaper.Tools {
 		private bool frameIntentSwapColors = false;
 		private bool frameIntentFlipTargetsHorizontally = false;
 		private bool frameIntentFlipTargetsVertically = false;
+		private bool frameIntentScaleUp = false;
+		private bool frameIntentScaleDown = false;
 		private bool frameIntentSetHitSoundStandard = false;
 		private bool frameIntentSetHitSoundSnare = false;
 		private bool frameIntentSetHitSoundPercussion = false;
@@ -367,6 +369,9 @@ namespace NotReaper.Tools {
 			frameIntentSwapColors = false;
 			frameIntentFlipTargetsHorizontally = false;
 			frameIntentFlipTargetsVertically = false;
+			frameIntentScaleUp = false;
+			frameIntentScaleDown = false;
+			
 			frameIntentSetBehavior = TargetBehavior.None;
 
 			// Keyboard input
@@ -408,6 +413,9 @@ namespace NotReaper.Tools {
 			}
 			else if (secondaryModifierHeld) {
 				frameIntentFlipTargetsVertically = Input.GetKeyDown(KeyCode.F);
+				frameIntentScaleUp = Input.GetKeyDown(KeyCode.Equals);
+				frameIntentScaleDown = Input.GetKeyDown(KeyCode.Minus);
+				
 			}
 			else {
 				frameIntentDelete = Input.GetKeyDown(KeyCode.Delete);
@@ -524,6 +532,10 @@ namespace NotReaper.Tools {
 			if (frameIntentSwapColors) timeline.SwapTargets(timeline.selectedNotes);
 			if (frameIntentFlipTargetsHorizontally) timeline.FlipTargetsHorizontal(timeline.selectedNotes);
 			if (frameIntentFlipTargetsVertically) timeline.FlipTargetsVertical(timeline.selectedNotes);
+			
+			/** Scale notes **/
+			if (frameIntentScaleUp) timeline.ScaleUp(timeline.selectedNotes);
+			if (frameIntentScaleDown) timeline.ScaleDown(timeline.selectedNotes);
 
 			/** Note selection and movement **/
 			if (frameIntentDeselectAll) timeline.DeselectAllTargets();

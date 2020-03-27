@@ -251,6 +251,70 @@ namespace NotReaper.Tools {
 		}
 	}
 
+	public class NRActionScaleUp : NRAction {
+		public List<TargetData> affectedTargets = new List<TargetData>();
+
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					targetData.y *= 1.1f;
+					targetData.x *= 1.1f;
+
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.stepDistance *= 1.1f;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					targetData.y /= 1.1f;
+					targetData.x /= 1.1f;
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.stepDistance /= 1.1f;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});	
+		}
+	}
+
+	public class NRActionScaleDown : NRAction {
+		public List<TargetData> affectedTargets = new List<TargetData>();
+
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					targetData.y *= 0.9f;
+					targetData.x *= 0.9f;
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.stepDistance *= 0.9f;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					targetData.y /= 0.9f;
+					targetData.x /= 0.9f;
+
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.stepDistance /= 0.9f;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});
+		}
+	}
+
 	public class NRActionSetTargetHitsound : NRAction {
 		public List<TargetSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
 
