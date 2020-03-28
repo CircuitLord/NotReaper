@@ -42,6 +42,8 @@ namespace NotReaper.Tools {
 		private bool frameIntentFlipTargetsHorizontally = false;
 		private bool frameIntentFlipTargetsVertically = false;
 		private bool frameIntentScaleUp = false;
+		private bool frameIntentRotateLeft = false;
+		private bool frameIntentRotateRight = false;
 		private bool frameIntentScaleDown = false;
 		private bool frameIntentSetHitSoundStandard = false;
 		private bool frameIntentSetHitSoundSnare = false;
@@ -369,6 +371,8 @@ namespace NotReaper.Tools {
 			frameIntentSwapColors = false;
 			frameIntentFlipTargetsHorizontally = false;
 			frameIntentFlipTargetsVertically = false;
+			frameIntentRotateLeft = false;
+			frameIntentRotateRight = false;
 			frameIntentScaleUp = false;
 			frameIntentScaleDown = false;
 			
@@ -385,6 +389,8 @@ namespace NotReaper.Tools {
 				frameIntentCopy = Input.GetKeyDown(KeyCode.C);
 				frameIntentPaste = Input.GetKeyDown(KeyCode.V);
 				frameIntentDeselectAll = Input.GetKeyDown(KeyCode.D);
+				frameIntentRotateLeft = Input.GetKeyDown(KeyCode.Minus);
+				frameIntentRotateRight = Input.GetKeyDown(KeyCode.Equals);
 
 				if(Input.GetKeyDown(InputManager.selectStandard)) {
 					frameIntentSetBehavior = TargetBehavior.Standard;
@@ -533,6 +539,10 @@ namespace NotReaper.Tools {
 			if (frameIntentFlipTargetsHorizontally) timeline.FlipTargetsHorizontal(timeline.selectedNotes);
 			if (frameIntentFlipTargetsVertically) timeline.FlipTargetsVertical(timeline.selectedNotes);
 			
+			/** Rotate notes **/
+			if (frameIntentRotateLeft) timeline.Rotate(timeline.selectedNotes, -15);
+			if (frameIntentRotateRight) timeline.Rotate(timeline.selectedNotes, 15);
+
 			/** Scale notes **/
 			if (frameIntentScaleUp) timeline.ScaleUp(timeline.selectedNotes);
 			if (frameIntentScaleDown) timeline.ScaleDown(timeline.selectedNotes);

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using NotReaper.Managers;
 using NotReaper.Timing;
+using System;
 
 namespace NotReaper.Tools {
 
@@ -253,7 +254,7 @@ namespace NotReaper.Tools {
 
 	public class NRActionScaleUp : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
-
+		
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
 				if(targetData.behavior != TargetBehavior.Melee) {
@@ -275,6 +276,55 @@ namespace NotReaper.Tools {
 					targetData.x /= 1.1f;
 					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
 						targetData.pathBuilderData.stepDistance /= 1.1f;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});	
+		}
+	}
+
+	public class NRActionRotate : NRAction {
+		public List<TargetData> affectedTargets = new List<TargetData>();
+
+		public int rotateAngle = 0;
+
+		public Vector2 rotateCenter = Vector2.zero;
+
+		public void NRRotate(TargetData data, Vector2 center, int angle)
+		{			
+			data.x -= center.x;
+			data.y -= center.y;
+			angle = -angle;
+
+			Vector2 rotate;
+
+			rotate.x = (float)(data.x * Math.Cos(angle / 180f * Math.PI) + data.y * Math.Sin(angle / 180f * Math.PI));
+			rotate.y = (float)(data.x * -Math.Sin(angle / 180f * Math.PI) + data.y * Math.Cos(angle / 180f * Math.PI));	
+			rotate.x += center.x;
+			rotate.y += center.y;
+
+			data.x = rotate.x;
+			data.y = rotate.y;
+		}		
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					NRRotate(targetData, rotateCenter, rotateAngle);
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.initialAngle -= rotateAngle;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					NRRotate(targetData, rotateCenter, -rotateAngle);
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.initialAngle += rotateAngle;
 
 						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
 					}
