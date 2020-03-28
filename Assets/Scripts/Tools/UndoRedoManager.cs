@@ -365,6 +365,72 @@ namespace NotReaper.Tools {
 		}
 	}
 
+	public class NRActionReverse : NRAction {
+		public List<TargetData> affectedTargets = new List<TargetData>();
+		public override void DoAction(Timeline timeline) {
+            bool first = true;
+
+            ulong firstTick = 0, lastTick = 0;
+            
+            //Find the first and last note in the sequence
+            foreach (TargetData data in affectedTargets) {
+
+                if (first) {
+                    firstTick = data.time.tick;
+                    lastTick = data.time.tick;
+                    first = false;
+                }
+                
+                else if (data.time.tick > lastTick) {
+                    lastTick = data.time.tick;
+                }
+
+                else if (data.time.tick < firstTick) {
+                    firstTick = data.time.tick;
+                }
+                
+            }
+            
+            //Reverse the notes
+            foreach (TargetData data in affectedTargets) {
+                ulong amt = data.time.tick - firstTick;
+                
+                data.time = new QNT_Timestamp(lastTick - amt);
+            }
+		}
+		public override void UndoAction(Timeline timeline) {
+            bool first = true;
+
+            ulong firstTick = 0, lastTick = 0;
+            
+            //Find the first and last note in the sequence
+            foreach (TargetData data in affectedTargets) {
+
+                if (first) {
+                    firstTick = data.time.tick;
+                    lastTick = data.time.tick;
+                    first = false;
+                }
+                
+                else if (data.time.tick > lastTick) {
+                    lastTick = data.time.tick;
+                }
+
+                else if (data.time.tick < firstTick) {
+                    firstTick = data.time.tick;
+                }
+                
+            }
+            
+            //Reverse the notes
+            foreach (TargetData data in affectedTargets) {
+                ulong amt = data.time.tick - firstTick;
+                
+                data.time = new QNT_Timestamp(lastTick - amt);
+            }
+		}
+	}
+
 	public class NRActionSetTargetHitsound : NRAction {
 		public List<TargetSetHitsoundIntent> targetSetHitsoundIntents = new List<TargetSetHitsoundIntent>();
 
