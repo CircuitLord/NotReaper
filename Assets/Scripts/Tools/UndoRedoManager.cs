@@ -397,6 +397,8 @@ namespace NotReaper.Tools {
                 
                 data.time = new QNT_Timestamp(lastTick - amt);
             }
+
+			timeline.SortOrderedList();
 		}
 		public override void UndoAction(Timeline timeline) {
             bool first = true;
@@ -428,6 +430,8 @@ namespace NotReaper.Tools {
                 
                 data.time = new QNT_Timestamp(lastTick - amt);
             }
+			
+			timeline.SortOrderedList();
 		}
 	}
 
