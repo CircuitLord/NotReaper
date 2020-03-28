@@ -716,6 +716,12 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
+		public void Reverse(List<Target> targets) {
+			var action = new NRActionReverse();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
+			Tools.undoRedoManager.AddAction(action);
+		}
+
 		// Flip the selected targets on the grid about the Y
 		public void FlipTargetsVertical(List<Target> targets) {
 			var action = new NRActionVFlipNotes();
