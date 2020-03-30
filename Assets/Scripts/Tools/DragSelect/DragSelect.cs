@@ -545,12 +545,12 @@ namespace NotReaper.Tools {
 			if (frameIntentFlipTargetsVertically) timeline.FlipTargetsVertical(timeline.selectedNotes);
 			
 			/** Rotate notes **/
-			if (frameIntentRotateLeft) timeline.Rotate(timeline.selectedNotes, -15);
-			if (frameIntentRotateRight) timeline.Rotate(timeline.selectedNotes, 15);
+			if (frameIntentRotateLeft) timeline.Rotate(timeline.selectedNotes, 15);
+			if (frameIntentRotateRight) timeline.Rotate(timeline.selectedNotes, -15);
 
 			/** Scale notes **/
-			if (frameIntentScaleUp) timeline.ScaleUp(timeline.selectedNotes);
-			if (frameIntentScaleDown) timeline.ScaleDown(timeline.selectedNotes);
+			if (frameIntentScaleUp) timeline.Scale(timeline.selectedNotes, 1.1f);
+			if (frameIntentScaleDown) timeline.Scale(timeline.selectedNotes, 0.9f);
 
 			/** Note selection and movement **/
 			if (frameIntentDeselectAll) timeline.DeselectAllTargets();
