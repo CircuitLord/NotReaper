@@ -44,8 +44,7 @@ namespace NotReaper {
                 string winConfigDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "CircuitCubed", "NotReaper", "BG1.png");
                 
                 // Check if Linux / Mac user is using an old cfg.
-                if (((Application.platform == RuntimePlatform.LinuxEditor) || (Application.platform == RuntimePlatform.LinuxPlayer)) || 
-                    ((Application.platform == RuntimePlatform.OSXEditor) || (Application.platform == RuntimePlatform.OSXPlayer)))
+                if (!(Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor))
                     if (config.bgImagePath == winConfigDir)
                         config.bgImagePath = GetbgImagePath();
 
