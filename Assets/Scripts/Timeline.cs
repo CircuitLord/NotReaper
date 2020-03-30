@@ -698,14 +698,10 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void ScaleDown(List<Target> targets) {
-			var action = new NRActionScaleDown();
+		public void Scale(List<Target> targets, float scale) {
+			var action = new NRActionScale();
 			action.affectedTargets = targets.Select(target => target.data).ToList();
-			Tools.undoRedoManager.AddAction(action);
-		}
-		public void ScaleUp(List<Target> targets) {
-			var action = new NRActionScaleUp();
-			action.affectedTargets = targets.Select(target => target.data).ToList();
+			action.scale = scale;
 			Tools.undoRedoManager.AddAction(action);
 		}
 

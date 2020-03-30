@@ -252,17 +252,19 @@ namespace NotReaper.Tools {
 		}
 	}
 
-	public class NRActionScaleUp : NRAction {
+	public class NRActionScale : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
 		
+		public float scale;
+
 		public override void DoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
 				if(targetData.behavior != TargetBehavior.Melee) {
-					targetData.y *= 1.1f;
-					targetData.x *= 1.1f;
+					targetData.y *= scale;
+					targetData.x *= scale;
 
 					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
-						targetData.pathBuilderData.stepDistance *= 1.1f;
+						targetData.pathBuilderData.stepDistance *= scale;
 
 						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
 					}
@@ -272,10 +274,10 @@ namespace NotReaper.Tools {
 		public override void UndoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
 				if(targetData.behavior != TargetBehavior.Melee) {
-					targetData.y /= 1.1f;
-					targetData.x /= 1.1f;
+					targetData.y /= scale;
+					targetData.x /= scale;
 					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
-						targetData.pathBuilderData.stepDistance /= 1.1f;
+						targetData.pathBuilderData.stepDistance /= scale;
 
 						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
 					}
@@ -333,37 +335,6 @@ namespace NotReaper.Tools {
 		}
 	}
 
-	public class NRActionScaleDown : NRAction {
-		public List<TargetData> affectedTargets = new List<TargetData>();
-
-		public override void DoAction(Timeline timeline) {
-			affectedTargets.ForEach(targetData => {
-				if(targetData.behavior != TargetBehavior.Melee) {
-					targetData.y *= 0.9f;
-					targetData.x *= 0.9f;
-					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
-						targetData.pathBuilderData.stepDistance *= 0.9f;
-
-						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
-					}
-				}
-			});
-		}
-		public override void UndoAction(Timeline timeline) {
-			affectedTargets.ForEach(targetData => {
-				if(targetData.behavior != TargetBehavior.Melee) {
-					targetData.y /= 0.9f;
-					targetData.x /= 0.9f;
-
-					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
-						targetData.pathBuilderData.stepDistance /= 0.9f;
-
-						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
-					}
-				}
-			});
-		}
-	}
 
 	public class NRActionReverse : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
