@@ -135,12 +135,18 @@ namespace NotReaper {
 
 	}
 	
-	public struct RepeaterSection {
+	public class RepeaterSection {
+		public RepeaterSection(uint id, QNT_Timestamp start, QNT_Timestamp end) {
+			ID = id;
+			startTime = start;
+			endTime = end;
+		}
+
 		public uint ID;
 		public QNT_Timestamp startTime; //Time when this section starts
 		public QNT_Timestamp endTime; //Time when this section ends
+		public GameObject timelineSectionObj;
 	}
-
 
 	public class Timeline : MonoBehaviour {
 
@@ -196,7 +202,6 @@ namespace NotReaper {
 		public List<Target> selectedNotes;
 
 		public List<RepeaterSection> repeaterSections = new List<RepeaterSection>();
-		public List<GameObject> repeaterSectionTimelineMarkers = new List<GameObject>();
 
 		public static List<Target> loadedNotes;
 
@@ -574,20 +579,8 @@ namespace NotReaper {
 				if(index != -1) {
 					List<TargetData> sectionNotes = new List<TargetData>();
 					RepeaterSection masterSection = siblingSections[index];
-					Relative_QNT length = masterSection.endTime - masterSection.startTime;
-					Relative_QNT newLength = newSection.endTime - newSection.startTime;
-					if(newLength > length) {
-						newLength = length;
-						newSection.endTime = newSection.startTime + length;
-					}
-
-					var result = BinarySearchOrderedNotes(masterSection.startTime);
-					for(int noteIdx = result.index; noteIdx < orderedNotes.Count; ++noteIdx) {
-						var note = orderedNotes[noteIdx];
-						if(note.data.time > masterSection.startTime + newLength) {
-							break;
-						}
-						sectionNotes.Add(note.data);
+					foreach(Target t in new NoteEnumerator(masterSection.startTime, masterSection.endTime)) {
+						sectionNotes.Add(t.data);
 					}
 
 					Relative_QNT offset = (newSection.startTime - masterSection.startTime);
@@ -603,15 +596,39 @@ namespace NotReaper {
 			lineRenderer.startWidth = lineRenderer.endWidth = 1.0f;
 			lineRenderer.SetPosition(1, new Vector3((newSection.endTime - newSection.startTime).ToBeatTime(), 0, 0));
 
-			repeaterSectionTimelineMarkers.Add(sectionObject);
-			
+			newSection.timelineSectionObj = sectionObject;
+
 			repeaterSections.Add(newSection);
 			repeaterSections.OrderBy(section => section.startTime);
 			miniTimeline.AddRepeaterSection(newSection);
 		}
 
-		public RepeaterSection? FindRepeaterForNote(TargetData data) {
-			RepeaterSection? targetSection = null;
+		public void RemoveRepeater(uint ID, QNT_Timestamp start) {
+			RepeaterSection foundSection = null;
+
+			foreach(RepeaterSection section in repeaterSections) {
+				if(section.ID == ID && start == section.startTime) {
+					foundSection = section;
+					break;
+				}
+			}
+
+			if(foundSection != null) {
+				GameObject.Destroy(foundSection.timelineSectionObj);
+				repeaterSections.Remove(foundSection);
+			}
+		}
+
+		public void RemoveAllRepeaters() {
+			foreach(RepeaterSection section in repeaterSections) {
+				GameObject.Destroy(section.timelineSectionObj);
+			}
+			
+			repeaterSections.Clear();
+		}
+
+		public RepeaterSection FindRepeaterForNote(TargetData data) {
+			RepeaterSection targetSection = null;
 			repeaterSections.ForEach(section => {
 				if(data.time >= section.startTime && data.time <= section.endTime) {
 					targetSection = section;
@@ -625,14 +642,17 @@ namespace NotReaper {
 		public List<TargetData> GenerateRepeaterTargets(TargetData data) {
 			List<TargetData> newTargets = new List<TargetData>();
 
-			RepeaterSection? targetSection = FindRepeaterForNote(data);
-			if(targetSection.HasValue) {
+			RepeaterSection targetSection = FindRepeaterForNote(data);
+			if(targetSection != null) {
 				for(int i = 0; i < repeaterSections.Count; ++i) {
 					var section = repeaterSections[i];
 
 					if(section.ID == targetSection?.ID && section.startTime != targetSection?.startTime) {
-						Relative_QNT offset = (section.startTime - targetSection.Value.startTime);
-						newTargets.Add(new RepeaterTargetData(data, data.time + offset));
+						Relative_QNT offset = (section.startTime - targetSection.startTime);
+						QNT_Timestamp newTime = data.time + offset;
+						if(newTime >= section.startTime && newTime <= section.endTime) {
+							newTargets.Add(new RepeaterTargetData(data, data.time + offset));
+						}
 					}
 				}
 			}
@@ -643,14 +663,14 @@ namespace NotReaper {
 		public List<TargetData> FindRepeaterTargets(TargetData data) {
 			List<TargetData> foundTargets = new List<TargetData>();
 
-			RepeaterSection? targetSection = FindRepeaterForNote(data);
-			if(targetSection.HasValue) {
+			RepeaterSection targetSection = FindRepeaterForNote(data);
+			if(targetSection != null) {
 				for(int i = 0; i < repeaterSections.Count; ++i) {
 					var section = repeaterSections[i];
 
 					if(section.ID == targetSection?.ID && section.startTime != targetSection?.startTime) {
 						//Find the note in the sibling section by offsetting our time
-						Relative_QNT offset = (section.startTime - targetSection.Value.startTime);
+						Relative_QNT offset = (section.startTime - targetSection.startTime);
 						QNT_Timestamp searchTime = data.time + offset;
 						var result = BinarySearchOrderedNotes(searchTime);
 						if(result.found) {
@@ -800,7 +820,7 @@ namespace NotReaper {
 				QNT_Timestamp endTime = intent.intendedTick;
 
 				//Did we start in a repeater section?
-				RepeaterSection? startSection = null;
+				RepeaterSection startSection = null;
 				repeaterSections.ForEach(section => {
 					if(startTime >= section.startTime && startTime <= section.endTime) {
 						startSection = section;
@@ -810,7 +830,7 @@ namespace NotReaper {
 
 				List<TargetData> startSiblings = new List<TargetData>();
 				List<RepeaterSection> startSiblingSections = new List<RepeaterSection>();
-				if(startSection.HasValue) {
+				if(startSection != null) {
 					bool isFirstSection = true;
 					QNT_Timestamp firstSectionTime = new QNT_Timestamp(0);
 
@@ -823,7 +843,7 @@ namespace NotReaper {
 
 						if(section.ID == startSection?.ID && section.startTime != startSection?.startTime) {
 							//Find the note in the sibling section by offsetting our time
-							QNT_Timestamp searchTime = endTime + (section.startTime - startSection.Value.startTime);
+							QNT_Timestamp searchTime = endTime + (section.startTime - startSection.startTime);
 							var result = BinarySearchOrderedNotes(searchTime);
 							if(result.found) {
 								int idx = result.index;
@@ -873,7 +893,7 @@ namespace NotReaper {
 				}
 
 				//Did we end in a repeater section?
-				RepeaterSection? endSection = null;
+				RepeaterSection endSection = null;
 				repeaterSections.ForEach(section => {
 					if(endTime >= section.startTime && endTime <= section.endTime) {
 						endSection = section;
@@ -881,7 +901,7 @@ namespace NotReaper {
 					}
 				});
 
-				if(endSection.HasValue && (!startSection.HasValue || startSection?.startTime != endSection?.startTime)) {
+				if(endSection != null && (startSection == null || startSection?.startTime != endSection?.startTime)) {
 					//Find the first section with this id
 					RepeaterSection firstSection = (RepeaterSection)endSection;
 					for(int i = 0; i < repeaterSections.Count; ++i) {
@@ -909,7 +929,7 @@ namespace NotReaper {
 					else {
 						//If we are non-relative, convert to relative
 						if(!(intent.endTargetData is RepeaterTargetData)) {
-							Relative_QNT offset = (endSection.Value.startTime - firstSection.startTime);
+							Relative_QNT offset = (endSection.startTime - firstSection.startTime);
 							intent.endTargetData = new RepeaterTargetData(intent.endTargetData, intent.endTargetData.time + offset);
 						}
 
@@ -1061,6 +1081,7 @@ namespace NotReaper {
 			DeleteAllTargets();
 			Tools.undoRedoManager.ClearActions();
 			tempoChanges.Clear();
+			RemoveAllRepeaters();
 		}
 
 		public void Export()
@@ -1310,41 +1331,6 @@ namespace NotReaper {
 			return true;
 		}
 
-		public void PostAudioClipLoad() {
-			RepeaterSection section;
-			section.ID = 0;
-			section.startTime = new QNT_Timestamp(Constants.PulsesPerWholeNote);
-			section.endTime = new QNT_Timestamp(Constants.PulsesPerWholeNote * 10);
-			AddRepeaterSection(section);
-
-			time = new QNT_Timestamp(section.startTime.tick + Constants.PulsesPerQuarterNote);
-			AddTarget(0,0);
-
-			time = new QNT_Timestamp(section.startTime.tick + Constants.PulsesPerQuarterNote * 2);
-			AddTarget(1,0);
-
-			time = new QNT_Timestamp(section.startTime.tick + Constants.PulsesPerQuarterNote * 7);
-			EditorInput.selectedHand = TargetHandType.Right;
-			AddTarget(0,3);
-
-			time = new QNT_Timestamp(section.startTime.tick + Constants.PulsesPerQuarterNote * 12);
-			EditorInput.selectedHand = TargetHandType.Left;
-			AddTarget(3,3);
-
-			time = new QNT_Timestamp(section.startTime.tick + Constants.PulsesPerQuarterNote * 14);
-			EditorInput.selectedHand = TargetHandType.Right;
-			AddTarget(-3,3);
-
-			RepeaterSection section2;
-			section2.ID = 0;
-			section2.startTime = new QNT_Timestamp(Constants.PulsesPerWholeNote * 20);
-			section2.endTime = section2.startTime + new QNT_Duration(Constants.PulsesPerWholeNote * 5);
-			AddRepeaterSection(section2);
-
-			time = new QNT_Timestamp(0);
-		}
-
-
 		IEnumerator GetAudioClip(string uri) {
 			using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
 				yield return www.SendWebRequest();
@@ -1363,8 +1349,6 @@ namespace NotReaper {
 
 					readyToRegenerate = true;
 					RegenerateBPMTimelineData();
-
-					PostAudioClipLoad();
 				}
 			}
 		}
