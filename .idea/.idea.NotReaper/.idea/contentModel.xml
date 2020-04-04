@@ -2,12 +2,15 @@
 <project version="4">
   <component name="ContentModelStore">
     <e p="C:\Files\Programming\UnityProjects\NotReaper" t="IncludeRecursive">
-      <e p=".git\info\exclude" t="IncludeRecursive" />
       <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
+      <e p="Assembly-CSharp-firstpass.csproj" t="IncludeRecursive" />
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
+        <e p="AddOrTrimAudioWindow.cs" t="Include" />
         <e p="AudioWaveformVisualizer.cs" t="Include" />
         <e p="BGFPS.cs" t="Include" />
+        <e p="BPMListWindow.cs" t="Include" />
+        <e p="CountInWindow.cs" t="Include" />
         <e p="DiscordRPC" t="Include">
           <e p="Editor" t="Include">
             <e p="CharacterLimitAttributeDrawer.cs" t="Include" />
@@ -69,18 +72,7 @@
             </e>
           </e>
         </e>
-        <e p="DOTween" t="Include">
-          <e p="Modules" t="Include">
-            <e p="DOTweenModuleAudio.cs" t="Include" />
-            <e p="DOTweenModulePhysics.cs" t="Include" />
-            <e p="DOTweenModulePhysics2D.cs" t="Include" />
-            <e p="DOTweenModuleSprite.cs" t="Include" />
-            <e p="DOTweenModuleUI.cs" t="Include" />
-            <e p="DOTweenModuleUnityVersion.cs" t="Include" />
-            <e p="DOTweenModuleUtils.cs" t="Include" />
-          </e>
-          <e p="readme.txt" t="Include" />
-        </e>
+        <e p="DynamicBPMWindow.cs" t="Include" />
         <e p="Editor" t="Include">
           <e p="AutoSaveOnRunMenuItem.cs" t="Include" />
           <e p="SceneSwitcherWindow.cs" t="Include" />
@@ -89,6 +81,7 @@
           <e p="Fisheye.shader" t="Include" />
           <e p="FlatFresnel.shader" t="Include" />
         </e>
+        <e p="MirrorTransform.cs" t="Include" />
         <e p="ModernUIPack" t="Include">
           <e p="Editor" t="Include">
             <e p="InitMUIP.cs" t="Include" />
@@ -128,11 +121,83 @@
         <e p="Notes" t="Include">
           <e p="Shader" t="Include">
             <e p="DistanceFade.shader" t="Include" />
+            <e p="DistanceFade_Prefade.shader" t="Include" />
             <e p="DistanceScale.shader" t="Include" />
             <e p="TimelineNote.shader" t="Include" />
           </e>
         </e>
         <e p="OptionsMenu.cs" t="Include" />
+        <e p="Plugins" t="Include">
+          <e p="CUI" t="Include">
+            <e p="Actions" t="Include">
+              <e p="CUIAction.cs" t="Include" />
+              <e p="CUIColorAction.cs" t="Include" />
+              <e p="CUIFadeInAction.cs" t="Include" />
+              <e p="CUIMoveAction.cs" t="Include" />
+              <e p="CUIScaleAction.cs" t="Include" />
+              <e p="CUISpinAction.cs" t="Include" />
+              <e p="IActionHandler.cs" t="Include" />
+            </e>
+            <e p="CUIButton.cs" t="Include" />
+            <e p="CUIGroup.cs" t="Include" />
+            <e p="CUIGroupSwapper.cs" t="Include" />
+            <e p="CUIManager.cs" t="Include" />
+            <e p="CUIToggle.cs" t="Include" />
+            <e p="CUIToggleGroup.cs" t="Include" />
+            <e p="Layouts" t="Include">
+              <e p="CUILayoutGroup.cs" t="Include" />
+            </e>
+            <e p="Theming" t="Include">
+              <e p="CUIThemeamble.cs" t="Include" />
+              <e p="CUIThemeData.cs" t="Include" />
+              <e p="CUIThemeManager.cs" t="Include" />
+            </e>
+            <e p="Utils" t="Include">
+              <e p="CUIMoveAtStart.cs" t="Include" />
+              <e p="CUIOpenLink.cs" t="Include" />
+            </e>
+          </e>
+          <e p="DOTween" t="Include">
+            <e p="Modules" t="Include">
+              <e p="DOTweenModuleAudio.cs" t="Include" />
+              <e p="DOTweenModulePhysics.cs" t="Include" />
+              <e p="DOTweenModulePhysics2D.cs" t="Include" />
+              <e p="DOTweenModuleSprite.cs" t="Include" />
+              <e p="DOTweenModuleUI.cs" t="Include" />
+              <e p="DOTweenModuleUnityVersion.cs" t="Include" />
+              <e p="DOTweenModuleUtils.cs" t="Include" />
+            </e>
+            <e p="readme.txt" t="Include" />
+          </e>
+          <e p="Sirenix" t="Include">
+            <e p="Assemblies" t="Include">
+              <e p="link.xml" t="Include" />
+              <e p="Sirenix.OdinInspector.Attributes.xml" t="Include" />
+              <e p="Sirenix.OdinInspector.Editor.xml" t="Include" />
+              <e p="Sirenix.Serialization.Config.xml" t="Include" />
+              <e p="Sirenix.Utilities.Editor.xml" t="Include" />
+              <e p="Sirenix.Utilities.xml" t="Include" />
+            </e>
+            <e p="Odin Inspector" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="Editor" t="Include">
+                  <e p="AssemblyImportSettingsAutomation.cs" t="Include" />
+                  <e p="BuildAOTAutomation.cs" t="Include" />
+                  <e p="EnsureOdinInspectorDefine.cs" t="Include" />
+                  <e p="FixBrokenUnityObjectWrapperDrawer.cs" t="Include" />
+                  <e p="SyncListDrawer.cs" t="Include" />
+                  <e p="SyncVarAttributeDrawer.cs" t="Include" />
+                  <e p="Vector2IntMinMaxAttributeDrawer.cs" t="Include" />
+                  <e p="VectorIntDrawers.cs" t="Include" />
+                  <e p="VectorIntPropertyResolvers.cs" t="Include" />
+                </e>
+                <e p="SerializedNetworkBehaviour.cs" t="Include" />
+                <e p="VectorIntFormatters.cs" t="Include" />
+              </e>
+            </e>
+            <e p="readme.txt" t="Include" />
+          </e>
+        </e>
         <e p="Scripts" t="Include">
           <e p="Audio" t="Include">
             <e p="AudioManager.cs" t="Include" />
@@ -140,7 +205,6 @@
           <e p="Grid" t="Include">
             <e p="HoverTarget.cs" t="Include" />
             <e p="IsHoveringGrid.cs" t="Include" />
-            <e p="LoadedNotes.cs" t="Include" />
             <e p="NoteGridSnap.cs" t="Include" />
             <e p="NotePosCalc.cs" t="Include" />
           </e>
@@ -154,6 +218,7 @@
             <e p="SteamFinder.cs" t="Include" />
           </e>
           <e p="Managers" t="Include">
+            <e p="AutoUpdater.cs" t="Include" />
             <e p="DifficultyManager.cs" t="Include" />
             <e p="EditorToolkit.cs" t="Include" />
             <e p="OutsideGridBounds.cs" t="Include" />
@@ -168,6 +233,7 @@
           </e>
           <e p="NRDiscordPresence.cs" t="Include" />
           <e p="NRSettings.cs" t="Include" />
+          <e p="SavWav.cs" t="Include" />
           <e p="Settings" t="Include">
             <e p="ProgramSettings.cs" t="Include" />
           </e>
@@ -179,9 +245,10 @@
             <e p="TargetMoveIntent.cs" t="Include" />
             <e p="TargetSetHitsoundIntent.cs" t="Include" />
           </e>
-          <e p="Ticker.cs" t="Include" />
           <e p="Timeline.cs" t="Include" />
           <e p="Timing" t="Include">
+            <e p="PrecisePlayback.cs" t="Include" />
+            <e p="TimingUnits.cs" t="Include" />
             <e p="TrimAudio.cs" t="Include" />
             <e p="UITiming.cs" t="Include" />
           </e>
@@ -196,6 +263,7 @@
               <e p="BoxDragSelect.cs" t="Include" />
               <e p="DragSelect.cs" t="Include" />
               <e p="GridBoxDragSelect.cs" t="Include" />
+              <e p="SidebarFunctions.cs" t="Include" />
             </e>
             <e p="ErrorChecker" t="Include">
               <e p="ErrorChecker.cs" t="Include" />
@@ -209,6 +277,7 @@
               <e p="NRGradient.cs" t="Include" />
               <e p="ProgressSliderColors.cs" t="Include" />
             </e>
+            <e p="DragHandler.cs" t="Include" />
             <e p="Easings.cs" t="Include" />
             <e p="HandTypeSelect.cs" t="Include" />
             <e p="MiniTimeline" t="Include">
@@ -216,6 +285,7 @@
               <e p="MiniTimeline.cs" t="Include" />
             </e>
             <e p="NotificationShower.cs" t="Include" />
+            <e p="NRThemeable.cs" t="Include" />
             <e p="ParallaxBG.cs" t="Include" />
             <e p="PauseStart" t="Include">
               <e p="PauseMenu.cs" t="Include" />
@@ -228,6 +298,9 @@
             <e p="UIModeSelect.cs" t="Include" />
             <e p="UINoteHandler.cs" t="Include" />
             <e p="UIToolSelect.cs" t="Include" />
+            <e p="UpdaterWindow" t="Include">
+              <e p="UpdaterWindow.cs" t="Include" />
+            </e>
           </e>
           <e p="UIMetadata.cs" t="Include" />
           <e p="UISettings.cs" t="Include" />
@@ -345,14 +418,16 @@
             <e p="EmojiOne Attribution.txt" t="Include" />
           </e>
         </e>
+        <e p="TextSliderCombo.cs" t="Include" />
       </e>
       <e p="NotReaper.sln" t="IncludeFlat" />
       <e p="obj" t="ExcludeRecursive" />
       <e p="packages" t="ExcludeRecursive" />
+      <e p="Sirenix.OdinInspector.CompatibilityLayer.csproj" t="IncludeRecursive" />
+      <e p="Sirenix.OdinInspector.CompatibilityLayer.Editor.csproj" t="IncludeRecursive" />
       <e p="Temp\bin" t="ExcludeRecursive" />
     </e>
-    <e p="C:\Users\circu\.Rider2019.2\config\scratches" t="IncludeRecursive" />
-    <e p="C:\Users\circu\.Rider2019.2\system\extResources" t="IncludeRecursive" />
-    <e p="C:\Users\circu\.Rider2019.2\system\resharper-host\Local\Transient\ReSharperHost\v192\SolutionCaches\_NotReaper.-1185763192.00" t="ExcludeRecursive" />
+    <e p="C:\Users\circu\AppData\Local\JetBrains\Rider2020.1\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\circu\AppData\Local\JetBrains\Rider2020.1\resharper-host\Local\Transient\ReSharperHost\v201\SolutionCaches\_NotReaper.-1185763192.00" t="ExcludeRecursive" />
   </component>
 </project>

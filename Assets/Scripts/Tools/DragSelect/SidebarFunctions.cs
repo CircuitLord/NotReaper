@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NotReaper.Grid;
@@ -6,6 +7,8 @@ using NotReaper.Targets;
 using NotReaper.UI;
 using NotReaper.UserInput;
 using NotReaper.Managers;
+using Sirenix.OdinInspector;
+using UnityEngine.UI;
 
 namespace NotReaper.Tools {
     public class SidebarFunctions : MonoBehaviour
@@ -13,6 +16,31 @@ namespace NotReaper.Tools {
         public Timeline timeline;
         
         public UndoRedoManager undoRedoManager;
+
+        [ChildGameObjectsOnly]
+        [SerializeField] private List<Button> selectionTools;
+        
+        
+
+        private bool notesSelectedState = true;
+        
+        private void Update() {
+
+            if (notesSelectedState != timeline.areNotesSelected) {
+                notesSelectedState = timeline.areNotesSelected;
+                
+                UpdateButtonState();
+            }
+            
+        }
+
+
+        private void UpdateButtonState() {
+            foreach (Button b in selectionTools) {
+                b.interactable = notesSelectedState;
+            }
+        }
+        
 
         public void FlipTargetsVertical() => timeline.FlipTargetsVertical(timeline.selectedNotes);
         public void FlipTargetsHorizontal() => timeline.FlipTargetsHorizontal(timeline.selectedNotes);
