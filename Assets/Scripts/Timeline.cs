@@ -698,6 +698,26 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
+		public void Scale(List<Target> targets, float scale) {
+			var action = new NRActionScale();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
+			action.scale = scale;
+			Tools.undoRedoManager.AddAction(action);
+		}
+
+		public void Rotate(List<Target> targets, int angle) {
+			var action = new NRActionRotate();
+			action.rotateAngle = angle;
+			action.affectedTargets = targets.Select(target => target.data).ToList();
+			Tools.undoRedoManager.AddAction(action);
+		}
+
+		public void Reverse(List<Target> targets) {
+			var action = new NRActionReverse();
+			action.affectedTargets = targets.Select(target => target.data).ToList();
+			Tools.undoRedoManager.AddAction(action);
+		}
+
 		// Flip the selected targets on the grid about the Y
 		public void FlipTargetsVertical(List<Target> targets) {
 			var action = new NRActionVFlipNotes();

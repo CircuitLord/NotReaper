@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using NotReaper.Managers;
 using NotReaper.Timing;
+using System;
 
 namespace NotReaper.Tools {
 
@@ -248,6 +249,160 @@ namespace NotReaper.Tools {
 		}
 		public override void UndoAction(Timeline timeline) {
 			DoAction(timeline); //Swap is symmetrical
+		}
+	}
+
+	public class NRActionScale : NRAction {
+		public List<TargetData> affectedTargets = new List<TargetData>();
+		
+		public float scale;
+
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					targetData.y *= scale;
+					targetData.x *= scale;
+
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.stepDistance *= scale;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					targetData.y /= scale;
+					targetData.x /= scale;
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.stepDistance /= scale;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});	
+		}
+	}
+
+	public class NRActionRotate : NRAction {
+		public List<TargetData> affectedTargets = new List<TargetData>();
+
+		public int rotateAngle = 0;
+
+		public Vector2 rotateCenter = Vector2.zero;
+
+		public void NRRotate(TargetData data, Vector2 center, int angle)
+		{			
+			data.x -= center.x;
+			data.y -= center.y;
+			angle = -angle;
+
+			Vector2 rotate;
+
+			rotate.x = (float)(data.x * Math.Cos(angle / 180f * Math.PI) + data.y * Math.Sin(angle / 180f * Math.PI));
+			rotate.y = (float)(data.x * -Math.Sin(angle / 180f * Math.PI) + data.y * Math.Cos(angle / 180f * Math.PI));	
+			rotate.x += center.x;
+			rotate.y += center.y;
+
+			data.x = rotate.x;
+			data.y = rotate.y;
+		}		
+		public override void DoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					NRRotate(targetData, rotateCenter, rotateAngle);
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.initialAngle -= rotateAngle;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});
+		}
+		public override void UndoAction(Timeline timeline) {
+			affectedTargets.ForEach(targetData => {
+				if(targetData.behavior != TargetBehavior.Melee) {
+					NRRotate(targetData, rotateCenter, -rotateAngle);
+					if(targetData.behavior == TargetBehavior.NR_Pathbuilder) {
+						targetData.pathBuilderData.initialAngle += rotateAngle;
+
+						ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
+					}
+				}
+			});	
+		}
+	}
+
+
+	public class NRActionReverse : NRAction {
+		public List<TargetData> affectedTargets = new List<TargetData>();
+		public override void DoAction(Timeline timeline) {
+            bool first = true;
+
+            ulong firstTick = 0, lastTick = 0;
+            
+            //Find the first and last note in the sequence
+            foreach (TargetData data in affectedTargets) {
+
+                if (first) {
+                    firstTick = data.time.tick;
+                    lastTick = data.time.tick;
+                    first = false;
+                }
+                
+                else if (data.time.tick > lastTick) {
+                    lastTick = data.time.tick;
+                }
+
+                else if (data.time.tick < firstTick) {
+                    firstTick = data.time.tick;
+                }
+                
+            }
+            
+            //Reverse the notes
+            foreach (TargetData data in affectedTargets) {
+                ulong amt = data.time.tick - firstTick;
+                
+                data.time = new QNT_Timestamp(lastTick - amt);
+            }
+
+			timeline.SortOrderedList();
+		}
+		public override void UndoAction(Timeline timeline) {
+            bool first = true;
+
+            ulong firstTick = 0, lastTick = 0;
+            
+            //Find the first and last note in the sequence
+            foreach (TargetData data in affectedTargets) {
+
+                if (first) {
+                    firstTick = data.time.tick;
+                    lastTick = data.time.tick;
+                    first = false;
+                }
+                
+                else if (data.time.tick > lastTick) {
+                    lastTick = data.time.tick;
+                }
+
+                else if (data.time.tick < firstTick) {
+                    firstTick = data.time.tick;
+                }
+                
+            }
+            
+            //Reverse the notes
+            foreach (TargetData data in affectedTargets) {
+                ulong amt = data.time.tick - firstTick;
+                
+                data.time = new QNT_Timestamp(lastTick - amt);
+            }
+			
+			timeline.SortOrderedList();
 		}
 	}
 
