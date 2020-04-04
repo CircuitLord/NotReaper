@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -59,9 +59,15 @@ namespace NotReaper.Timing {
             t.localPosition = new Vector3(0, position.y, position.z);
             window.alpha = 0;
 
-            string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG/ffmpeg.exe");
-			ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
-			ffmpeg.StartInfo.FileName = ffmpegPath;
+            string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg.exe");
+
+            if (((Application.platform == RuntimePlatform.LinuxEditor) || (Application.platform == RuntimePlatform.LinuxPlayer)) || 
+            ((Application.platform == RuntimePlatform.OSXEditor) || (Application.platform == RuntimePlatform.OSXPlayer)))
+                ffmpegPath = TrimAudio.GetffmpgPath();
+
+            ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            ffmpeg.StartInfo.FileName = ffmpegPath;
+
             ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             ffmpeg.StartInfo.UseShellExecute = false;
             ffmpeg.StartInfo.RedirectStandardOutput = true;
@@ -203,14 +209,10 @@ namespace NotReaper.Timing {
                     UnityEngine.Debug.Log(www.error);
                 } else {
                     audioFile = DownloadHandlerAudioClip.GetContent(www);
-
                     timeline.LoadTimingMode(audioFile);
-
                     ApplyValues();
 
                     yield break;
-
-
                 }
             }
         }

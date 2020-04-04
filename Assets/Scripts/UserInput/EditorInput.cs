@@ -99,31 +99,31 @@ namespace NotReaper.UserInput {
 			timeline.UpdateUIColors();
 
 			FigureOutIsInUI();
-			StartCoroutine(LoadBGImage("file://" + NRSettings.config.bgImagePath));
+			StartCoroutine(LoadBGImage(NRSettings.config.bgImagePath));
 			
 			nrDiscordPresence.InitPresence();
 		}
 
 
 		IEnumerator LoadBGImage(string URL) {
-			WWW www = new WWW(URL);
-			while (!www.isDone) {
-				//Debug.Log("Download image on progress" + www.progress);
-				yield return null;
-			}
-
-			if (!string.IsNullOrEmpty(www.error)) {
-				Debug.Log("Download failed");
-			} else {
-				Debug.Log("BG Loaded");
+			try
+			{
+				byte[] imageBytes = System.IO.File.ReadAllBytes(URL);
 				Texture2D texture = new Texture2D(1, 1);
-				www.LoadImageIntoTexture(texture);
+				texture.LoadImage(imageBytes);
 
 				Sprite sprite = Sprite.Create(texture,
 					new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-
 				bgImage.sprite = sprite;
+
+				Debug.Log("BG Loaded");
 			}
+			catch(System.Exception e)
+			{
+				Debug.LogError(e.Message);
+			}
+
+			yield return null;
 		}
 
 		public static Color GetSelectedColor() {

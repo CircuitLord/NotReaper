@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,8 +24,12 @@ namespace NotReaper.Timing {
 
         public TrimAudio() {
             string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg.exe");
-			ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
-			ffmpeg.StartInfo.FileName = ffmpegPath;
+
+            if (((Application.platform == RuntimePlatform.LinuxEditor) || (Application.platform == RuntimePlatform.LinuxPlayer)) || 
+            ((Application.platform == RuntimePlatform.OSXEditor) || (Application.platform == RuntimePlatform.OSXPlayer)))
+                ffmpegPath = TrimAudio.GetffmpgPath();
+
+            ffmpeg.StartInfo.FileName = ffmpegPath;
             ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             ffmpeg.StartInfo.UseShellExecute = false;
             ffmpeg.StartInfo.RedirectStandardOutput = true;
@@ -41,12 +45,12 @@ namespace NotReaper.Timing {
             string args;
             
             if (skipRetime) {
-	            args = String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", path, output);
+                args = String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", path, output);
             }
 
             else {
-				args = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
-	            
+                args = String.Format("-y -i \"{0}\" -af \"adelay={1}|{1}\" -map 0:a \"{2}\"", path, ms, output);
+                
             }
             
             Debug.Log($"Running ffmpeg with args {args}");
@@ -75,6 +79,30 @@ namespace NotReaper.Timing {
             return padding - shift;
         }
 
-    }
+        public static string GetffmpgPath() {
+            Process p = new Process();
+            ProcessStartInfo info = new ProcessStartInfo("bash") {
+                // Shell script required since bash doesn't use the same PATH environment variable if run in unity.
+                Arguments = "-c" + " \"" + Application.streamingAssetsPath + "/FFMPEG/ffmpegPath.sh\"",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Minimized
+            };
 
+            p.StartInfo = info;
+            p.Start();
+            p.WaitForExit();
+
+            var output = p.StandardOutput.ReadToEnd();
+
+            if (output.Length == 0) {
+                Debug.Log("ffmpeg is not installed.");
+                return null;
+            }
+            else {
+                return output.TrimEnd();
+            }
+        }
+    }
 }
