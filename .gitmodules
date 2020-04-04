@@ -1,0 +1,3 @@
+[submodule "Assets/Plugins/CUI"]
+	path = Assets/Plugins/CUI
+	url = https://github.com/CircuitLord/CircuitUserInterface
