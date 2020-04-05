@@ -49,6 +49,9 @@ namespace NotReaper {
                     if (config.bgImagePath == winConfigDir)
                         config.bgImagePath = GetbgImagePath();
 
+                if (!(File.Exists(config.bgImagePath)))
+                    GenNewConfig(true);
+
             } catch (Exception e) {
                 Debug.LogError(e);
             }
@@ -76,7 +79,7 @@ namespace NotReaper {
 	        SaveSettingsJson();
         }
 
-        private static void GenNewConfig() {
+        private static void GenNewConfig(bool regenConfig = false) {
 
             //Debug.Log("Generating new configuration file...");
 
@@ -95,18 +98,20 @@ namespace NotReaper {
             if ((Application.platform == RuntimePlatform.LinuxEditor) || (Application.platform == RuntimePlatform.LinuxPlayer))
                 destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.config/unity3d/" + Application.companyName + "/" + Application.productName);
 
-            if ((Application.platform == RuntimePlatform.OSXEditor) || (Application.platform == RuntimePlatform.OSXPlayer)) {
+            // On OSX the folder that unity creates is different based on if NotReaper is being launched in the editor/player.
+            if (Application.platform == RuntimePlatform.OSXEditor)
                 destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.companyName + "/" + Application.productName);
 
-                if (Environment.OSVersion.Version.Major >= 18)
-                    destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.identifier);
-            }
+            if (Application.platform == RuntimePlatform.OSXPlayer)
+                destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.identifier);
             
             //It's release time and I need a fix ok, don't make fun of my code.
-            if (File.Exists(Path.Combine(destPath, "BG1.png"))) return;
-            if (File.Exists(Path.Combine(destPath, "BG2.png"))) return;
-            if (File.Exists(Path.Combine(destPath, "BG3.png"))) return;
-            if (File.Exists(Path.Combine(destPath, "BG4.jpg"))) return;
+            if (!regenConfig) {
+                if (File.Exists(Path.Combine(destPath, "BG1.png"))) return;
+                if (File.Exists(Path.Combine(destPath, "BG2.png"))) return;
+                if (File.Exists(Path.Combine(destPath, "BG3.png"))) return;
+                if (File.Exists(Path.Combine(destPath, "BG4.jpg"))) return;
+            }
             
             //Copy bg images over
             File.Copy(Path.Combine(Application.streamingAssetsPath, "BG1.png"), destPath + "/BG1.png", false);
@@ -121,15 +126,22 @@ namespace NotReaper {
 
             if ((Application.platform == RuntimePlatform.LinuxEditor) || (Application.platform == RuntimePlatform.LinuxPlayer))
                 imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.config/unity3d/" + Application.companyName + "/" + Application.productName + "/BG1.png");
-
-            if ((Application.platform == RuntimePlatform.OSXEditor) || (Application.platform == RuntimePlatform.OSXPlayer)) {
+            
+            if (Application.platform == RuntimePlatform.OSXEditor)
                 imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.companyName + "/" + Application.productName + "/BG1.png");
 
-                if (Environment.OSVersion.Version.Major >= 18)
-                    imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.identifier + "/BG1.png");
-            }
+            if (Application.platform == RuntimePlatform.OSXPlayer)
+                imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.identifier + "/BG1.png");
 
             return(imagePath);
+        }
+
+        public static bool GetDiscordRichPresence() {
+            // Discord Manager is broken on mac.
+            if ((Application.platform == RuntimePlatform.OSXEditor) || (Application.platform == RuntimePlatform.OSXPlayer))
+                return false;
+
+            return true;
         }
     }
 
@@ -160,7 +172,7 @@ namespace NotReaper {
 
         public double UIFadeDuration = 1.0f;
 
-        public bool useDiscordRichPresence = true;
+        public bool useDiscordRichPresence = NRSettings.GetDiscordRichPresence();
         public bool showTimeElapsed = true;
 
         public bool clearCacheOnStartup = true;
