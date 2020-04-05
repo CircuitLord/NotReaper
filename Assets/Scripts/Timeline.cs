@@ -1270,6 +1270,7 @@ namespace NotReaper {
 			c.time = time;
 			c.microsecondsPerQuarterNote = microsecondsPerQuarterNote;
 			c.timeSignature = signature;
+			c.secondsFromStart = TimestampToSeconds(time);
 
 			UInt64 prevMicrosecondPerQuarterNote = 0;
 
@@ -1486,16 +1487,74 @@ namespace NotReaper {
 			}
 		}
 
-		public int GetCurrentBPMIndex(QNT_Timestamp t) {
-			for(int i = 0; i < tempoChanges.Count; ++i) {
-				var c = tempoChanges[i];
+		public BinarySearchResult BinarySearchBPMIndex(float seconds) {
+			BinarySearchResult result;
 
-				if(t >= c.time && (i + 1 >= tempoChanges.Count || t < tempoChanges[i + 1].time)) {
-					return i;
+			int min = 0;
+			int max = tempoChanges.Count - 1;
+				while (min <=max) {
+				int mid = (min + max) / 2;
+				float midCueTime = tempoChanges[mid].secondsFromStart;
+				if (seconds == midCueTime) {
+					while(mid != 0 && tempoChanges[mid - 1].secondsFromStart == seconds) {
+						--mid;
+					}
+
+					result.index = mid;
+					result.found = true;
+					return result;
+				}
+				else if (seconds < midCueTime) {
+					max = mid - 1;
+				}
+				else {
+					min = mid + 1;
 				}
 			}
 
-			return -1;
+			result.index = Math.Min(Math.Max(min, 0), max);
+			result.found = false;
+			return result;
+		}
+
+		public BinarySearchResult BinarySearchBPMIndex(QNT_Timestamp cueTime) {
+			BinarySearchResult result;
+
+			int min = 0;
+			int max = tempoChanges.Count - 1;
+				while (min <=max) {
+				int mid = (min + max) / 2;
+				QNT_Timestamp midCueTime = tempoChanges[mid].time;
+				if (cueTime == midCueTime) {
+					while(mid != 0 && tempoChanges[mid - 1].time == cueTime) {
+						--mid;
+					}
+
+					result.index = mid;
+					result.found = true;
+					return result;
+				}
+				else if (cueTime < midCueTime) {
+					max = mid - 1;
+				}
+				else {
+					min = mid + 1;
+				}
+			}
+
+			result.index = Math.Min(Math.Max(min, 0), max);
+			result.found = false;
+			return result;
+		}
+
+		public int GetCurrentBPMIndex(QNT_Timestamp t) {
+			var res = BinarySearchBPMIndex(t);
+
+			if(res.index > 0 && tempoChanges[0].time > t) {
+				return res.index - 1;
+			}
+
+			return res.index;
 		}
 
 		public TempoChange GetTempoForTime(QNT_Timestamp t) {
@@ -1505,6 +1564,7 @@ namespace NotReaper {
 				change.time = t;
 				change.microsecondsPerQuarterNote = Constants.OneMinuteInMicroseconds / 60;
 				change.timeSignature = new TimeSignature(4,4);
+				change.secondsFromStart = TimestampToSeconds(t);
 				return change;
 			}
 
@@ -2022,7 +2082,27 @@ namespace NotReaper {
 
 		//Shifts `startTime` by `duration` seconds, respecting bpm changes in between
 		public QNT_Timestamp ShiftTick(QNT_Timestamp startTime, float duration) {
-			int currentBpmIdx = GetCurrentBPMIndex(startTime);
+			int currentBpmIdx = -1;
+
+			//If we're stating at the beginning, jump to the nearest tempo marker
+			if(startTime.tick == 0) {
+				if(duration < 0) {
+					return new QNT_Timestamp(0);
+				}
+
+				var res = BinarySearchBPMIndex(duration);
+				currentBpmIdx = res.index;
+				while(currentBpmIdx > 0 && tempoChanges[currentBpmIdx].secondsFromStart > duration) {
+					--currentBpmIdx;
+				}
+
+				startTime = tempoChanges[currentBpmIdx].time;
+				duration -= tempoChanges[currentBpmIdx].secondsFromStart;
+			}
+			else {
+				currentBpmIdx = GetCurrentBPMIndex(startTime);
+			}
+
 			if(currentBpmIdx == -1) {
 				return startTime;
 			}

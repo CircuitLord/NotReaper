@@ -11,6 +11,8 @@ namespace NotReaper.Models {
 		public QNT_Timestamp time;
 		public UInt64 microsecondsPerQuarterNote;
 		public TimeSignature timeSignature;
+
+		public float secondsFromStart;
 	}
 
 	//KEEP IN MIND, almost all the song references are to the moggsong, not the mogg.
