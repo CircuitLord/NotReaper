@@ -115,8 +115,6 @@ namespace NotReaper.UserInput {
 				Sprite sprite = Sprite.Create(texture,
 					new Rect(0, 0, texture.width, texture.height), Vector2.zero);
 				bgImage.sprite = sprite;
-
-				Debug.Log("BG Loaded");
 			}
 			catch(System.Exception e)
 			{
