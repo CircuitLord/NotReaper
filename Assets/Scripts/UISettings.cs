@@ -50,9 +50,11 @@ public class UISettings : MonoBehaviour
 
       if ((Application.platform == RuntimePlatform.OSXEditor) || (Application.platform == RuntimePlatform.OSXPlayer)) {
             FilePath = "open";
-            Arguments = Path.Combine(@"""" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.companyName + "/" + Application.productName + "/NRConfig.txt" + @"""");
 
-            if (Environment.OSVersion.Version.Major >= 18)
+            if (Application.platform == RuntimePlatform.OSXEditor)
+               Arguments = Path.Combine(@"""" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.companyName + "/" + Application.productName + "/NRConfig.txt" + @"""");
+
+            if (Application.platform == RuntimePlatform.OSXPlayer)
                Arguments = Path.Combine(@"""" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.identifier + "/NRConfig.txt" + @"""");
       }
 
