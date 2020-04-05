@@ -1130,7 +1130,7 @@ namespace NotReaper {
 		// then adjust all of the notes in that tempo so that they are still aligned
 		void FixupTempoTimings(List<TempoFixup> tempoFixes, List<UpdateTiming> updateTimings) {
 			foreach(TempoFixup fixup in tempoFixes) {
-				QNT_Timestamp newTime = ShiftTick(new QNT_Timestamp(0), fixup.time);
+				QNT_Timestamp newTime = ShiftTick(new QNT_Timestamp(0), fixup.time, false);
 				TempoChange change = tempoChanges[fixup.tempoId];
 				Relative_QNT changeOffset = newTime - change.time;
 
@@ -1154,6 +1154,13 @@ namespace NotReaper {
 			}
 
 			tempoChanges = tempoChanges.OrderBy(tempo => tempo.time.tick).ToList();
+
+			//Fixup secondsFromStart
+			for(int i = 0; i < tempoChanges.Count; ++i) {
+				TempoChange c = tempoChanges[i];
+				c.secondsFromStart = TimestampToSeconds(c.time);
+				tempoChanges[i] = c;
+			}
 		}
 
 		void ShiftNotesByBPM(UInt64 prevMicrosecondPerQuarterNote, QNT_Timestamp time, List<TempoFixup> tempoFixes) {
@@ -2081,11 +2088,11 @@ namespace NotReaper {
 		}
 
 		//Shifts `startTime` by `duration` seconds, respecting bpm changes in between
-		public QNT_Timestamp ShiftTick(QNT_Timestamp startTime, float duration) {
+		public QNT_Timestamp ShiftTick(QNT_Timestamp startTime, float duration, bool useBinarySearch = true) {
 			int currentBpmIdx = -1;
 
 			//If we're stating at the beginning, jump to the nearest tempo marker
-			if(startTime.tick == 0) {
+			if(startTime.tick == 0 && useBinarySearch) {
 				if(duration < 0) {
 					return new QNT_Timestamp(0);
 				}
