@@ -1,0 +1,46 @@
+Changelog:
+
+v3.1.1:
+ - Fix issue with URP Post Processing
+
+v3.1.0:
+ *** Breaking change for LWRP project ***
+ - If you're using the asset in an existing LWRP project, please delete its folder first and import it again to avoid issue.
+ - If you're using the "Demo Forward Renderer" and "Demo LightweightRenderPipelineAsset", you'll have to replace them with the new one located in "Universal RP/'Configs" folder. I recommend creating your own, specific to your project.
+ ***
+
+ - Added Universal RP support. LWRP support package is included for compatibility with older Unity version, but will not be updated anymore.
+ - Fix some small bugs.
+
+v3.0.5:
+ - Added demo and documentation for setting up Translucent Images in world space.
+ - Disable scene gizmos.
+
+v3.0.4:
+ - Better default file name when creating Blur Config from Translucent Image Source.
+ - Some improvement to error messages
+
+v3.0.3:
+ - Fixed some bugs in demo scene
+
+v3.0.2:
+ - Fixed some bugs on LWRP
+ - Added new demo for LWRP
+
+v3.0.1:
+ - Fix compatibility issue with Post Processing Stack on LWRP
+
+v3.0:
+!!!Warning!!! Breaking changes:
+ - Blur Config now stored as asset file, allows for sharing of configuration between different Cameras/Scenes/Projects. You will need to re-config your all of your Translucent Image Sources. Settings on Translucent Images will be fine.
+ - Blur Size now called Radius to align with other software.
+
+Added:
+ - Initial LWRP support. Please visit the documentation for setup guide.
+ - Bug fixes and performance improvements.
+ - A lot of ground work for additional blur algorithms (none added yet).
+ - Probably bugs. 😩
+
+Changed:
+ - Minimum supported Unity version is now 2017.4
+ - Clearer preview box.

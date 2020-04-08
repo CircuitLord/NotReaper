@@ -1,0 +1,10 @@
+{
+    "name": "LeTai.TranslucentImage.Editor",
+    "references": [
+        "LeTai.TranslucentImage"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
