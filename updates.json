@@ -1,5 +1,5 @@
 {
-    "latestVersion" : "1.4.0",
+    "latestVersion" : "1.2.0",
     "downloadLink" : "https://github.com/CircuitLord/NotReaper/raw/master/updateOnly.zip",
     "changelog" : "Way too much stuff.\nNew transform tools, scale, rotate, and flip stuff to your desire\nUpgrades to note visuals.\nLinux and Mac support.\nAnd more!",
     "forced" : false
