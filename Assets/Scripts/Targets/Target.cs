@@ -355,8 +355,8 @@ namespace NotReaper.Targets {
 			yield return new WaitForSeconds(time + extensionTime);
 
 			if (gridTargetIcon != null) {
-				gridTargetIcon.transform.DOScale(Vector3.one, 0.1f).SetEase(Ease.InOutCubic);
-				gridTargetIcon.holdEndTrans.DOScale(Vector3.one, 0.1f).SetEase(Ease.InOutCubic);
+				gridTargetIcon.transform.DOScale(new Vector3(NRSettings.config.noteScale, NRSettings.config.noteScale, 1f), 0.1f).SetEase(Ease.InOutCubic);
+				gridTargetIcon.holdEndTrans.DOScale(new Vector3(NRSettings.config.noteScale, NRSettings.config.noteScale, 1f), 0.1f).SetEase(Ease.InOutCubic);
 			}
 
 
@@ -368,7 +368,7 @@ namespace NotReaper.Targets {
 		private IEnumerator AnimateNoteBounce() {
 			DOTween.To((float scale) => {
 				gridTargetIcon.transform.localScale = new Vector3(scale, scale, 1f);
-			}, NRSettings.config.noteHitScale, 1f, 0.3f).SetEase(Ease.OutCubic);
+			}, NRSettings.config.noteHitScale, NRSettings.config.noteScale, 0.3f).SetEase(Ease.OutCubic);
 			
 			yield return new WaitForSeconds(0.3f);
 			noteIsAnimating = false;

@@ -163,9 +163,12 @@ namespace NotReaper {
         public float noteVol = 0.5f;
         public float sustainVol = 0.5f;
         public int audioDSP = 480;
+        public float noteScale = 1.0f;
+        public float noteTimelineScale = 1.0f;
         public float noteHitScale = 0.8f;
         public float bgMoveMultiplier = 1.0f;
         public bool useBouncyAnimations = true;
+        
 
         public bool useAutoZOffsetWith360 = true;
 

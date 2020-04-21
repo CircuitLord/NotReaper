@@ -484,11 +484,12 @@ namespace NotReaper {
 			transform1.localPosition = new Vector3(targetData.time.ToBeatTime(), 0, 0);
 
 			Vector3 noteScale = transform1.localScale;
-			noteScale.x = targetScale;
+			noteScale.x = targetScale;// + (1f - NRSettings.config);
 			transform1.localScale = noteScale;
 
 			var gridTargetIcon = Instantiate(gridTargetIconPrefab, gridTransformParent);
 			gridTargetIcon.transform.localPosition = new Vector3(targetData.x, targetData.y, targetData.time.ToBeatTime());
+			gridTargetIcon.transform.localScale = new Vector3(NRSettings.config.noteScale, NRSettings.config.noteScale, 1f);
 			gridTargetIcon.location = TargetIconLocation.Grid;
 
 			Target target = new Target(targetData, timelineTargetIcon, gridTargetIcon, transient);
@@ -1613,6 +1614,10 @@ namespace NotReaper {
 			foreach (Transform note in timelineTransformParent.transform) {
 				Vector3 noteScale = note.localScale;
 				noteScale.x = targetScale;
+
+				//noteScale.x *= NRSettings.config.noteTimelineScale;
+				//noteScale.y = NRSettings.config.noteTimelineScale;
+				
 				note.localScale = noteScale;
 			}
 
