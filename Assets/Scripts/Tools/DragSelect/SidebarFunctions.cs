@@ -37,7 +37,7 @@ namespace NotReaper.Tools {
 
         private void UpdateButtonState() {
             foreach (Button b in selectionTools) {
-                b.interactable = notesSelectedState;
+                b.gameObject.SetActive(notesSelectedState);
             }
         }
         
