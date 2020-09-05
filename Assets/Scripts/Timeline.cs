@@ -1049,6 +1049,28 @@ namespace NotReaper {
 			}
 		}
 
+		IEnumerator LoadNewAudioClip(string uri)
+		{
+			using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS))
+			{
+				yield return www.SendWebRequest();
+
+				if (www.isNetworkError)
+				{
+					Debug.Log(www.error);
+				}
+				else
+				{
+					AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+					songPlayback.LoadAudioClip(myClip, PrecisePlayback.LoadType.MainSong);
+
+
+					readyToRegenerate = true;
+					RegenerateBPMTimelineData();
+				}
+			}
+		}
+
 		IEnumerator LoadLeftSustain(string uri) {
 			Debug.Log("Loading left sustian.");
 			using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
@@ -2307,6 +2329,61 @@ namespace NotReaper {
 			//Load the generated extra sounds
 			StartCoroutine(LoadExtraAudio($"file://{oggPath}"));
 		}
+
+		public void ReplaceAudio()
+		{
+			var compatible = new[] { new ExtensionFilter("Compatible Audio Types", "mp3", "ogg") };
+			string[] paths = StandaloneFileBrowser.OpenFilePanel("Select music track", Path.Combine(Application.persistentDataPath), compatible, false);
+			var filePath = paths[0];
+
+			if (filePath == null) return;
+
+			string appPath = Application.dataPath;
+			string moggName = "song.mogg";
+			string moggPath = $"{appPath}/.cache/" + moggName;
+
+			var ffmpeg = new System.Diagnostics.Process();
+
+			if (filePath != null)
+			{
+				if (paths[0].EndsWith(".mp3"))
+				{
+					UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg"));
+					ffmpeg.StartInfo.Arguments =
+						String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg");
+					ffmpeg.Start();
+					ffmpeg.WaitForExit();
+					filePath = $"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", filePath);
+					StartCoroutine(GetAudioClip(filePath));
+				}
+				else
+				{
+					StartCoroutine(GetAudioClip(filePath));
+				}
+			}
+
+			ConvertOggToMogg(filePath, moggPath);
+
+			using (var archive = ZipArchive.Open(audicaFile.filepath))
+			{
+				foreach (ZipArchiveEntry entry in archive.Entries)
+				{
+					if (entry.ToString() == moggName)
+					{
+						archive.RemoveEntry(entry);
+					}
+				}
+				archive.AddEntry(moggName, moggPath);
+				archive.SaveTo(audicaFile.filepath + ".temp", SharpCompress.Common.CompressionType.None);
+				archive.Dispose();
+			}
+			File.Delete(audicaFile.filepath);
+			File.Move(audicaFile.filepath + ".temp", audicaFile.filepath);
+
+			StartCoroutine(LoadNewAudioClip($"file://{filePath}"));
+		}
+
+
 
 		public void ShiftEverythingByTime(Relative_QNT shift_amount) {
 			//Shift tempo markers
