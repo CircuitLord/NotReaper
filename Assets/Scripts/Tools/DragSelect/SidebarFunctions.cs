@@ -19,6 +19,8 @@ namespace NotReaper.Tools {
 
         [ChildGameObjectsOnly]
         [SerializeField] private List<Button> selectionTools;
+
+        [SerializeField] private GameObject hiddenButtons;
         
         
 
@@ -28,18 +30,12 @@ namespace NotReaper.Tools {
 
             if (notesSelectedState != timeline.areNotesSelected) {
                 notesSelectedState = timeline.areNotesSelected;
-                
-                UpdateButtonState();
+
+                hiddenButtons.SetActive(notesSelectedState);
             }
             
         }
 
-
-        private void UpdateButtonState() {
-            foreach (Button b in selectionTools) {
-                b.gameObject.SetActive(notesSelectedState);
-            }
-        }
         
 
         public void FlipTargetsVertical() => timeline.FlipTargetsVertical(timeline.selectedNotes);
