@@ -27,6 +27,7 @@ namespace NotReaper.Timing {
         public TextMeshProUGUI nameText;
         public TMP_InputField songNameInput;
         public TMP_InputField mapperInput;
+        public TMP_InputField artistInput;
 
 
         [Header("Extras")]
@@ -41,6 +42,7 @@ namespace NotReaper.Timing {
 
         public string songName = "";
         public string mapperName = "";
+        public string artistName = "";
 
         public bool skipOffset = true;
         public bool isMp3 = false;
@@ -132,8 +134,9 @@ namespace NotReaper.Timing {
 
             timeline.SetTimingModeStats(Constants.MicrosecondsPerQuarterNoteFromBPM(DefaultBPM), 0);
 
-            mapperName = RemoveSpecialCharacters(mapperInput.text);
-            songName = RemoveSpecialCharacters(songNameInput.text);
+            mapperName = mapperInput.text;
+            songName = songNameInput.text;
+            artistName = artistInput.text;
 
             CheckAllUIFilled();
 
@@ -154,7 +157,7 @@ namespace NotReaper.Timing {
 		        
 	        }
 	        else {
-                path = AudicaGenerator.Generate(loadedSong, (songName + "-" + mapperName), songName, "artist", DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0);
+                path = AudicaGenerator.Generate(loadedSong, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0);
 	        }
 	        
             timeline.LoadAudicaFile(false, path);
