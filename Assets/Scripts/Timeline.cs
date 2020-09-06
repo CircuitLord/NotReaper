@@ -1711,9 +1711,12 @@ namespace NotReaper {
 			if (isAltDown && Input.mouseScrollDelta.y < -0.1f) {
 				isScrollingBeatSnap = true;
 				beatSnapSelector.PreviousClick();
+				beatSnapSelector.PreviousClick();
+
 
 			} else if (isAltDown && Input.mouseScrollDelta.y > 0.11f) {
 				isScrollingBeatSnap = true;
+				beatSnapSelector.ForwardClick();
 				beatSnapSelector.ForwardClick();
 			}
 			

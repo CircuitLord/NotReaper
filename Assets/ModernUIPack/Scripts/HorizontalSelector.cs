@@ -29,7 +29,7 @@ namespace Michsky.UI.ModernUIPack {
         }
 
         public void UpdateToIndex(int idx) {
-            if(labeHelper == null) {
+            if (labeHelper == null) {
                 return;
             }
             
@@ -39,9 +39,6 @@ namespace Michsky.UI.ModernUIPack {
             onValueChanged.Invoke();
             label.text = elements[index];
 
-            selectorAnimator.Play(null);
-            selectorAnimator.StopPlayback();
-            selectorAnimator.Play("Previous");
         }
 
         public void PreviousClick() {
@@ -56,9 +53,6 @@ namespace Michsky.UI.ModernUIPack {
             onValueChanged.Invoke();
             label.text = elements[index];
 
-            selectorAnimator.Play(null);
-            selectorAnimator.StopPlayback();
-            selectorAnimator.Play("Previous");
         }
 
         public void ForwardClick() {
@@ -72,10 +66,6 @@ namespace Michsky.UI.ModernUIPack {
 
             onValueChanged.Invoke();
             label.text = elements[index];
-
-            selectorAnimator.Play(null);
-            selectorAnimator.StopPlayback();
-            selectorAnimator.Play("Forward");
         }
     }
 }
