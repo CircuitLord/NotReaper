@@ -66,6 +66,8 @@ namespace NotReaper.UserInput {
 		public GameObject noGrid;
 		public GameObject meleeGrid;
 
+		public TimingPointsPanel timingPointsPanel;
+
 
 		public UIModeSelect editorMode;
 
@@ -380,13 +382,15 @@ namespace NotReaper.UserInput {
 
 			
 
-			if(bpmWindow.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf || addOrTrimAudioWindow.gameObject.activeSelf) {
+			if(bpmWindow.activeSelf || timingPointsPanel.gameObject.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf || addOrTrimAudioWindow.gameObject.activeSelf) {
 				inUI = true;
 				return;
 			}
 		}
 
 		private void Update() {
+
+			if (Input.GetKeyDown(KeyCode.F6)) timingPointsPanel.Toggle();
 
 			if ((Timeline.inTimingMode || countInWindow.gameObject.activeSelf) && inUI) {
 				if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {

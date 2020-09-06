@@ -2339,6 +2339,7 @@ namespace NotReaper {
 			if (filePath == null) return;
 
 			string appPath = Application.dataPath;
+			string mainSongPath = $"{appPath}/.cache/" + $"{audicaFile.desc.cachedMainSong}.ogg";
 			string moggName = "song.mogg";
 			string moggPath = $"{appPath}/.cache/" + moggName;
 
@@ -2361,6 +2362,9 @@ namespace NotReaper {
 					StartCoroutine(GetAudioClip(filePath));
 				}
 			}
+
+			File.Delete(mainSongPath);
+			File.Copy(filePath, mainSongPath);
 
 			ConvertOggToMogg(filePath, moggPath);
 
