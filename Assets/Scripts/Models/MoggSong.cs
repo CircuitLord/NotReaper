@@ -31,13 +31,13 @@ namespace NotReaper.Models
 
     public struct MoggVol
     {
-        public float L;
-        public float R;
+        public float l;
+        public float r;
 
         public MoggVol(float l, float r)
         {
-            L = l;
-            R = r;
+            this.l = l;
+            this.r = r;
         }
     }
 }
