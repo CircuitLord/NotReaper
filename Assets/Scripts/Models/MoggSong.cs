@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.Video;
 
 namespace NotReaper.Models
 {
@@ -22,7 +17,7 @@ namespace NotReaper.Models
             foreach (var line in lines)
             {
                 if (line.Contains("vol")) this.volume = GetMoggVolFromLine(line);
-                if (line.Contains("pan")) this.volume = GetMoggVolFromLine(line);
+                if (line.Contains("pans")) this.volume = GetMoggVolFromLine(line);
             }
         }
 
