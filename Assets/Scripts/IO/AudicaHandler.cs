@@ -31,32 +31,47 @@ namespace NotReaper.IO {
 					MemoryStream ms = new MemoryStream();
 					entry.Extract(ms);
 					string tempDesc = Encoding.UTF8.GetString(ms.ToArray());
-
 					JsonUtility.FromJsonOverwrite(tempDesc, audicaFile.desc);
-
-
 					ms.Dispose();
 					continue;
 				}
 
 				//Extract the cues files.
-				else if (entry.FileName == "expert.cues") {
+				else if (entry.FileName == "expert.cues")
+				{
 					entry.Extract($"{appPath}/.cache");
 					expert = true;
 
-				} else if (entry.FileName == "advanced.cues") {
+				}
+				else if (entry.FileName == "advanced.cues")
+				{
 					entry.Extract($"{appPath}/.cache");
 					advanced = true;
 
-				} else if (entry.FileName == "moderate.cues") {
+				}
+				else if (entry.FileName == "moderate.cues")
+				{
 					entry.Extract($"{appPath}/.cache");
 					standard = true;
 
-				} else if (entry.FileName == "beginner.cues") {
+				}
+				else if (entry.FileName == "beginner.cues")
+				{
 					entry.Extract($"{appPath}/.cache");
 					easy = true;
 				} 
 			}
+
+			//Load moggsongg, has to be done after desc is loaded
+			if (audicaZip.ContainsEntry(audicaFile.desc.moggSong))
+			{
+				MemoryStream ms = new MemoryStream();
+				audicaZip[audicaFile.desc.moggSong].Extract(ms);
+				audicaFile.mainMoggSong = new MoggSong(ms);
+				Debug.Log($"MoggSong volumes: L{audicaFile.mainMoggSong.volume.l}, R{audicaFile.mainMoggSong.volume.r} ");
+			}
+			else Debug.Log("Moggsong not found");
+
 
 			//Now we fill the audicaFile var with all the things it needs.
 			//Remember, all props in audicaFile.desc refer to either moggsong or the name of the mogg.
