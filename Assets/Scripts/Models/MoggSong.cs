@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace NotReaper.Models
@@ -10,18 +11,18 @@ namespace NotReaper.Models
         public MoggVol volume;
         public string moggPath;
         public MoggVol pan;
+        public string[] moggString;
 
         public MoggSong(MemoryStream ms)
         {
             StreamReader reader = new StreamReader(ms);
-            string[] moggString = Encoding.UTF8.GetString(ms.ToArray()).Split(new char[] { '\r', '\n' }, StringSplitOptions.None);
+            moggString = Encoding.UTF8.GetString(ms.ToArray()).Split(new char[] { '\r', '\n' }, StringSplitOptions.None);
             foreach (var line in moggString)
             {
-                if (line.Contains("vol")) this.volume = GetMoggVolFromLine(line);
-                if (line.Contains("pans")) this.volume = GetMoggVolFromLine(line);
+                if (line.Contains("(vol")) this.volume = GetMoggVolFromLine(line);
+                if (line.Contains("(pans")) this.volume = GetMoggVolFromLine(line);
             }
         }
-
         public MoggVol GetMoggVolFromLine(string line)
         {
             var split = line.Split(new char[] { '(', ')' });
@@ -32,6 +33,22 @@ namespace NotReaper.Models
             else values = split[2].Split(new string[] { " " }, StringSplitOptions.None);
             return new MoggVol(float.Parse(values[0]), float.Parse(values[1]));
         }
+
+        public string ExportToText()
+        {
+            string[] exportString = moggString;
+            int volIndex = 0;
+            int panIndex = 0;
+            for (int i = 0; i < exportString.Length; i++)
+            {
+                if (exportString[i].Contains("(vols")) volIndex = i;
+                if (exportString[i].Contains("(pan")) panIndex = i;
+            }
+            exportString[volIndex] = $"(vols ({volume.l.ToString("n2")}   {volume.r.ToString("n2")}))";
+            exportString[panIndex] = $"(pans ({pan.l.ToString("n2")}   {pan.l.ToString("n2")}))";
+            return string.Join("\n", exportString);
+        }
+
     }
 
     public struct MoggVol

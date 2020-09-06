@@ -73,8 +73,13 @@ namespace NotReaper.IO {
 					if (entry.ToString() == "expert.cues") {
 						archive.RemoveEntry(entry);
 						
+
+
 					} else if (entry.ToString() == "song.desc") {
 						archive.RemoveEntry(entry);
+					}
+					else if (entry.ToString() == audicaFile.desc.moggSong)
+					{	archive.RemoveEntry(entry);
 					} else if (entry.ToString() == "song.mid") {
 						archive.RemoveEntry(entry);
 					} else if (entry.ToString() == "advanced.cues") {
@@ -92,6 +97,8 @@ namespace NotReaper.IO {
 				if (standard) archive.AddEntry("moderate.cues", $"{Application.dataPath}/.cache/moderate-new.cues");
 				if (easy) archive.AddEntry("beginner.cues", $"{Application.dataPath}/.cache/beginner-new.cues");
 
+
+				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}");
 				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/song-new.desc");
 				archive.AddEntry("song.mid", $"{Application.dataPath}/.cache/song.mid");
 				archive.SaveTo(audicaFile.filepath + ".temp", SharpCompress.Common.CompressionType.None);
