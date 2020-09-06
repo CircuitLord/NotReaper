@@ -24,7 +24,9 @@ namespace NotReaper.Timing {
         [Header("UI Elements")]
         public Button genAudicaButton;
         public Button selectSongButton;
+        public Button selectMidiButton;
         public TextMeshProUGUI nameText;
+        public TextMeshProUGUI midiText;
         public TMP_InputField songNameInput;
         public TMP_InputField mapperInput;
         public TMP_InputField artistInput;
@@ -39,6 +41,7 @@ namespace NotReaper.Timing {
         private AudioClip audioFile;
         public Timeline timeline;
         public string loadedSong;
+        public string loadedMidi;
 
         public string songName = "";
         public string mapperName = "";
@@ -115,10 +118,24 @@ namespace NotReaper.Timing {
 	                StartCoroutine(GetAudioClip(filePath));
                 }
 
-                nameText.text = paths[0];
+                nameText.text = System.IO.Path.GetFileName(paths[0]);
 	            loadedSong = paths[0];
             }
         }
+
+        public void SelectMidiFile() // Load Midi for tempo
+        {
+            var compatible = new[] { new ExtensionFilter("MIDI", "mid") };
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("Select midi tempo map", Path.Combine(Application.persistentDataPath), compatible, false);
+            var filePath = paths[0];
+
+            if (filePath != null)
+            {
+                midiText.text = System.IO.Path.GetFileName(paths[0]);
+                loadedMidi = paths[0];
+            }
+        }
+
 
         public void Cancel() {
             Timeline.inTimingMode = false;
@@ -153,11 +170,11 @@ namespace NotReaper.Timing {
 
 	        if (isMp3 || !skipOffset) {
                 trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), 0, DefaultBPM, skipOffset);
-                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), songName, "artist", DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0);
+                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), songName, "artist", DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0, loadedMidi);
 		        
 	        }
 	        else {
-                path = AudicaGenerator.Generate(loadedSong, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0);
+                path = AudicaGenerator.Generate(loadedSong, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0, loadedMidi);
 	        }
 	        
             timeline.LoadAudicaFile(false, path);
@@ -165,14 +182,23 @@ namespace NotReaper.Timing {
 
             genAudicaButton.interactable = true;
             selectSongButton.interactable = false;
+            selectMidiButton.interactable = false;
         }
 
         public bool CheckAllUIFilled() {
-            if (loadedSong != "" && mapperName != "" && songName != "") {
-                return true;
-            } else {
-                return false;
+            if (loadedSong != "" && mapperName != "" && songName != "" && artistName != "") {
+                if (loadedMidi != "") {
+                    return true;
+                } 
+                else {
+                    var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
+                    loadedMidi = Path.Combine(workFolder, "songtemplate.mid");
+                    return true;
+                }
             }
+            else {
+                    return false;
+            }     
         }
 
         public IEnumerator FadeIn() {
