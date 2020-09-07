@@ -16,7 +16,7 @@ namespace NotReaper.Models
         public MoggSong(MemoryStream ms)
         {
             StreamReader reader = new StreamReader(ms);
-            moggString = Encoding.UTF8.GetString(ms.ToArray()).Split(new char[] { '\r', '\n' }, StringSplitOptions.None);
+            moggString = Encoding.UTF8.GetString(ms.ToArray()).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in moggString)
             {
                 if (line.Contains("(vol")) this.volume = GetMoggVolFromLine(line);
@@ -41,14 +41,19 @@ namespace NotReaper.Models
             int panIndex = 0;
             for (int i = 0; i < exportString.Length; i++)
             {
+                exportString[i].Replace("\n", "");
                 if (exportString[i].Contains("(vols")) volIndex = i;
                 if (exportString[i].Contains("(pan")) panIndex = i;
             }
             exportString[volIndex] = $"(vols ({volume.l.ToString("n2")}   {volume.r.ToString("n2")}))";
             exportString[panIndex] = $"(pans ({pan.l.ToString("n2")}   {pan.l.ToString("n2")}))";
-            return string.Join("\n", exportString);
+            return string.Join(Environment.NewLine, exportString);
         }
 
+        public void SetVolume(float value)
+        {
+            this.volume.l = this.volume.r = value;
+        }
     }
 
     public struct MoggVol

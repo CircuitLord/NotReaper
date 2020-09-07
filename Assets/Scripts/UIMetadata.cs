@@ -26,6 +26,8 @@ namespace NotReaper.UI {
         public TMP_InputField artistField;
         public TMP_InputField mapperField;
 
+        public TMP_InputField moggSongVolume;
+
 
         public GameObject selectDiffWindow;
 
@@ -38,6 +40,8 @@ namespace NotReaper.UI {
         public GameObject warningDeleteWindow;
 
         public TMP_Dropdown diffDropdown;
+
+       
 
         public void Start() {
             var t = transform;
@@ -53,6 +57,8 @@ namespace NotReaper.UI {
             if (Timeline.desc.artist != null) artistField.text = Timeline.desc.artist;
             if (Timeline.desc.author != null) mapperField.text = Timeline.desc.author;
 
+            if (Timeline.desc.moggSong != null) moggSongVolume.text = Timeline.audicaFile.mainMoggSong.volume.l.ToString("n2");
+
             diffDropdown.value = difficultyManager.loadedIndex;
             ChangeSelectedDifficulty(difficultyManager.loadedIndex);
         }
@@ -65,6 +71,7 @@ namespace NotReaper.UI {
             Timeline.desc.title = titleField.text;
             Timeline.desc.artist = artistField.text;
             Timeline.desc.author = mapperField.text;
+            Timeline.audicaFile.mainMoggSong.SetVolume(float.Parse(moggSongVolume.text));
         }
 
         public void TryCopyCuesToOther() {

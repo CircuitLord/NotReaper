@@ -53,6 +53,7 @@ namespace NotReaper.IO {
 					easy = true;
 				}
 
+				File.WriteAllText($"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}", audicaFile.mainMoggSong.ExportToText());
 				File.WriteAllText($"{Application.dataPath}/.cache/song-new.desc", JsonUtility.ToJson(audicaFile.desc));
 
 				var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
@@ -98,7 +99,7 @@ namespace NotReaper.IO {
 				if (easy) archive.AddEntry("beginner.cues", $"{Application.dataPath}/.cache/beginner-new.cues");
 
 
-				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}");
+				archive.AddEntry($"{audicaFile.desc.moggSong}", $"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}");
 				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/song-new.desc");
 				archive.AddEntry("song.mid", $"{Application.dataPath}/.cache/song.mid");
 				archive.SaveTo(audicaFile.filepath + ".temp", SharpCompress.Common.CompressionType.None);
@@ -107,6 +108,8 @@ namespace NotReaper.IO {
 
 
 			}
+			File.Delete($"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}");
+			
 			File.Delete(audicaFile.filepath);
 			File.Move(audicaFile.filepath + ".temp", audicaFile.filepath);
 
