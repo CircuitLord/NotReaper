@@ -585,11 +585,6 @@ namespace NotReaper {
 
             var action = new NRActionAddRepeaterSection();
 
-            //First, clear all notes in the repeater area
-            foreach (Target t in new NoteEnumerator(newSection.startTime, newSection.endTime)) {
-                action.removeTargets.affectedTargets.Add(t.data);
-            }
-
             //Next, gather all other repeaters with the same id
             List<RepeaterSection> siblingSections = repeaterSections.Where(section => { return section.ID == newSection.ID; }).ToList();
 			if(siblingSections.Count != 0) {
@@ -620,6 +615,13 @@ namespace NotReaper {
 					});
 				}
 			}
+
+            //If there are targets to add from another repeater section, then we need to clear out the notes in our section
+            if (action.addTargets.affectedTargets.Count != 0) {
+                foreach (Target t in new NoteEnumerator(newSection.startTime, newSection.endTime)) {
+                    action.removeTargets.affectedTargets.Add(t.data);
+                }
+            }
 
             action.section = newSection;
             Tools.undoRedoManager.AddAction(action);
