@@ -833,27 +833,26 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void MoveTimelineTargets(List<TargetTimelineMoveIntent> intents) {
-			SortOrderedList();
-			var action = new NRActionTimelineMoveNotes();
-			action.targetTimelineMoveIntents = intents.Select(oldIntent => {
-				var intent = new TargetTimelineMoveIntent(oldIntent);
-				QNT_Timestamp startTime = intent.startTick;
-				QNT_Timestamp endTime = intent.intendedTick;
+        public NRActionTimelineMoveNotes GenerateMoveTimelineAction(List<TargetTimelineMoveIntent> intents) {
+            SortOrderedList();
+            var action = new NRActionTimelineMoveNotes();
+            action.targetTimelineMoveIntents = intents.Select(oldIntent => {
+                var intent = new TargetTimelineMoveIntent(oldIntent);
+                QNT_Timestamp startTime = intent.startTick;
+                QNT_Timestamp endTime = intent.intendedTick;
                 Relative_QNT delta = endTime - startTime;
 
-				//Did we start in a repeater section?
-				RepeaterSection startSection = null;
-				repeaterSections.ForEach(section => {
-					if(section.Contains(startTime)) {
-						startSection = section;
-						return;
-					}
-				});
+                //Did we start in a repeater section?
+                RepeaterSection startSection = null;
+                repeaterSections.ForEach(section => {
+                    if (section.Contains(startTime)) {
+                        startSection = section;
+                        return;
+                    }
+                });
 
                 //We did start in a section!
-                if(startSection != null)
-                {
+                if (startSection != null) {
                     //No matter what, we need to find our siblings in the other sections
                     List<TargetData> siblings = new List<TargetData>();
                     List<RepeaterSection> siblingSections = new List<RepeaterSection>();
@@ -861,107 +860,96 @@ namespace NotReaper {
 
                     repeaterSections.ForEach(section => {
                         //Same section id, but not the one we've already found
-                        if (section.ID == startSection.ID && section != startSection)
-                        {
+                        if (section.ID == startSection.ID && section != startSection) {
                             Relative_QNT offset = (section.startTime - startSection.startTime);
 
-                            if(section.Contains(startTime + offset))
-                            {
+                            if (section.Contains(startTime + offset)) {
                                 var data = FindTargetData(startTime + offset, intent.targetData.behavior, intent.targetData.handType);
-                                if(data == null)
-                                {
+                                if (data == null) {
                                     Debug.LogError("Expected to find a note for a sibling repeater section but none was found! This means that repeaters failed to replicate at some point!");
-						}
-                                else
-                                {
+                                }
+                                else {
                                     siblings.Add(data);
                                     siblingSections.Add(section);
-									}
-									}
-                            else
-                            {
+                                }
+                            }
+                            else {
                                 otherSiblingSections.Add(section);
-								}
-							}
+                            }
+                        }
                     });
 
                     //If we've moved outside our section, then all of our siblings will be destroyed
-                    if (!startSection.Contains(endTime))
-                    {
+                    if (!startSection.Contains(endTime)) {
                         intent.startSiblingsToBeDestroyed = siblings;
-								}
-                    else
-                    {
+                    }
+                    else {
                         //We need to check our siblings to see if they will survive the move
                         List<TargetData> moved = new List<TargetData>();
                         List<TargetData> destroyed = new List<TargetData>();
-                        for (int i = 0; i < siblings.Count; ++i)
-                        {
+                        for (int i = 0; i < siblings.Count; ++i) {
                             var sibling = siblings[i];
                             var siblingSection = siblingSections[i];
-                            
-                            if(siblingSection.Contains(sibling.time + delta))
-                            {
+
+                            if (siblingSection.Contains(sibling.time + delta)) {
                                 moved.Add(sibling);
-								}
-                            else
-                            {
+                            }
+                            else {
                                 destroyed.Add(sibling);
-							}
-						}
+                            }
+                        }
                         intent.startSiblingsToBeMoved = moved;
                         intent.startSiblingsToBeDestroyed = destroyed;
 
                         //We also need to check if any new siblings need to be created from the move (since we can move from a section ouside the bounds of a sibling section to inside their bounds)
                         List<TargetData> created = new List<TargetData>();
-                        otherSiblingSections.ForEach(section =>
-                        {
+                        otherSiblingSections.ForEach(section => {
                             Relative_QNT offset = (section.startTime - startSection.startTime);
-                            if (section.Contains(endTime + offset))
-                            {
+                            if (section.Contains(endTime + offset)) {
                                 created.Add(new TargetData(intent.targetData, endTime + offset));
-						}
+                            }
                         });
                         intent.endRepeaterSiblingsToBeCreated = created;
-					}
-				}
+                    }
+                }
 
-				//Did we end in a repeater section that wasn't our start section?
-				RepeaterSection endSection = null;
-				repeaterSections.ForEach(section => {
-					if(section.Contains(endTime) && startSection != section) {
-						endSection = section;
-						return;
-					}
-				});
+                //Did we end in a repeater section that wasn't our start section?
+                RepeaterSection endSection = null;
+                repeaterSections.ForEach(section => {
+                    if (section.Contains(endTime) && startSection != section) {
+                        endSection = section;
+                        return;
+                    }
+                });
 
-				if(endSection != null) {
+                if (endSection != null) {
                     //Gather all the other sections with the same ID
                     List<RepeaterSection> otherSections = new List<RepeaterSection>();
-                    repeaterSections.ForEach(section =>
-                    {
-                        if (section.ID == endSection.ID && section != endSection)
-                        {
+                    repeaterSections.ForEach(section => {
+                        if (section.ID == endSection.ID && section != endSection) {
                             otherSections.Add(section);
-							}
-						});
+                        }
+                    });
 
                     //Create a target in each other section that will contain it
                     List<TargetData> endTargetsToCreate = new List<TargetData>();
-                    otherSections.ForEach(section =>
-                    {
+                    otherSections.ForEach(section => {
                         Relative_QNT offset = (section.startTime - endSection.startTime);
-                        if(section.Contains(endTime + offset))
-                        {
+                        if (section.Contains(endTime + offset)) {
                             endTargetsToCreate.Add(new TargetData(intent.targetData, endTime + offset));
-							}
-						});
+                        }
+                    });
                     intent.endRepeaterSiblingsToBeCreated = endTargetsToCreate;
-				}
-				return intent;
+                }
+                return intent;
 
-			}).ToList();
-			Tools.undoRedoManager.AddAction(action);
+            }).ToList();
+
+            return action;
+        }
+
+        public void MoveTimelineTargets(List<TargetTimelineMoveIntent> intents) {
+			Tools.undoRedoManager.AddAction(GenerateMoveTimelineAction(intents));
 		}
 
 		public void PasteCues(List<TargetData> cues, QNT_Timestamp pasteBeatTime) {

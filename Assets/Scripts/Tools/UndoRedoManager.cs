@@ -387,72 +387,51 @@ namespace NotReaper.Tools {
 
 	public class NRActionReverse : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
+        NRActionTimelineMoveNotes moveAction;
+
 		public override void DoAction(Timeline timeline) {
-            bool first = true;
+            if (moveAction == null) {
+                bool first = true;
 
-            ulong firstTick = 0, lastTick = 0;
-            
-            //Find the first and last note in the sequence
-            foreach (TargetData data in affectedTargets) {
+                ulong firstTick = 0, lastTick = 0;
 
-                if (first) {
-                    firstTick = data.time.tick;
-                    lastTick = data.time.tick;
-                    first = false;
-                }
-                
-                else if (data.time.tick > lastTick) {
-                    lastTick = data.time.tick;
+                //Find the first and last note in the sequence
+                foreach (TargetData data in affectedTargets) {
+
+                    if (first) {
+                        firstTick = data.time.tick;
+                        lastTick = data.time.tick;
+                        first = false;
+                    }
+
+                    else if (data.time.tick > lastTick) {
+                        lastTick = data.time.tick;
+                    }
+
+                    else if (data.time.tick < firstTick) {
+                        firstTick = data.time.tick;
+                    }
+
                 }
 
-                else if (data.time.tick < firstTick) {
-                    firstTick = data.time.tick;
+                List<TargetTimelineMoveIntent> intents = new List<TargetTimelineMoveIntent>();
+                foreach (TargetData data in affectedTargets) {
+                    ulong amt = data.time.tick - firstTick;
+                    TargetTimelineMoveIntent intent = new TargetTimelineMoveIntent();
+                    intent.targetData = data;
+                    intent.startTick = data.time;
+                    intent.intendedTick = new QNT_Timestamp(lastTick - amt);
+                    intents.Add(intent);
                 }
-                
+
+                moveAction = timeline.GenerateMoveTimelineAction(intents);
             }
-            
-            //Reverse the notes
-            foreach (TargetData data in affectedTargets) {
-                ulong amt = data.time.tick - firstTick;
-                
-                data.time = new QNT_Timestamp(lastTick - amt);
-            }
 
-			timeline.SortOrderedList();
+            moveAction.DoAction(timeline);
 		}
 		public override void UndoAction(Timeline timeline) {
-            bool first = true;
-
-            ulong firstTick = 0, lastTick = 0;
-            
-            //Find the first and last note in the sequence
-            foreach (TargetData data in affectedTargets) {
-
-                if (first) {
-                    firstTick = data.time.tick;
-                    lastTick = data.time.tick;
-                    first = false;
-                }
-                
-                else if (data.time.tick > lastTick) {
-                    lastTick = data.time.tick;
-                }
-
-                else if (data.time.tick < firstTick) {
-                    firstTick = data.time.tick;
-                }
-                
-            }
-            
-            //Reverse the notes
-            foreach (TargetData data in affectedTargets) {
-                ulong amt = data.time.tick - firstTick;
-                
-                data.time = new QNT_Timestamp(lastTick - amt);
-            }
-			
-			timeline.SortOrderedList();
-		}
+            moveAction.UndoAction(timeline);
+        }
 	}
 
 	public class NRActionSetTargetHitsound : NRAction {
