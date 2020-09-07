@@ -25,13 +25,22 @@ namespace NotReaper.Models
         }
         public MoggVol GetMoggVolFromLine(string line)
         {
-            var split = line.Split(new char[] { '(', ')' });
-            string[] values;
-            if(split[2].Contains("    ")) values = split[2].Split(new string[] { "    " }, StringSplitOptions.None);
-            else if(split[2].Contains("   ")) values = split[2].Split(new string[] { "   " }, StringSplitOptions.None);
-            else if(split[2].Contains("  ")) values = split[2].Split(new string[] { "  " }, StringSplitOptions.None);
-            else values = split[2].Split(new string[] { " " }, StringSplitOptions.None);
-            return new MoggVol(float.Parse(values[0]), float.Parse(values[1]));
+            try
+            {
+                var split = line.Split(new char[] { '(', ')' });
+                string[] values;
+                if (split[2].Contains("    ")) values = split[2].Split(new string[] { "    " }, StringSplitOptions.None);
+                else if (split[2].Contains("   ")) values = split[2].Split(new string[] { "   " }, StringSplitOptions.None);
+                else if (split[2].Contains("  ")) values = split[2].Split(new string[] { "  " }, StringSplitOptions.None);
+                else values = split[2].Split(new string[] { " " }, StringSplitOptions.None);
+                return new MoggVol(float.Parse(values[0]), float.Parse(values[1]));
+            }
+            catch (Exception)
+            {
+                UnityEngine.Debug.LogWarning("Moggsong is invalid. Using defaults instead");
+                return new MoggVol(0f, 0f);
+
+            }
         }
 
         public string ExportToText()
