@@ -169,7 +169,8 @@ namespace NotReaper {
 		public QNT_Timestamp startTime; //Time when this section starts (inclusive)
 		public QNT_Timestamp endTime; //Time when this section ends (inclusive)
 		public GameObject timelineSectionObj;
-	}
+		public GameObject miniTimelineSectionObj;
+    }
 
 	public class Timeline : MonoBehaviour {
 
@@ -582,8 +583,15 @@ namespace NotReaper {
 				return;
 			}
 
-			//First, gather all other repeaters with the same id
-			List<RepeaterSection> siblingSections = repeaterSections.Where(section => { return section.ID == newSection.ID; }).ToList();
+            var action = new NRActionAddRepeaterSection();
+
+            //First, clear all notes in the repeater area
+            foreach (Target t in new NoteEnumerator(newSection.startTime, newSection.endTime)) {
+                action.removeTargets.affectedTargets.Add(t.data);
+            }
+
+            //Next, gather all other repeaters with the same id
+            List<RepeaterSection> siblingSections = repeaterSections.Where(section => { return section.ID == newSection.ID; }).ToList();
 			if(siblingSections.Count != 0) {
 				//Find the section with the largest length
 				int index = -1;
@@ -608,59 +616,62 @@ namespace NotReaper {
 
 					Relative_QNT offset = (newSection.startTime - masterSection.startTime);
 					sectionNotes.ForEach(data => {
-						AddTargetFromAction(new TargetData(data, data.time + offset));
+						action.addTargets.affectedTargets.Add(new TargetData(data, data.time + offset));
 					});
 				}
 			}
 
-			var sectionObject = Instantiate(repeaterSectionPrefab, new Vector3(0, 0, 0), Quaternion.identity, timelineNotesStatic);
-			sectionObject.transform.localPosition = new Vector3(newSection.startTime.ToBeatTime(), -0.111f, 1.0f);
-			var lineRenderer = sectionObject.GetComponent<LineRenderer>();
-			lineRenderer.startWidth = lineRenderer.endWidth = 1.0f;
-			lineRenderer.SetPosition(1, new Vector3((newSection.endTime - newSection.startTime).ToBeatTime(), 0, 0));
-
-			newSection.timelineSectionObj = sectionObject;
-
-			repeaterSections.Add(newSection);
-			repeaterSections.OrderBy(section => section.startTime);
-			miniTimeline.AddRepeaterSection(newSection);
+            action.section = newSection;
+            Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void RemoveRepeater(uint ID, QNT_Timestamp start) {
-			RepeaterSection foundSection = null;
+        public void AddRepeaterSectionFromAction(RepeaterSection newSection) {
+            var sectionObject = Instantiate(repeaterSectionPrefab, new Vector3(0, 0, 0), Quaternion.identity, timelineNotesStatic);
+            sectionObject.transform.localPosition = new Vector3(newSection.startTime.ToBeatTime(), -0.111f, 1.0f);
+            var lineRenderer = sectionObject.GetComponent<LineRenderer>();
+            lineRenderer.startWidth = lineRenderer.endWidth = 1.0f;
+            lineRenderer.SetPosition(1, new Vector3((newSection.endTime - newSection.startTime).ToBeatTime(), 0, 0));
 
-			foreach(RepeaterSection section in repeaterSections) {
-				if(section.ID == ID && start == section.startTime) {
-					foundSection = section;
-					break;
-				}
-			}
+            newSection.timelineSectionObj = sectionObject;
 
-			if(foundSection != null) {
-				GameObject.Destroy(foundSection.timelineSectionObj);
-				repeaterSections.Remove(foundSection);
-			}
-		}
+            repeaterSections.Add(newSection);
+            repeaterSections.OrderBy(section => section.startTime);
+            miniTimeline.AddRepeaterSection(newSection);
+        }
+
+        public void RemoveRepeaterSection(RepeaterSection section) {
+            var action = new NRActionRemoveRepeaterSection();
+            action.section = section;
+            Tools.undoRedoManager.AddAction(action);
+        }
+
+		public void RemoveRepeaterSectionFromAction(RepeaterSection section) {
+            GameObject.Destroy(section.timelineSectionObj);
+            miniTimeline.RemoveRepeaterSection(section);
+            repeaterSections.Remove(section);
+        }
 
 		public void RemoveAllRepeaters() {
 			foreach(RepeaterSection section in repeaterSections) {
-				GameObject.Destroy(section.timelineSectionObj);
+                RemoveRepeaterSectionFromAction(section);
 			}
-			
-			repeaterSections.Clear();
 		}
 
-		public RepeaterSection FindRepeaterForNote(TargetData data) {
-			RepeaterSection targetSection = null;
-			repeaterSections.ForEach(section => {
-				if(data.time >= section.startTime && data.time <= section.endTime) {
-					targetSection = section;
-					return;
-				}
-			});
+        public RepeaterSection FindRepeaterForTime(QNT_Timestamp time) {
+            RepeaterSection targetSection = null;
+            repeaterSections.ForEach(section => {
+                if (section.Contains(time)) {
+                    targetSection = section;
+                    return;
+                }
+            });
 
-			return targetSection;
-		}
+            return targetSection;
+        }
+
+        public RepeaterSection FindRepeaterForNote(TargetData data) {
+            return FindRepeaterForTime(data.time);
+        }
 
 		public List<TargetData> GenerateRepeaterTargets(TargetData data) {
 			List<TargetData> newTargets = new List<TargetData>();
@@ -2032,7 +2043,7 @@ namespace NotReaper {
 
 			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f) {
 				if (!audioLoaded) return;
-				if (EditorInput.inUI) return;
+				if (EditorInput.inUI && EditorInput.enableScrolling == false) return;
 
 				Relative_QNT jumpDuration = new Relative_QNT((long)Constants.DurationFromBeatSnap((uint)beatSnap).tick);
 

@@ -147,9 +147,16 @@ namespace NotReaper.UI {
             lineRenderer.SetPosition(1, new Vector3((float)(barLength * timeline.GetPercentPlayedFromSeconds(timeline.TimestampToSeconds(newSection.endTime) - timeline.TimestampToSeconds(newSection.startTime))), 0, 0));
 
             repeaterSections.Add(sectionObject);
+            newSection.miniTimelineSectionObj = sectionObject;
         }
 
-		public void SetBookmark(float miniXPos, float topXPos,  TargetHandType newType, bool useTopXPos, bool addToAudicaFile = false) {
+        public void RemoveRepeaterSection(RepeaterSection section) {
+            repeaterSections.Remove(section.miniTimelineSectionObj);
+            GameObject.Destroy(section.miniTimelineSectionObj);
+        }
+
+
+        public void SetBookmark(float miniXPos, float topXPos,  TargetHandType newType, bool useTopXPos, bool addToAudicaFile = false) {
 			Bookmark bookmarkMini = Instantiate(bookmarkPrefab, new Vector3(0, 0, 0), Quaternion.identity, bookmarksParent).GetComponent<Bookmark>();
 			
 			Bookmark bookmarkTop = Instantiate(bookmarkPrefab, Timeline.timelineNotesStatic).GetComponent<Bookmark>();

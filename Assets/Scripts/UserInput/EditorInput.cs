@@ -36,7 +36,8 @@ namespace NotReaper.UserInput {
 		public static EditorMode selectedMode = EditorMode.Compose;
 		public static bool isOverGrid = false;
 		public static bool inUI = false;
-		public static bool isFocusGrid = false;
+		public static bool enableScrolling = false;
+        public static bool isFocusGrid = false;
 
 		//public PlaceNote toolPlaceNote;
 		[SerializeField] public EditorToolkit Tools;
@@ -58,6 +59,7 @@ namespace NotReaper.UserInput {
 		[SerializeField] private GameObject bpmResultWindow;
 		[SerializeField] private CountInWindow countInWindow;
 		[SerializeField] private AddOrTrimAudioWindow addOrTrimAudioWindow;
+        [SerializeField] private AddRepeaterWindow repeaterWindow;
 
 
 		public HoverTarget hover;
@@ -357,8 +359,9 @@ namespace NotReaper.UserInput {
 		}
 
 		public void FigureOutIsInUI() {
+            enableScrolling = false;
 
-			if (pauseMenu.isOpened) {
+            if (pauseMenu.isOpened) {
 				inUI = true;
 				return;
 			}
@@ -383,9 +386,14 @@ namespace NotReaper.UserInput {
 
 			
 
-			if(bpmWindow.activeSelf || timingPointsPanel.gameObject.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf || addOrTrimAudioWindow.gameObject.activeSelf) {
+			if(bpmWindow.activeSelf || timingPointsPanel.gameObject.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf || addOrTrimAudioWindow.gameObject.activeSelf || repeaterWindow.gameObject.activeSelf) {
 				inUI = true;
-				return;
+
+                if(repeaterWindow.gameObject.activeSelf) {
+                    enableScrolling = true;
+                }
+
+                return;
 			}
 		}
 
@@ -396,7 +404,8 @@ namespace NotReaper.UserInput {
 
 			if (Input.GetKeyDown(KeyCode.F6)) timingPointsPanel.Toggle();
 
-			if ((Timeline.inTimingMode || countInWindow.gameObject.activeSelf) && inUI) {
+
+            if ((Timeline.inTimingMode || countInWindow.gameObject.activeSelf) && inUI) {
 				if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
 					timeline.TogglePlayback();
 				}
@@ -427,6 +436,9 @@ namespace NotReaper.UserInput {
 					else if(addOrTrimAudioWindow.gameObject.activeSelf) {
 						addOrTrimAudioWindow.Deactivate();
 					}
+                    else if(addOrTrimAudioWindow.gameObject.activeSelf) {
+                        addOrTrimAudioWindow.Deactivate();
+                    }
 					else {
 						pauseMenu.OpenPauseMenu();
 					}
@@ -439,7 +451,19 @@ namespace NotReaper.UserInput {
 				isShiftDown = false;
 			}
 
-			if(Input.GetKeyDown(KeyCode.B)) {
+            if (Input.GetKeyDown(KeyCode.F7)) {
+                if (isShiftDown) {
+                    var foundRepeaterSection = timeline.FindRepeaterForTime(Timeline.time);
+                    if (foundRepeaterSection != null) {
+                        timeline.RemoveRepeaterSection(foundRepeaterSection);
+                    }
+                }
+                else {
+                    repeaterWindow.Activate();
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.B)) {
 				if(isShiftDown) {
 					if(bpmStartTimestamp == null) {
 						bpmStartTimestamp = Timeline.time;

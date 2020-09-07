@@ -606,4 +606,34 @@ namespace NotReaper.Tools {
 			ChainBuilder.ChainBuilder.GenerateChainNotes(removeNoteAction.targetData);
 		}
 	}
+
+    public class NRActionAddRepeaterSection : NRAction {
+        public RepeaterSection section;
+        public NRActionMultiAddNote addTargets = new NRActionMultiAddNote();
+        public NRActionMultiRemoveNote removeTargets = new NRActionMultiRemoveNote();
+
+        public override void DoAction(Timeline timeline) {
+            addTargets.DoAction(timeline);
+            removeTargets.DoAction(timeline);
+            timeline.AddRepeaterSectionFromAction(section);
+        }
+
+        public override void UndoAction(Timeline timeline) {
+            timeline.RemoveRepeaterSectionFromAction(section);
+            addTargets.UndoAction(timeline);
+            removeTargets.UndoAction(timeline);
+        }
+    };
+
+    public class NRActionRemoveRepeaterSection : NRAction {
+        public RepeaterSection section;
+
+        public override void DoAction(Timeline timeline) {
+            timeline.RemoveRepeaterSectionFromAction(section);
+        }
+
+        public override void UndoAction(Timeline timeline) {
+            timeline.AddRepeaterSectionFromAction(section);
+        }
+    };
 }
