@@ -11,228 +11,230 @@ using NotReaper.Timing;
 
 namespace NotReaper.Targets {
 
-	[Serializable]
-	public class PathBuilderData {
-		
-		[SerializeField]
-		private TargetBehavior _behavior;
+    [Serializable]
+    public class PathBuilderData {
 
-		[SerializeField]
-		private TargetVelocity _velocity;
+        [SerializeField]
+        private TargetBehavior _behavior;
 
-		[SerializeField]
-		private TargetHandType _handType;
+        [SerializeField]
+        private TargetVelocity _velocity;
 
-		[SerializeField]
-		private int _interval = 16;
+        [SerializeField]
+        private TargetHandType _handType;
 
-		[SerializeField]
-		private float _initialAngle = 0.0f;
+        [SerializeField]
+        private int _interval = 16;
 
-		[SerializeField]
-		private float _angle = 0.0f;
+        [SerializeField]
+        private float _initialAngle = 0.0f;
 
-		[SerializeField]
-		private float _angleIncrement = 0.0f;
+        [SerializeField]
+        private float _angle = 0.0f;
 
-		[SerializeField]
-		private float _stepDistance = 0.5f;
+        [SerializeField]
+        private float _angleIncrement = 0.0f;
 
-		[SerializeField]
-		private float _stepIncrement = 0.0f;
+        [SerializeField]
+        private float _stepDistance = 0.5f;
 
-		public TargetBehavior behavior {
-			get { return _behavior; }
-			set { _behavior = value; RecalculateChain(); }
-		}
-		public TargetVelocity velocity {
-			get { return _velocity; }
-			set { _velocity = value; RecalculateChain(); }
-		}
-		public TargetHandType handType {
-			get { return _handType; }
-			set { _handType = value; RecalculateChain(); }
-		}
-		public int interval {
-			get { return _interval; }
-			set { _interval = value; RecalculateChain(); }
-		}
-		public float initialAngle {
-			get { return _initialAngle; }
-			set { _initialAngle = value; InitialAngleChangedEvent(); RecalculateChain(); }
-		}
-		public float angle {
-			get { return _angle; }
-			set { _angle = value; RecalculateChain(); }
-		}
-		public float angleIncrement {
-			get { return _angleIncrement; }
-			set { _angleIncrement = value; RecalculateChain(); }
-		}
-		public float stepDistance {
-			get { return _stepDistance; }
-			set { _stepDistance = value; RecalculateChain(); }
-		}
-		public float stepIncrement {
-			get { return _stepIncrement; }
-			set { _stepIncrement = value; RecalculateChain(); }
-		}
+        [SerializeField]
+        private float _stepIncrement = 0.0f;
 
-		public void RecalculateChain() {
-			RecalculateEvent();
-		}
+        public TargetBehavior behavior {
+            get { return _behavior; }
+            set { _behavior = value; RecalculateChain(); }
+        }
+        public TargetVelocity velocity {
+            get { return _velocity; }
+            set { _velocity = value; RecalculateChain(); }
+        }
+        public TargetHandType handType {
+            get { return _handType; }
+            set { _handType = value; RecalculateChain(); }
+        }
+        public int interval {
+            get { return _interval; }
+            set { _interval = value; RecalculateChain(); }
+        }
+        public float initialAngle {
+            get { return _initialAngle; }
+            set { _initialAngle = value; InitialAngleChangedEvent(); RecalculateChain(); }
+        }
+        public float angle {
+            get { return _angle; }
+            set { _angle = value; RecalculateChain(); }
+        }
+        public float angleIncrement {
+            get { return _angleIncrement; }
+            set { _angleIncrement = value; RecalculateChain(); }
+        }
+        public float stepDistance {
+            get { return _stepDistance; }
+            set { _stepDistance = value; RecalculateChain(); }
+        }
+        public float stepIncrement {
+            get { return _stepIncrement; }
+            set { _stepIncrement = value; RecalculateChain(); }
+        }
 
-		public void OnFinishRecalculate() {
-			RecalculateFinishedEvent();
-		}
+        public void RecalculateChain() {
+            RecalculateEvent();
+        }
 
-		[NonSerialized] public Action RecalculateEvent = delegate {};
-		[NonSerialized] public Action RecalculateFinishedEvent = delegate {};
-		[NonSerialized] public Action InitialAngleChangedEvent = delegate {};
-		[NonSerialized] public List<TargetData> generatedNotes = new List<TargetData>();
-		[NonSerialized] public bool createdNotes = false;
+        public void OnFinishRecalculate() {
+            RecalculateFinishedEvent();
+        }
 
-		public void Copy(PathBuilderData data) {
-			behavior = data.behavior;
-			velocity = data.velocity;
-			handType = data.handType;
-			interval = data.interval;
-			initialAngle = data.initialAngle;
-			angle = data.angle;
-			angleIncrement = data.angleIncrement;
-			stepDistance = data.stepDistance;
-			stepIncrement = data.stepIncrement;
-		}
+        [NonSerialized] public Action RecalculateEvent = delegate { };
+        [NonSerialized] public Action RecalculateFinishedEvent = delegate { };
+        [NonSerialized] public Action InitialAngleChangedEvent = delegate { };
+        [NonSerialized] public List<TargetData> generatedNotes = new List<TargetData>();
+        [NonSerialized] public HashSet<TargetData> parentNotes = new HashSet<TargetData>();
+        [NonSerialized] public bool createdNotes = false;
 
-		public void DeleteCreatedNotes(Timeline timeline) {
-			if(createdNotes) {
-				generatedNotes.ForEach(t => {
-					timeline.DeleteTargetFromAction(t);
-				});
-				generatedNotes.Clear();
-				createdNotes = false;
-			}
-		}
-	}
+        public void Copy(PathBuilderData data) {
+            behavior = data.behavior;
+            velocity = data.velocity;
+            handType = data.handType;
+            interval = data.interval;
+            initialAngle = data.initialAngle;
+            angle = data.angle;
+            angleIncrement = data.angleIncrement;
+            stepDistance = data.stepDistance;
+            stepIncrement = data.stepIncrement;
+        }
 
-	internal class TargetDataInternal {
-		private static uint TargetDataId = 0;
+        public void DeleteCreatedNotes(Timeline timeline) {
+            if (createdNotes) {
+                generatedNotes.ForEach(t => {
+                    timeline.DeleteTargetFromAction(t);
+                });
+                generatedNotes.Clear();
+                createdNotes = false;
+            }
+        }
+    }
 
-		public static uint GetNextId() { return TargetDataId++; }
+    internal class TargetDataInternal {
+        private static uint TargetDataId = 0;
 
-		public TargetDataInternal() {
-			InternalId = GetNextId();
-		}
+        public static uint GetNextId() { return TargetDataId++; }
 
-		public uint InternalId {get; private set; }
+        public TargetDataInternal() {
+            InternalId = GetNextId();
+        }
 
-		private float _x;
-		private float _y;
-		private QNT_Timestamp _time;
-		private QNT_Duration _beatLength;
-		private TargetVelocity _velocity;
-		private TargetHandType _handType;
-		private TargetBehavior _behavior;
-		
-		public float x
-		{
-			get { return _x; }
-			set { _x = value; if(PositionChangeEvent != null) PositionChangeEvent(x, y); }
-		}
+        public uint InternalId { get; private set; }
 
-		public float y
-		{
-			get { return _y; }
-			set { _y = value; if(PositionChangeEvent != null) PositionChangeEvent(x, y); }
-		}
+        private float _x;
+        private float _y;
+        private QNT_Duration _beatLength;
+        private TargetVelocity _velocity;
+        private TargetHandType _handType;
+        private TargetBehavior _behavior;
+        public PathBuilderData pathBuilderData;
 
-		public Vector2 position {
-			get { return new Vector2(x, y); }
-			set { _x = value.x; _y = value.y; if(PositionChangeEvent != null) PositionChangeEvent(x, y); }
-		}
+        public float x {
+            get { return _x; }
+            set { _x = value; if (PositionChangeEvent != null) PositionChangeEvent(x, y); }
+        }
 
-		public QNT_Timestamp time
-		{
-			get { return _time; }
-			set { _time = value; if(TickChangeEvent != null) TickChangeEvent(time); }
-		}
+        public float y {
+            get { return _y; }
+            set { _y = value; if (PositionChangeEvent != null) PositionChangeEvent(x, y); }
+        }
 
-		public QNT_Duration beatLength
-		{
-			get { return _beatLength; }
-			set { _beatLength = value; if(BeatLengthChangeEvent != null) BeatLengthChangeEvent(beatLength); }
-		}
+        public Vector2 position {
+            get { return new Vector2(x, y); }
+            set { _x = value.x; _y = value.y; if (PositionChangeEvent != null) PositionChangeEvent(x, y); }
+        }
 
-		public TargetVelocity velocity
-		{
-			get { return _velocity; }
-			set { _velocity = value; if(VelocityChangeEvent != null) VelocityChangeEvent(velocity); }
-		}
-		public TargetHandType handType
-		{
-			get { return _handType; }
-			set { _handType = value; if(HandTypeChangeEvent != null) HandTypeChangeEvent(handType); }
-		}
-		public TargetBehavior behavior
-		{
-			get { return _behavior; }
-			set { var prevBehavior = _behavior; _behavior = value; if(BehaviourChangeEvent != null) BehaviourChangeEvent(prevBehavior, behavior); }
-		}
+        public QNT_Duration beatLength {
+            get { return _beatLength; }
+            set { _beatLength = value; if (BeatLengthChangeEvent != null) BeatLengthChangeEvent(beatLength); }
+        }
+
+        public TargetVelocity velocity {
+            get { return _velocity; }
+            set { _velocity = value; if (VelocityChangeEvent != null) VelocityChangeEvent(velocity); }
+        }
+        public TargetHandType handType {
+            get { return _handType; }
+            set { _handType = value; if (HandTypeChangeEvent != null) HandTypeChangeEvent(handType); }
+        }
+        public TargetBehavior behavior {
+            get { return _behavior; }
+            set { var prevBehavior = _behavior; _behavior = value; if (BehaviourChangeEvent != null) BehaviourChangeEvent(prevBehavior, behavior); }
+        }
 
 
-		public Action<float, float> PositionChangeEvent;
-		public Action<QNT_Timestamp> TickChangeEvent;
-		public Action<QNT_Duration> BeatLengthChangeEvent;
-		public Action<TargetVelocity> VelocityChangeEvent;
-		public Action<TargetHandType> HandTypeChangeEvent;
-		public Action<TargetBehavior, TargetBehavior> BehaviourChangeEvent;
-	}
+        public Action<float, float> PositionChangeEvent;
+        public Action<QNT_Duration> BeatLengthChangeEvent;
+        public Action<TargetVelocity> VelocityChangeEvent;
+        public Action<TargetHandType> HandTypeChangeEvent;
+        public Action<TargetBehavior, TargetBehavior> BehaviourChangeEvent;
+    }
 
-	public class TargetData {
-		internal TargetDataInternal data;
+    public class TargetData {
+        internal TargetDataInternal data;
 
-		public uint ID {get; protected set;}
+        public uint ID { get; protected set; }
 
-		public TargetData() {
-			ID = TargetDataInternal.GetNextId();
-			data = new TargetDataInternal();
+        public TargetData() {
+            ID = TargetDataInternal.GetNextId();
+            data = new TargetDataInternal();
 
-			beatLength = Constants.SixteenthNoteDuration;
-			velocity = TargetVelocity.Standard;
-			handType = TargetHandType.Left;
-			behavior = TargetBehavior.Standard;
-		}
+            beatLength = Constants.SixteenthNoteDuration;
+            velocity = TargetVelocity.Standard;
+            handType = TargetHandType.Left;
+            behavior = TargetBehavior.Standard;
+        }
 
-		public TargetData(Cue cue) {
-			ID = TargetDataInternal.GetNextId();
-			data = new TargetDataInternal();
+        public TargetData(Cue cue) {
+            ID = TargetDataInternal.GetNextId();
+            data = new TargetDataInternal();
 
-			Vector2 pos = NotePosCalc.PitchToPos(cue);
-			x = pos.x;
-			y = pos.y;
-			time = new QNT_Timestamp((UInt64)cue.tick);
-			beatLength = new QNT_Duration((UInt64)cue.tickLength);
-			velocity = cue.velocity;
-			handType = cue.handType;
-			behavior = cue.behavior;
-		}
+            Vector2 pos = NotePosCalc.PitchToPos(cue);
+            x = pos.x;
+            y = pos.y;
+            time = new QNT_Timestamp((UInt64)cue.tick);
+            beatLength = new QNT_Duration((UInt64)cue.tickLength);
+            velocity = cue.velocity;
+            handType = cue.handType;
+            behavior = cue.behavior;
+        }
 
-		public TargetData(TargetData other) {
-			ID = TargetDataInternal.GetNextId();
-			data = other.data;
-		}
+        public TargetData(TargetData other, QNT_Timestamp? timeOverride = null) {
+            ID = TargetDataInternal.GetNextId();
+            data = other.data;
 
-		public void Copy(TargetData data) {
-			x = data.x;
-			y = data.y;
-			time = data.time;
-			beatLength = data.beatLength;
-			velocity = data.velocity;
-			handType = data.handType;
-			behavior = data.behavior;
-		}
+            if (!timeOverride.HasValue) {
+                time = other.time;
+            }
+            else {
+                time = timeOverride.Value;
+            }
+        }
 
-		public PathBuilderData pathBuilderData;
+        public void Copy(TargetData data) {
+            x = data.x;
+            y = data.y;
+            time = data.time;
+            beatLength = data.beatLength;
+            velocity = data.velocity;
+            handType = data.handType;
+            behavior = data.behavior;
+            pathBuilderData = data.pathBuilderData;
+        }
+
+        public PathBuilderData pathBuilderData
+        {
+            get { return data.pathBuilderData; }
+            set { data.pathBuilderData = value; }
+        }
+
+        private QNT_Timestamp _time;
 
 		public float x
 		{
@@ -253,18 +255,14 @@ namespace NotReaper.Targets {
 
 		public virtual QNT_Timestamp time
 		{
-			get { return data.time; }
-			protected set { data.time = value; }
+			get { return _time; }
+			protected set { _time = value; if (TickChangeEvent != null) TickChangeEvent(time); }
 		}
 
-		//These should only be used when you need to set time directly, and are handling repeaters yourself.
+		//This should only be used when you need to set time directly, and are handling repeaters yourself.
 		//In all other cases, NRActionTimelineMoveNotes should be used
 		public virtual void SetTimeFromAction(QNT_Timestamp time) {
 			this.time = time;
-		}
-
-		public virtual void MoveTimeFromAction(QNT_Timestamp newTime) {
-			time = newTime;
 		}
 
 		public QNT_Duration beatLength
@@ -302,11 +300,10 @@ namespace NotReaper.Targets {
 			add { data.PositionChangeEvent += value; }
 			remove {data.PositionChangeEvent -= value; }
 		}
-		public virtual event Action<QNT_Timestamp> TickChangeEvent {
-			add { data.TickChangeEvent += value; }
-			remove {data.TickChangeEvent -= value; }
-		}
-		public event Action<QNT_Duration> BeatLengthChangeEvent {
+		
+        public Action<QNT_Timestamp> TickChangeEvent;
+
+        public event Action<QNT_Duration> BeatLengthChangeEvent {
 			add { data.BeatLengthChangeEvent += value; }
 			remove {data.BeatLengthChangeEvent -= value; }
 		}
@@ -321,48 +318,6 @@ namespace NotReaper.Targets {
 		public event Action<TargetBehavior, TargetBehavior> BehaviourChangeEvent {
 			add { data.BehaviourChangeEvent += value; }
 			remove {data.BehaviourChangeEvent -= value; }
-		}
-	}
-
-
-	public class RepeaterTargetData : TargetData {
-		public RepeaterTargetData(TargetData data, QNT_Timestamp time) {
-			ID = TargetDataInternal.GetNextId();
-			this._time = time;
-			this.data = data.data;
-			data.TickChangeEvent += InvokeBeatTimeChangeEvent;
-		}
-
-		~RepeaterTargetData() {
-			data.TickChangeEvent -= InvokeBeatTimeChangeEvent;
-		}
-
-		QNT_Timestamp _time = new QNT_Timestamp(0);
-
-		private Action<QNT_Timestamp> RelativeBeatTimeChangeEvent;
-
-		public override event Action<QNT_Timestamp> TickChangeEvent {
-			add { RelativeBeatTimeChangeEvent += value; }
-			remove { RelativeBeatTimeChangeEvent -= value; }
-		}
-
-		public override QNT_Timestamp time
-		{
-			get { return _time; }
-			
-			protected set { _time = value; }
-		}
-
-		public override void SetTimeFromAction(QNT_Timestamp time) {
-			this.time = time;
-		}
-
-		public override void MoveTimeFromAction(QNT_Timestamp newTime) {
-			time = newTime;
-		}
-
-		void InvokeBeatTimeChangeEvent(QNT_Timestamp newTime) {
-			if(RelativeBeatTimeChangeEvent != null) RelativeBeatTimeChangeEvent(_time);
 		}
 	}
 }

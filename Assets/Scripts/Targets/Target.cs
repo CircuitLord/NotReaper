@@ -115,8 +115,9 @@ namespace NotReaper.Targets {
 				data.pathBuilderData.InitialAngleChangedEvent += UpdatePathInitialAngle;
 				data.pathBuilderData.RecalculateEvent += RecalculatePathbuilderData;
 				data.pathBuilderData.RecalculateFinishedEvent += UpdatePath;
+                data.pathBuilderData.parentNotes.Add(data);
 
-				UpdatePathInitialAngle();
+                UpdatePathInitialAngle();
 			}
 		}
 
@@ -138,8 +139,9 @@ namespace NotReaper.Targets {
 				data.pathBuilderData.InitialAngleChangedEvent -= UpdatePathInitialAngle;
 				data.pathBuilderData.RecalculateEvent -= RecalculatePathbuilderData;
 				data.pathBuilderData.RecalculateFinishedEvent -= UpdatePath;
+                data.pathBuilderData.parentNotes.Remove(data);
 
-				data.pathBuilderData.DeleteCreatedNotes(timeline);
+                data.pathBuilderData.DeleteCreatedNotes(timeline);
 			}
 		}
 
@@ -288,14 +290,21 @@ namespace NotReaper.Targets {
 				data.pathBuilderData.InitialAngleChangedEvent += UpdatePathInitialAngle;
 				data.pathBuilderData.RecalculateEvent += RecalculatePathbuilderData;
 				data.pathBuilderData.RecalculateFinishedEvent += UpdatePath;
-			}
+            }
 
 			if(oldBehavior == TargetBehavior.NR_Pathbuilder) {
 				data.pathBuilderData.InitialAngleChangedEvent -= UpdatePathInitialAngle;
 				data.pathBuilderData.RecalculateEvent -= RecalculatePathbuilderData;
-				data.pathBuilderData.RecalculateFinishedEvent -= UpdatePath;
-			}
-		}
+                data.pathBuilderData.RecalculateFinishedEvent -= UpdatePath;
+            }
+
+            if (data.behavior != TargetBehavior.NR_Pathbuilder && oldBehavior == TargetBehavior.NR_Pathbuilder) {
+                data.pathBuilderData.parentNotes.Remove(data);
+            }
+            else if(data.behavior == TargetBehavior.NR_Pathbuilder) {
+                data.pathBuilderData.parentNotes.Add(data);
+            }
+        }
 
 		public void UpdateTimelineSustainLength() {
 			if (!data.supportsBeatLength) return;

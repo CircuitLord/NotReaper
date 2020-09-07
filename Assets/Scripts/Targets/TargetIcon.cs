@@ -325,6 +325,10 @@ namespace NotReaper.Targets {
                 return;
             }
 
+            if (data.pathBuilderData.parentNotes.Count == 0) {
+                return;
+            }
+
             var lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>();
             foreach (LineRenderer l in lineRenderers) {
                 switch (data.pathBuilderData.handType) {
@@ -346,9 +350,11 @@ namespace NotReaper.Targets {
                         break;
                 }
 
-                Vector3[] positions = new Vector3[data.pathBuilderData.generatedNotes.Count];
+                int count = data.pathBuilderData.generatedNotes.Count / data.pathBuilderData.parentNotes.Count;
 
-                for(int i = 0; i < data.pathBuilderData.generatedNotes.Count; ++i) {
+                Vector3[] positions = new Vector3[count];
+
+                for(int i = 0; i < count; ++i) {
                     var note = data.pathBuilderData.generatedNotes[i];
                     positions[i] = new Vector3(note.x, note.y, 0.0f);
                 }

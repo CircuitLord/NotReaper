@@ -217,82 +217,84 @@ namespace NotReaper.Tools.ChainBuilder {
 			data.pathBuilderData.createdNotes = true;
 		}
 		
-		public static void CalculateChainNotes(TargetData data) {
-			if(data.behavior != TargetBehavior.NR_Pathbuilder) {
+		public static void CalculateChainNotes(TargetData parentData) {
+			if(parentData.behavior != TargetBehavior.NR_Pathbuilder) {
 				return;
 			}
 
-			if(data.pathBuilderData.createdNotes) {
-				data.pathBuilderData.generatedNotes.ForEach(t => {
+			if(parentData.pathBuilderData.createdNotes) {
+                parentData.pathBuilderData.generatedNotes.ForEach(t => {
 					timeline.DeleteTargetFromAction(t);
 				});
-				data.pathBuilderData.createdNotes = false;
+                parentData.pathBuilderData.createdNotes = false;
 			}
 
 			//No notes can be generated
-			if(data.beatLength.tick == 0) {
+			if(parentData.beatLength.tick == 0) {
 				return;
 			}
 
-			data.pathBuilderData.generatedNotes = new List<TargetData>();
+            parentData.pathBuilderData.generatedNotes = new List<TargetData>();
 
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			/////////                                            WARNING!                                                      /////////
-			/////////       Chainging this calculation breaks backwards compatibility with saves of older NotReaper versions!  /////////
-			/////////                    Make sure to update NRCueData.Version, and handle an upgrade path!                    /////////
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            foreach (TargetData data in parentData.pathBuilderData.parentNotes) {
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                /////////                                            WARNING!                                                      /////////
+                /////////       Chainging this calculation breaks backwards compatibility with saves of older NotReaper versions!  /////////
+                /////////                    Make sure to update NRCueData.Version, and handle an upgrade path!                    /////////
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			//Generate first note at the start
-			TargetData firstData = new TargetData();
-			firstData.behavior = data.pathBuilderData.behavior;
-			firstData.velocity = data.pathBuilderData.velocity;
-			firstData.handType = data.pathBuilderData.handType;
+                //Generate first note at the start
+                TargetData firstData = new TargetData();
+                firstData.behavior = data.pathBuilderData.behavior;
+                firstData.velocity = data.pathBuilderData.velocity;
+                firstData.handType = data.pathBuilderData.handType;
 
-			//Force set the time, since these transient notes will get generated for all pathbuilders in repeaters
-			firstData.SetTimeFromAction(data.time);
+                //Force set the time, since these transient notes will get generated for all pathbuilders in repeaters
+                firstData.SetTimeFromAction(data.time);
 
-			firstData.position = data.position;
-			data.pathBuilderData.generatedNotes.Add(firstData);
+                firstData.position = data.position;
+                data.pathBuilderData.generatedNotes.Add(firstData);
 
-			//We increment as if all these values were for 1/4 notes over 4 beats, makes the ui much better
-			float quarterIncrConvert = (4.0f / data.pathBuilderData.interval) * (Constants.PulsesPerQuarterNote * 4.0f / data.beatLength.tick);
+                //We increment as if all these values were for 1/4 notes over 4 beats, makes the ui much better
+                float quarterIncrConvert = (4.0f / data.pathBuilderData.interval) * (Constants.PulsesPerQuarterNote * 4.0f / data.beatLength.tick);
 
-			//Generate new notes
-			Vector2 currentPos = data.position;
-			Vector2 currentDir = new Vector2(Mathf.Sin(data.pathBuilderData.initialAngle * Mathf.Deg2Rad), Mathf.Cos(data.pathBuilderData.initialAngle * Mathf.Deg2Rad));
-			float currentAngle = (data.pathBuilderData.angle / 4) * quarterIncrConvert;
-			float currentStep = data.pathBuilderData.stepDistance * quarterIncrConvert;
-			
-			TargetBehavior generatedBehavior = data.pathBuilderData.behavior;
-			if(generatedBehavior == TargetBehavior.ChainStart) {
-				generatedBehavior = TargetBehavior.Chain;
-			}
+                //Generate new notes
+                Vector2 currentPos = data.position;
+                Vector2 currentDir = new Vector2(Mathf.Sin(data.pathBuilderData.initialAngle * Mathf.Deg2Rad), Mathf.Cos(data.pathBuilderData.initialAngle * Mathf.Deg2Rad));
+                float currentAngle = (data.pathBuilderData.angle / 4) * quarterIncrConvert;
+                float currentStep = data.pathBuilderData.stepDistance * quarterIncrConvert;
 
-			TargetVelocity generatedVelocity = data.pathBuilderData.velocity;
-			if(generatedVelocity == TargetVelocity.ChainStart) {
-				generatedVelocity = TargetVelocity.Chain;
-			}
+                TargetBehavior generatedBehavior = data.pathBuilderData.behavior;
+                if (generatedBehavior == TargetBehavior.ChainStart) {
+                    generatedBehavior = TargetBehavior.Chain;
+                }
 
-			for(int i = 1; i <= (data.beatLength.tick / (float)Constants.PulsesPerQuarterNote) * (data.pathBuilderData.interval / 4.0f); ++i) {
-				currentPos += currentDir * currentStep;
-				currentDir = currentDir.Rotate(currentAngle);
+                TargetVelocity generatedVelocity = data.pathBuilderData.velocity;
+                if (generatedVelocity == TargetVelocity.ChainStart) {
+                    generatedVelocity = TargetVelocity.Chain;
+                }
 
-				currentAngle += (data.pathBuilderData.angleIncrement / 4) * quarterIncrConvert;
-				currentStep += data.pathBuilderData.stepIncrement * quarterIncrConvert;
+                for (int i = 1; i <= (data.beatLength.tick / (float)Constants.PulsesPerQuarterNote) * (data.pathBuilderData.interval / 4.0f); ++i) {
+                    currentPos += currentDir * currentStep;
+                    currentDir = currentDir.Rotate(currentAngle);
 
-				TargetData newData = new TargetData();
-				newData.behavior = generatedBehavior;
-				newData.velocity = generatedVelocity;
-				newData.handType = data.pathBuilderData.handType;
+                    currentAngle += (data.pathBuilderData.angleIncrement / 4) * quarterIncrConvert;
+                    currentStep += data.pathBuilderData.stepIncrement * quarterIncrConvert;
 
-				//Force set the time, since these transient notes will get generated for all pathbuilders in repeaters
-				newData.SetTimeFromAction(data.time + QNT_Duration.FromBeatTime(i * (4.0f / data.pathBuilderData.interval)));
-				
-				newData.position = currentPos;
-				data.pathBuilderData.generatedNotes.Add(newData);
-			}
+                    TargetData newData = new TargetData();
+                    newData.behavior = generatedBehavior;
+                    newData.velocity = generatedVelocity;
+                    newData.handType = data.pathBuilderData.handType;
 
-			data.pathBuilderData.OnFinishRecalculate();
+                    //Force set the time, since these transient notes will get generated for all pathbuilders in repeaters
+                    newData.SetTimeFromAction(data.time + QNT_Duration.FromBeatTime(i * (4.0f / data.pathBuilderData.interval)));
+
+                    newData.position = currentPos;
+                    data.pathBuilderData.generatedNotes.Add(newData);
+                }
+            }
+
+			parentData.pathBuilderData.OnFinishRecalculate();
 		}
 
 		public void BakePathFromSelectedNote() {
@@ -302,7 +304,7 @@ namespace NotReaper.Tools.ChainBuilder {
 			}
 
 			NRActionBakePath action = new NRActionBakePath();
-			action.data = target.data;
+            action.removeNoteAction = new NRActionRemoveNote { targetData = target.data };
 			timeline.Tools.undoRedoManager.AddAction(action);
 		}
 

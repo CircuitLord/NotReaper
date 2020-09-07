@@ -171,29 +171,40 @@ namespace NotReaper.Tools {
 		public List<TargetTimelineMoveIntent> targetTimelineMoveIntents = new List<TargetTimelineMoveIntent>();
 
 		public override void DoAction(Timeline timeline) {
-			targetTimelineMoveIntents.ForEach(intent => {
-				intent.startRepeaterSiblings.ForEach(data => { timeline.DeleteTargetFromAction(data); });
+            //First, we destroy all siblings (either because we moved out of a repeater, or because we moved too far into a repeater that another section didn't cover)
+            targetTimelineMoveIntents.ForEach(intent =>
+            {
+                intent.startSiblingsToBeDestroyed.ForEach(data => { timeline.DeleteTargetFromAction(data); });
+            });
 
-				if(intent.endTargetData.ID != intent.startTargetData.ID) {
-					timeline.FindNote(intent.startTargetData).ReplaceData(intent.endTargetData);
-				}
-				intent.endTargetData.MoveTimeFromAction(intent.intendedTick);
-				
-				intent.endRepeaterSiblings.ForEach(data => { timeline.AddTargetFromAction(data); });
-			});
+            targetTimelineMoveIntents.ForEach(intent => {
+                //Move the actual note
+                intent.targetData.SetTimeFromAction(intent.intendedTick);
+
+                //Then, we move all the siblings by the delta
+                intent.startSiblingsToBeMoved.ForEach(sibling => { sibling.SetTimeFromAction(sibling.time + (intent.intendedTick - intent.startTick)); });
+
+                //Finally, create targets in the ending section (if any exist)
+                intent.endRepeaterSiblingsToBeCreated.ForEach(data => { timeline.AddTargetFromAction(data); });
+            });
 			timeline.SortOrderedList();
 		}
 		public override void UndoAction(Timeline timeline) {
-			targetTimelineMoveIntents.ForEach(intent => {
-				intent.endRepeaterSiblings.ForEach(data => { timeline.DeleteTargetFromAction(data); });
+            //First, destroy targets in the ending section (if any exist)
+            targetTimelineMoveIntents.ForEach(intent => {
+                intent.endRepeaterSiblingsToBeCreated.ForEach(data => { timeline.DeleteTargetFromAction(data); });
+            });
 
-				if(intent.startTargetData.ID != intent.endTargetData.ID) {
-					timeline.FindNote(intent.endTargetData).ReplaceData(intent.startTargetData);
-				}
-				intent.startTargetData.MoveTimeFromAction(intent.startTick);
+            targetTimelineMoveIntents.ForEach(intent => {
+                //Then, we move all the siblings by the delta
+                intent.startSiblingsToBeMoved.ForEach(sibling => { sibling.SetTimeFromAction(sibling.time + (intent.startTick - intent.intendedTick)); });
 
-				intent.startRepeaterSiblings.ForEach(data => { timeline.AddTargetFromAction(data); });
-			});
+                //First, we move the actual note
+                intent.targetData.SetTimeFromAction(intent.startTick);
+
+                //Next, we create all siblings (either because we moved out of a repeater, or because we moved too far into a repeater that another section didn't cover)
+                intent.startSiblingsToBeDestroyed.ForEach(data => { timeline.AddTargetFromAction(data); });
+            });
 			timeline.SortOrderedList();
 		}
 	}
@@ -590,30 +601,30 @@ namespace NotReaper.Tools {
 	}
 
 	public class NRActionBakePath : NRAction {
-		public TargetData data;
+		public NRActionRemoveNote removeNoteAction;
 
 		public override void DoAction(Timeline timeline) {
 			//Generate and create real notes
-			ChainBuilder.ChainBuilder.GenerateChainNotes(data);
-			foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
+			ChainBuilder.ChainBuilder.GenerateChainNotes(removeNoteAction.targetData);
+			foreach(TargetData genData in removeNoteAction.targetData.pathBuilderData.generatedNotes) {
 				timeline.AddTargetFromAction(new TargetData(genData));
 			}
 
-			//Destroy the path builder note (and all the generated transient notes)
-			timeline.DeleteTargetFromAction(data);
-		}
+            //Destroy the path builder note (and all the generated transient notes
+            removeNoteAction.DoAction(timeline);
+        }
 		public override void UndoAction(Timeline timeline) {
-			timeline.AddTargetFromAction(data);
+            removeNoteAction.UndoAction(timeline);
 
-			//Recalculate the notes, and remove the "real" notes
-			ChainBuilder.ChainBuilder.CalculateChainNotes(data);
-			foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
+            //Recalculate the notes, and remove the "real" notes
+            ChainBuilder.ChainBuilder.CalculateChainNotes(removeNoteAction.targetData);
+			foreach(TargetData genData in removeNoteAction.targetData.pathBuilderData.generatedNotes) {
 				var foundData = timeline.FindTargetData(genData.time, genData.behavior, genData.handType);
 				if(foundData != null) {
 					timeline.DeleteTargetFromAction(foundData);
 				}
 			}
-			ChainBuilder.ChainBuilder.GenerateChainNotes(data);
+			ChainBuilder.ChainBuilder.GenerateChainNotes(removeNoteAction.targetData);
 		}
 	}
 }
