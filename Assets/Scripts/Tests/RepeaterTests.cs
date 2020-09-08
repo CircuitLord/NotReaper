@@ -73,8 +73,10 @@ namespace Tests
             timeline = timelineObj.GetComponent<Timeline>();
             Assert.That(timelineObj != null, "The object named 'Timeline' must have a 'Timeline' component!");
 
-            timeline.SetupBlankTest();
 
+#if UNITY_EDITOR
+            timeline.SetupBlankTest();
+#endif
             //Setup repeater sections (0 - 500)
             RepeaterSection section = new RepeaterSection(0, new QNT_Timestamp(0), new QNT_Timestamp(500));
             timeline.AddRepeaterSection(section);
