@@ -65,6 +65,7 @@ namespace NotReaper.Timing {
     /// QNT (or quarter note ticks), represents a value in pulses per quarter note
     /// This value represents a point in time in the current song
     /// </summary>
+    [Serializable]
     public struct QNT_Timestamp {
         public QNT_Timestamp(UInt64 tick) {
             this.tick = tick;
@@ -74,6 +75,7 @@ namespace NotReaper.Timing {
             return tick.ToString();
         }
 
+        [SerializeField]
         public UInt64 tick;
 
         public static QNT_Timestamp GetSnappedValue(QNT_Timestamp time, uint beatSnap) {

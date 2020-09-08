@@ -114,6 +114,7 @@ namespace NotReaper.Models {
 		
 		public List<Cue> pathBuilderNoteCues = new List<Cue>();
 		public List<PathBuilderData> pathBuilderNoteData = new List<PathBuilderData>();
+        public List<RepeaterSection> repeaterSections = new List<RepeaterSection>();
 	}
 
 	[Serializable]

@@ -248,31 +248,45 @@ namespace NotReaper.Managers {
             if (save) timeline.Export();
 
             timeline.DeleteAllTargets();
+            timeline.RemoveAllRepeaters();
 
             foreach (Cue cue in cueFile.cues) {
                 timeline.AddTargetFromAction(timeline.GetTargetDataForCue(cue));
             }
 
-            if(cueFile.NRCueData != null && cueFile.NRCueData.pathBuilderNoteData.Count == cueFile.NRCueData.pathBuilderNoteCues.Count) {
-                for(int i = 0; i < cueFile.NRCueData.pathBuilderNoteCues.Count; ++i) {
-                    var data = timeline.GetTargetDataForCue(cueFile.NRCueData.pathBuilderNoteCues[i]);
-                    data.pathBuilderData = cueFile.NRCueData.pathBuilderNoteData[i];
+            if(cueFile.NRCueData != null) {
+                if (cueFile.NRCueData.pathBuilderNoteData.Count == cueFile.NRCueData.pathBuilderNoteCues.Count) {
+                    for (int i = 0; i < cueFile.NRCueData.pathBuilderNoteCues.Count; ++i) {
+                        var data = timeline.GetTargetDataForCue(cueFile.NRCueData.pathBuilderNoteCues[i]);
+                        data.pathBuilderData = cueFile.NRCueData.pathBuilderNoteData[i];
 
-                    //Recalculate the notes, and remove any identical enties that would have been loaded through the cues
-                    ChainBuilder.CalculateChainNotes(data);
-                    foreach(TargetData genData in data.pathBuilderData.generatedNotes) {
-                        var foundData = timeline.FindTargetData(genData.time, genData.behavior, genData.handType);
-                        if(foundData != null) {
-                            timeline.DeleteTargetFromAction(foundData);
+                        //Recalculate the notes, and remove any identical enties that would have been loaded through the cues
+                        ChainBuilder.CalculateChainNotes(data);
+                        foreach (TargetData genData in data.pathBuilderData.generatedNotes) {
+                            var foundData = timeline.FindTargetData(genData.time, genData.behavior, genData.handType);
+                            if (foundData != null) {
+                                timeline.DeleteTargetFromAction(foundData);
+                            }
                         }
+
+                        timeline.AddTargetFromAction(data);
+
+                        //Generate the notes, so the song is complete
+                        ChainBuilder.GenerateChainNotes(data);
                     }
+                }
 
-                    timeline.AddTargetFromAction(data);
-
-                    //Generate the notes, so the song is complete
-                    ChainBuilder.GenerateChainNotes(data);
+                if (Timeline.audioLoaded) {
+                    foreach (var section in cueFile.NRCueData.repeaterSections) {
+                        timeline.AddRepeaterSectionFromAction(section);
+                    }
+                }
+                else {
+                    timeline.loadRepeaterSectionAfterAudio = cueFile.NRCueData.repeaterSections;
                 }
             }
+
+            
 
             return true;
         }

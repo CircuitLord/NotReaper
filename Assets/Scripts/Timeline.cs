@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -134,8 +134,9 @@ namespace NotReaper {
 		}
 
 	}
-	
-	public class RepeaterSection {
+
+    [Serializable]
+    public class RepeaterSection {
 		public RepeaterSection(uint id, QNT_Timestamp start, QNT_Timestamp end) {
 			ID = id;
 			startTime = start;
@@ -165,11 +166,20 @@ namespace NotReaper {
             return lhs.startTime != rhs.startTime;
         }
 
+        [SerializeField]
 		public uint ID;
-		public QNT_Timestamp startTime; //Time when this section starts (inclusive)
-		public QNT_Timestamp endTime; //Time when this section ends (inclusive)
-		public GameObject timelineSectionObj;
-		public GameObject miniTimelineSectionObj;
+
+        [SerializeField]
+        public QNT_Timestamp startTime; //Time when this section starts (inclusive)
+
+        [SerializeField]
+        public QNT_Timestamp endTime; //Time when this section ends (inclusive)
+
+        [NonSerialized]
+        public GameObject timelineSectionObj;
+
+        [NonSerialized]
+        public GameObject miniTimelineSectionObj;
     }
 
 	public class Timeline : MonoBehaviour {
@@ -638,6 +648,7 @@ namespace NotReaper {
 
             repeaterSections.Add(newSection);
             repeaterSections.OrderBy(section => section.startTime);
+            
             miniTimeline.AddRepeaterSection(newSection);
         }
 
@@ -654,7 +665,8 @@ namespace NotReaper {
         }
 
 		public void RemoveAllRepeaters() {
-			foreach(RepeaterSection section in repeaterSections) {
+			List<RepeaterSection> sections = repeaterSections.GetRange(0, repeaterSections.Count);
+			foreach(RepeaterSection section in sections) {
                 RemoveRepeaterSectionFromAction(section);
 			}
 		}
@@ -1089,7 +1101,6 @@ namespace NotReaper {
 			orderedNotes = new List<Target>();
 			loadedNotes = new List<Target>();
 			selectedNotes = new List<Target>();
-			repeaterSections = new List<RepeaterSection>();
 		}
 
 		public void ResetTimeline() {
@@ -1140,6 +1151,8 @@ namespace NotReaper {
 
 				export.cues.Add(cue);
 			}
+
+			export.NRCueData.repeaterSections = repeaterSections.GetRange(0, repeaterSections.Count);
 
 			switch (difficultyManager.loadedIndex) {
 				case 0:
@@ -1346,7 +1359,18 @@ namespace NotReaper {
 			return true;
 		}
 
-		IEnumerator GetAudioClip(string uri) {
+		public List<RepeaterSection> loadRepeaterSectionAfterAudio;
+		void PostAudioLoad() {
+			if (loadRepeaterSectionAfterAudio != null) {
+				foreach(var section in loadRepeaterSectionAfterAudio) {
+					AddRepeaterSectionFromAction(section);
+				}
+				loadRepeaterSectionAfterAudio = null;
+			}
+		}
+
+
+        IEnumerator GetAudioClip(string uri) {
 			using(UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.OGGVORBIS)) {
 				yield return www.SendWebRequest();
 
@@ -1364,6 +1388,8 @@ namespace NotReaper {
 
 					readyToRegenerate = true;
 					RegenerateBPMTimelineData();
+
+					PostAudioLoad();
 				}
 			}
 		}

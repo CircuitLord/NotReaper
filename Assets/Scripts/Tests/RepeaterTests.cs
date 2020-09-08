@@ -184,16 +184,5 @@ namespace Tests
 
             //Copy paste?
         }
-
-        public void AddRemoveTargetsInRepeaterSection() {
-            
-
-            
-
-            
-
-            timeline.RemoveAllRepeaters();
-            timeline.DeleteAllTargets();
-        }
     }
 }
