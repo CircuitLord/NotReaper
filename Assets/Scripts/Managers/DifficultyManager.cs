@@ -259,6 +259,7 @@ namespace NotReaper.Managers {
                     for (int i = 0; i < cueFile.NRCueData.pathBuilderNoteCues.Count; ++i) {
                         var data = timeline.GetTargetDataForCue(cueFile.NRCueData.pathBuilderNoteCues[i]);
                         data.pathBuilderData = cueFile.NRCueData.pathBuilderNoteData[i];
+                        data.pathBuilderData.parentNotes.Add(data);
 
                         //Recalculate the notes, and remove any identical enties that would have been loaded through the cues
                         ChainBuilder.CalculateChainNotes(data);
