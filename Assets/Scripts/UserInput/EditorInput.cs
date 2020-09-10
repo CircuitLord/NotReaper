@@ -161,14 +161,14 @@ namespace NotReaper.UserInput {
 				case SnappingMode.Grid:
 					normalGrid.SetActive(true);
 
-					normalGrid.GetComponent<SpriteRenderer>().color = Color.white;
+					//normalGrid.GetComponent<SpriteRenderer>().color = Color.white;
 					
 					noGrid.SetActive(false);
 					meleeGrid.SetActive(false);
 					break;
 				case SnappingMode.None:
 					normalGrid.SetActive(true);
-					normalGrid.GetComponent<SpriteRenderer>().color = normalGridDisabledColor;
+					//normalGrid.GetComponent<SpriteRenderer>().color = normalGridDisabledColor;
 					
 					
 					noGrid.SetActive(false);
