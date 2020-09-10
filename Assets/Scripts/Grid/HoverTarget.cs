@@ -16,7 +16,7 @@ namespace NotReaper.Grid {
         public GameObject icon;
         private bool iconEnabled = true;
         public GameObject cursor;
-        public SpriteRenderer cursorTint;
+        public Image cursorTint;
 
         private Camera cam;
 
