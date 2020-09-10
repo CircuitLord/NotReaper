@@ -16,9 +16,8 @@
 </p>
 
 <p align="center">
-NotReaper is a custom song and community mapper for the VR rhythm game Audica.
-	</br>
-	</br>
+NotReaper is a custom song and community mapper for the VR rhythm game Audica.  
+Unity Version: 2020.1.0b11.3880<br>
 
 
 <img src="https://github.com/CircuitLord/NotReaper/raw/master/Github/NR1.gif" alt="Main showcase GIF" width=500/>
