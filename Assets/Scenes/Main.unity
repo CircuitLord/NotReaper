@@ -29571,6 +29571,7 @@ MonoBehaviour:
   isDragging: 0
   isEditMode: 0
   activated: 0
+  isHovering: 0
   activeChain: {fileID: 0}
   chainBuilderWindow: {fileID: 1183512475}
   chainBuilderWindowSelectedControls: {fileID: 615985310}
@@ -41576,6 +41577,7 @@ GameObject:
   - component: {fileID: 1183512478}
   - component: {fileID: 1183512477}
   - component: {fileID: 1183512481}
+  - component: {fileID: 1183512482}
   m_Layer: 5
   m_Name: Pathbuilder Window
   m_TagString: Untagged
@@ -41601,7 +41603,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -660, y: 0}
-  m_SizeDelta: {x: 213.66064, y: 200.2}
+  m_SizeDelta: {x: 213.66064, y: 224.28}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1183512477
 CanvasGroup:
@@ -41675,6 +41677,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1183512476}
   shouldReturn: 0
+--- !u!114 &1183512482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1183512475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6622a797ee00c548b1195238e724066, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chainBuilder: {fileID: 869528925}
 --- !u!1001 &1186385271
 PrefabInstance:
   m_ObjectHideFlags: 0

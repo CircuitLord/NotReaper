@@ -64,6 +64,7 @@ namespace NotReaper.Tools.ChainBuilder {
 		public bool isDragging = false;
 		public bool isEditMode = false;
 		public bool activated = false;
+		public bool isHovering = false;
 
 		private Transform draggingPoint;
 		public GameObject activeChain;
