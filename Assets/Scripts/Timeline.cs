@@ -278,7 +278,7 @@ namespace NotReaper {
 		public List<TempoChange> tempoChanges = new List<TempoChange>();
 		private List<GameObject> bpmMarkerObjects = new List<GameObject>();
 
-		[SerializeField] private PrecisePlayback songPlayback;
+		[SerializeField] public PrecisePlayback songPlayback;
 
 		[SerializeField]
 		private AudioWaveformVisualizer waveformVisualizer;
@@ -639,9 +639,9 @@ namespace NotReaper {
 
         public void AddRepeaterSectionFromAction(RepeaterSection newSection) {
             var sectionObject = Instantiate(repeaterSectionPrefab, new Vector3(0, 0, 0), Quaternion.identity, timelineNotesStatic);
-            sectionObject.transform.localPosition = new Vector3(newSection.startTime.ToBeatTime(), -0.111f, 1.0f);
+            sectionObject.transform.localPosition = new Vector3(newSection.startTime.ToBeatTime(), -0.4f, 1.0f);
             var lineRenderer = sectionObject.GetComponent<LineRenderer>();
-            lineRenderer.startWidth = lineRenderer.endWidth = 1.0f;
+            lineRenderer.startWidth = lineRenderer.endWidth = 0.2f;
             lineRenderer.SetPosition(1, new Vector3((newSection.endTime - newSection.startTime).ToBeatTime(), 0, 0));
 
             newSection.timelineSectionObj = sectionObject;

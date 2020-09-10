@@ -51,14 +51,25 @@ namespace NotReaper.UI {
 
 		public void SetPreviewStartPoint(QNT_Timestamp timestamp) {
 			Timeline.desc.previewStartSeconds = timeline.TimestampToSeconds(timestamp);
-
-			double percent = timeline.GetPercentPlayedFromSeconds(Timeline.desc.previewStartSeconds);
-
-			double x = barLength * percent;
-			x -= barLength / 2;
-			songPreviewIcon.localPosition = new Vector3((float) x, 0, 0);
+			songPreviewIcon.localPosition = new Vector3(TimestampToMinitimeline(timestamp), 0, 0);
 		}
 
+		public float TimestampToMinitimeline(QNT_Timestamp timestamp)
+		{
+			double seconds = timeline.TimestampToSeconds(timestamp);
+			double percent = timeline.GetPercentPlayedFromSeconds(seconds);
+			double pos = barLength * percent;
+			pos -= barLength / 2;
+			return (float)pos;
+		}
+
+		public double MinitimelineToSeconds(float pos)
+		{
+			double newPos = pos + (barLength * 2);
+			double percent = newPos / barLength;
+			double seconds = timeline.songPlayback.song.length / 100d * percent;
+			return seconds;
+		}
 
 		float prevX = 0f;
 
@@ -143,7 +154,7 @@ namespace NotReaper.UI {
             sectionObject.transform.localPosition = new Vector3((float)(barLength * timeline.GetPercentPlayedFromSeconds(timeline.TimestampToSeconds(newSection.startTime)) - (barLength / 2.0f)), 0, -1.0f);
             var lineRenderer = sectionObject.GetComponent<LineRenderer>();
             
-            lineRenderer.startWidth = lineRenderer.endWidth = 0.5f;
+            lineRenderer.startWidth = lineRenderer.endWidth = 0.4f;
             lineRenderer.SetPosition(1, new Vector3((float)(barLength * timeline.GetPercentPlayedFromSeconds(timeline.TimestampToSeconds(newSection.endTime) - timeline.TimestampToSeconds(newSection.startTime))), 0, 0));
 
             repeaterSections.Add(sectionObject);
@@ -223,6 +234,7 @@ namespace NotReaper.UI {
 
 			if (Input.GetKeyDown(KeyCode.P)) {
 				SetPreviewStartPoint(Timeline.time);
+				Debug.Log(MinitimelineToSeconds(songPreviewIcon.localPosition.x));
 			}
 
 			if (Input.GetKeyDown(KeyCode.U)) {

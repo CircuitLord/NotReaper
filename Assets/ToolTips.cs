@@ -16,7 +16,7 @@ public class ToolTips : MonoBehaviour
 
     public void SetText(string text)
     {
-        label.text = text;
+        label.text = text.Replace("[", "<color=#FDA50F>").Replace("]", "</color>");
     }
 
 }
