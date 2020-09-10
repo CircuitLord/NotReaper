@@ -339,7 +339,8 @@ namespace NotReaper.Tools.ChainBuilder {
 
 			if(Input.GetMouseButton(0)) {
 				//We have already selected a pathbuilder note, do the initial angle flow
-				if(timeline.selectedNotes.Count == 1 && timeline.selectedNotes[0] == startClickNote && timeline.selectedNotes[0].data.behavior == TargetBehavior.NR_Pathbuilder) {
+				if (isHovering) return;
+				if (timeline.selectedNotes.Count == 1 && timeline.selectedNotes[0] == startClickNote && timeline.selectedNotes[0].data.behavior == TargetBehavior.NR_Pathbuilder) {
 					var mousePosV3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 					var mousePos = new Vector2(mousePosV3.x, mousePosV3.y);
 
@@ -368,6 +369,7 @@ namespace NotReaper.Tools.ChainBuilder {
 			}
 
 			if (Input.GetMouseButtonDown(0)) {
+				if (isHovering) return;
 				if(startClickNote == null && iconUnderMouse != null && !iconUnderMouse.target.transient) {
 
 					if(iconUnderMouse.data.behavior != TargetBehavior.NR_Pathbuilder) {

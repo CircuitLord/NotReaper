@@ -7,7 +7,7 @@ using NotReaper.Timing;
 namespace NotReaper.UserInput {
 	public class MouseUtil {
 		public static TargetIcon[] IconsUnderMouse(Timeline timeline) {
-			if (!EditorInput.isOverGrid) return new TargetIcon[0];
+			//if (!EditorInput.isOverGrid) return new TargetIcon[0];
 			Vector3 cameraPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
 			Vector2 point = new Vector2(cameraPoint.x, cameraPoint.y);
