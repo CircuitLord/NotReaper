@@ -14,6 +14,7 @@ namespace NotReaper.UI {
         public Timeline timeline;
         public Button saveButton;
         public Button newAudicaButton;
+        [SerializeField] RecentPanel recentPanel;
 
         public CanvasGroup window;
         public Image BG;
@@ -25,6 +26,7 @@ namespace NotReaper.UI {
             var t = transform;
             var position = t.localPosition;
             t.localPosition = new Vector3(0, position.y, position.z);
+            recentPanel.Show();
         }
 
         public void NewAudica() {
@@ -63,7 +65,7 @@ namespace NotReaper.UI {
             
             BG.gameObject.SetActive(true);
             window.gameObject.SetActive(true);
-
+            recentPanel.Show();
 
         }
 

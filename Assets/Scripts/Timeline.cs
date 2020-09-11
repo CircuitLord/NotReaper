@@ -299,6 +299,7 @@ namespace NotReaper {
 			
 			//Load the config file
 			NRSettings.LoadSettingsJson();
+			RecentAudicaFiles.LoadRecents();
 			
 			//Initialize autoupdating:
 			HandleAutoupdater();
@@ -1243,6 +1244,7 @@ namespace NotReaper {
 				audicaFile = null;
 				audicaFile = AudicaHandler.LoadAudicaFile(filePath);
 				PlayerPrefs.SetString("recentFile", audicaFile.filepath);
+				RecentAudicaFiles.AddRecentDir(audicaFile.filepath);
 
 			} else {
 
@@ -1271,6 +1273,7 @@ namespace NotReaper {
 				
 				audicaFile = AudicaHandler.LoadAudicaFile(paths[0]);
 				PlayerPrefs.SetString("recentFile", paths[0]);
+				RecentAudicaFiles.AddRecentDir(audicaFile.filepath);
 			}
 
 			ResetTimeline();

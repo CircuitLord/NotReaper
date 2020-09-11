@@ -109,6 +109,7 @@ namespace NotReaper.Tools.ChainBuilder {
 		public void Activate(bool active) {
 			bool wasActive = activated == true;
 
+			isHovering = false;
 			activated = active;
 
 			startClickNote = null;
