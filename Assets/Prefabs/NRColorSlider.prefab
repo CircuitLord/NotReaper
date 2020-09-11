@@ -274,7 +274,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 11, y: 11}
+  m_SizeDelta: {x: 15, y: 15}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &342287734802391655
 CanvasRenderer:
@@ -709,6 +709,9 @@ MonoBehaviour:
   display: {fileID: 342287735557500573}
   text: {fileID: 342287735708529970}
   color: {r: 0, g: 0, b: 0, a: 0}
+  onColorsSet:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &342287736407750557
 GameObject:
   m_ObjectHideFlags: 0

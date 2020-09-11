@@ -17,6 +17,8 @@ public class AddRepeaterWindow : MonoBehaviour {
 
     [SerializeField] private Timeline timeline;
 
+    [SerializeField] GameObject startText;
+    [SerializeField] GameObject endText;
     void Start() {
         Vector3 defaultPos;
         defaultPos.x = 0;
@@ -35,6 +37,9 @@ public class AddRepeaterWindow : MonoBehaviour {
         repeaterStart = null;
         repeaterEnd = null;
 
+        startText.SetActive(false);
+        endText.SetActive(false);
+
         gameObject.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
         gameObject.SetActive(true);
 
@@ -49,14 +54,16 @@ public class AddRepeaterWindow : MonoBehaviour {
 
     public void SetBeginTime() {
         repeaterStart = Timeline.time;
+        startText.SetActive(true);
 
-        if(repeaterStart.HasValue && repeaterEnd.HasValue) {
+        if (repeaterStart.HasValue && repeaterEnd.HasValue) {
             CreateRepeater();
         }
     }
 
     public void SetEndTime() {
         repeaterEnd = Timeline.time;
+        endText.SetActive(true);
 
         if (repeaterStart.HasValue && repeaterEnd.HasValue) {
             CreateRepeater();

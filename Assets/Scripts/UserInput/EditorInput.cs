@@ -386,10 +386,17 @@ namespace NotReaper.UserInput {
 
 			
 
-			if(bpmWindow.activeSelf || timingPointsPanel.gameObject.activeSelf || bpmResultWindow.activeSelf || countInWindow.gameObject.activeSelf || addOrTrimAudioWindow.gameObject.activeSelf || repeaterWindow.gameObject.activeSelf) {
+			if(bpmWindow.activeSelf
+				|| timingPointsPanel.gameObject.activeSelf 
+				|| bpmResultWindow.activeSelf 
+				|| countInWindow.gameObject.activeSelf 
+				|| addOrTrimAudioWindow.gameObject.activeSelf 
+				|| repeaterWindow.gameObject.activeSelf) 
+			{
 				inUI = true;
 
-                if(repeaterWindow.gameObject.activeSelf) {
+                if(repeaterWindow.gameObject.activeSelf || !timingPointsPanel.isHovering) 
+				{
                     enableScrolling = true;
                 }
 
@@ -452,13 +459,11 @@ namespace NotReaper.UserInput {
 			}
 
             if (Input.GetKeyDown(KeyCode.F7)) {
-                if (isShiftDown) {
-                    var foundRepeaterSection = timeline.FindRepeaterForTime(Timeline.time);
-                    if (foundRepeaterSection != null) {
-                        timeline.RemoveRepeaterSection(foundRepeaterSection);
-                    }
-                }
-                else {
+                if (isShiftDown)
+				{
+					FindAndRemoveCurrentRepeater();
+				}
+				else {
                     repeaterWindow.Activate();
                 }
             }
@@ -708,6 +713,15 @@ namespace NotReaper.UserInput {
 				Debug.Log("Redoing...");
 			}
 			
+		}
+
+		public void FindAndRemoveCurrentRepeater()
+		{
+			var foundRepeaterSection = timeline.FindRepeaterForTime(Timeline.time);
+			if (foundRepeaterSection != null)
+			{
+				timeline.RemoveRepeaterSection(foundRepeaterSection);
+			}
 		}
 
 		public void ToggleHandColor() {

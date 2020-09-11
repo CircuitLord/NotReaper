@@ -3,14 +3,16 @@ using NotReaper.Models;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class TimingPointsPanel : MonoBehaviour
+public class TimingPointsPanel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private bool isActive;
     [SerializeField] private Timeline timeline;
     public TimingPointItem timingPointItem;
     public Transform scrollContent;
     public List<TimingPointItem> items = new List<TimingPointItem>();
+    public bool isHovering;
 
     private void Awake()
     {
@@ -22,6 +24,7 @@ public class TimingPointsPanel : MonoBehaviour
         transform.position = new Vector3(0f, 0f, 0f);
         gameObject.SetActive(true);
         isActive = true;
+        isHovering = false;
         UpdateTimingPointList(timeline.tempoChanges);
     }
 
@@ -29,6 +32,7 @@ public class TimingPointsPanel : MonoBehaviour
     {
         gameObject.SetActive(false);
         isActive = false;
+        isHovering = false;
         ClearTimingItems();
     }
 
@@ -60,4 +64,13 @@ public class TimingPointsPanel : MonoBehaviour
         items.Clear();
     }
 
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        isHovering = true;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        isHovering = false;
+    }
 }
