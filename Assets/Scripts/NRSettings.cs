@@ -121,16 +121,16 @@ namespace NotReaper {
         }
 
         public static string GetbgImagePath() {
-            string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", Application.companyName, Application.productName, "BG1.png");
+            string imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", Application.companyName, Application.productName, "BG2.png");
 
             if ((Application.platform == RuntimePlatform.LinuxEditor) || (Application.platform == RuntimePlatform.LinuxPlayer))
-                imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.config/unity3d/" + Application.companyName + "/" + Application.productName + "/BG1.png");
+                imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.config/unity3d/" + Application.companyName + "/" + Application.productName + "/BG2.png");
             
             if (Application.platform == RuntimePlatform.OSXEditor)
-                imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.companyName + "/" + Application.productName + "/BG1.png");
+                imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.companyName + "/" + Application.productName + "/BG2.png");
 
             if (Application.platform == RuntimePlatform.OSXPlayer)
-                imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.identifier + "/BG1.png");
+                imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Library/Application Support/" + Application.identifier + "/BG2.png");
 
             return(imagePath);
         }
@@ -154,10 +154,10 @@ namespace NotReaper {
     [System.Serializable]
     public class NRJsonSettings {
 
-        public Color leftColor = new Color(0.0f, 0.5f, 1.0f, 1.0f);
-        public Color rightColor = new Color(1.0f, 0.47f, 0.14f, 1.0f);
+        public Color leftColor = new Color(0.44f, 0.78f, 1.0f, 1.0f);
+        public Color rightColor = new Color(0.73f, 0.44f, 1.0f, 1.0f);
         public Color selectedHighlightColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-        public Color waveformColor = new Color(0f, 255 / 255f, 178 / 255f, 0.75f);
+        public Color waveformColor = new Color(1f,1f,1f,0.2f);
 
         public float mainVol = 0.5f;
         public float noteVol = 0.5f;
@@ -165,9 +165,9 @@ namespace NotReaper {
         public int audioDSP = 480;
         public float noteScale = 1.0f;
         public float noteTimelineScale = 1.0f;
-        public float noteHitScale = 0.8f;
+        public float noteHitScale = 0.94f;
         public float bgMoveMultiplier = 1.0f;
-        public bool useBouncyAnimations = true;
+        public bool useBouncyAnimations = false;
         
 
         public bool useAutoZOffsetWith360 = true;

@@ -14,6 +14,18 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField] Toggle useAutoZOffsetWith360;
     [SerializeField] Toggle useBouncyAnimations;
 
+    [SerializeField] ColorSlider LeftHand;
+    [SerializeField] ColorSlider RightHand;
+
+    [SerializeField] GameObject WarningText;
+
+    private void Start()
+    {
+        NRSettings.OnLoad(() => {
+            UpdateUI();
+        });
+    }
+
     public void UpdateUI()
     {
         richPresence.isOn = NRSettings.config.useDiscordRichPresence;
@@ -22,6 +34,8 @@ public class SettingsMenu : MonoBehaviour
         enableDualines.isOn = NRSettings.config.enableDualines;
         useAutoZOffsetWith360.isOn = NRSettings.config.useAutoZOffsetWith360;
         useBouncyAnimations.isOn = NRSettings.config.useBouncyAnimations;
+        LeftHand.SetColor(NRSettings.config.leftColor);
+        RightHand.SetColor(NRSettings.config.rightColor);
     }
 
     public void ApplyValues()
@@ -32,5 +46,9 @@ public class SettingsMenu : MonoBehaviour
         NRSettings.config.enableDualines = enableDualines.isOn;
         NRSettings.config.useAutoZOffsetWith360 = useAutoZOffsetWith360.isOn;
         NRSettings.config.useBouncyAnimations = useBouncyAnimations.isOn;
+        NRSettings.config.leftColor = LeftHand.color;
+        NRSettings.config.rightColor = RightHand.color;
+        WarningText.SetActive(true);
+        NRSettings.SaveSettingsJson();
     }
 }
