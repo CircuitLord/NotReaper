@@ -1764,8 +1764,12 @@ namespace NotReaper {
 
 			uint barLengthIncr = 0;
 			for(float t = 0; t < endOfAudio.tick;) {
-				float increment = Constants.PulsesPerWholeNote / currentTempo.timeSignature.Denominator;
+				ulong snap = (ulong)(beatSnap / 4);
+				float increment = 0f;
 
+				if (snap != 0) increment = Constants.PulsesPerWholeNote / currentTempo.timeSignature.Denominator / snap;
+				else increment = Constants.PulsesPerWholeNote / currentTempo.timeSignature.Denominator;
+				
 				int indexStart = vertices.Count;
 
 				const float width = 0.020f;
@@ -1851,6 +1855,8 @@ namespace NotReaper {
 			int snap = 4;
 			int.TryParse(temp.Substring(2), out snap);
 			beatSnap = snap;
+
+			RegenerateBPMTimelineData();
 
 			if (snap >= 32 && !isBeatSnapWarningActive) {
 				beatSnapWarningText.DOFade(1f, 0.5f);
