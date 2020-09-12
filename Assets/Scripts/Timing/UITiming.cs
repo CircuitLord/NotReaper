@@ -170,11 +170,11 @@ namespace NotReaper.Timing {
 
 	        if (isMp3 || !skipOffset) {
                 trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), 0, DefaultBPM, skipOffset);
-                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), (songName + "-" + mapperName), songName, "artist", DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0, loadedMidi);
+                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi);
 		        
 	        }
 	        else {
-                path = AudicaGenerator.Generate(loadedSong, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_C#", mapperName, 0, loadedMidi);
+                path = AudicaGenerator.Generate(loadedSong, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi);
 	        }
 	        
             timeline.LoadAudicaFile(false, path);
