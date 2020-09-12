@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -218,13 +218,15 @@ namespace NotReaper {
 		public static Transform timelineNotesStatic;
 		[SerializeField] private Renderer timelineBG;
 		[SerializeField] private TextMeshProUGUI beatSnapWarningText;
-		
-		
+		[SerializeField] private TextMeshProUGUI playbackSpeedText;
+
+
 		public Slider musicVolumeSlider;
 		public Slider hitSoundVolumeSlider;
 
 		[Header("Configuration")]
 		public float playbackSpeed = 1f;
+		public string playbackSpeedPercentage = "Playback Speed: 100%";
 
 		public float musicVolume = 0.5f; 
 		public float sustainVolume = 0.5f;
@@ -1471,6 +1473,8 @@ namespace NotReaper {
 
 			playbackSpeed = speed;
 			songPlayback.speed = speed;
+			string PlaybackText = ("Playback Speed: " + speed.ToString("#%"));
+			playbackSpeedText.text = PlaybackText;
 		}
 		
 		public void SetPlaybackSpeedFromSlider(Slider slider) {

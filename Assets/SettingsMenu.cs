@@ -13,6 +13,7 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField] Toggle enableDualines;
     [SerializeField] Toggle useAutoZOffsetWith360;
     [SerializeField] Toggle useBouncyAnimations;
+    [SerializeField] Toggle playNoteSoundsWhileScrolling;
 
     [SerializeField] ColorSlider LeftHand;
     [SerializeField] ColorSlider RightHand;
@@ -34,6 +35,7 @@ public class SettingsMenu : MonoBehaviour
         enableDualines.isOn = NRSettings.config.enableDualines;
         useAutoZOffsetWith360.isOn = NRSettings.config.useAutoZOffsetWith360;
         useBouncyAnimations.isOn = NRSettings.config.useBouncyAnimations;
+        playNoteSoundsWhileScrolling.isOn = NRSettings.config.playNoteSoundsWhileScrolling;
         LeftHand.SetColor(NRSettings.config.leftColor);
         RightHand.SetColor(NRSettings.config.rightColor);
     }
@@ -46,6 +48,7 @@ public class SettingsMenu : MonoBehaviour
         NRSettings.config.enableDualines = enableDualines.isOn;
         NRSettings.config.useAutoZOffsetWith360 = useAutoZOffsetWith360.isOn;
         NRSettings.config.useBouncyAnimations = useBouncyAnimations.isOn;
+        NRSettings.config.playNoteSoundsWhileScrolling = playNoteSoundsWhileScrolling.isOn;
         NRSettings.config.leftColor = LeftHand.color;
         NRSettings.config.rightColor = RightHand.color;
         WarningText.SetActive(true);
