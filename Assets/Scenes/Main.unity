@@ -54447,9 +54447,11 @@ MonoBehaviour:
   gridTransformParent: {fileID: 312348744}
   timelineBG: {fileID: 1052582752}
   beatSnapWarningText: {fileID: 684373921}
+  playbackSpeedText: {fileID: 1864348106}
   musicVolumeSlider: {fileID: 2098098317}
   hitSoundVolumeSlider: {fileID: 643110668}
   playbackSpeed: 1
+  playbackSpeedPercentage: 'Playback Speed: 100%'
   musicVolume: 0.5
   sustainVolume: 0.5
   previewDuration: 0.1
@@ -73641,7 +73643,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Playback Speed:'
+  m_text: 'Playback Speed: 100%'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a2083ced2e4bb5f4bb44cdd878d4279e, type: 2}
   m_sharedMaterial: {fileID: -5671039305874678615, guid: a2083ced2e4bb5f4bb44cdd878d4279e,
