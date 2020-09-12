@@ -271,7 +271,7 @@ namespace NotReaper {
 
 		[HideInInspector] public bool hover = false;
 		public bool paused = true;
-
+		private bool animationsNeedStopping;
 		public Button generateAudicaButton;
 		public Button loadAudioFileTiming;
 
@@ -784,9 +784,15 @@ namespace NotReaper {
 								songPlayback.rightSustainVolume = 0.0f;
 							}
 						}
+						if (paused && animationsNeedStopping)
+						{
+							note.gridTargetIcon.transform.DOKill(true);
+							note.gridTargetIcon.transform.DOScale(1f, 0.1f);
+						}
 					}
 				}
 			}
+			if (paused) animationsNeedStopping = false;
 		}
 
 
@@ -2378,6 +2384,7 @@ namespace NotReaper {
 				//aud.Pause();
 				songPlayback.Stop();
 				paused = true;
+				animationsNeedStopping = true;
 
 				//Snap to the beat snap when we pause
 				time = GetClosestBeatSnapped(time, (uint)beatSnap);

@@ -13,8 +13,8 @@ namespace NotReaper.Targets {
 
 	public class Target {
 
-		private TargetIcon gridTargetIcon;
-		private TargetIcon timelineTargetIcon;
+		public TargetIcon gridTargetIcon;
+		public TargetIcon timelineTargetIcon;
 
 		private bool noteIsAnimating = false;
 
