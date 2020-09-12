@@ -342,15 +342,17 @@ namespace NotReaper.Timing {
 			playPreview = true;
 			source.Play();
 
-			List<HitsoundEvent> previewHits = new List<HitsoundEvent>();
-			AddHitsoundEvents(previewHits, time, previewDuration.tick > 0 ? timeline.ShiftTick(time, duration) : time);
-			for(int i = 0; i < previewHits.Count; ++i) {
-				HitsoundEvent ev = previewHits[i];
-				ev.waitSamples = 0;
-				previewHits[i] = ev;
-			}
+			if (NRSettings.config.playNoteSoundsWhileScrolling) {
+				List<HitsoundEvent> previewHits = new List<HitsoundEvent>();
+				AddHitsoundEvents(previewHits, time, previewDuration.tick > 0 ? timeline.ShiftTick(time, duration) : time);
+				for (int i = 0; i < previewHits.Count; ++i) {
+					HitsoundEvent ev = previewHits[i];
+					ev.waitSamples = 0;
+					previewHits[i] = ev;
+				}
 
-			newPreviewHitsoundEvents = previewHits;
+				newPreviewHitsoundEvents = previewHits;
+			}
 		}
 
 		public void PlayHitsound(QNT_Timestamp time) {

@@ -168,7 +168,7 @@ namespace NotReaper {
         public float noteHitScale = 0.94f;
         public float bgMoveMultiplier = 1.0f;
         public bool useBouncyAnimations = false;
-        
+        public bool playNoteSoundsWhileScrolling = false;
 
         public bool useAutoZOffsetWith360 = true;
 
