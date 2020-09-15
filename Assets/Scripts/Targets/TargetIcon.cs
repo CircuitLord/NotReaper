@@ -15,27 +15,64 @@ namespace NotReaper.Targets {
 
     public class TargetIcon : MonoBehaviour {
 
-        public GameObject standard;
-        public GameObject hold;
-        public GameObject horizontal;
-        public GameObject vertical;
-        public GameObject chainStart;
-        public GameObject chain;
-        public GameObject melee;
-        public GameObject mine;
+        [Header("Main sprites")]
+        public Sprite standard;
+        public Sprite hold;
+        public Sprite horizontal;
+        public Sprite vertical;
+        public Sprite chainStart;
+        public Sprite chain;
+        public Sprite melee;
+        public Sprite mine;
+        public Sprite none;
+
+        [Header("Ring sprites")]
+        public Sprite standardRing;
+        public Sprite holdRing;
+        public Sprite horizontalRing;
+        public Sprite verticalRing;
+        public Sprite chainStartRing;
+        public Sprite chainRing;
+        public Sprite meleeRing;
+        public Sprite mineRing;
+        public Sprite noneRing;
+
+        [Header("Telegraph sprites")]
+        public Sprite standardTelegraph;
+        public Sprite holdTelegraph;
+        public Sprite horizontalTelegraph;
+        public Sprite verticalTelegraph;
+        public Sprite chainStartTelegraph;
+        public Sprite chainTelegraph;
+        public Sprite meleeTelegraph;
+        public Sprite mineTelegraph;
+        public Sprite noneTelegraph;
+
+        [Header("Select ring sprites")]
+        public Sprite standardSelect;
+        public Sprite holdSelect;
+        public Sprite horizontalSelect;
+        public Sprite verticalSelect;
+        public Sprite chainStartSelect;
+        public Sprite chainSelect;
+        public Sprite meleeSelect;
+        public Sprite mineSelect;
+        public Sprite noneSelect;
+
         public GameObject line;
         public GameObject pathBuilder;
-        public GameObject pathBuilderArrow;
 
-        public SpriteRenderer standardOutline;
-        public SpriteRenderer holdOutline;
-        public SpriteRenderer horzOutline;
-        public SpriteRenderer vertOutline;
-        public SpriteRenderer chainStartOutline;
-        public SpriteRenderer chainOutline;
-        public SpriteRenderer meleeOutline;
-        public SpriteRenderer mineOutline;
-        public SpriteRenderer pathBuilderOutline;
+        [Header("Other")]
+
+        [SerializeField] SpriteRenderer prefade;
+        [SerializeField] SpriteRenderer ring;
+        [SerializeField] SpriteRenderer note;
+
+        public SpriteRenderer selection;
+
+        public float targetSize = 1f;
+        public float timelineTargetSize = 1f;
+
 
         public TargetData data;
         public Target target;
@@ -106,6 +143,7 @@ namespace NotReaper.Targets {
             }
 
             SetupFade();
+
         }
 
         public void OnDestroy() {
@@ -128,16 +166,7 @@ namespace NotReaper.Targets {
         }
 
         public void EnableSelected(TargetBehavior behavior) {
-            standardOutline.enabled = (behavior == TargetBehavior.Standard);
-            holdOutline.enabled = (behavior == TargetBehavior.Hold);
-            horzOutline.enabled = (behavior == TargetBehavior.Horizontal);
-            vertOutline.enabled = (behavior == TargetBehavior.Vertical);
-            chainStartOutline.enabled = (behavior == TargetBehavior.ChainStart);
-            chainOutline.enabled = (behavior == TargetBehavior.Chain);
-            meleeOutline.enabled = (behavior == TargetBehavior.Melee);
-            mineOutline.enabled = (behavior == TargetBehavior.Mine);
-            pathBuilderOutline.enabled = (behavior == TargetBehavior.NR_Pathbuilder);
-            if(pathBuilderArrow != null) pathBuilderArrow.SetActive((behavior == TargetBehavior.NR_Pathbuilder));
+            selection.enabled = true;
 
             isSelected = true;
 
@@ -149,17 +178,7 @@ namespace NotReaper.Targets {
         }
 
         public void DisableSelected() {
-            if (!standardOutline) return;
-            standardOutline.enabled = false;
-            holdOutline.enabled = false;
-            horzOutline.enabled = false;
-            vertOutline.enabled = false;
-            chainStartOutline.enabled = false;
-            chainOutline.enabled = false;
-            meleeOutline.enabled = false;
-            mineOutline.enabled = false;
-            pathBuilderOutline.enabled = false;
-            if(pathBuilderArrow != null) pathBuilderArrow.SetActive(false);
+            selection.enabled = false;
 
             isSelected = false;
             if(location == TargetIconLocation.Grid) {
@@ -171,15 +190,7 @@ namespace NotReaper.Targets {
 
 
         public void SetOutlineColor(Color color) {
-            standardOutline.color = color;
-            holdOutline.color = color;
-            horzOutline.color = color;
-            vertOutline.color = color;
-            chainStartOutline.color = color;
-            chainOutline.color = color;
-            meleeOutline.color = color;
-            mineOutline.color = color;
-            pathBuilderOutline.color = color;
+            selection.color = color;
         }
 
         private void OnHandTypeChanged(TargetHandType handType) {
@@ -271,33 +282,131 @@ namespace NotReaper.Targets {
             }
         }
 
-        private void OnBehaviorChanged(TargetBehavior oldbehavior, TargetBehavior behavior) {
-            standard.SetActive(behavior == TargetBehavior.Standard);
-            hold.SetActive(behavior == TargetBehavior.Hold);
-            horizontal.SetActive(behavior == TargetBehavior.Horizontal);
-            vertical.SetActive(behavior == TargetBehavior.Vertical);
-            chainStart.SetActive(behavior == TargetBehavior.ChainStart);
-            chain.SetActive(behavior == TargetBehavior.Chain);
-            melee.SetActive(behavior == TargetBehavior.Melee);
-            mine.SetActive(behavior == TargetBehavior.Mine);
-            pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
+        private void OnBehaviorChanged(TargetBehavior oldbehavior, TargetBehavior behavior)
+        {
+            ResetSpriteTransforms();
 
-            if(location == TargetIconLocation.Timeline) {
-                line.SetActive(data.supportsBeatLength);
+            switch (behavior)
+            {
+                case TargetBehavior.Standard:
+                    note.sprite = standard;
+                    prefade.sprite = standardTelegraph;
+                    ring.sprite = standardRing;
+                    selection.sprite = standardSelect;
+                    break;
+                case TargetBehavior.Hold:
+                    note.sprite = hold;
+                    prefade.sprite = holdTelegraph;
+                    ring.sprite = holdRing;
+                    selection.sprite = holdSelect;
+                    break;
+                case TargetBehavior.Horizontal:
+                    note.sprite = horizontal;
+                    prefade.sprite = horizontalTelegraph;
+                    ring.sprite = horizontalRing;
+                    selection.sprite = horizontalSelect;
+
+                    note.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+                    prefade.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+                    ring.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+                    selection.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+                    break;
+                case TargetBehavior.Vertical:
+                    note.sprite = vertical;
+                    prefade.sprite = verticalTelegraph;
+                    ring.sprite = verticalRing;
+                    selection.sprite = verticalSelect;
+
+
+                    note.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                    prefade.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                    ring.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                    selection.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                    break;
+                case TargetBehavior.ChainStart:
+                    note.sprite = chainStart;
+                    prefade.sprite = chainStartTelegraph;
+                    ring.sprite = chainStartRing;
+                    selection.sprite = chainStartSelect;
+
+                    if (location == TargetIconLocation.Grid) note.transform.localScale = Vector3.one * 1.7f;
+                    break;
+                case TargetBehavior.Chain:
+                    note.sprite = chain;
+                    prefade.sprite = chainTelegraph;
+                    ring.sprite = chainRing;
+                    selection.sprite = chainSelect;
+                    break;
+                case TargetBehavior.Melee:
+                    note.sprite = melee;
+                    prefade.sprite = meleeTelegraph;
+                    ring.sprite = meleeRing;
+                    selection.sprite = meleeSelect;
+                    if (location == TargetIconLocation.Grid)
+                    {
+                        note.transform.localScale = Vector3.one * 1.7f;
+                        selection.transform.localScale = Vector3.one * 1.7f;
+                    }
+                    break;
+                case TargetBehavior.Mine:
+                    note.sprite = mine;
+                    prefade.sprite = mineTelegraph;
+                    ring.sprite = mineRing;
+                    selection.sprite = mineSelect;
+                    break;
+                case TargetBehavior.NR_Pathbuilder:
+                    note.sprite = none;
+                    prefade.sprite = noneTelegraph;
+                    ring.sprite = noneRing;
+                    selection.sprite = noneSelect;
+                    break;
+
+                default:
+                    break;
             }
 
-            if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline) {
+            pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
+
+            if (location == TargetIconLocation.Timeline)
+            {
+                line.SetActive(data.supportsBeatLength);
+                transform.localScale = Vector3.one * timelineTargetSize * 0.4f;
+            }
+            else
+            {
+                transform.localScale = Vector3.one * timelineTargetSize * 0.4f;
+            }
+
+
+            if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline)
+            {
                 collisionRadius = 0.25f;
             }
 
-            if(behavior == TargetBehavior.NR_Pathbuilder) {
+            if (behavior == TargetBehavior.NR_Pathbuilder)
+            {
                 data.velocity = TargetVelocity.None;
+            }
+
+        }
+
+        private void ResetSpriteTransforms()
+        {
+            note.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            prefade.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            ring.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            selection.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            if (location == TargetIconLocation.Grid)
+            {
+                note.transform.localScale = Vector3.one * 0.728f;
+                selection.transform.localScale = Vector3.one * 0.5414f;
             }
         }
 
         private void OnTickChanged(QNT_Timestamp newTime) {
             SetupFade();
         }
+
 
         private void SetupFade() {
             if(location != TargetIconLocation.Grid) return;
@@ -369,9 +478,6 @@ namespace NotReaper.Targets {
                 return;
             }
 
-            var transform = pathBuilderArrow.GetComponent<Transform>();
-            transform.localPosition = new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad) * 0.5f, Mathf.Cos(angle * Mathf.Deg2Rad) * 0.5f, 0);
-            transform.localRotation = Quaternion.Euler(0, 0, 180 - angle);
             
             UpdatePath();
         }

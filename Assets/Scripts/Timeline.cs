@@ -343,7 +343,7 @@ namespace NotReaper {
 				}
 			});
 
-
+			NRSettings.PostLoad.Invoke();
 			beatSnapWarningText.DOFade(0f, 0f);
 		}
 
@@ -744,6 +744,7 @@ namespace NotReaper {
 		}
 
 		private void UpdateSustains() {
+			return;
 			foreach (var note in loadedNotes) {
 				if (note.data.behavior == TargetBehavior.Hold) {
 					if ((note.GetRelativeBeatTime() < 0) && (note.GetRelativeBeatTime() + note.data.beatLength.ToBeatTime() > 0) && !paused)
@@ -788,8 +789,8 @@ namespace NotReaper {
 						}
 						if (paused && animationsNeedStopping)
 						{
-							note.gridTargetIcon.transform.DOKill(true);
-							note.gridTargetIcon.transform.DOScale(1f, 0.1f);
+							//note.gridTargetIcon.transform.DOKill(true);
+							//note.gridTargetIcon.transform.doscale(1f, 0.1f);
 						}
 					}
 				}
@@ -2000,6 +2001,7 @@ namespace NotReaper {
 			foreach (Transform note in timelineTransformParent.transform) {
 				Vector3 noteScale = note.localScale;
 				noteScale.x = targetScale;
+				noteScale.x /= 1.2f;
 
 				//noteScale.x *= NRSettings.config.noteTimelineScale;
 				//noteScale.y = NRSettings.config.noteTimelineScale;

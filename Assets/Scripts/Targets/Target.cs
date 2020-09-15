@@ -103,11 +103,14 @@ namespace NotReaper.Targets {
 					}
 				}
 				foreach (Renderer r in timelineTargetIcon.GetComponentsInChildren<SpriteRenderer>(true)) {
-					var color = r.material.color;
-					color.r = 0.5f;
-					color.g = 0.5f;
-					color.b = 0.5f;
-					r.material.color = color;
+					if (r.material.HasProperty("_Color"))
+					{
+						var color = r.material.color;
+						color.r = 0.5f;
+						color.g = 0.5f;
+						color.b = 0.5f;
+						r.material.color = color; 
+					}
 				}
 			}
 
@@ -184,8 +187,8 @@ namespace NotReaper.Targets {
 			gridTargetIcon.transform.localPosition = pos;
 
 			if (data.behavior == TargetBehavior.Hold) {
-				var holdEnd = gridTargetIcon.GetComponentInChildren<HoldTargetManager>().endMarker;
-				if (holdEnd) holdEnd.transform.localPosition = new Vector3 (x, y, holdEnd.transform.localPosition.z);
+				//var holdEnd = gridTargetIcon.GetComponentInChildren<HoldTargetManager>().endMarker;
+				//if (holdEnd) holdEnd.transform.localPosition = new Vector3 (x, y, holdEnd.transform.localPosition.z);
 			}
 
 			if(data.behavior == TargetBehavior.NR_Pathbuilder && data.pathBuilderData.generatedNotes.Count > 0) {
@@ -374,18 +377,18 @@ namespace NotReaper.Targets {
 			extensionTime /= Timeline.instance.playbackSpeed;
 
 
-			gridTargetIcon.transform.DOLocalRotate(new Vector3(0.0f, 0.0f, 1080), time + extensionTime).SetRelative().SetEase(Ease.InSine);
-			gridTargetIcon.transform.DOScale(0.75f, time + extensionTime).SetEase(Ease.Linear);
+			//gridTargetIcon.transform.DOLocalRotate(new Vector3(0.0f, 0.0f, 1080), time + extensionTime).SetRelative().SetEase(Ease.InSine);
+			//gridTargetIcon.transform.DOScale(0.75f, time + extensionTime).SetEase(Ease.Linear);
 
-			gridTargetIcon.holdEndTrans.DOLocalRotate(new Vector3(0.0f, 0.0f, 1080), time + extensionTime).SetRelative().SetEase(Ease.InSine);
-			gridTargetIcon.holdEndTrans.DOScale(0.75f, time + extensionTime).SetEase(Ease.Linear);
+			//gridTargetIcon.holdEndTrans.DOLocalRotate(new Vector3(0.0f, 0.0f, 1080), time + extensionTime).SetRelative().SetEase(Ease.InSine);
+			//gridTargetIcon.holdEndTrans.DOScale(0.75f, time + extensionTime).SetEase(Ease.Linear);
 			
 			yield return new WaitForSeconds(time + extensionTime);
 
-			if (gridTargetIcon != null) {
-				gridTargetIcon.transform.DOScale(new Vector3(NRSettings.config.noteScale, NRSettings.config.noteScale, 1f), 0.1f).SetEase(Ease.InOutCubic);
-				gridTargetIcon.holdEndTrans.DOScale(new Vector3(NRSettings.config.noteScale, NRSettings.config.noteScale, 1f), 0.1f).SetEase(Ease.InOutCubic);
-			}
+			//if (gridTargetIcon != null) {
+			//	gridTargetIcon.transform.DOScale(new Vector3(NRSettings.config.noteScale, NRSettings.config.noteScale, 1f), 0.1f).SetEase(Ease.InOutCubic);
+			//	gridTargetIcon.holdEndTrans.DOScale(new Vector3(NRSettings.config.noteScale, NRSettings.config.noteScale, 1f), 0.1f).SetEase(Ease.InOutCubic);
+			//}
 
 
 			noteIsAnimating = false;
@@ -394,9 +397,9 @@ namespace NotReaper.Targets {
 		}
 
 		private IEnumerator AnimateNoteBounce() {
-			DOTween.To((float scale) => {
-				gridTargetIcon.transform.localScale = new Vector3(scale, scale, 1f);
-			}, NRSettings.config.noteHitScale, NRSettings.config.noteScale, 0.3f).SetEase(Ease.OutCubic);
+			//DOTween.To((float scale) => {
+			//	gridTargetIcon.transform.localScale = new Vector3(scale, scale, 1f);
+			//}, NRSettings.config.noteHitScale, NRSettings.config.noteScale, 0.3f).SetEase(Ease.OutCubic);
 			
 			yield return new WaitForSeconds(0.3f);
 			noteIsAnimating = false;

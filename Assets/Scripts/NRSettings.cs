@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
@@ -18,6 +19,7 @@ namespace NotReaper {
         private static readonly string configFilePath = Path.Combine(Application.persistentDataPath, "NRConfig.txt");
         private static bool failsafeThingy = false;
         private static List<Action> pendingActions = new List<Action>();
+        public static UnityEvent PostLoad = new UnityEvent();
 
         public static void LoadSettingsJson(bool regenConfig = false) {
             //If it doesn't exist, we need to gen a new one.
