@@ -143,7 +143,6 @@ namespace NotReaper.Targets {
             }
 
             SetupFade();
-
         }
 
         public void OnDestroy() {
@@ -278,7 +277,7 @@ namespace NotReaper.Targets {
 
                 l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                 l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
-                l.SetPosition(2, new Vector3((beatLength.ToBeatTime() / 0.7f) * scale, sustainDirection, 0.0f));
+                l.SetPosition(2, new Vector3((beatLength.ToBeatTime() / 0.7f) * scale * 1.25f, sustainDirection, 0.0f));
             }
         }
 
@@ -286,6 +285,36 @@ namespace NotReaper.Targets {
         {
             ResetSpriteTransforms();
 
+            UpdateSpriteForBehavior(behavior);
+
+            pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
+
+            if (location == TargetIconLocation.Timeline)
+            {
+                line.SetActive(data.supportsBeatLength);
+                transform.localScale = Vector3.one * timelineTargetSize * 0.4f;
+            }
+            else
+            {
+                transform.localScale = Vector3.one * timelineTargetSize * 0.4f;
+            }
+
+
+            if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline)
+            {
+                collisionRadius = 0.25f;
+            }
+
+            if (behavior == TargetBehavior.NR_Pathbuilder)
+            {
+                data.velocity = TargetVelocity.None;
+            }
+
+            UpdateTimelineSustainLength();
+        }
+
+        private void UpdateSpriteForBehavior(TargetBehavior behavior)
+        {
             switch (behavior)
             {
                 case TargetBehavior.Standard:
@@ -330,6 +359,7 @@ namespace NotReaper.Targets {
                     selection.sprite = chainStartSelect;
 
                     if (location == TargetIconLocation.Grid) note.transform.localScale = Vector3.one * 1.7f;
+                    else note.transform.localScale = Vector3.one * 1f;
                     break;
                 case TargetBehavior.Chain:
                     note.sprite = chain;
@@ -344,8 +374,9 @@ namespace NotReaper.Targets {
                     selection.sprite = meleeSelect;
                     if (location == TargetIconLocation.Grid)
                     {
-                        note.transform.localScale = Vector3.one * 1.7f;
-                        selection.transform.localScale = Vector3.one * 1.7f;
+                        note.transform.localScale = Vector3.one * 1.5f;
+                        selection.transform.localScale = Vector3.one * 1.25f;
+                        ring.transform.localScale = Vector3.one * 1.5f;
                     }
                     break;
                 case TargetBehavior.Mine:
@@ -364,30 +395,6 @@ namespace NotReaper.Targets {
                 default:
                     break;
             }
-
-            pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
-
-            if (location == TargetIconLocation.Timeline)
-            {
-                line.SetActive(data.supportsBeatLength);
-                transform.localScale = Vector3.one * timelineTargetSize * 0.4f;
-            }
-            else
-            {
-                transform.localScale = Vector3.one * timelineTargetSize * 0.4f;
-            }
-
-
-            if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline)
-            {
-                collisionRadius = 0.25f;
-            }
-
-            if (behavior == TargetBehavior.NR_Pathbuilder)
-            {
-                data.velocity = TargetVelocity.None;
-            }
-
         }
 
         private void ResetSpriteTransforms()
@@ -400,6 +407,12 @@ namespace NotReaper.Targets {
             {
                 note.transform.localScale = Vector3.one * 0.728f;
                 selection.transform.localScale = Vector3.one * 0.5414f;
+                ring.transform.localScale = Vector3.one * 0.728f;
+            }
+            else
+            {
+                note.transform.localScale = Vector3.one * 0.707f;
+                selection.transform.localScale = Vector3.one * 0.406f;
             }
         }
 

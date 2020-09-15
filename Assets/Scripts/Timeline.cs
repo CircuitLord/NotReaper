@@ -526,6 +526,7 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 
 			songPlayback.PlayHitsound(time);
+			SetScale(scale);
 		}
 
 		//Adds a target directly to the timeline. targetData is kept as a reference NOT copied
@@ -2001,7 +2002,7 @@ namespace NotReaper {
 			foreach (Transform note in timelineTransformParent.transform) {
 				Vector3 noteScale = note.localScale;
 				noteScale.x = targetScale;
-				noteScale.x /= 1.2f;
+				noteScale.x /= 1.25f;
 
 				//noteScale.x *= NRSettings.config.noteTimelineScale;
 				//noteScale.y = NRSettings.config.noteTimelineScale;
