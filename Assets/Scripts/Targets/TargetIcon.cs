@@ -322,6 +322,7 @@ namespace NotReaper.Targets {
                 data.velocity = TargetVelocity.None;
             }
 
+            Timeline.instance.ReapplyScale();
             UpdateTimelineSustainLength();
         }
 
@@ -441,7 +442,7 @@ namespace NotReaper.Targets {
             else
             {
                 note.transform.localScale = Vector3.one * 0.657f;
-                selection.transform.localScale = Vector3.one * 0.306f;
+                selection.transform.localScale = Vector3.one * 0.276f;
             }
         }
 

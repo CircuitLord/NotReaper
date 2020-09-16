@@ -362,6 +362,7 @@ namespace NotReaper.Tools.ChainBuilder {
 						}
 
 						startClickNote.data.pathBuilderData.initialAngle = snappedAngle;
+						timeline.ReapplyScale();
 					}
 				}
 			}

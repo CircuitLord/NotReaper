@@ -26,6 +26,7 @@ using NotReaper.Timing;
 
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
+using Sirenix.Utilities;
 
 namespace NotReaper {
 
@@ -1743,7 +1744,7 @@ namespace NotReaper {
 
 
 		bool readyToRegenerate = false;
-		public void RegenerateBPMTimelineData() {
+		public void RegenerateBPMTimelineData(bool onlyRegenerateMesh = false) {
 			if(!readyToRegenerate) {
 				return;
 			}
@@ -1846,7 +1847,7 @@ namespace NotReaper {
 			mesh.vertices = vertices.ToArray();
 			mesh.triangles = indices.ToArray();
 
-			waveformVisualizer.GenerateWaveform(songPlayback.song, this);
+			if(!onlyRegenerateMesh) waveformVisualizer.GenerateWaveform(songPlayback.song, this);
 		}
 
 		public void SetOffset(Relative_QNT newOffset) {
@@ -1871,7 +1872,7 @@ namespace NotReaper {
 			int.TryParse(temp.Substring(2), out snap);
 			beatSnap = snap;
 
-			RegenerateBPMTimelineData();
+			RegenerateBPMTimelineData(true);
 
 			if (snap >= 32 && !isBeatSnapWarningActive) {
 				beatSnapWarningText.DOFade(1f, 0.5f);
@@ -1985,6 +1986,13 @@ namespace NotReaper {
 			timelineTransformParent.transform.localPosition = Vector3.left * x / (scale / 20f);
 
 			gridTransformParent.transform.localPosition = Vector3.back * x;
+
+			OptimizeInvisibleTargets();
+		}
+
+		public void ReapplyScale()
+		{
+			SetScale(scale);
 		}
 
 		public void SetScale(int newScale) {
@@ -2048,78 +2056,95 @@ namespace NotReaper {
 		}
 
 		bool checkForNearSustainsOnThisFrame = false;
-		public void Update() {
+		public void Update()
+		{
 			QNT_Timestamp startTime = time;
 
 			UpdateSustains();
 
-			if (!paused) {
+			if (!paused)
+			{
 				time = ShiftTick(new QNT_Timestamp(0), (float)songPlayback.GetTime());
 			}
 
 			bool isScrollingBeatSnap = false;
-			
-			
+
+
 			bool isShiftDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 			bool isAltDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
 			bool isCtrlDown = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
 
-			if (hover) {
-				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
-					if (Input.mouseScrollDelta.y > 0.1f) {
+			if (hover)
+			{
+				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+				{
+					if (Input.mouseScrollDelta.y > 0.1f)
+					{
 						SetScale(scale - 1);
-					} else if (Input.mouseScrollDelta.y < -0.1f) {
+					}
+					else if (Input.mouseScrollDelta.y < -0.1f)
+					{
 						SetScale(scale + 1);
 					}
 					SetBeatTime(time);
 				}
 			}
 
-			if (isAltDown && Input.mouseScrollDelta.y < -0.1f) {
+			if (isAltDown && Input.mouseScrollDelta.y < -0.1f)
+			{
 				isScrollingBeatSnap = true;
 				beatSnapSelector.PreviousClick();
 				beatSnapSelector.PreviousClick();
 
 
-			} else if (isAltDown && Input.mouseScrollDelta.y > 0.11f) {
+			}
+			else if (isAltDown && Input.mouseScrollDelta.y > 0.11f)
+			{
 				isScrollingBeatSnap = true;
 				beatSnapSelector.ForwardClick();
 				beatSnapSelector.ForwardClick();
 			}
-			
+
 			//if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && hover))
 
 			bool dragging = Input.GetMouseButton(0) && hover;
 
-			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f) {
+			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f)
+			{
 				if (!audioLoaded) return;
 				if (EditorInput.inUI && EditorInput.enableScrolling == false) return;
 
 				Relative_QNT jumpDuration = new Relative_QNT((long)Constants.DurationFromBeatSnap((uint)beatSnap).tick);
 
 				bool moveTick = false;
-				if(isCtrlDown && !dragging) {
+				if (isCtrlDown && !dragging)
+				{
 					moveTick = true;
 					jumpDuration = new Relative_QNT(1);
 				}
 
-				if(Input.mouseScrollDelta.y >= -0.1f) {
+				if (Input.mouseScrollDelta.y >= -0.1f)
+				{
 					jumpDuration.tick *= -1;
 				}
 
-				if(!moveTick) {
+				if (!moveTick)
+				{
 					time = GetClosestBeatSnapped(time + jumpDuration, (uint)beatSnap);
 				}
-				else {
+				else
+				{
 					time = time + jumpDuration;
 				}
 
 				SafeSetTime();
-				if (paused) {
+				if (paused)
+				{
 					songPlayback.PlayPreview(time, jumpDuration);
 					checkForNearSustainsOnThisFrame = true;
 				}
-				else {
+				else
+				{
 					songPlayback.Play(time);
 				}
 
@@ -2128,24 +2153,28 @@ namespace NotReaper {
 				StopCoroutine(AnimateSetTime(new QNT_Timestamp(0)));
 			}
 
-            if (Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.C)) {
-                CopyTimestampToClipboard();
-            }
+			if (Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.C))
+			{
+				CopyTimestampToClipboard();
+			}
 
-			if (!paused && !animatingTimeline) {
+			if (!paused && !animatingTimeline)
+			{
 				SetBeatTime(time);
 			}
 
 
-			if (Input.GetKeyDown(KeyCode.A) && isCtrlDown) {
+			if (Input.GetKeyDown(KeyCode.A) && isCtrlDown)
+			{
 
 				Camera.main.farClipPlane = 1000;
-				
-				foreach (Target target in orderedNotes) {
+
+				foreach (Target target in orderedNotes)
+				{
 					target.MakeTimelineSelectTarget();
 				}
 			}
-			
+
 
 			songPlayback.volume = NRSettings.config.mainVol;
 			songPlayback.hitSoundVolume = NRSettings.config.noteVol;
@@ -2161,68 +2190,83 @@ namespace NotReaper {
 			List<Target> newLoadedNotes = new List<Target>();
 			QNT_Timestamp loadStart = Timeline.time - Relative_QNT.FromBeatTime(10.0f);
 			QNT_Timestamp loadEnd = Timeline.time + Relative_QNT.FromBeatTime(10.0f);
-			
-			foreach(Target t in new NoteEnumerator(loadStart, loadEnd)) {
+
+			foreach (Target t in new NoteEnumerator(loadStart, loadEnd))
+			{
 				newLoadedNotes.Add(t);
 			}
 			loadedNotes = newLoadedNotes;
 
-			if(startTime != time) {
+			if (startTime != time)
+			{
 				QNT_Timestamp start = startTime;
 				QNT_Timestamp end = time;
 
-				if(start > end) {
+				if (start > end)
+				{
 					QNT_Timestamp temp = start;
 					start = end;
 					end = temp;
 				}
 
-				foreach(Target t in new NoteEnumerator(start, end)) {
+				foreach (Target t in new NoteEnumerator(start, end))
+				{
 					t.OnNoteHit();
 				}
 			}
 
 
 			//Update trace lines
-			if(NRSettings.config.enableTraceLines) {
+			if (NRSettings.config.enableTraceLines)
+			{
 				UpdateTraceLine(leftHandTraceLine, TargetHandType.Left, NRSettings.config.leftColor);
 				UpdateTraceLine(rightHandTraceLine, TargetHandType.Right, NRSettings.config.rightColor);
 			}
 
-			if(NRSettings.config.enableDualines) {
-				foreach(var line in dualNoteTraceLines) {
+
+			if (NRSettings.config.enableDualines)
+			{
+				foreach (var line in dualNoteTraceLines)
+				{
 					line.enabled = false;
 				}
 
 				int index = 0;
 				var backIt = new NoteEnumerator(Timeline.time - Relative_QNT.FromBeatTime(0.3f), Timeline.time + Relative_QNT.FromBeatTime(1.7f));
 				Target lastTarget = null;
-				foreach(Target t in backIt) {
-					if(lastTarget != null && 
+				foreach (Target t in backIt)
+				{
+					if (lastTarget != null &&
 						t.data.behavior != TargetBehavior.Chain && lastTarget.data.behavior != TargetBehavior.Chain &&
-						t.data.handType != TargetHandType.Either && t.data.handType != TargetHandType.None && 
+						t.data.handType != TargetHandType.Either && t.data.handType != TargetHandType.None &&
 						lastTarget.data.handType != TargetHandType.Either && lastTarget.data.handType != TargetHandType.None
-						) {
+						)
+					{
 						TargetHandType expected = TargetHandType.Left;
-						if(lastTarget.data.handType == expected) {
+						if (lastTarget.data.handType == expected)
+						{
 							expected = TargetHandType.Right;
 						}
 
-						if(t.data.time == lastTarget.data.time && t.data.handType == expected) {
+						if (t.data.time == lastTarget.data.time && t.data.handType == expected)
+						{
 							var dualNoteTraceLine = GetOrCreateDualLine(index++);
 							dualNoteTraceLine.enabled = true;
 
 							float alphaVal = 0.0f;
-							if(Timeline.time > t.data.time) {
+							if (Timeline.time > t.data.time)
+							{
 								alphaVal = 1.0f - ((Timeline.time - t.data.time).ToBeatTime() / 0.3f);
 							}
-							else {
+							else
+							{
 								alphaVal = 1.0f - ((t.data.time - Timeline.time).ToBeatTime() / 1.7f);
 							}
 
 							Vector2 leftPos = t.data.position;
 							Vector2 rightPos = lastTarget.data.position;
-							if(t.data.handType == TargetHandType.Right) {
+							if (t.data.handType == TargetHandType.Right)
+							{
 								Vector2 temp = rightPos;
 								rightPos = leftPos;
 								leftPos = temp;
@@ -2244,6 +2288,24 @@ namespace NotReaper {
 					}
 
 					lastTarget = t;
+				}
+			}
+		}
+
+		private static void OptimizeInvisibleTargets()
+		{
+			if (NRSettings.config.optimizeInvisibleTargets)
+			{
+				var targetsToShow = new NoteEnumerator(Timeline.time - Relative_QNT.FromBeatTime(10f), Timeline.time + Relative_QNT.FromBeatTime(10f));
+				for (int i = 0; i < orderedNotes.Count; i++)
+				{
+					orderedNotes[i].gridTargetIcon.gameObject.SetActive(false);
+					orderedNotes[i].timelineTargetIcon.gameObject.SetActive(false);
+				}
+				foreach (Target target in targetsToShow)
+				{
+					target.gridTargetIcon.gameObject.SetActive(true);
+					target.timelineTargetIcon.gameObject.SetActive(true);
 				}
 			}
 		}

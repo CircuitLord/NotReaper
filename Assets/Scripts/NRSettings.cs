@@ -191,7 +191,7 @@ namespace NotReaper {
         public string cuesSavePath = "";
 
         public string bgImagePath = NRSettings.GetbgImagePath();
-
+        public bool optimizeInvisibleTargets = true;
     }
 
 }

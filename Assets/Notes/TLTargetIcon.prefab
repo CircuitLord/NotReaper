@@ -29,8 +29,8 @@ Transform:
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_Children:
   - {fileID: 5580887524603858364}
-  - {fileID: 5644645337985901340}
   - {fileID: 7219536529543342091}
+  - {fileID: 5644645337985901340}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -78,8 +78,8 @@ MonoBehaviour:
   noneTelegraph: {fileID: 21300000, guid: 68ecec8366dbf674db6c58eb23358188, type: 3}
   standardSelect: {fileID: 21300000, guid: 1a5f3bc0e628e634f9caae3b65d9ba9d, type: 3}
   holdSelect: {fileID: 21300000, guid: f882076b166282a47af06a9895e5f288, type: 3}
-  horizontalSelect: {fileID: 21300000, guid: 86538f13ca520bc45bba328cb7bd81e3, type: 3}
-  verticalSelect: {fileID: 21300000, guid: 86538f13ca520bc45bba328cb7bd81e3, type: 3}
+  horizontalSelect: {fileID: 21300000, guid: 659feb4a81714c545898c2dad3585e30, type: 3}
+  verticalSelect: {fileID: 21300000, guid: 659feb4a81714c545898c2dad3585e30, type: 3}
   chainStartSelect: {fileID: 21300000, guid: f882076b166282a47af06a9895e5f288, type: 3}
   chainSelect: {fileID: 21300000, guid: f3b5a7ba7308d824fa0ad4e2f615593e, type: 3}
   meleeSelect: {fileID: 21300000, guid: 911a6d218bdf7274e9415d86a5619c2e, type: 3}
@@ -91,7 +91,7 @@ MonoBehaviour:
   ring: {fileID: 0}
   note: {fileID: 7671712862182785124}
   selection: {fileID: 6960228028383700939}
-  timelineSpread: 0.09
+  timelineSpread: 0.12
   targetSize: 1
   timelineTargetSize: 1
   sustainDirection: 0.6
@@ -259,7 +259,7 @@ Transform:
   m_LocalScale: {x: 0.4288995, y: 0.4288995, z: 0.4288995}
   m_Children: []
   m_Father: {fileID: 2633904944298091780}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7671712862182785124
 SpriteRenderer:
@@ -341,7 +341,7 @@ Transform:
   m_LocalScale: {x: 0.32261395, y: 0.322614, z: 0.82721543}
   m_Children: []
   m_Father: {fileID: 2633904944298091780}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6960228028383700939
 SpriteRenderer:

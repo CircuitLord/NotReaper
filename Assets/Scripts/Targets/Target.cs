@@ -269,10 +269,13 @@ namespace NotReaper.Targets {
 				if(!TargetData.BehaviorSupportsBeatLength(oldBehavior)) {
 					var gridHoldTargetManager = gridTargetIcon.GetComponentInChildren<HoldTargetManager>();
 
-					gridHoldTargetManager.sustainLength = data.beatLength;
-					gridHoldTargetManager.LoadSustainController();
+					if (gridHoldTargetManager != null)
+					{
+						gridHoldTargetManager.sustainLength = data.beatLength;
+						gridHoldTargetManager.LoadSustainController();
 
-					gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength;
+						gridHoldTargetManager.OnTryChangeSustainEvent += MakeTimelineUpdateSustainLength; 
+					}
 				}
 
 				gridTargetIcon.UpdatePath();

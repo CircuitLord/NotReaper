@@ -14,6 +14,7 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField] Toggle useAutoZOffsetWith360;
     [SerializeField] Toggle useBouncyAnimations;
     [SerializeField] Toggle playNoteSoundsWhileScrolling;
+    [SerializeField] Toggle optimizeInvisibleTargets;
 
     [SerializeField] ColorSlider LeftHand;
     [SerializeField] ColorSlider RightHand;
@@ -36,6 +37,7 @@ public class SettingsMenu : MonoBehaviour
         useAutoZOffsetWith360.isOn = NRSettings.config.useAutoZOffsetWith360;
         useBouncyAnimations.isOn = NRSettings.config.useBouncyAnimations;
         playNoteSoundsWhileScrolling.isOn = NRSettings.config.playNoteSoundsWhileScrolling;
+        optimizeInvisibleTargets.isOn = NRSettings.config.optimizeInvisibleTargets;
         LeftHand.SetColor(NRSettings.config.leftColor);
         RightHand.SetColor(NRSettings.config.rightColor);
     }
@@ -51,6 +53,7 @@ public class SettingsMenu : MonoBehaviour
         NRSettings.config.playNoteSoundsWhileScrolling = playNoteSoundsWhileScrolling.isOn;
         NRSettings.config.leftColor = LeftHand.color;
         NRSettings.config.rightColor = RightHand.color;
+        NRSettings.config.optimizeInvisibleTargets = optimizeInvisibleTargets.isOn;
         WarningText.SetActive(true);
         NRSettings.SaveSettingsJson();
     }

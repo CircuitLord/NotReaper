@@ -40,7 +40,7 @@ namespace NotReaper.Tools {
 			redoActions.Add(action);
 			actions.RemoveAt(actions.Count - 1);
 
-
+			timeline.ReapplyScale();
 		}
 
 		public void Redo() {
@@ -55,6 +55,7 @@ namespace NotReaper.Tools {
 
 			actions.Add(action);
 			redoActions.RemoveAt(redoActions.Count - 1);
+			timeline.ReapplyScale();
 		}
 
 		public void AddAction(NRAction action) {
