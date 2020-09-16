@@ -299,7 +299,7 @@ namespace NotReaper.Targets {
 
             UpdateSpriteForBehavior(behavior);
 
-            pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
+            if(pathBuilder != null) pathBuilder.SetActive(behavior == TargetBehavior.NR_Pathbuilder);
 
             if (location == TargetIconLocation.Timeline)
             {
@@ -331,20 +331,20 @@ namespace NotReaper.Targets {
             {
                 case TargetBehavior.Standard:
                     note.sprite = standard;
-                    prefade.sprite = standardTelegraph;
-                    ring.sprite = standardRing;
+                    if (prefade != null) prefade.sprite = standardTelegraph;
+                    if (ring != null) ring.sprite = standardRing;
                     selection.sprite = standardSelect;
                     break;
                 case TargetBehavior.Hold:
                     note.sprite = hold;
-                    prefade.sprite = holdTelegraph;
-                    ring.sprite = holdRing;
+                    if(prefade != null)prefade.sprite = holdTelegraph;
+                    if (ring != null)ring.sprite = holdRing;
                     selection.sprite = holdSelect;
                     break;
                 case TargetBehavior.Horizontal:
                     note.sprite = horizontal;
-                    prefade.sprite = horizontalTelegraph;
-                    ring.sprite = horizontalRing;
+                    if(prefade != null)prefade.sprite = horizontalTelegraph;
+                    if (ring != null)ring.sprite = horizontalRing;
                     selection.sprite = horizontalSelect;
 
                     if (location == TargetIconLocation.Grid)
@@ -362,8 +362,8 @@ namespace NotReaper.Targets {
                     break;
                 case TargetBehavior.Vertical:
                     note.sprite = vertical;
-                    prefade.sprite = verticalTelegraph;
-                    ring.sprite = verticalRing;
+                    if(prefade != null)prefade.sprite = verticalTelegraph;
+                    if (ring != null)ring.sprite = verticalRing;
                     selection.sprite = verticalSelect;
 
 
@@ -382,8 +382,8 @@ namespace NotReaper.Targets {
                     break;
                 case TargetBehavior.ChainStart:
                     note.sprite = chainStart;
-                    prefade.sprite = chainStartTelegraph;
-                    ring.sprite = chainStartRing;
+                    if(prefade != null)prefade.sprite = chainStartTelegraph;
+                    if (ring != null)ring.sprite = chainStartRing;
                     selection.sprite = chainStartSelect;
 
                     if (location == TargetIconLocation.Grid) note.transform.localScale = Vector3.one * 1.7f;
@@ -391,15 +391,15 @@ namespace NotReaper.Targets {
                     break;
                 case TargetBehavior.Chain:
                     note.sprite = chain;
-                    prefade.sprite = chainTelegraph;
-                    ring.sprite = chainRing;
+                    if(prefade != null)prefade.sprite = chainTelegraph;
+                    if (ring != null)ring.sprite = chainRing;
                     selection.sprite = chainSelect;
                     if (location == TargetIconLocation.Timeline) note.transform.localScale = Vector3.one * 0.2f;
                     break;
                 case TargetBehavior.Melee:
                     note.sprite = melee;
-                    prefade.sprite = meleeTelegraph;
-                    ring.sprite = meleeRing;
+                    if(prefade != null)prefade.sprite = meleeTelegraph;
+                    if (ring != null)ring.sprite = meleeRing;
                     selection.sprite = meleeSelect;
                     if (location == TargetIconLocation.Grid)
                     {
@@ -410,14 +410,14 @@ namespace NotReaper.Targets {
                     break;
                 case TargetBehavior.Mine:
                     note.sprite = mine;
-                    prefade.sprite = mineTelegraph;
-                    ring.sprite = mineRing;
+                    if(prefade != null)prefade.sprite = mineTelegraph;
+                    if (ring != null)ring.sprite = mineRing;
                     selection.sprite = mineSelect;
                     break;
                 case TargetBehavior.NR_Pathbuilder:
                     note.sprite = pathbuilder;
-                    prefade.sprite = chainTelegraph;
-                    ring.sprite = chainRing;
+                    if(prefade != null)prefade.sprite = chainTelegraph;
+                    if (ring != null)ring.sprite = chainRing;
                     selection.sprite = chainSelect;
                     break;
 
@@ -429,8 +429,8 @@ namespace NotReaper.Targets {
         private void ResetSpriteTransforms()
         {
             note.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-            prefade.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-            ring.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            if(prefade != null) prefade.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            if(ring != null) ring.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
             selection.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
             if (location == TargetIconLocation.Grid)
             {
