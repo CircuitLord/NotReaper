@@ -24,6 +24,7 @@ namespace NotReaper.Targets {
         public Sprite chain;
         public Sprite melee;
         public Sprite mine;
+        public Sprite pathbuilder;
         public Sprite none;
 
         [Header("Ring sprites")]
@@ -69,6 +70,8 @@ namespace NotReaper.Targets {
         [SerializeField] SpriteRenderer note;
 
         public SpriteRenderer selection;
+
+        [SerializeField] float timelineSpread = 1.5f;
 
         public float targetSize = 1f;
         public float timelineTargetSize = 1f;
@@ -223,16 +226,23 @@ namespace NotReaper.Targets {
                         l.startColor = NRSettings.config.leftColor;
                         l.endColor = NRSettings.config.leftColor;
                         sustainDirection = 0.6f;
+                        if(location == TargetIconLocation.Timeline) transform.localPosition += Vector3.up * timelineSpread;
                         break;
                     case TargetHandType.Right:
                         l.startColor = NRSettings.config.rightColor;
                         l.endColor = NRSettings.config.rightColor;
                         sustainDirection = -0.6f;
+                        if (location == TargetIconLocation.Timeline) transform.localPosition += Vector3.down * timelineSpread;
                         break;
                     case TargetHandType.Either:
                         l.startColor = UserPrefsManager.bothColor;
                         l.endColor = UserPrefsManager.bothColor;
                         sustainDirection = 0.6f;
+                        if (location == TargetIconLocation.Timeline)
+                        {
+                            Vector3 newPos = new Vector3(transform.localPosition.x, 0f, transform.localPosition.z); // Resets y offset
+                            transform.localPosition = newPos; 
+                        }
                         break;
                     default:
                         l.startColor = UserPrefsManager.neitherColor;
@@ -246,6 +256,8 @@ namespace NotReaper.Targets {
                     var pos2 = l.GetPosition(2);
                     l.SetPosition(2, new Vector3(pos2.x, sustainDirection, pos2.z));
                 }
+
+
             }
         }
 
@@ -277,7 +289,7 @@ namespace NotReaper.Targets {
 
                 l.SetPosition(0, new Vector3(0.0f, 0.0f, 0.0f));
                 l.SetPosition(1, new Vector3(0.0f, sustainDirection, 0.0f));
-                l.SetPosition(2, new Vector3((beatLength.ToBeatTime() / 0.7f) * scale * 1.25f, sustainDirection, 0.0f));
+                l.SetPosition(2, new Vector3((beatLength.ToBeatTime() / 0.7f) * scale * 1.32f, sustainDirection, 0.0f));
             }
         }
 
@@ -335,10 +347,18 @@ namespace NotReaper.Targets {
                     ring.sprite = horizontalRing;
                     selection.sprite = horizontalSelect;
 
-                    note.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
-                    prefade.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
-                    ring.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
-                    selection.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+                    if (location == TargetIconLocation.Grid)
+                    {
+                        note.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+                        prefade.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+                        ring.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+                        selection.transform.localRotation = Quaternion.Euler(0f, 0f, -45f); 
+                    }
+                    else
+                    {
+                        note.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+                        selection.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+                    }
                     break;
                 case TargetBehavior.Vertical:
                     note.sprite = vertical;
@@ -347,10 +367,18 @@ namespace NotReaper.Targets {
                     selection.sprite = verticalSelect;
 
 
-                    note.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
-                    prefade.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
-                    ring.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
-                    selection.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                    if (location == TargetIconLocation.Grid)
+                    {
+                        note.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                        prefade.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                        ring.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                        selection.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                    }
+                    else
+                    {
+                        note.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+                        selection.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+                    }
                     break;
                 case TargetBehavior.ChainStart:
                     note.sprite = chainStart;
@@ -359,13 +387,14 @@ namespace NotReaper.Targets {
                     selection.sprite = chainStartSelect;
 
                     if (location == TargetIconLocation.Grid) note.transform.localScale = Vector3.one * 1.7f;
-                    else note.transform.localScale = Vector3.one * 1f;
+                    else note.transform.localScale = Vector3.one * 0.7f;
                     break;
                 case TargetBehavior.Chain:
                     note.sprite = chain;
                     prefade.sprite = chainTelegraph;
                     ring.sprite = chainRing;
                     selection.sprite = chainSelect;
+                    if (location == TargetIconLocation.Timeline) note.transform.localScale = Vector3.one * 0.2f;
                     break;
                 case TargetBehavior.Melee:
                     note.sprite = melee;
@@ -386,10 +415,10 @@ namespace NotReaper.Targets {
                     selection.sprite = mineSelect;
                     break;
                 case TargetBehavior.NR_Pathbuilder:
-                    note.sprite = none;
-                    prefade.sprite = noneTelegraph;
-                    ring.sprite = noneRing;
-                    selection.sprite = noneSelect;
+                    note.sprite = pathbuilder;
+                    prefade.sprite = chainTelegraph;
+                    ring.sprite = chainRing;
+                    selection.sprite = chainSelect;
                     break;
 
                 default:
@@ -411,8 +440,8 @@ namespace NotReaper.Targets {
             }
             else
             {
-                note.transform.localScale = Vector3.one * 0.707f;
-                selection.transform.localScale = Vector3.one * 0.406f;
+                note.transform.localScale = Vector3.one * 0.657f;
+                selection.transform.localScale = Vector3.one * 0.306f;
             }
         }
 

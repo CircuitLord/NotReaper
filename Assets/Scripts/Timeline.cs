@@ -2002,7 +2002,7 @@ namespace NotReaper {
 			foreach (Transform note in timelineTransformParent.transform) {
 				Vector3 noteScale = note.localScale;
 				noteScale.x = targetScale;
-				noteScale.x /= 1.25f;
+				noteScale.x /= 1.32f; // If you change this you also have to change UpdateTimelineSustainLength. NR is a mess.
 
 				//noteScale.x *= NRSettings.config.noteTimelineScale;
 				//noteScale.y = NRSettings.config.noteTimelineScale;

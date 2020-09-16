@@ -250,8 +250,9 @@ MonoBehaviour:
   vertical: {fileID: 21300000, guid: 908790b33f364754a888f797d6b0c755, type: 3}
   chainStart: {fileID: 21300000, guid: 6c68a0a6e800b7848944784ff461bcc7, type: 3}
   chain: {fileID: 21300000, guid: 2704b01e0a65eac4c9d94bf50c61467e, type: 3}
-  melee: {fileID: 21300000, guid: 4de32145b1444794d84076effd3d6187, type: 3}
+  melee: {fileID: 21300000, guid: 08ad967b1e97b31458e448a97b921b06, type: 3}
   mine: {fileID: 21300000, guid: 68ecec8366dbf674db6c58eb23358188, type: 3}
+  pathbuilder: {fileID: 21300000, guid: 681bcad972a67454990acaeadcbc26f5, type: 3}
   none: {fileID: 21300000, guid: 68ecec8366dbf674db6c58eb23358188, type: 3}
   standardRing: {fileID: 21300000, guid: 911a6d218bdf7274e9415d86a5619c2e, type: 3}
   holdRing: {fileID: 21300000, guid: f882076b166282a47af06a9895e5f288, type: 3}
@@ -288,6 +289,7 @@ MonoBehaviour:
   ring: {fileID: 2267729611534424998}
   note: {fileID: 5403194974021325982}
   selection: {fileID: 3596132329354415679}
+  timelineSpread: 1.5
   targetSize: 0.2
   timelineTargetSize: 1
   sustainDirection: 0.6
