@@ -55,13 +55,15 @@ namespace NotReaper.Models
                 if (exportString[i].Contains("(pan")) panIndex = i;
             }
             exportString[volIndex] = $"(vols ({volume.l.ToString("n2")}   {volume.r.ToString("n2")}))";
-            exportString[panIndex] = $"(pans ({pan.l.ToString("n2")}   {pan.l.ToString("n2")}))";
+            exportString[panIndex] = $"(pans ({pan.l.ToString("n2")}   {pan.r.ToString("n2")}))";
             return string.Join(Environment.NewLine, exportString);
         }
 
         public void SetVolume(float value)
         {
             this.volume.l = this.volume.r = value;
+            this.pan.l = -1;
+            this.pan.r = 1;
         }
     }
 

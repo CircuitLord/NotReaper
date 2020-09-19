@@ -47,6 +47,8 @@ namespace NotReaper.Timing {
         public string mapperName = "";
         public string artistName = "";
 
+        public float moggSongVolume = -5;
+
         public bool skipOffset = true;
         public bool isMp3 = false;
 
@@ -75,13 +77,16 @@ namespace NotReaper.Timing {
             ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             ffmpeg.StartInfo.FileName = ffmpegPath;
 
-            ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            ffmpeg.StartInfo.CreateNoWindow = true;
             ffmpeg.StartInfo.UseShellExecute = false;
             ffmpeg.StartInfo.RedirectStandardOutput = true;
             ffmpeg.StartInfo.WorkingDirectory = Path.Combine(Application.streamingAssetsPath, "FFMPEG");
-            
+
         }
 
+        public void UpdateUIValues() {
+            if (NRSettings.config.savedMapperName != null) mapperInput.text = NRSettings.config.savedMapperName;
+        }
 
 
         public void SkipOffset(bool yes) {
@@ -108,19 +113,63 @@ namespace NotReaper.Timing {
                     filePath = "converted.ogg";
 
                     isMp3 = true;
-                    
+
                     StartCoroutine(
 	                    GetAudioClip($"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", filePath)));
                 }
 
                 else {
 	                isMp3 = false;
-	                StartCoroutine(GetAudioClip(filePath));
+                    StartCoroutine(GetAudioClip(filePath));
                 }
 
                 nameText.text = System.IO.Path.GetFileName(paths[0]);
 	            loadedSong = paths[0];
+                if (NRSettings.config.autoSongVolume) {
+                    SetAutoVolume();
+                }
             }
+        }
+
+        public void SetAutoVolume() // Compare to normalized and set song volume in moggsong to match OST
+        {
+            string retMessage = string.Empty;
+            UnityEngine.Debug.Log("Start auto song volume");
+            ffmpeg.StartInfo.RedirectStandardError = true;
+            ffmpeg.StartInfo.Arguments =
+            String.Format("-i \"{0}\" -filter:a volumedetect -f null /dev/null", loadedSong);
+            ffmpeg.Start();
+            retMessage = ffmpeg.StandardError.ReadToEnd();
+            ffmpeg.WaitForExit();
+            ffmpeg.Close();
+
+            var outputFile = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica", "audioOutput.txt");
+            File.Delete(outputFile);
+            File.WriteAllText(outputFile, retMessage);
+
+            string max_volume = string.Empty; // Pulling max_volume line
+            foreach (var line in File.ReadLines(outputFile))
+            {
+                if (line.Contains("max_volume:"))
+                {
+                    max_volume = line;
+                }
+            }
+            string normalized_db = max_volume.Split(' ')[4]; // Grab only the number
+
+            float foundVolume = float.Parse(normalized_db); // Crappy maths
+            if (foundVolume > 0){
+                foundVolume = foundVolume * -1;
+            }
+            else if (foundVolume < 0){
+                foundVolume = Mathf.Abs(foundVolume);
+            }
+            moggSongVolume = foundVolume - Mathf.Abs(moggSongVolume);
+
+            NotificationShower.AddNotifToQueue(new NRNotification("Mogg volume set to " + moggSongVolume.ToString("n2")));
+            UnityEngine.Debug.Log("Moggsong volume set to " + moggSongVolume.ToString("n2"));
+            UnityEngine.Debug.Log("End auto song volume");
+
         }
 
         public void SelectMidiFile() // Load Midi for tempo
@@ -170,11 +219,11 @@ namespace NotReaper.Timing {
 
 	        if (isMp3 || !skipOffset) {
                 trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), 0, DefaultBPM, skipOffset);
-                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi);
+                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi);
 		        
 	        }
 	        else {
-                path = AudicaGenerator.Generate(loadedSong, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi);
+                path = AudicaGenerator.Generate(loadedSong, moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi);
 	        }
 	        
             timeline.LoadAudicaFile(false, path);
@@ -212,8 +261,11 @@ namespace NotReaper.Timing {
             yield return new WaitForSeconds(fadeDuration / 4f);
 
             DOTween.To(x => window.alpha = x, 0.0f, 1.0f, fadeDuration / 2f);
+           
+            UpdateUIValues();
 
             yield break;
+
         }
 
         public IEnumerator FadeOut() {
@@ -226,6 +278,7 @@ namespace NotReaper.Timing {
 
             yield return new WaitForSeconds(fadeDuration / 2f);
 
+            UpdateUIValues();
             this.gameObject.SetActive(false);
 
             yield break;

@@ -1,6 +1,7 @@
 ﻿using NotReaper;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,11 +15,15 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField] Toggle useAutoZOffsetWith360;
     [SerializeField] Toggle useBouncyAnimations;
     [SerializeField] Toggle playNoteSoundsWhileScrolling;
+    [SerializeField] Toggle autoSongVolume;
+
+    [SerializeField] TMP_InputField savedMapperField;
 
     [SerializeField] ColorSlider LeftHand;
     [SerializeField] ColorSlider RightHand;
 
     [SerializeField] GameObject WarningText;
+
 
     private void Start()
     {
@@ -36,8 +41,11 @@ public class SettingsMenu : MonoBehaviour
         useAutoZOffsetWith360.isOn = NRSettings.config.useAutoZOffsetWith360;
         useBouncyAnimations.isOn = NRSettings.config.useBouncyAnimations;
         playNoteSoundsWhileScrolling.isOn = NRSettings.config.playNoteSoundsWhileScrolling;
+        autoSongVolume.isOn = NRSettings.config.autoSongVolume;
         LeftHand.SetColor(NRSettings.config.leftColor);
         RightHand.SetColor(NRSettings.config.rightColor);
+        savedMapperField.text = NRSettings.config.savedMapperName;
+        
     }
 
     public void ApplyValues()
@@ -49,8 +57,10 @@ public class SettingsMenu : MonoBehaviour
         NRSettings.config.useAutoZOffsetWith360 = useAutoZOffsetWith360.isOn;
         NRSettings.config.useBouncyAnimations = useBouncyAnimations.isOn;
         NRSettings.config.playNoteSoundsWhileScrolling = playNoteSoundsWhileScrolling.isOn;
+        NRSettings.config.autoSongVolume = autoSongVolume.isOn;
         NRSettings.config.leftColor = LeftHand.color;
         NRSettings.config.rightColor = RightHand.color;
+        NRSettings.config.savedMapperName = savedMapperField.text;
         WarningText.SetActive(true);
         NRSettings.SaveSettingsJson();
     }

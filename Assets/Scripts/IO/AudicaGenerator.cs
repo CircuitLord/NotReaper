@@ -13,7 +13,7 @@ namespace NotReaper.IO {
 
 	public class AudicaGenerator {
 
-		public static string Generate(string oggPath, string songID, string songName, string artist, double bpm, string songEndEvent, string author, int offset, string midiPath) {
+		public static string Generate(string oggPath, float moggSongVol, string songID, string songName, string artist, double bpm, string songEndEvent, string author, int offset, string midiPath) {
 
 
 			HandleCache.CheckSaveFolderValid();
@@ -54,7 +54,14 @@ namespace NotReaper.IO {
 
 			ogg2mogg.WaitForExit();
 
+			//Set the song.moggsong volume
+			var moggpath = Path.Combine(workFolder, "song.moggsong");
+			var moggsongTemplate = Path.Combine(workFolder, "MoggsongTemplate", "song.moggsong");
 
+			File.Delete(moggpath);
+			File.Copy(moggsongTemplate, moggpath);
+			File.WriteAllText(moggpath, File.ReadAllText(moggpath).Replace("-5", moggSongVol.ToString("n2")));
+			
 			//Make the song.desc file;
 			File.Delete(Path.Combine(workFolder, "song.desc"));
 			SongDesc songDesc = JsonUtility.FromJson<SongDesc>(File.ReadAllText(Path.Combine(workFolder, "songtemplate.desc")));
@@ -74,8 +81,9 @@ namespace NotReaper.IO {
 				archive.AddEntry("song.desc", Path.Combine(workFolder, "song.desc"));
 				archive.AddEntry("song.mid", Path.Combine(workFolder, "song.mid"));
 				archive.AddEntry("song.mogg", Path.Combine(workFolder, "song.mogg"));
-				
-				
+				archive.AddEntry("song.moggsong", Path.Combine(workFolder, "song.moggsong"));
+
+
 				archive.SaveTo(Path.Combine(Application.dataPath, @"../", "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
 			}
 
