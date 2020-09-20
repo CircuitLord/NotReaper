@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class NRPrompt : MonoBehaviour
+public class NRPrompt : UnitySingleton<NRPrompt>
 {
     [SerializeField] NRButton confirm;
     [SerializeField] NRButton cancel;
@@ -12,15 +12,7 @@ public class NRPrompt : MonoBehaviour
 
     private bool promptActive;
 
-    private Queue<PromptQueueEntry> promptQueue;
-
-    public static NRPrompt I;
-
-    void Awake()
-    {
-        if (I == null) I = this;
-        promptQueue = new Queue<PromptQueueEntry>();
-    }
+    private Queue<PromptQueueEntry> promptQueue = new Queue<PromptQueueEntry>();
 
     public void CreatePrompt(UnityAction confirmAction, string promptString, string promptTitleString)
     {

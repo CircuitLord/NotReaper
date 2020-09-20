@@ -1,5 +1,6 @@
 ﻿using NotReaper;
 using NotReaper.IO;
+using NotReaper.UserInput;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using UnityEngine.Events;
 public class OnNRStart : MonoBehaviour
 {
     string argsAudicaFilePath;
-    void Start()
+    void Awake()
     {
         string[] arguments = Environment.GetCommandLineArgs();
         if (arguments.Length == 1) return;
@@ -20,7 +21,8 @@ public class OnNRStart : MonoBehaviour
             argsAudicaFilePath = arguments[1];
             NRSettings.PostLoad.AddListener(new UnityAction(() =>
             {
-                Invoke("LoadArgsFile", 6f); // This is really bad, don't do this.
+                Invoke("LoadArgsFile", 2f); // This is really bad, don't do this.
+                EditorInput.I.pauseMenu.ClosePauseMenu();
             }));
         }
     }

@@ -107,6 +107,7 @@ namespace NotReaper.UserInput {
 			StartCoroutine(LoadBGImage(NRSettings.config.bgImagePath));
 			
 			nrDiscordPresence.InitPresence();
+			NRSettings.PostLoad.Invoke();
 		}
 
 
