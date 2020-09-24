@@ -171,6 +171,7 @@ namespace NotReaper {
         public float bgMoveMultiplier = 1.0f;
         public bool useBouncyAnimations = false;
         public bool playNoteSoundsWhileScrolling = false;
+        public bool autoSongVolume = true;
 
         public bool useAutoZOffsetWith360 = true;
 
@@ -189,6 +190,8 @@ namespace NotReaper {
         public bool enableDualines = true;
 
         public string cuesSavePath = "";
+
+        public string savedMapperName = "";
 
         public string bgImagePath = NRSettings.GetbgImagePath();
         public bool optimizeInvisibleTargets = true;
