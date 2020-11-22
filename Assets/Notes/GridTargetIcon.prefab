@@ -293,6 +293,7 @@ MonoBehaviour:
   targetSize: 0.2
   timelineTargetSize: 1
   sustainDirection: 0.6
+  collisionRadius: 0.95
   isSelected: 0
   location: 1
   holdParticles: {fileID: 0}

@@ -82,7 +82,7 @@ namespace NotReaper.Targets {
 
         public float sustainDirection = 0.6f;
 
-        private float collisionRadius = 0.5f;
+        [SerializeField] private float collisionRadius = 0.95f;
 
         public bool isSelected = false;
         public TargetIconLocation location;
@@ -314,8 +314,9 @@ namespace NotReaper.Targets {
 
             if (behavior == TargetBehavior.Chain && location == TargetIconLocation.Timeline)
             {
-                collisionRadius = 0.25f;
+                collisionRadius = 0.4f;
             }
+            else if (behavior == TargetBehavior.Melee && location == TargetIconLocation.Grid) collisionRadius = 1.7f;
 
             if (behavior == TargetBehavior.NR_Pathbuilder)
             {

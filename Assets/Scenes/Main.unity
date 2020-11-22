@@ -13537,7 +13537,7 @@ PrefabInstance:
     - target: {fileID: 5456530713361385453, guid: 79f10c0c52f5444438631f1632b5457a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5456530713361385453, guid: 79f10c0c52f5444438631f1632b5457a,
         type: 3}
@@ -13562,7 +13562,7 @@ PrefabInstance:
     - target: {fileID: 5456530713361385453, guid: 79f10c0c52f5444438631f1632b5457a,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -32.3
+      value: -51.2
       objectReference: {fileID: 0}
     - target: {fileID: 5456530713361385453, guid: 79f10c0c52f5444438631f1632b5457a,
         type: 3}
@@ -46589,8 +46589,8 @@ MonoBehaviour:
   useAutoZOffsetWith360: {fileID: 38323878}
   useBouncyAnimations: {fileID: 1655875961}
   playNoteSoundsWhileScrolling: {fileID: 702753724}
-  optimizeInvisibleTargets: {fileID: 325575325}
   autoSongVolume: {fileID: 1327466142}
+  optimizeInvisibleTargets: {fileID: 325575325}
   savedMapperField: {fileID: 1218014654}
   LeftHand: {fileID: 77451977}
   RightHand: {fileID: 1117116562}

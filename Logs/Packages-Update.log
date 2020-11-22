@@ -103,3 +103,15 @@ The following packages were updated:
   com.unity.xr.legacyinputhelpers from version 2.0.6 to 2.1.4
 The following packages were removed:
   com.unity.google.resonance.audio@1.18.3
+
+=== Sun Nov 22 23:04:57 2020
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.ide.visualstudio from version 2.0.2 to 2.0.3
+  com.unity.ide.vscode from version 1.2.1 to 1.2.3
+  com.unity.render-pipelines.lightweight from version 8.1.0 to 8.2.0
+  com.unity.shadergraph from version 8.1.0 to 8.2.0
+  com.unity.test-framework from version 1.0.18 to 1.1.18
