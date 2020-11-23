@@ -7,6 +7,7 @@ using NotReaper.Targets;
 using NotReaper.UI;
 using NotReaper.UserInput;
 using NotReaper.Managers;
+using NotReaper.Models;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
 
@@ -48,6 +49,7 @@ namespace NotReaper.Tools {
         public void ScaleDown() => timeline.Scale(timeline.selectedNotes, 0.9f);
         public void undo() => undoRedoManager.Undo();
         public void redo() => undoRedoManager.Redo();
+        public void DeselectBehavior(int behavior) => timeline.DeselectBehavior((TargetBehavior)behavior);
 
     }
 }

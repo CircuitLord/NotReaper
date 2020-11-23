@@ -547,7 +547,30 @@ namespace NotReaper.Tools {
 		}
 	}
 
-	public class NRActionConvertNoteToPathbuilder : NRAction {
+    public class NRActionDeselectBehavior : NRAction
+    {
+		public TargetBehavior behaviorToDeselect;
+		Target[] deselectedTargets;
+        public override void DoAction(Timeline timeline)
+        {
+			deselectedTargets = timeline.selectedNotes
+								.Where(target => target.data.behavior == behaviorToDeselect)
+								.ToArray();
+            foreach (var target in deselectedTargets)
+            {
+				target.Deselect();
+            }
+        }
+
+        public override void UndoAction(Timeline timeline)
+        {
+            foreach (var target in deselectedTargets)
+			{
+				target.Select();
+            }
+        }
+    }
+    public class NRActionConvertNoteToPathbuilder : NRAction {
 		public TargetData data;
 		public QNT_Duration oldBeatLength;
 		public PathBuilderData pathBuilderData = new PathBuilderData();

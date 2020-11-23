@@ -1084,6 +1084,13 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
+		public void DeselectBehavior(TargetBehavior behavior)
+		{
+			var action = new NRActionDeselectBehavior();
+			action.behaviorToDeselect = behavior;
+			Tools.undoRedoManager.AddAction(action);
+		}
+
 		public void DeleteTargetFromAction(TargetData targetData) {
 			Target target = FindNote(targetData);
 			if (target == null) return;
