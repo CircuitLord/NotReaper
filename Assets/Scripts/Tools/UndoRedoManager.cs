@@ -113,9 +113,11 @@ namespace NotReaper.Tools {
 			}
 
 			actions.ForEach(action => { action.DoAction(timeline); });
+			TransformTool.instance.UpdateOverlay();
 		}
 		public override void UndoAction(Timeline timeline) {
 			actions.ForEach(action => { action.UndoAction(timeline); });
+			TransformTool.instance.UpdateOverlay();
 		}
 	}
 
@@ -129,10 +131,12 @@ namespace NotReaper.Tools {
 			}
 			timeline.DeleteTargetFromAction(targetData);
 			repeaterData.ForEach(data => { timeline.DeleteTargetFromAction(data); });
+			TransformTool.instance.UpdateOverlay();
 		}
 		public override void UndoAction(Timeline timeline) {
 			timeline.AddTargetFromAction(targetData);
 			repeaterData.ForEach(data => { timeline.AddTargetFromAction(data); });
+			TransformTool.instance.UpdateOverlay();
 		}
 	}
 
@@ -160,11 +164,13 @@ namespace NotReaper.Tools {
 			targetGridMoveIntents.ForEach(intent => {
 				intent.target.position = intent.intendedPosition;
 			});
+			TransformTool.instance.UpdateOverlay();
 		}
 		public override void UndoAction(Timeline timeline) {
 			targetGridMoveIntents.ForEach(intent => {
 				intent.target.position = intent.startingPosition;
 			});
+			TransformTool.instance.UpdateOverlay();
 		}
 	}
 
@@ -188,6 +194,7 @@ namespace NotReaper.Tools {
 				intent.endRepeaterSiblingsToBeCreated.ForEach(data => { timeline.AddTargetFromAction(data); });
 			});
 			timeline.SortOrderedList();
+			TransformTool.instance.UpdateOverlay();
 		}
 		public override void UndoAction(Timeline timeline) {
 			//First, destroy targets in the ending section (if any exist)
@@ -206,6 +213,7 @@ namespace NotReaper.Tools {
 				intent.startSiblingsToBeDestroyed.ForEach(data => { timeline.AddTargetFromAction(data); });
 			});
 			timeline.SortOrderedList();
+			TransformTool.instance.UpdateOverlay();
 		}
 	}
 
@@ -265,6 +273,7 @@ namespace NotReaper.Tools {
 					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
 				}
 			});
+			TransformTool.instance.UpdateOverlay();
 		}
 		public override void UndoAction(Timeline timeline) {
 			DoAction(timeline); //Swap is symmetrical
@@ -295,6 +304,7 @@ namespace NotReaper.Tools {
 					ChainBuilder.ChainBuilder.GenerateChainNotes(targetData);
 				}
 			});
+			TransformTool.instance.UpdateOverlay();
 		}
 		public override void UndoAction(Timeline timeline) {
 			DoAction(timeline); //Swap is symmetrical
@@ -319,6 +329,7 @@ namespace NotReaper.Tools {
 					}
 				}
 			});
+			TransformTool.instance.UpdateOverlay();
 		}
 		public override void UndoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
@@ -332,17 +343,18 @@ namespace NotReaper.Tools {
 					}
 				}
 			});
+			TransformTool.instance.UpdateOverlay();
 		}
 	}
 
 	public class NRActionRotate : NRAction {
 		public List<TargetData> affectedTargets = new List<TargetData>();
 
-		public int rotateAngle = 0;
+		public float rotateAngle = 0;
 
 		public Vector2 rotateCenter = Vector2.zero;
 
-		public void NRRotate(TargetData data, Vector2 center, int angle) {
+		public void NRRotate(TargetData data, Vector2 center, float angle) {
 			data.x -= center.x;
 			data.y -= center.y;
 			angle = -angle;
@@ -368,6 +380,7 @@ namespace NotReaper.Tools {
 					}
 				}
 			});
+			TransformTool.instance.UpdateOverlay();
 		}
 		public override void UndoAction(Timeline timeline) {
 			affectedTargets.ForEach(targetData => {
@@ -380,6 +393,7 @@ namespace NotReaper.Tools {
 					}
 				}
 			});
+			TransformTool.instance.UpdateOverlay();
 		}
 	}
 

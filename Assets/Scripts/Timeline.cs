@@ -1048,8 +1048,10 @@ namespace NotReaper {
 			Tools.undoRedoManager.AddAction(action);
 		}
 
-		public void Rotate(List<Target> targets, int angle) {
+		public void Rotate(List<Target> targets, float angle, Vector2 ?center = null) {
 			var action = new NRActionRotate();
+			if (center == null) action.rotateCenter = Vector2.zero;
+			else action.rotateCenter = (Vector2)center;
 			action.rotateAngle = angle;
 			action.affectedTargets = targets.Select(target => target.data).ToList();
 			Tools.undoRedoManager.AddAction(action);
