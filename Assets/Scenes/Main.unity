@@ -25292,6 +25292,7 @@ MonoBehaviour:
   canvasGroup: {fileID: 673293019}
   centerPoint: {fileID: 1243387342}
   chainBuilderWindow: {fileID: 1183512482}
+  selectionMesh: {fileID: 2077763986}
 --- !u!114 &673293017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83153,8 +83154,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transformTool: {fileID: 673293016}
-  shouldReturn: 0
-  shouldSnap: 0
 --- !u!114 &2045246388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -84744,20 +84743,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26f0af32852672749b326d38e55e0178, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_Material: {fileID: 2100000, guid: ba85e959c58c04c4c974a01ee5ec399e, type: 2}
+  m_Color: {r: 0.9450981, g: 0.7019608, b: 0.054901965, a: 1}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  myColor: {r: 0, g: 0, b: 0, a: 0}
-  myColor1: {r: 0, g: 0, b: 0, a: 0}
-  myColor2: {r: 0, g: 0, b: 0, a: 0}
-  myColor3: {r: 0, g: 0, b: 0, a: 0}
-  debugColor: {r: 0, g: 0, b: 0, a: 0}
-  myFloat: 0
   canvas: {fileID: 1197730502}
   centerPoint: {fileID: 1243387342}
+  sprite: {fileID: 0}
   m: {fileID: 0}
-  scaleOffset: 0
 --- !u!222 &2077763987
 CanvasRenderer:
   m_ObjectHideFlags: 0

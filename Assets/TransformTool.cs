@@ -16,6 +16,7 @@ public class TransformTool : MonoBehaviour
     public static TransformTool instance;
     RectTransform rectTransform;
     int lastSelectedTargetCount = 0;
+    [SerializeField] SelectionMesh selectionMesh;
 
     private void Awake()
     {
@@ -63,6 +64,7 @@ public class TransformTool : MonoBehaviour
         transform.position = new Vector3(minX, maxY);
         rectTransform.sizeDelta = new Vector2(Mathf.Abs(maxX - minX), Mathf.Abs(maxY - minY)) * (1 / canvas.transform.localScale.x);
         centerPoint.localPosition = new Vector2((float)(rectTransform.sizeDelta.x * 0.5), (float)-(rectTransform.sizeDelta.y * 0.5));
+        selectionMesh.GenerateMeshForTimeline();
     }
 
     public void SetPivot(Vector2 pivot)

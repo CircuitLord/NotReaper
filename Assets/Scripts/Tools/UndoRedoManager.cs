@@ -574,7 +574,8 @@ namespace NotReaper.Tools {
             {
 				target.Deselect();
             }
-        }
+			TransformTool.instance.UpdateOverlay();
+		}
 
         public override void UndoAction(Timeline timeline)
         {
@@ -582,7 +583,8 @@ namespace NotReaper.Tools {
 			{
 				target.Select();
             }
-        }
+			TransformTool.instance.UpdateOverlay();
+		}
     }
     public class NRActionConvertNoteToPathbuilder : NRAction {
 		public TargetData data;

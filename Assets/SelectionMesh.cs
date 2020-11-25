@@ -4,24 +4,13 @@ using UnityEngine.UI;
 
 public class SelectionMesh : Graphic
 {
-    public Color myColor;
-    public Color myColor1;
-    public Color myColor2;
-    public Color myColor3;
-    public Color debugColor;
-    public float myFloat;
     VertexHelper vh;
     [SerializeField] Canvas canvas;
     [SerializeField] Transform centerPoint;
     [SerializeField] Sprite sprite;
     public Mesh m;
-    public float scaleOffset;
-    //protected override void OnPopulateMesh(Mesh toFill)
-    //{
-    //    //m = toFill;
 
-    //}
-    private void CreateQuad(VertexHelper vh, float offsetX, float offsetY, Color color, float scaleOffset)
+    private void CreateQuad(VertexHelper vh, float offsetX, float offsetY)
     {
         Vector2 corner1 = Vector2.zero;
         Vector2 corner2 = Vector2.zero;
@@ -49,18 +38,18 @@ public class SelectionMesh : Graphic
         UIVertex vert4 = UIVertex.simpleVert;
 
         vert1.position = new Vector2(corner1.x + offsetX, corner1.y + offsetY);
-        
+        vert1.color = color;
 
         //topleft
-        vert2.position = new Vector2(corner1.x + offsetX, corner2.y + offsetY - scaleOffset);
-        
+        vert2.position = new Vector2(corner1.x + offsetX, corner2.y + offsetY);
+        vert2.color = color;
 
         //topright
-        vert3.position = new Vector2(corner2.x + offsetX, corner2.y + offsetY - scaleOffset);
-        
+        vert3.position = new Vector2(corner2.x + offsetX, corner2.y + offsetY);
+        vert3.color = color;
 
         vert4.position = new Vector2(corner2.x + offsetX, corner1.y + offsetY);
-        
+        vert4.color = color;
 
         UIVertex[] verts = { vert1, vert2, vert3, vert4 };
         vh.AddUIVertexQuad(verts);
@@ -68,7 +57,7 @@ public class SelectionMesh : Graphic
 
     public void GenerateMeshForTimeline()
     {
-        
+
         m = new Mesh();
         var timeline = Timeline.instance;
         using (var vh = new VertexHelper(m))
@@ -78,7 +67,7 @@ public class SelectionMesh : Graphic
             {
                 var selectedTarget = timeline.selectedNotes[i].data;
                 float canvasScale = (1 / canvas.transform.localScale.x);
-                CreateQuad(vh, (selectedTarget.x * canvasScale), (selectedTarget.y * canvasScale), Color.white, 1f);
+                CreateQuad(vh, (selectedTarget.x * canvasScale), (selectedTarget.y * canvasScale));
             }
 
             //CreateQuad(vh, 10);
@@ -100,7 +89,8 @@ public class SelectionMesh : Graphic
     }
     protected override void Awake()
     {
-        defaultMaterial.mainTexture = sprite.texture;
+
     }
+
 
 }
