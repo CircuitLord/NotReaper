@@ -98,13 +98,14 @@ namespace NotReaper.Timing {
 
 
         public void SelectAudioFile() {
-            var compatible = new[] { new ExtensionFilter("Compatible Audio Types", "mp3", "ogg") }; 
+            var compatible = new[] { new ExtensionFilter("Compatible Audio Types", "mp3", "ogg", "flac") }; 
             string[] paths = StandaloneFileBrowser.OpenFilePanel("Select music track", Path.Combine(Application.persistentDataPath), compatible, false);
             var filePath = paths[0];
 
             if (filePath != null) {
-                // if user loads mp3 instead of ogg, do the conversion first
-                if (paths[0].EndsWith(".mp3")) {
+                // if user loads mp3 or flac instead of ogg, do the conversion first
+                if (paths[0].EndsWith(".mp3") || paths[0].EndsWith(".flac"))
+                {
                     UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg"));
                     ffmpeg.StartInfo.Arguments =
                         String.Format("-y -i \"{0}\" -map 0:a \"{1}\"", paths[0], "converted.ogg");
