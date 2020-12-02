@@ -34,6 +34,8 @@ namespace NotReaper.Models {
 
 		public string midiFile = "";
 
+		public string albumArt = "";
+
 		public string fusionSpatialized = "fusion/guns/default/drums_default_spatial.fusion";
 		public string fusionUnspatialized = "fusion/guns/default/drums_default_sub.fusion";
 
@@ -83,6 +85,7 @@ namespace NotReaper.Models {
 		public string title;
 		public string artist;
 		public string midiFile = "song.mid";
+		public string albumArt = "song.png";
 		public string fusionSpatialized = "fusion/guns/default/drums_default_spatial.fusion";
 		public string fusionUnspatialized = "fusion/guns/default/drums_default_sub.fusion";
 		public string sustainSongRight = "song_sustain_r.moggsong";

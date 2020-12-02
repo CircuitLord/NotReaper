@@ -25,8 +25,10 @@ namespace NotReaper.Timing {
         public Button genAudicaButton;
         public Button selectSongButton;
         public Button selectMidiButton;
+        public Button selectArtButton;
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI midiText;
+        public TextMeshProUGUI artText;
         public TMP_InputField songNameInput;
         public TMP_InputField mapperInput;
         public TMP_InputField artistInput;
@@ -34,6 +36,7 @@ namespace NotReaper.Timing {
 
         [Header("Extras")]
         public Image BG;
+        public Image AlbumArtImg;
         public CanvasGroup window;
         public EditorInput editorInput;
 
@@ -42,6 +45,7 @@ namespace NotReaper.Timing {
         public Timeline timeline;
         public string loadedSong;
         public string loadedMidi;
+        public string loadedArt;
 
         public string songName = "";
         public string mapperName = "";
@@ -186,6 +190,31 @@ namespace NotReaper.Timing {
             }
         }
 
+        public void SelectAlbumArtFile() // Album art
+        {
+            var compatible = new[] { new ExtensionFilter("Compatible Image Types", "png", "jpeg") };
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("Select album art", Path.Combine(Application.persistentDataPath), compatible, false);
+            var filePath = paths[0];
+
+            if (filePath != null)
+            {
+
+                UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -vf scale=256:256 \"{1}\"", paths[0], "song.png"));
+                ffmpeg.StartInfo.Arguments =
+                    String.Format("-y -i \"{0}\" -vf scale=256:256 \"{1}\"", paths[0], "song.png");
+                ffmpeg.Start();
+                ffmpeg.WaitForExit();
+                filePath = "song.png";
+
+
+                 StartCoroutine(
+                    GetAlbumArt($"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", filePath)));
+
+                artText.text = "";
+                loadedArt = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "song.png");
+
+            }
+        }
 
         public void Cancel() {
             Timeline.inTimingMode = false;
@@ -220,11 +249,11 @@ namespace NotReaper.Timing {
 
 	        if (isMp3 || !skipOffset) {
                 trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), 0, DefaultBPM, skipOffset);
-                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi);
+                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi, loadedArt);
 		        
 	        }
 	        else {
-                path = AudicaGenerator.Generate(loadedSong, moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi);
+                path = AudicaGenerator.Generate(loadedSong, moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi, loadedArt);
 	        }
 	        
             timeline.LoadAudicaFile(false, path);
@@ -233,22 +262,43 @@ namespace NotReaper.Timing {
             genAudicaButton.interactable = true;
             selectSongButton.interactable = false;
             selectMidiButton.interactable = false;
+            selectArtButton.interactable = false;
         }
 
         public bool CheckAllUIFilled() {
-            if (loadedSong != "" && mapperName != "" && songName != "" && artistName != "") {
-                if (loadedMidi != "") {
-                    return true;
-                } 
-                else {
-                    var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
+            var workFolder = Path.Combine(Application.streamingAssetsPath, "Ogg2Audica");
+            if (loadedSong != "" && mapperName != "" && songName != "" && artistName != "")
+            {
+                if (loadedMidi != "")
+                {
+                    if (loadedArt != "")
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        loadedArt = Path.Combine(workFolder, "song.png");
+                        return true;
+                    }
+                }
+                else
+                {
                     loadedMidi = Path.Combine(workFolder, "songtemplate.mid");
-                    return true;
+                    if (loadedArt != "")
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        loadedArt = Path.Combine(workFolder, "song.png");
+                        return true;
+                    }
                 }
             }
-            else {
-                    return false;
-            }     
+            else
+            {
+                return false;
+            }
         }
 
         public IEnumerator FadeIn() {
@@ -300,6 +350,24 @@ namespace NotReaper.Timing {
                     yield break;
                 }
             }
+        }
+
+        IEnumerator GetAlbumArt(string filepath)
+        {
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(filepath);
+            yield return request.SendWebRequest();
+            if (request.isNetworkError || request.isHttpError)
+            {
+                UnityEngine.Debug.Log(request.error);
+            }
+            else
+            {
+                Texture2D tex = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(tex.width / 2, tex.height / 2));
+                AlbumArtImg.GetComponent<Image>().overrideSprite = sprite;
+                AlbumArtImg.GetComponent<Image>().color = new Color32(255, 255, 255, 255);
+            }
+            yield break;
         }
 
         public AudioClip LoadMp3(string filePath) {

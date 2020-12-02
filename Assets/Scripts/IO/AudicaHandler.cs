@@ -97,28 +97,38 @@ namespace NotReaper.IO {
 			//Load the names of the moggs
 			foreach (ZipEntry entry in audicaZip.Entries) {
 
-				if (entry.FileName == audicaFile.desc.moggSong) {
+				if (entry.FileName == audicaFile.desc.moggSong)
+				{
 					entry.Extract(temp);
-					audicaFile.desc.moggMainSong = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray())) [0];
+					audicaFile.desc.moggMainSong = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray()))[0];
 
-				} else if (entry.FileName == audicaFile.desc.sustainSongLeft) {
+				}
+				else if (entry.FileName == audicaFile.desc.sustainSongLeft)
+				{
 					entry.Extract(temp);
-					audicaFile.desc.moggSustainSongLeft = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray())) [0];
+					audicaFile.desc.moggSustainSongLeft = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray()))[0];
 
-				} else if (entry.FileName == audicaFile.desc.sustainSongRight) {
+				}
+				else if (entry.FileName == audicaFile.desc.sustainSongRight)
+				{
 					entry.Extract(temp);
-					audicaFile.desc.moggSustainSongRight = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray())) [0];
+					audicaFile.desc.moggSustainSongRight = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray()))[0];
 
-				} else if (entry.FileName == audicaFile.desc.fxSong) {
+				}
+				else if (entry.FileName == audicaFile.desc.fxSong)
+				{
 					entry.Extract(temp);
-					audicaFile.desc.moggFxSong = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray())) [0];
-					
-				} else if (entry.FileName == "song.mid" || entry.FileName == audicaFile.desc.midiFile) {
+					audicaFile.desc.moggFxSong = MoggSongParser.parse_metadata(Encoding.UTF8.GetString(temp.ToArray()))[0];
+
+				}
+				else if (entry.FileName == "song.mid" || entry.FileName == audicaFile.desc.midiFile)
+				{
 					string midiFiileName = $"{appPath}/.cache/song.mid";
 
 					entry.Extract($"{appPath}/.cache", ExtractExistingFileAction.OverwriteSilently);
 
-					if(entry.FileName != "song.mid") {
+					if (entry.FileName != "song.mid")
+					{
 						File.Delete(midiFiileName);
 						File.Move($"{appPath}/.cache/" + audicaFile.desc.midiFile, midiFiileName);
 
@@ -127,9 +137,26 @@ namespace NotReaper.IO {
 					}
 
 					audicaFile.song_mid = new MidiFile(midiFiileName);
+
+					//Album art, just gonna shove it here
+				}
+				else if (entry.FileName == "song.png" || entry.FileName == audicaFile.desc.albumArt)
+				{
+					string albumArtName = $"{appPath}/.cache/song.png";
+
+					entry.Extract($"{appPath}/.cache", ExtractExistingFileAction.OverwriteSilently);
+
+					if (entry.FileName != "song.png")
+					{
+						File.Delete(albumArtName);
+						File.Move($"{appPath}/.cache/" + audicaFile.desc.albumArt, albumArtName);
+
+					}
+
+					//audicaFile.song_png = new ArtFile(artFileName);
 				}
 
-				temp.SetLength(0);
+					temp.SetLength(0);
 
 			}
 

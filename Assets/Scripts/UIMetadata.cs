@@ -1,11 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using DG.Tweening;
 using NotReaper.Managers;
 using TMPro;
+using SFB;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 namespace NotReaper.UI {
 
@@ -42,6 +46,8 @@ namespace NotReaper.UI {
         public TMP_Dropdown diffDropdown;
         public TMP_Dropdown pitchDropdown;
 
+        public Image AlbumArtImg;
+        public TextMeshProUGUI artText;
 
 
         public void Start() {
@@ -117,6 +123,9 @@ namespace NotReaper.UI {
                     pitchDropdown.value = 12;
                     break;
             }
+
+            StartCoroutine(
+                    GetAlbumArt($"file://" + Path.Combine(Application.dataPath, ".cache", "song.png")));
 
         }
 
@@ -257,6 +266,71 @@ namespace NotReaper.UI {
         public void LoadThisDiff() {
             difficultyManager.LoadDifficulty(selectedDiff, true);
             UpdateUIValues();
+        }
+
+        public void SelectAlbumArtFile() // Album art
+        {
+
+            var compatible = new[] { new ExtensionFilter("Compatible Image Types", "png", "jpeg") };
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("Select album art", Path.Combine(Application.persistentDataPath), compatible, false);
+            var filePath = paths[0];
+
+            if (filePath != null)
+            {
+                Process ffmpeg = new Process();
+                string ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg.exe");
+
+                if ((Application.platform == RuntimePlatform.LinuxEditor) || (Application.platform == RuntimePlatform.LinuxPlayer))
+                    ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpeg");
+
+                if ((Application.platform == RuntimePlatform.OSXEditor) || (Application.platform == RuntimePlatform.OSXPlayer))
+                    ffmpegPath = Path.Combine(Application.streamingAssetsPath, "FFMPEG", "ffmpegOSX");
+
+                ffmpeg.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                ffmpeg.StartInfo.FileName = ffmpegPath;
+
+                ffmpeg.StartInfo.CreateNoWindow = true;
+                ffmpeg.StartInfo.UseShellExecute = false;
+                ffmpeg.StartInfo.RedirectStandardOutput = true;
+                ffmpeg.StartInfo.WorkingDirectory = Path.Combine(Application.streamingAssetsPath, "FFMPEG");
+                UnityEngine.Debug.Log(String.Format("-y -i \"{0}\" -vf scale=256:256 \"{1}\"", paths[0], "song.png"));
+                ffmpeg.StartInfo.Arguments =
+                    String.Format("-y -i \"{0}\" -vf scale=256:256 \"{1}\"", paths[0], "song.png");
+                ffmpeg.Start();
+                ffmpeg.WaitForExit();
+                filePath = "song.png";
+
+
+                StartCoroutine(
+                   GetAlbumArt($"file://" + Path.Combine(Application.streamingAssetsPath, "FFMPEG", "song.png")));
+
+                artText.text = "";
+
+                string cachedArt = Path.Combine(Application.dataPath, ".cache", "song.png");
+
+                File.Delete(cachedArt);
+                File.Copy(Path.Combine(Application.streamingAssetsPath, "FFMPEG", filePath), cachedArt);
+
+            }
+        }
+
+        public IEnumerator GetAlbumArt(string filepath)
+        {
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(filepath);
+            yield return request.SendWebRequest();
+            if (request.isNetworkError || request.isHttpError)
+            {
+                UnityEngine.Debug.Log(request.error);
+            }
+            else
+            {
+                Texture2D tex = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(tex.width / 2, tex.height / 2));
+                AlbumArtImg.GetComponent<Image>().overrideSprite = sprite;
+                AlbumArtImg.GetComponent<Image>().color = new Color32(255, 255, 255, 255);
+                artText.text = "";
+            }
+            yield break;
         }
 
 

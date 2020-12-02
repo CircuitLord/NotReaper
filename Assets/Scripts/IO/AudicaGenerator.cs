@@ -13,7 +13,7 @@ namespace NotReaper.IO {
 
 	public class AudicaGenerator {
 
-		public static string Generate(string oggPath, float moggSongVol, string songID, string songName, string artist, double bpm, string songEndEvent, string author, int offset, string midiPath) {
+		public static string Generate(string oggPath, float moggSongVol, string songID, string songName, string artist, double bpm, string songEndEvent, string author, int offset, string midiPath, string artPath) {
 
 
 			HandleCache.CheckSaveFolderValid();
@@ -25,6 +25,9 @@ namespace NotReaper.IO {
 
 			Encoding encoding = Encoding.GetEncoding("UTF-8");
 
+			//Album art
+			File.Delete(Path.Combine(workFolder, "song.png"));
+			File.Copy(artPath, Path.Combine(workFolder, "song.png"));
 
 			//We need to modify the BPM of the song.mid contained in the template audica to match whatever this is.
 			File.Delete(Path.Combine(workFolder, "song.mid"));
@@ -80,6 +83,7 @@ namespace NotReaper.IO {
 				archive.AddAllFromDirectory(audicaTemplate);
 				archive.AddEntry("song.desc", Path.Combine(workFolder, "song.desc"));
 				archive.AddEntry("song.mid", Path.Combine(workFolder, "song.mid"));
+				archive.AddEntry("song.png", Path.Combine(workFolder, "song.png"));
 				archive.AddEntry("song.mogg", Path.Combine(workFolder, "song.mogg"));
 				archive.AddEntry("song.moggsong", Path.Combine(workFolder, "song.moggsong"));
 
