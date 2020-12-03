@@ -11464,7 +11464,7 @@ PrefabInstance:
     - target: {fileID: 2659449176521097660, guid: 2b90f86cb0a086c478a8674a47c640a3,
         type: 3}
       propertyPath: m_Options.m_Options.Array.size
-      value: 12
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 2659449176521097660, guid: 2b90f86cb0a086c478a8674a47c640a3,
         type: 3}
@@ -11519,11 +11519,16 @@ PrefabInstance:
     - target: {fileID: 2659449176521097660, guid: 2b90f86cb0a086c478a8674a47c640a3,
         type: 3}
       propertyPath: m_Options.m_Options.Array.data[10].m_Text
-      value: G
+      value: F#
       objectReference: {fileID: 0}
     - target: {fileID: 2659449176521097660, guid: 2b90f86cb0a086c478a8674a47c640a3,
         type: 3}
       propertyPath: m_Options.m_Options.Array.data[11].m_Text
+      value: G
+      objectReference: {fileID: 0}
+    - target: {fileID: 2659449176521097660, guid: 2b90f86cb0a086c478a8674a47c640a3,
+        type: 3}
+      propertyPath: m_Options.m_Options.Array.data[12].m_Text
       value: G#
       objectReference: {fileID: 0}
     - target: {fileID: 2659449176521097660, guid: 2b90f86cb0a086c478a8674a47c640a3,
