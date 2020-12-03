@@ -9,6 +9,7 @@ using NLayer;
 using NotReaper.IO;
 using NotReaper.UI;
 using NotReaper.UserInput;
+using NotReaper.Tools;
 using SFB;
 using TMPro;
 using UnityEngine;
@@ -50,6 +51,7 @@ namespace NotReaper.Timing {
         public string songName = "";
         public string mapperName = "";
         public string artistName = "";
+        public string songEndEvent = "";
 
         public float moggSongVolume = -5;
 
@@ -233,6 +235,7 @@ namespace NotReaper.Timing {
             mapperName = mapperInput.text;
             songName = songNameInput.text;
             artistName = artistInput.text;
+            songEndEvent = KeyScraper.GetSongEndEvent(artistInput.text, songNameInput.text);
 
             CheckAllUIFilled();
 
@@ -249,11 +252,11 @@ namespace NotReaper.Timing {
 
 	        if (isMp3 || !skipOffset) {
                 trimAudio.SetAudioLength(loadedSong, Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), 0, DefaultBPM, skipOffset);
-                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi, loadedArt);
+                path = AudicaGenerator.Generate(Path.Combine(Application.streamingAssetsPath, "FFMPEG", "output.ogg"), moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, songEndEvent, mapperName, 0, loadedMidi, loadedArt);
 		        
 	        }
 	        else {
-                path = AudicaGenerator.Generate(loadedSong, moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, "event:/song_end/song_end_nopitch", mapperName, 0, loadedMidi, loadedArt);
+                path = AudicaGenerator.Generate(loadedSong, moggSongVolume, RemoveSpecialCharacters(songName + "-" + mapperName), songName, artistName, DefaultBPM, songEndEvent, mapperName, 0, loadedMidi, loadedArt);
 	        }
 	        
             timeline.LoadAudicaFile(false, path);
@@ -277,7 +280,7 @@ namespace NotReaper.Timing {
                     }
                     else
                     {
-                        loadedArt = Path.Combine(workFolder, "song.png");
+                        loadedArt = Path.Combine(workFolder, "defaultArt.png");
                         return true;
                     }
                 }
@@ -290,7 +293,7 @@ namespace NotReaper.Timing {
                     }
                     else
                     {
-                        loadedArt = Path.Combine(workFolder, "song.png");
+                        loadedArt = Path.Combine(workFolder, "defaultArt.png");
                         return true;
                     }
                 }
