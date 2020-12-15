@@ -14,15 +14,6 @@ public class ModifierToolPanel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F8))
-        {
-            SwapToolPanel();
-        }
-    }
 
-    private void SwapToolPanel()
-    {
-        noteToolSelect.SetActive(!noteToolSelect.activeSelf);
-        modifierList.SetActive(!modifierList.activeSelf);
     }
 }

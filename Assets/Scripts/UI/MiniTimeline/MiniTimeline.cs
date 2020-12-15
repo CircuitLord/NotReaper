@@ -9,7 +9,9 @@ using Random = UnityEngine.Random;
 
 namespace NotReaper.UI {
 	public class MiniTimeline : MonoBehaviour {
-		//bar is 440 pixels long total
+        //bar is 440 pixels long total
+
+        public static MiniTimeline Instance = null;
 
 		public Transform songPreviewIcon;
 
@@ -34,8 +36,19 @@ namespace NotReaper.UI {
 
 		private List<GameObject> repeaterSections = new List<GameObject>();
 
-		private void Start() {
+       
+
+        private void Start() {
 			_mainCamera = Camera.main;
+            if(Instance is null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Debug.LogWarning("Trying to create a second MiniTimeline.");
+                return;
+            }
 		}
 
 		public void SetPercentagePlayed(double percent) {
@@ -206,6 +219,7 @@ namespace NotReaper.UI {
 			bookmarkMini.GetComponent<SpriteRenderer>().color = background;
 			bookmarkTop.GetComponent<SpriteRenderer>().color = background;
 			bookmarkTop.GetComponent<SpriteRenderer>().size = new Vector2(0.07f, 0.1f);
+
 			
 			bookmarks.Add(bookmarkMini);
 			bookmarks.Add(bookmarkTop);
@@ -226,8 +240,23 @@ namespace NotReaper.UI {
 			if (deleteInAudica) Timeline.audicaFile.desc.bookmarks.Clear();
 		}
 
+        public float GetXForTheBookmarkThingy()
+        {
+            float percent = Timeline.instance.GetPercentagePlayed();
+            float x = (float)barLength * (float)percent;
+            x -= (float)barLength / 2f;
+            return x;
+        }
 
-		private void Update() {
+        public float GetXForTheModifierThingy(QNT_Timestamp tick)
+        {
+            float percent = timeline.GetPercentagePlayed(tick);
+            float x = (float)barLength * (float)percent;
+            x -= (float)barLength / 2f;
+            return x;
+        }
+
+        private void Update() {
 			bool isCtrlDown = false;
 			bool isShiftDown = false;
 
@@ -238,10 +267,7 @@ namespace NotReaper.UI {
 			}
 
 			if (Input.GetKeyDown(KeyCode.U)) {
-				float percent = timeline.GetPercentagePlayed();
-				float x = (float) barLength * (float) percent;
-				x -= (float) barLength / 2f;
-				SetBookmark(x, 0f, EditorInput.selectedHand, false, true);
+				SetBookmark(GetXForTheBookmarkThingy(), 0f, EditorInput.selectedHand, false, true);
 			}
 
 			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {

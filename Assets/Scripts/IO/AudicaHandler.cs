@@ -19,7 +19,7 @@ namespace NotReaper.IO {
 			
 
 			string appPath = Application.dataPath;
-			bool easy = false, standard = false, advanced = false, expert = false;
+			bool easy = false, standard = false, advanced = false, expert = false, modifiers = false;
 
 
 			HandleCache.CheckCacheFolderValid();
@@ -60,6 +60,11 @@ namespace NotReaper.IO {
 					entry.Extract($"{appPath}/.cache");
 					easy = true;
 				} 
+                else if(entry.FileName == "modifiers.json")
+                {
+                    entry.Extract($"{appPath}/.cache");
+                    modifiers = true;
+                }
 			}
 
 			//Load moggsongg, has to be done after desc is loaded
@@ -91,6 +96,10 @@ namespace NotReaper.IO {
 			if (easy) {
 				audicaFile.diffs.beginner = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/beginner.cues"));
 			}
+            if (modifiers)
+            {
+                audicaFile.modifiers = JsonUtility.FromJson<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"));
+            }
 
 			MemoryStream temp = new MemoryStream();
 

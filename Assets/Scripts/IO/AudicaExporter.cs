@@ -34,7 +34,7 @@ namespace NotReaper.IO {
 				HandleCache.CheckCacheFolderValid();
 				HandleCache.CheckSaveFolderValid();
 
-				bool expert = false, advanced = false, standard = false, easy = false;
+                bool expert = false, advanced = false, standard = false, easy = false, modifiers = false;
 				//Write the cues files to disk so we can add them to the audica file.
 				if (audicaFile.diffs.expert.cues != null) {
 					File.WriteAllText($"{Application.dataPath}/.cache/expert-new.cues", CuesToJson(audicaFile.diffs.expert));
@@ -52,6 +52,11 @@ namespace NotReaper.IO {
 					File.WriteAllText($"{Application.dataPath}/.cache/beginner-new.cues", CuesToJson(audicaFile.diffs.beginner));
 					easy = true;
 				}
+                if(audicaFile.modifiers != null)
+                {
+                    File.WriteAllText($"{Application.dataPath}/.cache/modifiers-new.json", ModifiersToJson(audicaFile.modifiers));
+                    modifiers = true;
+                }
 
 				File.WriteAllText($"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}", audicaFile.mainMoggSong.ExportToText());
 				File.WriteAllText($"{Application.dataPath}/.cache/song-new.desc", JsonUtility.ToJson(audicaFile.desc));
@@ -91,7 +96,10 @@ namespace NotReaper.IO {
 						archive.RemoveEntry(entry);
 					} else if (entry.ToString() == "beginner.cues") {
 						archive.RemoveEntry(entry);
-					}
+					} else if(entry.ToString() == "modifiers.json")
+                    {
+                        archive.RemoveEntry(entry);
+                    }
 					
 
 				}
@@ -99,7 +107,7 @@ namespace NotReaper.IO {
 				if (advanced) archive.AddEntry("advanced.cues", $"{Application.dataPath}/.cache/advanced-new.cues");
 				if (standard) archive.AddEntry("moderate.cues", $"{Application.dataPath}/.cache/moderate-new.cues");
 				if (easy) archive.AddEntry("beginner.cues", $"{Application.dataPath}/.cache/beginner-new.cues");
-
+                if (modifiers) archive.AddEntry("modifiers.json", $"{Application.dataPath}/.cache/modifiers-new.json");
 
 				archive.AddEntry($"{audicaFile.desc.moggSong}", $"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}");
 				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/song-new.desc");
@@ -130,6 +138,12 @@ namespace NotReaper.IO {
 			return JsonUtility.ToJson(cueFile, true);
 		}
 
+        public static string ModifiersToJson(ModifierList modifiers)
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.All;
+            return JsonConvert.SerializeObject(modifiers, Formatting.Indented);
+        }
 
 	}
 

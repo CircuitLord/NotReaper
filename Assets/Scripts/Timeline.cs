@@ -348,7 +348,6 @@ namespace NotReaper {
 			beatSnapWarningText.DOFade(0f, 0f);
 		}
 
-
 		private void HandleAutoupdater() {
 
 
@@ -2301,7 +2300,7 @@ namespace NotReaper {
 			}
 		}
 
-		private static void OptimizeInvisibleTargets()
+		public static void OptimizeInvisibleTargets()
 		{
 			if (NRSettings.config.optimizeInvisibleTargets)
 			{
@@ -2311,11 +2310,15 @@ namespace NotReaper {
 					orderedNotes[i].gridTargetIcon.gameObject.SetActive(false);
 					orderedNotes[i].timelineTargetIcon.gameObject.SetActive(false);
 				}
-				foreach (Target target in targetsToShow)
-				{
-					target.gridTargetIcon.gameObject.SetActive(true);
-					target.timelineTargetIcon.gameObject.SetActive(true);
-				}
+                if (!ModifierHandler.instance.activated)
+                {
+                    foreach (Target target in targetsToShow)
+                    {
+                        target.gridTargetIcon.gameObject.SetActive(true);
+                        target.timelineTargetIcon.gameObject.SetActive(true);
+                    }
+                }
+				
 			}
 		}
 
@@ -2555,6 +2558,15 @@ namespace NotReaper {
 			else
 				return 0;
 		}
+
+        public float GetPercentagePlayed(QNT_Timestamp tick)
+        {
+            if (songPlayback.song != null)
+                return (TimestampToSeconds(tick) / songPlayback.song.length);
+
+            else
+                return 0;
+        }
 
 		//Shifts `startTime` by `duration` seconds, respecting bpm changes in between
 		public QNT_Timestamp ShiftTick(QNT_Timestamp startTime, float duration, bool useBinarySearch = true) {

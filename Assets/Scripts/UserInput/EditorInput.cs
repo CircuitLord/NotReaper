@@ -17,7 +17,7 @@ using NotReaper.Timing;
 namespace NotReaper.UserInput {
 
 
-	public enum EditorTool { Standard, Hold, Horizontal, Vertical, ChainStart, ChainNode, Melee, Mine, DragSelect, ChainBuilder, None }
+	public enum EditorTool { Standard, Hold, Horizontal, Vertical, ChainStart, ChainNode, Melee, Mine, DragSelect, ChainBuilder, ModifierCreator, None }
 
 
 	public class EditorInput : MonoBehaviour {
@@ -32,6 +32,7 @@ namespace NotReaper.UserInput {
 		public static SnappingMode previousSnappingMode = SnappingMode.None;
 		public static TargetBehavior selectedBehavior = TargetBehavior.Standard;
 		public static UITargetVelocity selectedVelocity = UITargetVelocity.Standard;
+        //public static TargetModifier selectedModifier = TargetModifier.None;
 
 		public static EditorMode selectedMode = EditorMode.Compose;
 		public static bool isOverGrid = false;
@@ -246,21 +247,41 @@ namespace NotReaper.UserInput {
 				return;
 			}
 
-			uiToolSelect.UpdateUINoteSelected(tool);
+            if (ModifierHandler.instance.activated)
+            {
+                switch (tool)
+                {
+                    case EditorTool.ChainNode:
+                    case EditorTool.ChainStart:
+                    case EditorTool.Hold:
+                    case EditorTool.Horizontal:
+                    case EditorTool.Melee:
+                    case EditorTool.Mine:
+                    case EditorTool.Standard:
+                    case EditorTool.Vertical:
+                    case EditorTool.ChainBuilder:
+                        return;
+                    default:
+                        break;
+                }
+            }
+
+            uiToolSelect.UpdateUINoteSelected(tool);
 
 			hover.UpdateUITool(tool);
+            if(tool != EditorTool.ModifierCreator) previousTool = selectedTool;
 
-			previousTool = selectedTool;
-			selectedTool = tool;
+            selectedTool = tool;
 
 			if (previousTool == EditorTool.Melee && selectedHand == TargetHandType.Either) {
 				SelectHand(previousHand);
 			} else if (previousTool == EditorTool.Mine && selectedHand == TargetHandType.Either) {
 				SelectHand(previousHand);
 			}
+           
 
-			//Update the UI based on the tool:
-			switch (tool) {
+            //Update the UI based on the tool:
+            switch (tool) {
 				case EditorTool.Standard:
 					selectedBehavior = TargetBehavior.Standard;
 					soundDropdown.SetValueWithoutNotify((int) UITargetVelocity.Standard);
@@ -326,7 +347,6 @@ namespace NotReaper.UserInput {
 				case EditorTool.DragSelect:
 					selectedBehavior = TargetBehavior.None;
 
-
 					Tools.dragSelect.Activate(true);
 					Tools.chainBuilder.Activate(false);
 					break;
@@ -337,7 +357,10 @@ namespace NotReaper.UserInput {
 					Tools.dragSelect.Activate(false);
 					Tools.chainBuilder.Activate(true);
 					break;
-
+                case EditorTool.ModifierCreator:
+                    selectedBehavior = TargetBehavior.None;
+                    Tools.modifierCreator.Activate(true);
+                    break;
 
 				default:
 					break;
@@ -346,17 +369,22 @@ namespace NotReaper.UserInput {
 			if(tool != EditorTool.ChainBuilder) {
 				Tools.chainBuilder.Activate(false);
 			}
+            if (tool != EditorTool.DragSelect)
+            {
+                Tools.dragSelect.Activate(false);
+            }
 
-			if(tool != EditorTool.DragSelect) {
-				Tools.dragSelect.Activate(false); 
-			}
-
-
+            if (tool != EditorTool.ModifierCreator)
+            {
+                if (ModifierHandler.instance.activated && tool == EditorTool.DragSelect) return;              
+                Tools.modifierCreator.Activate(false);
+                previousTool = EditorTool.None;
+            }
 		}
 
 		public void RevertTool() {
 			SelectTool(previousTool);
-			previousTool = selectedTool;
+			if(selectedTool != EditorTool.ModifierCreator) previousTool = selectedTool;
 		}
 
 		public void FigureOutIsInUI() {
@@ -669,8 +697,22 @@ namespace NotReaper.UserInput {
 					
 				}
 			}
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                if (Tools.modifierCreator.activated)
+                {
+                    Tools.modifierCreator.Activate(false);
+                    RevertTool();
+                    //selectedTool = EditorTool.Standard;
+                }
+                else
+                {
+                    SelectTool(EditorTool.ModifierCreator);
 
-			if (Input.GetKeyDown(KeyCode.V) && !isCTRLDown) {
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.V) && !isCTRLDown) {
 				SelectTool(EditorTool.DragSelect);
 			}
 

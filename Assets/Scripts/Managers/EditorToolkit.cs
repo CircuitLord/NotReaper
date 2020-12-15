@@ -20,6 +20,7 @@ namespace NotReaper.Managers {
 
 		public DragSelect dragSelect;
 
+        [SerializeField] public ModifierHandler modifierCreator;
 
 
 	}
