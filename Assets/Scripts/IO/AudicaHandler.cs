@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Ionic.Zip;
 using NAudio.Midi;
+using Newtonsoft.Json;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -98,7 +99,11 @@ namespace NotReaper.IO {
 			}
             if (modifiers)
             {
-                audicaFile.modifiers = JsonUtility.FromJson<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"));
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.TypeNameHandling = TypeNameHandling.All;
+                audicaFile.modifiers = JsonConvert.DeserializeObject<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"), settings);
+
+                //audicaFile.modifiers = JsonUtility.FromJson<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"));
             }
 
 			MemoryStream temp = new MemoryStream();

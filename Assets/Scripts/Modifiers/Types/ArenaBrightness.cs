@@ -11,10 +11,6 @@ namespace NotReaper.Modifier
 
     public class ArenaBrightness : Modifier
     {
-        public string type;
-        public float startTick;
-        public float endTick;
-        public float amount;
         public bool continuous;
         public bool strobo;      
 

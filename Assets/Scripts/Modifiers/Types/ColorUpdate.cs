@@ -8,8 +8,6 @@ namespace NotReaper.Modifier
 {
     public class ColorUpdate : Modifier
     {        
-        public string type;
-        public float startTick;
         public string leftHandColor;
         public string rightHandColor;
 

@@ -6403,6 +6403,7 @@ MonoBehaviour:
   label: {fileID: 67139606}
   inputField: {fileID: 0}
   slider: {fileID: 0}
+  toggle: {fileID: 0}
 --- !u!1 &136151776
 GameObject:
   m_ObjectHideFlags: 0
@@ -10380,6 +10381,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: playhead-01
+      objectReference: {fileID: 0}
+    - target: {fileID: -8794629182415543781, guid: c9c08db71d576c245ba39e46283f2499,
+        type: 3}
+      propertyPath: m_Layer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -6387200925977116845, guid: c9c08db71d576c245ba39e46283f2499,
         type: 3}
@@ -25977,7 +25983,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 1867729102}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1857674414}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
@@ -31669,6 +31675,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4373510378632668492, guid: 65f89434f54737048b049c0aec83c405,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4373510378632668492, guid: 65f89434f54737048b049c0aec83c405,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1288364400}
@@ -31680,7 +31691,12 @@ PrefabInstance:
     - target: {fileID: 4373510378632668492, guid: 65f89434f54737048b049c0aec83c405,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ModifierUI, Assembly-CSharp
+      value: ModifierHandler, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4373510378632668492, guid: 65f89434f54737048b049c0aec83c405,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_FloatArgument
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 65f89434f54737048b049c0aec83c405, type: 3}
@@ -35253,6 +35269,22 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 527191052}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &877921598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 877921593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbcefff806725ba478838565cf0ac5c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  label: {fileID: 1531149840}
+  inputField: {fileID: 0}
+  slider: {fileID: 0}
+  toggle: {fileID: 0}
 --- !u!1 &878235367
 GameObject:
   m_ObjectHideFlags: 0
@@ -41138,6 +41170,7 @@ MonoBehaviour:
   label: {fileID: 0}
   inputField: {fileID: 0}
   slider: {fileID: 645779100}
+  toggle: {fileID: 0}
 --- !u!1 &1013985923
 GameObject:
   m_ObjectHideFlags: 0
@@ -53279,7 +53312,7 @@ MonoBehaviour:
   isHovering: 0
   modifierWindow: {fileID: 1489224484}
   dropdown: {fileID: 584908804}
-  amountSlider: {fileID: 1857674414}
+  amountSlider: {fileID: 1013282134}
   value1: {fileID: 2116243770}
   value2: {fileID: 1643465627}
   option1: {fileID: 1574797389}
@@ -64363,6 +64396,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1531149840 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9161362406262751312, guid: ea496fe9b2035904391f05fb2e4015bb,
+    type: 3}
+  m_PrefabInstance: {fileID: 527191052}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1531805960
 GameObject:
   m_ObjectHideFlags: 0
@@ -65171,6 +65216,19 @@ MonoBehaviour:
   label: {fileID: 70067482}
   inputField: {fileID: 0}
   slider: {fileID: 0}
+  toggle: {fileID: 1554280602}
+--- !u!114 &1554280602 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8044432990886106778, guid: cb9b6d8cb396a2b4ca2fd4220552097d,
+    type: 3}
+  m_PrefabInstance: {fileID: 516501858}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1554280600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1556706298
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -66689,6 +66747,19 @@ MonoBehaviour:
   label: {fileID: 1988730513}
   inputField: {fileID: 0}
   slider: {fileID: 0}
+  toggle: {fileID: 1574797391}
+--- !u!114 &1574797391 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8044432990886106778, guid: f31c73d5624b6e948850c01335df3c4f,
+    type: 3}
+  m_PrefabInstance: {fileID: 375724463}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574797389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1577574762
 GameObject:
   m_ObjectHideFlags: 0
@@ -68849,6 +68920,7 @@ MonoBehaviour:
   label: {fileID: 1975619598}
   inputField: {fileID: 1643465630}
   slider: {fileID: 0}
+  toggle: {fileID: 0}
 --- !u!114 &1643465630 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6319337996811404650, guid: cdc7eb5c9214b6d489a7113a01268c16,
@@ -71027,6 +71099,7 @@ MonoBehaviour:
   label: {fileID: 1982884375}
   inputField: {fileID: 0}
   slider: {fileID: 0}
+  toggle: {fileID: 0}
 --- !u!1 &1688694765
 GameObject:
   m_ObjectHideFlags: 0
@@ -77670,12 +77743,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1854093898}
   m_CullTransparentMesh: 0
---- !u!1 &1857674414 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2488427407501947071, guid: 47bcf3ff5225dbc4d87841df41520f96,
-    type: 3}
-  m_PrefabInstance: {fileID: 1867729102}
-  m_PrefabAsset: {fileID: 0}
 --- !u!850595691 &1864334184
 LightingSettings:
   m_ObjectHideFlags: 0
@@ -88228,6 +88295,7 @@ MonoBehaviour:
   label: {fileID: 395997289}
   inputField: {fileID: 2116243772}
   slider: {fileID: 0}
+  toggle: {fileID: 0}
 --- !u!114 &2116243772 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6319337996811404650, guid: c143298a3700c2e4eab60c0b71eddcd7,

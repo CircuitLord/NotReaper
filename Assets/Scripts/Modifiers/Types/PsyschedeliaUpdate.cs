@@ -8,9 +8,6 @@ namespace NotReaper.Modifier
 {
     public class PsychedeliaUpdate : Modifier
     {
-        public string type;
-        public float startTick;
-        public float amount;
 
         public PsychedeliaUpdate(string _type, float _startTick, float _amount)
         {

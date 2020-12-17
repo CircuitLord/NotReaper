@@ -1374,6 +1374,11 @@ namespace NotReaper {
 				
 			}
 
+            if(audicaFile.modifiers != null)
+            {
+                StartCoroutine(ModifierHandler.instance.ILoadModifiers());         
+            }
+
 			//Loaded successfully
 
 			NotificationShower.AddNotifToQueue(new NRNotification("Map loaded successfully!"));
@@ -2004,6 +2009,12 @@ namespace NotReaper {
 		}
 
 		public void SetScale(int newScale) {
+            if (ModifierHandler.instance.activated)
+            {
+                //newScale = 20;
+                //if (scale == newScale) return;
+            }
+
 			if (newScale < 5 || newScale > 100) return;
 			timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
 			scaleOffset = -newScale % 8 / 8f;
@@ -2025,7 +2036,7 @@ namespace NotReaper {
 				
 				note.localScale = noteScale;
 			}
-
+            ModifierTimeline.Instance.Scale((float)newScale / scale);
 
 			scale = newScale;
 

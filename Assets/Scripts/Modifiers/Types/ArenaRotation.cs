@@ -11,10 +11,6 @@ namespace NotReaper.Modifier
     
     public class ArenaRotation : Modifier
     {       
-        public string type;
-        public float startTick;
-        public float endTick;
-        public float amount;
         public bool continuous;
 
         public ArenaRotation(string _type, float _startTick, float _endTick, float _amount, bool _continuous)

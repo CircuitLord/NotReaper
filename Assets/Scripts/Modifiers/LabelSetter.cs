@@ -9,7 +9,8 @@ public class LabelSetter : MonoBehaviour
     [SerializeField] private TextMeshProUGUI label;
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private Slider slider;
-    public void SetText(string text)
+    [SerializeField] private Toggle toggle;
+    public void SetLabelText(string text)
     {
         label.text = text;
     }
@@ -23,8 +24,23 @@ public class LabelSetter : MonoBehaviour
         slider.maxValue = max;
     }
 
+    public void SetSliderValue(float value)
+    {
+        slider.value = value;
+    }
+
     public string GetText()
     {
         return inputField.text;
+    }
+
+    public void SetInputText(string text)
+    {
+        inputField.text = text;
+    }
+
+    public void SetToggleState(bool on)
+    {
+        toggle.isOn = on;
     }
 }

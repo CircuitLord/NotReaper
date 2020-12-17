@@ -9,15 +9,14 @@ namespace NotReaper.Modifier
 {
     public class ColorChange : Modifier
     {       
-        public string type;
-        public float startTick;
         public string leftHandColor;
         public string rightHandColor;
 
-        public ColorChange(string _type, float _startTick, string lhColor, string rhColor)
+        public ColorChange(string _type, float _startTick, float _endTick, string lhColor, string rhColor)
         {
             type = _type;
             startTick = _startTick;
+            endTick = _endTick;
             leftHandColor = lhColor;
             rightHandColor = rhColor;
         }

@@ -8,9 +8,6 @@ namespace NotReaper.Modifier
 {
     public class InvisibleGuns : Modifier
     {
-        public string type;
-        public float startTick;
-        public float endTick;
 
         public InvisibleGuns(string _type, float _startTick, float _endTick)
         {

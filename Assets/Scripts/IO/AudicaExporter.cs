@@ -52,7 +52,7 @@ namespace NotReaper.IO {
 					File.WriteAllText($"{Application.dataPath}/.cache/beginner-new.cues", CuesToJson(audicaFile.diffs.beginner));
 					easy = true;
 				}
-                if(audicaFile.modifiers != null)
+                if(audicaFile.modifiers.modifiers.Count > 0)
                 {
                     File.WriteAllText($"{Application.dataPath}/.cache/modifiers-new.json", ModifiersToJson(audicaFile.modifiers));
                     modifiers = true;
@@ -142,7 +142,7 @@ namespace NotReaper.IO {
         {
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.All;
-            return JsonConvert.SerializeObject(modifiers, Formatting.Indented);
+            return JsonConvert.SerializeObject(modifiers, Formatting.Indented, settings);
         }
 
 	}

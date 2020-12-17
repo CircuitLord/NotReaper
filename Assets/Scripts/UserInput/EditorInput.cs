@@ -260,6 +260,7 @@ namespace NotReaper.UserInput {
                     case EditorTool.Standard:
                     case EditorTool.Vertical:
                     case EditorTool.ChainBuilder:
+                    case EditorTool.DragSelect:
                         return;
                     default:
                         break;
@@ -269,8 +270,8 @@ namespace NotReaper.UserInput {
             uiToolSelect.UpdateUINoteSelected(tool);
 
 			hover.UpdateUITool(tool);
-            if(tool != EditorTool.ModifierCreator) previousTool = selectedTool;
-
+            //if(tool != EditorTool.ModifierCreator) previousTool = selectedTool;
+            previousTool = selectedTool;
             selectedTool = tool;
 
 			if (previousTool == EditorTool.Melee && selectedHand == TargetHandType.Either) {
@@ -376,9 +377,11 @@ namespace NotReaper.UserInput {
 
             if (tool != EditorTool.ModifierCreator)
             {
+                /*
                 if (ModifierHandler.instance.activated && tool == EditorTool.DragSelect) return;              
                 Tools.modifierCreator.Activate(false);
-                previousTool = EditorTool.None;
+                previousTool = EditorTool.None;*/
+                Tools.modifierCreator.Activate(false);
             }
 		}
 

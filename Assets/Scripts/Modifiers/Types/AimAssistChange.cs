@@ -10,11 +10,6 @@ namespace NotReaper.Modifier
     [Serializable]
     public class AimAssistChange : Modifier
     {
-        public string type;
-        public float startTick;
-        public float endTick;
-        public float amount;
-
         public AimAssistChange(string _type, float _startTick, float _endTick, float _amount)
         {
             type = _type;
