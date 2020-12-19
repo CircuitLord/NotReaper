@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace NotReaper.Modifier
 {
-
+    [Serializable]
     public class Fader : Modifier
     {
 

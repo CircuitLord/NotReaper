@@ -5,17 +5,21 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using NotReaper.UI;
 
-public class ModifierWindow : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+namespace NotReaper.Modifier
 {
-    public ModifierHandler modifierCreator;
-
-    public void OnPointerEnter(PointerEventData eventData)
+    public class ModifierWindow : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        modifierCreator.isHovering = true;
-    }
+        public ModifierHandler modifierCreator;
 
-    public void OnPointerExit(PointerEventData eventData) 
-    {
-        modifierCreator.isHovering = false;
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            modifierCreator.isHovering = true;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            modifierCreator.isHovering = false;
+        }
     }
 }
+

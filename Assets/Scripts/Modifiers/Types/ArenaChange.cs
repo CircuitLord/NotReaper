@@ -8,19 +8,20 @@ using System.Collections;
 
 namespace NotReaper.Modifier
 {
-
+    [Serializable]
     public class ArenaChange : Modifier
     {        
-        public string option1;
-        public string option2;
-
-        public ArenaChange(string _type, float _startTick, float _endTick, float _amount, string value1, string value2)
+        public string arena1;
+        public string arena2;
+        public bool preload;
+        public ArenaChange(string _type, float _startTick, float _endTick, string value1, string value2, bool _preload)
         {
             type = _type;
             startTick = _startTick;
             endTick = _endTick;
-            option1 = value1;
-            option2 = value2;
+            arena1 = value1;
+            arena2 = value2;
+            preload = _preload;
         }
     }
 }

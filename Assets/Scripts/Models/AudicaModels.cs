@@ -5,6 +5,7 @@ using NAudio.Midi;
 using NotReaper.Targets;
 using NotReaper.Timing;
 using NotReaper.UI;
+using NotReaper.Modifier;
 
 namespace NotReaper.Models {
 	public struct TempoChange {

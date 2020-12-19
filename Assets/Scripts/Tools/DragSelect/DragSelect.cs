@@ -7,6 +7,7 @@ using NotReaper.Targets;
 using NotReaper.UserInput;
 using UnityEngine;
 using NotReaper.Timing;
+using NotReaper.Modifier;
 
 namespace NotReaper.Tools {
 	public class DragSelect : MonoBehaviour {
@@ -384,7 +385,7 @@ namespace NotReaper.Tools {
 			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) primaryModifierHeld = true;
 			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) secondaryModifierHeld = true;
 
-			if (primaryModifierHeld && !secondaryModifierHeld) {
+			if (primaryModifierHeld && !secondaryModifierHeld && !ModifierHandler.activated) {
 				// permits holding primary and secondary down
 				frameIntentFlipTargetsHorizontally = Input.GetKeyDown(KeyCode.F);
 				frameIntentCut = Input.GetKeyDown(KeyCode.X);

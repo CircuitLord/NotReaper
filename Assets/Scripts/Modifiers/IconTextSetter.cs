@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class IconTextSetter : MonoBehaviour
+namespace NotReaper.Modifier
 {
-    [SerializeField] private TextMeshProUGUI text;
-
-    public void SetText(string _text)
+    public class IconTextSetter : MonoBehaviour
     {
-        text.text = _text;
+        [SerializeField] private TextMeshProUGUI text;
+
+        public void SetText(string _text)
+        {
+            text.text = _text;
+        }
     }
 }
+

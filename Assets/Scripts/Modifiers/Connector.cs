@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using NotReaper;
 
-public class Connector : MonoBehaviour
+namespace NotReaper.Modifier
 {
-    public Vector3 originalScale { get; private set; }
-
-    private void Start()
+    public class Connector : MonoBehaviour
     {
-        originalScale = transform.localScale;
+        public Vector3 originalScale { get; private set; }
+
+        private void Start()
+        {
+            originalScale = transform.localScale;
+        }
     }
 }
+

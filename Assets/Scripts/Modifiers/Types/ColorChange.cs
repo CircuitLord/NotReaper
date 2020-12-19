@@ -7,12 +7,13 @@ using UnityEngine;
 
 namespace NotReaper.Modifier
 {
+    [Serializable]
     public class ColorChange : Modifier
     {       
-        public string leftHandColor;
-        public string rightHandColor;
+        public float[] leftHandColor = new float[] { 0f, 0f, 0f };
+        public float[] rightHandColor = new float[] { 0f, 0f, 0f };
 
-        public ColorChange(string _type, float _startTick, float _endTick, string lhColor, string rhColor)
+        public ColorChange(string _type, float _startTick, float _endTick, float[] lhColor, float[] rhColor)
         {
             type = _type;
             startTick = _startTick;

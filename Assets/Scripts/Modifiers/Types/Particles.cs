@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace NotReaper.Modifier
 {
+    [Serializable]
     public class Particles : Modifier
     {
 

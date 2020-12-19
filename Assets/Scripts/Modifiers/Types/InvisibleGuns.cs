@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace NotReaper.Modifier
 {
+    [Serializable]
     public class InvisibleGuns : Modifier
     {
-
         public InvisibleGuns(string _type, float _startTick, float _endTick)
         {
             type = _type;

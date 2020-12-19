@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace NotReaper.Modifier
 {
+    [Serializable]
     public class ColorSwap : Modifier
     {
 

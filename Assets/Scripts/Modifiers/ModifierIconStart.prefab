@@ -325,6 +325,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   glow: {fileID: 2046692837910954558}
+  isSelected: 0
 --- !u!60 &7424116769541277143
 PolygonCollider2D:
   m_ObjectHideFlags: 0

@@ -13,6 +13,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using NotReaper.Timing;
+using NotReaper.Modifier;
 
 namespace NotReaper.UserInput {
 
@@ -247,7 +248,7 @@ namespace NotReaper.UserInput {
 				return;
 			}
 
-            if (ModifierHandler.instance.activated)
+            if (ModifierHandler.activated)
             {
                 switch (tool)
                 {
@@ -547,6 +548,7 @@ namespace NotReaper.UserInput {
 				}
 			}
 
+
 			bool wasInUI = inUI;
 			FigureOutIsInUI();
 
@@ -691,22 +693,24 @@ namespace NotReaper.UserInput {
 			
 			//Toggles the chain builder state
 			if (Input.GetKeyDown(KeyCode.H)) {
-				if (Tools.chainBuilder.activated) {
-					Tools.chainBuilder.Activate(false);
-					RevertTool();
-				}
-				else {
-					SelectTool(EditorTool.ChainBuilder);
-					
-				}
-			}
+                if (Tools.chainBuilder.activated)
+                {
+                    Tools.chainBuilder.Activate(false);
+                    RevertTool();
+                }
+                else
+                {
+                    SelectTool(EditorTool.ChainBuilder);
+
+                }
+            }
             if (Input.GetKeyDown(KeyCode.F8))
             {
-                if (Tools.modifierCreator.activated)
+                if (ModifierHandler.activated)
                 {
                     Tools.modifierCreator.Activate(false);
                     RevertTool();
-                    //selectedTool = EditorTool.Standard;
+
                 }
                 else
                 {

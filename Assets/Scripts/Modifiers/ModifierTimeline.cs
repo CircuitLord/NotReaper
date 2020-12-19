@@ -9,457 +9,514 @@ using NotReaper.Modifier;
 using System.Linq;
 using System;
 
-public class ModifierTimeline : MonoBehaviour
+namespace NotReaper.Modifier
 {
-    public static ModifierTimeline Instance = null;
-    public bool startSet => currentPair.startMarkTop != null;
-    public bool endMarkExists => currentPair.endMarkTop is null;
-
-    [Header("References")]
-    [SerializeField] private GameObject modifierStartPrefab;
-    [SerializeField] private GameObject modifierEndPrefab;
-    [SerializeField] private LineRenderer modifierConnectorPrefab;
-
-    public List<ModifierContainer> modifiers = new List<ModifierContainer>();
-
-    private ModifierContainer currentPair;
-    private Vector3 pStart = new Vector3(0f, 5.1f, -3f);
-    private bool isSelectedModifier = false;
-
-    public void UpdateConnectors(float newScale)
+    public class ModifierTimeline : MonoBehaviour
     {
-        foreach(ModifierContainer mc in modifiers)
+        public static ModifierTimeline Instance = null;
+        public bool startSet => currentPair.startMarkTop != null;
+        public bool endMarkExists => currentPair.endMarkTop is null;
+
+        [Header("References")]
+        [SerializeField] private GameObject modifierStartPrefab;
+        [SerializeField] private GameObject modifierEndPrefab;
+        [SerializeField] private LineRenderer modifierConnectorPrefab;
+
+        public List<ModifierContainer> modifiers = new List<ModifierContainer>();
+        private ModifierContainer currentPair;
+        private Vector3 pStart = new Vector3(0f, 5.1f, -3f);
+        public void UpdateConnectors(float newScale)
         {
-            if (mc.connector is null) continue;
-            Vector3 scale = mc.connector.transform.localScale;
-            scale.x = newScale;
-            mc.connector.transform.localScale = scale;
+            foreach (ModifierContainer mc in modifiers)
+            {
+                if (mc.connector is null) continue;
+                Vector3 scale = mc.connector.transform.localScale;
+                scale.x = newScale;
+                mc.connector.transform.localScale = scale;
+
+            }
+        }
+
+        public void Start()
+        {
+            if (Instance is null) Instance = this;
+            else
+            {
+                Debug.LogWarning("Trying to create a second instance of ModifierTimeline.");
+                return;
+            }
+        }
+
+        public void OptimizeModifiers()
+        {
+
+            if (NRSettings.config.optimizeInvisibleTargets)
+            {
+                if (ModifierHandler.activated)
+                {
+                    foreach (ModifierContainer mc in modifiers)
+                    {
+
+                        if (mc.startMarkTop.GetComponent<TimelineEntry>().transform.TransformPoint(transform.localPosition).x > 50f || mc.startMarkTop.GetComponent<TimelineEntry>().transform.TransformPoint(transform.localPosition).x < -50f)
+                        {
+                            ActivateModifierContainer(mc, false);
+                        }
+                        else
+                        {
+                            ActivateModifierContainer(mc, true);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        private void ActivateModifierContainer(ModifierContainer container, bool active)
+        {
+            if (container.startMarkTop != null) container.startMarkTop.SetActive(active);
+            if (container.startMarkBottom != null) container.startMarkBottom.SetActive(active);
+            if (container.endMarkBottom != null) container.endMarkBottom.SetActive(active);
+            if (container.endMarkTop != null) container.endMarkTop.SetActive(active);
+            if (container.connector != null) container.connector.gameObject.SetActive(active);
+
+        }
+
+        public void RemoveModifier(ModifierContainer container)
+        {
+            modifiers.Remove(container);
+        }
+
+        public void CreateModifier(ModifierHandler.ModifierData data, bool fromLoad = false)
+        {
+            LookForOtherModifiers(data.startTick, data.endTick);
+            CreateConnector();
+            UpdateLineBoxCollider();
+            currentPair.data = data;
+            if (fromLoad) FixPosition();
+            currentPair.startMarkTop.transform.position = new Vector3(currentPair.startMarkTop.transform.position.x, currentPair.startMarkTop.transform.position.y, -3f);
+            currentPair.startMarkTop.GetComponent<SpriteRenderer>().color = Color.white;
+            currentPair.startMarkBottom.GetComponent<SpriteRenderer>().color = Color.white;
+
+
+            if (currentPair.endMarkTop != null)
+            {
+                currentPair.endMarkTop.GetComponent<SpriteRenderer>().color = Color.white;
+                currentPair.endMarkBottom.GetComponent<SpriteRenderer>().color = Color.white;
+                currentPair.connector.colorGradient = GetGradient(1f);
+                //UpdateLineBoxCollider();
+            }
+            modifiers.Add(currentPair);
+            currentPair.startMarkTop.GetComponent<TimelineEntry>().SetContainer(currentPair, fromLoad);
             
+            currentPair = new ModifierContainer();
+            // modifiers.Add(currentPair);
+
         }
-    }
 
-    public void Start()
-    {
-        if (Instance is null) Instance = this;
-        else
+        public void SelectModifier(ModifierContainer container)
         {
-            Debug.LogWarning("Trying to create a second instance of ModifierTimeline.");
-            return;
+            //Debug.Log(container.startMarkTop.transform.name + " " + container.startMarkTop.transform.position);
+            DropMarks();
+            currentPair = container;
+            modifiers.Remove(container);
         }
-    }
 
-    public void RemoveModifier(ModifierContainer container)
-    {
-        modifiers.Remove(container);
-    }
-
-    public void CreateModifier(ModifierHandler.ModifierData data, bool fromLoad = false)
-    {
-        LookForOtherModifiers(data.startTick, data.endTick);
-        CreateConnector();
-        UpdateLineBoxCollider();
-        currentPair.data = data;
-        if (fromLoad) FixPosition();
-        currentPair.startMarkTop.transform.position = new Vector3(currentPair.startMarkTop.transform.position.x, currentPair.startMarkTop.transform.position.y, -3f);
-        currentPair.startMarkTop.GetComponent<SpriteRenderer>().color = Color.white;
-        currentPair.startMarkBottom.GetComponent<SpriteRenderer>().color = Color.white;
-        
-       
-        if(currentPair.endMarkTop != null)
+        private void PrintData()
         {
-            currentPair.endMarkTop.GetComponent<SpriteRenderer>().color = Color.white;
-            currentPair.endMarkBottom.GetComponent<SpriteRenderer>().color = Color.white;
-            currentPair.connector.colorGradient = GetGradient(1f);
-            //UpdateLineBoxCollider();
+            Debug.Log(currentPair.startMarkTop.name);
+            Debug.Log(currentPair.endMarkTop.name);
+            Debug.Log(currentPair.data.startPosX);
+            Debug.Log(currentPair.startTick);
         }
-        modifiers.Add(currentPair);
-        currentPair.startMarkTop.GetComponent<TimelineEntry>().SetContainer(currentPair, fromLoad);
-        currentPair = new ModifierContainer();
-       // modifiers.Add(currentPair);
 
-    }
-
-    public void SelectModifier(ModifierContainer container)
-    {
-        //Debug.Log(container.startMarkTop.transform.name + " " + container.startMarkTop.transform.position);
-        DropMarks();
-        currentPair = container;
-        modifiers.Remove(container);
-        
-    }
-
-    private void PrintData()
-    {
-        Debug.Log(currentPair.startMarkTop.name);
-        Debug.Log(currentPair.endMarkTop.name);
-        Debug.Log(currentPair.data.startPosX);
-        Debug.Log(currentPair.startTick);
-    }
-
-    public void FixPosition()
-    {      
-        //Vector3 pos = currentPair.startMarkTop.transform.localPosition;
-        //pos.z = -3f;    
-        //currentPair.startMarkTop.transform.localPosition = pos;
-        //currentPair.startMarkTop.transform.localScale = new Vector3(.3f, .3f, .3f);
-        //UpdateLinePositions();
-        //UpdateLineBoxColliderLoad();
-    }
-
-    public float GetStartPosX()
-    {
-        return currentPair.startMarkTop.transform.localPosition.x;
-    }
-    public float GetEndPosX()
-    {
-        return currentPair.endMarkTop is null ? 0f : currentPair.endMarkTop.transform.localPosition.x;
-    }
-
-    private void LookForOtherModifiers(QNT_Timestamp startTick, QNT_Timestamp endTick)
-    {
-        //if (currentPair.raised) return;
-        for (int i = 0; i < Enum.GetNames(typeof(ModifierType)).Length; i++)
+        public void FixPosition()
         {
-            bool skip = false;
+            //Vector3 pos = currentPair.startMarkTop.transform.localPosition;
+            //pos.z = -3f;    
+            //currentPair.startMarkTop.transform.localPosition = pos;
+            //currentPair.startMarkTop.transform.localScale = new Vector3(.3f, .3f, .3f);
+            //UpdateLinePositions();
+            //UpdateLineBoxColliderLoad();
+        }
+
+        public float GetStartPosX()
+        {
+            return currentPair.startMarkTop.transform.localPosition.x;
+        }
+        public float GetEndPosX()
+        {
+            return currentPair.endMarkTop is null ? 0f : currentPair.endMarkTop.transform.localPosition.x;
+        }
+
+        private void LookForOtherModifiers(QNT_Timestamp startTick, QNT_Timestamp endTick)
+        {
+            //if (currentPair.raised) return;
+            QNT_Timestamp _endTick = endTick;
+            if (endTick.tick == 0) _endTick = startTick;
+            for (int i = 0; i < Enum.GetNames(typeof(ModifierType)).Length; i++)
+            {
+                bool skip = false;
+
+                foreach (ModifierContainer mc in modifiers)
+                {
+                    if (mc.data.startTick <= startTick && mc.data.endTick >= _endTick)
+                    {
+                        if (mc.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+
+                    }
+                    else if (startTick <= mc.data.startTick && _endTick >= mc.data.startTick)
+                    {
+                        if (mc.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                }
+                if (skip) continue;
+                if (currentPair.level >= i) return;
+                currentPair.level = i;
+                break;
+            }
+            float addY = currentPair.level * .3f;
+            if (currentPair.startMarkTop != null)
+            {
+                pStart.x = currentPair.startMarkTop.transform.position.x;
+                currentPair.startMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
+            }
+            if (currentPair.endMarkTop != null)
+            {
+                pStart.x = currentPair.endMarkTop.transform.position.x;
+                currentPair.endMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
+            }
+        }
+
+        private void LookForOtherModifiers(QNT_Timestamp tick)
+        {
+            for (int i = 0; i < Enum.GetNames(typeof(ModifierType)).Length; i++)
+            {
+                bool skip = false;
+
+                foreach (ModifierContainer mc in modifiers)
+                {
+                    if (mc.data.startTick <= tick && mc.data.endTick >= tick)
+                    {
+                        if (mc.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+
+                    }
+                    else if (mc.data.startTick == tick || mc.data.endTick == tick)
+                    {
+                        if (mc.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                }
+                if (skip) continue;
+                currentPair.level = i;
+                break;
+            }
+            float addY = currentPair.level * .3f;
+            if (currentPair.startMarkTop != null)
+            {
+                pStart.x = currentPair.startMarkTop.transform.position.x;
+                currentPair.startMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
+            }
+            if (currentPair.endMarkTop != null)
+            {
+                pStart.x = currentPair.endMarkTop.transform.position.x;
+                currentPair.endMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
+            }
+        }
+
+        public bool CanCreateModifier(ModifierHandler.ModifierType type, QNT_Timestamp tick)
+        {
+            if (type != ModifierHandler.ModifierType.ColorUpdate && type != ModifierHandler.ModifierType.PsychedeliaUpdate) return true;
 
             foreach (ModifierContainer mc in modifiers)
             {
-                if (mc.data.startTick <= startTick && mc.data.endTick >= endTick)
+                if (mc.data.startTick < tick && mc.data.endTick > tick)
                 {
-                    if (mc.level == i)
+                    if (mc.data.type == ModifierHandler.ModifierType.ColorChange && type == ModifierHandler.ModifierType.ColorUpdate)
                     {
-                        skip = true;
-                        break;
+                        return true;
                     }
 
+                    else if (mc.data.type == ModifierHandler.ModifierType.Psychedelia && type == ModifierHandler.ModifierType.PsychedeliaUpdate) return true;
                 }
-                else if (startTick <= mc.data.startTick && endTick >= mc.data.startTick)
+                else if (mc.data.endTick.tick == 0 && tick.tick > 0)
                 {
-                    if (mc.level == i)
-                    {
-                        skip = true;
-                        break;
-                    }
+                    if (mc.data.type == ModifierHandler.ModifierType.ColorChange && type == ModifierHandler.ModifierType.ColorUpdate) return true;
+                    else if (mc.data.type == ModifierHandler.ModifierType.Psychedelia && type == ModifierHandler.ModifierType.PsychedeliaUpdate) return true;
                 }
             }
-            if (skip) continue;
-            if (currentPair.level >= i) return;
-            currentPair.level = i;
-            break;
-        }
-        float addY = currentPair.level * .3f;
-        if (currentPair.startMarkTop != null)
-        {
-            pStart.x = currentPair.startMarkTop.transform.position.x;
-            currentPair.startMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
-        }
-        if (currentPair.endMarkTop != null)
-        {
-            pStart.x = currentPair.endMarkTop.transform.position.x;
-            currentPair.endMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
-        }      
-    }
 
-    private void LookForOtherModifiers(QNT_Timestamp tick)
-    {      
-        for(int i = 0; i < Enum.GetNames(typeof(ModifierType)).Length; i++)
-        {
-            bool skip = false;
+            return false;
+        }
 
+        public void DropMarksSave()
+        {
+            CreateModifier(currentPair.data);
+        }
+
+        public void DropMarks()
+        {
+            if (currentPair.startMarkTop != null)
+            {
+                GameObject.Destroy(currentPair.startMarkTop);
+                GameObject.Destroy(currentPair.startMarkBottom);
+            }
+            if (currentPair.endMarkTop != null)
+            {
+                GameObject.Destroy(currentPair.endMarkTop);
+                GameObject.Destroy(currentPair.endMarkBottom);
+            }
+            if (currentPair.connector != null)
+            {
+                GameObject.Destroy(currentPair.connector.gameObject);
+            }
+
+
+            currentPair = new ModifierContainer();
+        }
+
+        public void ShowModifiers(bool show)
+        {
+            if (modifiers.Count == 0) return;
             foreach (ModifierContainer mc in modifiers)
             {
-                if (mc.data.startTick <= tick && mc.data.endTick >= tick)
+                if (mc.startMarkTop != null)
                 {
-                    if (mc.level == i)
-                    {
-                        skip = true;
-                        break;
-                    }
-                        
+                    mc.startMarkTop.SetActive(show);
                 }
-                else if (mc.data.startTick == tick || mc.data.endTick == tick)
+
+                if (mc.startMarkBottom != null) mc.startMarkBottom.SetActive(show);
+                if (mc.endMarkTop != null)
                 {
-                    if (mc.level == i)
-                    {
-                        skip = true;
-                        break;
-                    }
+                    mc.endMarkTop.SetActive(show);
                 }
-            }
-            if (skip) continue;
-            currentPair.level = i;
-            break;
-        }
-        float addY = currentPair.level * .3f;
-        if (currentPair.startMarkTop != null)
-        {
-            pStart.x = currentPair.startMarkTop.transform.position.x;
-            currentPair.startMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
-        }
-        if (currentPair.endMarkTop != null)
-        {
-            pStart.x = currentPair.endMarkTop.transform.position.x;
-            currentPair.endMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
-        }
-    }
+                if (mc.endMarkBottom != null) mc.endMarkBottom.SetActive(show);
+                if (mc.connector != null)
+                {
+                    mc.connector.gameObject.SetActive(show);
+                }
 
-    public bool CanCreateModifier(ModifierHandler.ModifierType type, QNT_Timestamp tick)
-    {
-        if (type != ModifierHandler.ModifierType.ColorUpdate && type != ModifierHandler.ModifierType.PsychedeliaUpdate) return true;
-
-        foreach (ModifierContainer mc in modifiers)
-        {
-            if (mc.data.startTick < tick && mc.data.endTick > tick)
-            {
-                if (mc.data.type == ModifierHandler.ModifierType.ColorChange && type == ModifierHandler.ModifierType.ColorUpdate) return true;
-                else if (mc.data.type == ModifierHandler.ModifierType.Psychedelia && type == ModifierHandler.ModifierType.PsychedeliaUpdate) return true;
             }
         }
 
-        return false;
-    }
-
-    public void DropMarksSave()
-    {
-        Debug.Log("Calling drop marks save, will drop modifiers");
-        CreateModifier(currentPair.data);
-    }
-
-    public void DropMarks()
-    {
-
-        if (currentPair.startMarkTop != null)
+        public void Scale(float targetScale)
         {
-            GameObject.Destroy(currentPair.startMarkTop);
-            GameObject.Destroy(currentPair.startMarkBottom);
-        }
-        if (currentPair.endMarkTop != null)
-        {
-            GameObject.Destroy(currentPair.endMarkTop);
-            GameObject.Destroy(currentPair.endMarkBottom);
-        }
-        if(currentPair.connector != null)
-        {
-            GameObject.Destroy(currentPair.connector.gameObject);
-        }
-        
-       
-        currentPair = new ModifierContainer();
-    }
-
-    public void ShowModifiers(bool show)
-    {
-        if (modifiers.Count == 0) return;
-        foreach (ModifierContainer mc in modifiers)
-        {
-            if(mc.startMarkTop != null)
+            foreach (ModifierContainer mc in modifiers)
             {
-                mc.startMarkTop.SetActive(show);
+                float s = .3f;
+                s *= targetScale;
+                Vector3 scale = new Vector3(s, .3f, .3f);
+
+                if (mc.startMarkTop != null)
+                {
+                    mc.startMarkTop.transform.localScale = scale;
+                }
+                if (mc.endMarkTop != null)
+                {
+                    mc.endMarkTop.transform.localScale = scale;
+                }
+                if (mc.connector != null)
+                {
+                    mc.connector.transform.localScale = mc.connector.GetComponent<Connector>().originalScale;
+                    //mc.connector.GetComponent<Connector>().Scale(targetScale);
+                }
+
+            }
+        }
+
+        public void UpdateMark(UpdateType type, ulong tick = 0)
+        {
+            switch (type)
+            {
+                case UpdateType.MoveStart:
+                    currentPair.startMarkTop.transform.position = new Vector3(0f, currentPair.startMarkTop.transform.position.y, 0f);
+                    currentPair.startMarkBottom.transform.position = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(new QNT_Timestamp(tick)), 0f, 0f);
+                    LookForOtherModifiers(currentPair.startTick, currentPair.endTick);
+                    CreateConnector();
+                    UpdateLineBoxCollider();
+                    break;
+                case UpdateType.UpdateStart:
+                    currentPair.startMarkTop.transform.position = new Vector3(0f, currentPair.startMarkTop.transform.position.y, 0f);
+                    currentPair.startMarkBottom.transform.position = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(new QNT_Timestamp(tick)), 0f, 0f);
+                    if (currentPair.connector != null) GameObject.Destroy(currentPair.connector);
+                    if (currentPair.endMarkTop != null) GameObject.Destroy(currentPair.endMarkTop);
+                    if (currentPair.endMarkBottom != null) GameObject.Destroy(currentPair.endMarkBottom);
+                    currentPair.endMarkTop = null;
+                    currentPair.endMarkBottom = null;
+                    break;
+                case UpdateType.UpdateEnd:
+                    if (currentPair.endMarkBottom != null) GameObject.Destroy(currentPair.endMarkBottom);
+                    if (currentPair.endMarkTop != null) GameObject.Destroy(currentPair.endMarkTop);
+                    if (currentPair.connector != null) GameObject.Destroy(currentPair.connector);
+                    currentPair.endMarkTop = null;
+                    currentPair.endMarkBottom = null;
+                    break;
+            }
+        }
+
+        public void SetModifierMark(ModifierHandler.ModifierType type, QNT_Timestamp tick, string shorthand, bool startMarker, float posX, bool usePosX = false)
+        {
+            GameObject modifierBottom = Instantiate(startMarker ? modifierStartPrefab : modifierEndPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, MiniTimeline.Instance.bookmarksParent);
+            GameObject modifierTop = Instantiate(startMarker ? modifierStartPrefab : modifierEndPrefab, ModifierSelectionHandler.isPasting ? Timeline.timelineNotesStatic : null);
+            if (startMarker) modifierTop.GetComponent<IconTextSetter>().SetText(shorthand);
+            Color background = Color.white;
+            background.a = .5f;
+            modifierBottom.transform.localPosition = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(tick), 0f, 0f);
+            if (!usePosX)
+            {
+                modifierTop.transform.position = startMarker ? new Vector3(0f, modifierTop.transform.position.y, -3f) : new Vector3(0f, currentPair.startMarkTop.transform.position.y, -3f);
+            }
+            else if (ModifierSelectionHandler.isPasting)
+            {
+                modifierTop.transform.localPosition = startMarker ? new Vector3(posX, modifierTop.transform.localPosition.y, -3f) : new Vector3(posX, currentPair.startMarkTop.transform.localPosition.y, -3f);
+                //modifierTop.transform.position = startMarker ? new Vector3(posX, modifierTop.transform.position.y, -3f) : new Vector3(posX, currentPair.startMarkTop.transform.position.y, -3f);
+            }
+            else
+            {
+                modifierTop.transform.position = startMarker ? new Vector3(posX, modifierTop.transform.position.y, -3f) : new Vector3(posX, currentPair.startMarkTop.transform.position.y, -3f);
             }
                
-            if (mc.startMarkBottom != null) mc.startMarkBottom.SetActive(show);
-            if (mc.endMarkTop != null)
-            {
-                mc.endMarkTop.SetActive(show);
-            }              
-            if (mc.endMarkBottom != null) mc.endMarkBottom.SetActive(show);
-            if (mc.connector != null)
-            {
-                mc.connector.gameObject.SetActive(show);
-            }
-                
-        }
-    }
+            modifierTop.transform.SetParent(Timeline.timelineNotesStatic);
+            modifierTop.transform.localScale = new Vector3(0.3f, 0.3f);
+            modifierBottom.transform.localScale = new Vector3(10f, 10f);
+            modifierBottom.GetComponent<SpriteRenderer>().color = background;
+            modifierTop.GetComponent<SpriteRenderer>().color = background;
 
-    public void Scale(float targetScale)
-    {
-        foreach (ModifierContainer mc in modifiers)
-        {
-            float s = .3f;
-            s *= targetScale;
-            Vector3 scale = new Vector3(s, .3f, .3f);
-
-            if (mc.startMarkTop != null)
+            if (startMarker)
             {
-                mc.startMarkTop.transform.localScale = scale;
-            }
-            if (mc.endMarkTop != null)
-            {
-                mc.endMarkTop.transform.localScale = scale;
-            }
-            if (mc.connector != null)
-            {
-                mc.connector.transform.localScale = mc.connector.GetComponent<Connector>().originalScale;
-                //mc.connector.GetComponent<Connector>().Scale(targetScale);
-            }
 
-        }
-    }
+                currentPair.startTick = tick;
+                if (currentPair.endMarkTop != null) currentPair.endMarkTop.transform.SetParent(Timeline.timelineNotesStatic);
+                if (currentPair.startMarkBottom != null) GameObject.Destroy(currentPair.startMarkBottom);
+                if (currentPair.startMarkTop != null) GameObject.Destroy(currentPair.startMarkTop);
 
-    public void UpdateMark(UpdateType type, ulong tick = 0)
-    {
-        switch (type)
-        {
-            case UpdateType.MoveStart:
-                currentPair.startMarkTop.transform.position = new Vector3(0f, currentPair.startMarkTop.transform.position.y, 0);
-                currentPair.startMarkBottom.transform.position = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(new QNT_Timestamp(tick)), 0f, 0f);
-                LookForOtherModifiers(currentPair.startTick, currentPair.endTick);
+                currentPair.startMarkBottom = modifierBottom;
+                currentPair.startMarkTop = modifierTop;
+
                 CreateConnector();
+
+                LookForOtherModifiers(tick);
                 UpdateLineBoxCollider();
-                break;
-            case UpdateType.UpdateStart:
-                currentPair.startMarkTop.transform.position = new Vector3(0f, currentPair.startMarkTop.transform.position.y, 0);
-                currentPair.startMarkBottom.transform.position = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(new QNT_Timestamp(tick)), 0f, 0f);
-                if (currentPair.connector != null) GameObject.Destroy(currentPair.connector);
-                if (currentPair.endMarkTop != null) GameObject.Destroy(currentPair.endMarkTop);
-                if (currentPair.endMarkBottom != null) GameObject.Destroy(currentPair.endMarkBottom);
-                currentPair.endMarkTop = null;
-                currentPair.endMarkBottom = null;
-                break;
-            case UpdateType.UpdateEnd:
+                if (currentPair.endMarkTop != null) currentPair.endMarkTop.transform.SetParent(currentPair.startMarkTop.transform);
+            }
+            else
+            {
+                currentPair.endTick = tick;
                 if (currentPair.endMarkBottom != null) GameObject.Destroy(currentPair.endMarkBottom);
                 if (currentPair.endMarkTop != null) GameObject.Destroy(currentPair.endMarkTop);
-                if (currentPair.connector != null) GameObject.Destroy(currentPair.connector);
-                currentPair.endMarkTop = null;
-                currentPair.endMarkBottom = null;
-                break;
+                currentPair.endMarkBottom = modifierBottom;
+                currentPair.endMarkTop = modifierTop;
+                currentPair.endMarkTop.GetComponent<ClickNotifier>().SetEntry(currentPair.startMarkTop);
+                CreateConnector();
+                LookForOtherModifiers(currentPair.startTick, currentPair.endTick);
+                UpdateLineBoxCollider();
+                //currentPair.endMarkTop.transform.SetParent(currentPair.startMarkTop.transform);
+            }
         }
-    }
 
-    public void SetModifierMark(ModifierHandler.ModifierType type, QNT_Timestamp tick, string shorthand, bool startMarker, float posX, bool usePosX = false)
-    {
-        GameObject modifierBottom = Instantiate(startMarker ? modifierStartPrefab : modifierEndPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, MiniTimeline.Instance.bookmarksParent);
-        GameObject modifierTop = Instantiate(startMarker ? modifierStartPrefab : modifierEndPrefab, null);
-        if(startMarker) modifierTop.GetComponent<IconTextSetter>().SetText(shorthand);
-        Color background = Color.white;
-        background.a = .5f;
-
-        modifierBottom.transform.localPosition = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(tick), 0f, 0f);
-        if(!usePosX) modifierTop.transform.position = startMarker ? new Vector3(0f, modifierTop.transform.position.y, -3f) : new Vector3(0f, currentPair.startMarkTop.transform.position.y, -3f);
-        else modifierTop.transform.position = startMarker ? new Vector3(posX, modifierTop.transform.position.y, -3f) : new Vector3(posX, currentPair.startMarkTop.transform.position.y, -3f);
-        //modifierTop.transform.position = startMarker ? new Vector3(usePosX ? posX : 0f, modifierTop.transform.position.y, 0) : new Vector3(usePosX ? posX : 0f, currentPair.startMarkTop.transform.position.y, 0);
-        modifierTop.transform.SetParent(Timeline.timelineNotesStatic);
-        modifierTop.transform.localScale = new Vector3(0.3f, 0.3f);
-        modifierBottom.transform.localScale = new Vector3(10f, 10f);
-        modifierBottom.GetComponent<SpriteRenderer>().color = background;
-        modifierTop.GetComponent<SpriteRenderer>().color = background;
-
-        if (startMarker)
+        private void CreateConnector()
         {
-            
-            currentPair.startTick = tick;
-            if (currentPair.endMarkTop != null) currentPair.endMarkTop.transform.SetParent(Timeline.timelineNotesStatic);
-            if (currentPair.startMarkBottom != null) GameObject.Destroy(currentPair.startMarkBottom);
-            if (currentPair.startMarkTop != null) GameObject.Destroy(currentPair.startMarkTop);
-            
-            currentPair.startMarkBottom = modifierBottom;
-            currentPair.startMarkTop = modifierTop;
-
-            CreateConnector();
-
-            LookForOtherModifiers(tick);
-            UpdateLineBoxCollider();
-            if(currentPair.endMarkTop != null) currentPair.endMarkTop.transform.SetParent(currentPair.startMarkTop.transform);
+            if (currentPair.endMarkTop != null)
+            {
+                LineRenderer lr = GameObject.Instantiate(modifierConnectorPrefab, null);
+                lr.SetPosition(0, currentPair.startMarkTop.transform.position);
+                lr.SetPosition(1, currentPair.endMarkTop.transform.position);
+                lr.transform.SetParent(Timeline.timelineNotesStatic);
+                lr.colorGradient = GetGradient(.5f);
+                lr.GetComponent<ClickNotifier>().SetEntry(currentPair.startMarkTop);
+                if (currentPair.connector != null) GameObject.Destroy(currentPair.connector.gameObject);
+                currentPair.connector = lr;
+            }
         }
-        else
+
+        private void UpdateLineBoxCollider()
         {
-            currentPair.endTick = tick;
-            if (currentPair.endMarkBottom != null) GameObject.Destroy(currentPair.endMarkBottom);
-            if (currentPair.endMarkTop != null) GameObject.Destroy(currentPair.endMarkTop);
-            currentPair.endMarkBottom = modifierBottom;
-            currentPair.endMarkTop = modifierTop;
-            currentPair.endMarkTop.GetComponent<ClickNotifier>().SetEntry(currentPair.startMarkTop);
-            CreateConnector();
-            LookForOtherModifiers(currentPair.startTick, currentPair.endTick);
-            UpdateLineBoxCollider();
-            //currentPair.endMarkTop.transform.SetParent(currentPair.startMarkTop.transform);
-        }
-    }
+            UpdateLinePositions();
+            if (currentPair.connector != null)
+            {
 
-    private void CreateConnector()
-    {
-        if (currentPair.endMarkTop != null)
+                BoxCollider boxCollider = currentPair.connector.GetComponent<BoxCollider>();
+
+                boxCollider.center = new Vector3((currentPair.connector.GetPosition(1).x + currentPair.connector.GetPosition(0).x) / 2, currentPair.connector.GetPosition(0).y, -1.5f);
+                boxCollider.size = new Vector3(currentPair.connector.GetPosition(1).x - currentPair.connector.GetPosition(0).x - .33f, boxCollider.size.y, -1.5f);
+                boxCollider.enabled = false;
+            }
+        }
+
+        public void UpdateLineBoxColliderLoad()
         {
-            LineRenderer lr = GameObject.Instantiate(modifierConnectorPrefab, null);
-            lr.SetPosition(0, currentPair.startMarkTop.transform.position);
-            lr.SetPosition(1, currentPair.endMarkTop.transform.position);
-            lr.transform.SetParent(Timeline.timelineNotesStatic);
-            lr.colorGradient = GetGradient(.5f);
-            lr.GetComponent<ClickNotifier>().SetEntry(currentPair.startMarkTop);
-            if (currentPair.connector != null) GameObject.Destroy(currentPair.connector.gameObject);
-            currentPair.connector = lr;
-        }
-    }
+            if (currentPair.connector != null)
+            {
 
-    private void UpdateLineBoxCollider()
-    {
-        UpdateLinePositions();
-        if (currentPair.connector != null)
+                BoxCollider boxCollider = currentPair.connector.GetComponent<BoxCollider>();
+
+                boxCollider.center = new Vector3(currentPair.startMarkTop.transform.localPosition.x / 2, currentPair.connector.GetPosition(0).y, -1.5f);
+                //boxCollider.size = new Vector2(currentPair.connector.GetPosition(0).x, boxCollider.size.y);
+                boxCollider.size = new Vector3(currentPair.connector.GetPosition(0).x, boxCollider.size.y, -1.5f);
+                boxCollider.enabled = false;
+            }
+        }
+
+        private void UpdateLinePositions()
         {
-            BoxCollider boxCollider = currentPair.connector.GetComponent<BoxCollider>();
+            if (currentPair.connector is null || currentPair.endMarkTop is null) return;
 
-            boxCollider.center = new Vector3((currentPair.connector.GetPosition(1).x + currentPair.connector.GetPosition(0).x) / 2, currentPair.connector.GetPosition(0).y, 1f);
-            boxCollider.size = new Vector3(currentPair.connector.GetPosition(1).x - currentPair.connector.GetPosition(0).x - .33f, boxCollider.size.y, 1f);
-
+            currentPair.connector.SetPosition(0, currentPair.startMarkTop.transform.position);
+            currentPair.connector.SetPosition(1, currentPair.endMarkTop.transform.position);
         }
-    }
 
-    public void UpdateLineBoxColliderLoad()
-    {
-        if (currentPair.connector != null)
+        private Gradient GetGradient(float alpha)
         {
-            BoxCollider boxCollider = currentPair.connector.GetComponent<BoxCollider>();
-           
-            boxCollider.center = new Vector3(currentPair.startMarkTop.transform.localPosition.x / 2, currentPair.connector.GetPosition(0).y, 1f);
-            //boxCollider.size = new Vector2(currentPair.connector.GetPosition(0).x, boxCollider.size.y);
-            boxCollider.size = new Vector3(currentPair.connector.GetPosition(0).x, boxCollider.size.y, 1f);
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(Color.white, 0f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0f) }
+                );
+            return gradient;
         }
-    }
 
-   private void UpdateLinePositions()
-    {
-        if (currentPair.connector is null || currentPair.endMarkTop is null) return;
-        
-        currentPair.connector.SetPosition(0, currentPair.startMarkTop.transform.position);
-        currentPair.connector.SetPosition(1, currentPair.endMarkTop.transform.position);
-    }
-
-    private Gradient GetGradient(float alpha)
-    {
-        Gradient gradient = new Gradient();
-        gradient.SetKeys(
-            new GradientColorKey[] { new GradientColorKey(Color.white, 0f) },
-            new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0f) }
-            );
-        return gradient;
-    }
-
-    public struct ModifierContainer
-    {
-        public GameObject startMarkTop;
-        public GameObject startMarkBottom;
-        public GameObject endMarkTop;
-        public GameObject endMarkBottom;
-        public LineRenderer connector;
-        public int level;
-        public QNT_Timestamp startTick;
-        public QNT_Timestamp endTick;
-        public ModifierHandler.ModifierData data;
-
-        public void Reset()
+        public struct ModifierContainer
         {
-            startMarkBottom = null;
-            startMarkTop = null;
-            endMarkTop = null;
-            endMarkBottom = null;
-            connector = null;
+            public GameObject startMarkTop;
+            public GameObject startMarkBottom;
+            public GameObject endMarkTop;
+            public GameObject endMarkBottom;
+            public LineRenderer connector;
+            public int level;
+            public QNT_Timestamp startTick;
+            public QNT_Timestamp endTick;
+            public ModifierHandler.ModifierData data;
+
+            public void Reset()
+            {
+                startMarkBottom = null;
+                startMarkTop = null;
+                endMarkTop = null;
+                endMarkBottom = null;
+                connector = null;
+            }
+        }
+
+        public enum UpdateType
+        {
+            UpdateStart,
+            MoveStart,
+            UpdateEnd
         }
     }
 
-    public enum UpdateType
-    {
-        UpdateStart,
-        MoveStart,
-        UpdateEnd
-    }
 }

@@ -23,10 +23,9 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using Application = UnityEngine.Application;
 using NotReaper.Timing;
-
+using NotReaper.Modifier;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
-using Sirenix.Utilities;
 
 namespace NotReaper {
 
@@ -1376,7 +1375,7 @@ namespace NotReaper {
 
             if(audicaFile.modifiers != null)
             {
-                StartCoroutine(ModifierHandler.instance.ILoadModifiers());         
+                StartCoroutine(ModifierHandler.Instance.ILoadModifiers());         
             }
 
 			//Loaded successfully
@@ -2009,7 +2008,7 @@ namespace NotReaper {
 		}
 
 		public void SetScale(int newScale) {
-            if (ModifierHandler.instance.activated)
+            if (ModifierHandler.activated)
             {
                 //newScale = 20;
                 //if (scale == newScale) return;
@@ -2128,7 +2127,7 @@ namespace NotReaper {
 
 			bool dragging = Input.GetMouseButton(0) && hover;
 
-			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f)
+			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f && !ModifierHandler.Instance.IsDropdownExpanded())
 			{
 				if (!audioLoaded) return;
 				if (EditorInput.inUI && EditorInput.enableScrolling == false) return;
@@ -2321,7 +2320,7 @@ namespace NotReaper {
 					orderedNotes[i].gridTargetIcon.gameObject.SetActive(false);
 					orderedNotes[i].timelineTargetIcon.gameObject.SetActive(false);
 				}
-                if (!ModifierHandler.instance.activated)
+                if (!ModifierHandler.activated)
                 {
                     foreach (Target target in targetsToShow)
                     {
@@ -2329,7 +2328,11 @@ namespace NotReaper {
                         target.timelineTargetIcon.gameObject.SetActive(true);
                     }
                 }
-				
+                else
+                {
+                    //ModifierTimeline.Instance.OptimizeModifiers();
+                }
+                
 			}
 		}
 

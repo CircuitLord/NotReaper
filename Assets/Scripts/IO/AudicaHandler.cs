@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.Networking;
+using NotReaper.Modifier;
 
 namespace NotReaper.IO {
 

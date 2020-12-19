@@ -8,14 +8,15 @@ namespace NotReaper.Modifier
     {
         [SerializeField] private GameObject glow;
         private ModifierTimeline.ModifierContainer container;
-        private bool isSelected = false;
+        public bool isSelected = false;
         private bool isCreated = false;
         public void SetContainer(ModifierTimeline.ModifierContainer _container, bool fromLoad)
         {
+            ModifierSelectionHandler.selectables.Add(this);
             container = _container;
             isCreated = true;
             Select(false);
-            if (fromLoad)
+            if (fromLoad && !ModifierSelectionHandler.isPasting)
             {
                 if (container.startMarkTop != null) container.startMarkTop.SetActive(false);
                 if (container.endMarkTop != null) container.endMarkTop.SetActive(false);
@@ -23,17 +24,35 @@ namespace NotReaper.Modifier
                 if (container.endMarkBottom != null) container.endMarkBottom.SetActive(false);
                 if (container.startMarkBottom != null) container.startMarkBottom.SetActive(false);
                 this.gameObject.SetActive(false);
-            }
-               
+            }               
+        }
+
+        public ModifierTimeline.ModifierContainer GetContainer()
+        {
+            return container;
         }
         private void OnMouseDown()
         {
             if (!isCreated) return;
 
-            if(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl))
             {
-                ModifierHandler.instance.SelectModifier(container, this);
-            }        
+                if (isSelected)
+                {
+                    ModifierSelectionHandler.RemoveEntry(this);
+                }
+                else
+                {
+                    ModifierSelectionHandler.AddEntry(this);
+                }
+                ModifierHandler.Instance.DeselectModifier();
+            }
+            else
+            {
+                ModifierSelectionHandler.RemoveAllEntries();
+                ModifierSelectionHandler.selectedEntry = this;
+                ModifierHandler.Instance.SelectModifier(container, this);
+            }                  
         }
 
         public void Select(bool select)
@@ -47,21 +66,29 @@ namespace NotReaper.Modifier
             if (!isCreated) return;
             if (!isSelected) return;
 
-            if(Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Delete))
+            if(Input.GetKeyDown(KeyCode.Delete))
             {
-                ModifierHandler.instance.RemoveModifier(container.data.modifier);
-                ModifierTimeline.Instance.RemoveModifier(container);
-                if(container.endMarkBottom != null) GameObject.Destroy(container.endMarkBottom);
-                if (container.startMarkBottom != null) GameObject.Destroy(container.startMarkBottom);
-                if (container.endMarkTop != null) GameObject.Destroy(container.endMarkTop);
-                if (container.connector != null) GameObject.Destroy(container.connector);
-                GameObject.Destroy(this.gameObject);
+                DeleteModifier();
             }
+        }
+
+        public void DeleteModifier()
+        {
+            //ModifierDragHandler.RemoveSelectedEntry(this);
+            ModifierTimeline.Instance.SelectModifier(container);
+            ModifierTimeline.Instance.RemoveModifier(container);
+            ModifierHandler.Instance.RemoveModifier(container.data.modifier);
+           
+           /* if (container.endMarkBottom != null) GameObject.Destroy(container.endMarkBottom);
+            if (container.startMarkBottom != null) GameObject.Destroy(container.startMarkBottom);
+            if (container.endMarkTop != null) GameObject.Destroy(container.endMarkTop);
+            if (container.connector != null) GameObject.Destroy(container.connector);
+            GameObject.Destroy(this.gameObject);
+            */
         }
 
         public void ReportClick()
         {
-            Debug.Log("Report Click");
             OnMouseDown();
         }
     }

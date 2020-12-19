@@ -1,7 +1,7 @@
 using NotReaper.Tools;
 using NotReaper.Tools.ChainBuilder;
 using UnityEngine;
-
+using NotReaper.Modifier;
 
 namespace NotReaper.Managers {
 

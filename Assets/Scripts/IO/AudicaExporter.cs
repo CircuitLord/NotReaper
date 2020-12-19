@@ -13,6 +13,7 @@ using SharpCompress.Common;
 using SharpCompress.Writers;
 using UnityEngine;
 using NotReaper.Timing;
+using NotReaper.Modifier;
 
 namespace NotReaper.IO {
 

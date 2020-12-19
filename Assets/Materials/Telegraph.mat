@@ -10,7 +10,7 @@ Material:
   m_Name: Telegraph
   m_Shader: {fileID: -6465566751694194690, guid: 8e9c326b1faa4d74b81901bfd5749752,
     type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -42,11 +42,14 @@ Material:
     - Strength: 1.25
     - Vector1_24D4E1D8: 2
     - Vector1_555CF114: 0.1
+    - Vector1_6D268C6B: 2.84
     - Vector1_9F865091: 2
     - Vector1_AF95E7A8: 1
+    - Vector1_C89AA531: 300
     - _EnableExternalAlpha: 0
     m_Colors:
     - _Color: {r: 0, g: 0.64710045, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Tint: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
