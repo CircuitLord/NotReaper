@@ -1375,7 +1375,7 @@ namespace NotReaper {
 
             if(audicaFile.modifiers != null)
             {
-                StartCoroutine(ModifierHandler.Instance.ILoadModifiers());         
+                StartCoroutine(ModifierHandler.Instance.LoadModifiers(audicaFile.modifiers.modifiers));         
             }
 
 			//Loaded successfully
@@ -2008,11 +2008,6 @@ namespace NotReaper {
 		}
 
 		public void SetScale(int newScale) {
-            if (ModifierHandler.activated)
-            {
-                //newScale = 20;
-                //if (scale == newScale) return;
-            }
 
 			if (newScale < 5 || newScale > 100) return;
 			timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
@@ -2035,7 +2030,7 @@ namespace NotReaper {
 				
 				note.localScale = noteScale;
 			}
-            ModifierTimeline.Instance.Scale((float)newScale / scale);
+            ModifierHandler.Instance.Scale((float)newScale / scale);
 
 			scale = newScale;
 
@@ -2444,6 +2439,7 @@ namespace NotReaper {
 		}
 
 		public void JumpToX(float x) {
+            if (ModifierHandler.activated) return;
 			StopCoroutine(AnimateSetTime(new QNT_Timestamp(0)));
 
 			float posX = Math.Abs(timelineTransformParent.position.x) + x;

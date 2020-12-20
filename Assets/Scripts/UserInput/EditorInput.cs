@@ -704,7 +704,7 @@ namespace NotReaper.UserInput {
 
                 }
             }
-            if (Input.GetKeyDown(KeyCode.F8))
+            if (Input.GetKeyDown(KeyCode.F8) || Input.GetKeyDown(KeyCode.O))
             {
                 if (ModifierHandler.activated)
                 {

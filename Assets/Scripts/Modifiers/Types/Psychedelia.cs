@@ -9,6 +9,7 @@ using System.Threading;
 
 namespace NotReaper.Modifier
 {
+    /*
     [Serializable]
     public class Psychedelia : Modifier
     {
@@ -21,5 +22,5 @@ namespace NotReaper.Modifier
             amount = _amount;
         }
 
-    }
+    }*/
 }

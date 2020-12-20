@@ -53,9 +53,11 @@ namespace NotReaper.IO {
 					File.WriteAllText($"{Application.dataPath}/.cache/beginner-new.cues", CuesToJson(audicaFile.diffs.beginner));
 					easy = true;
 				}
-                if(audicaFile.modifiers.modifiers.Count > 0)
+                audicaFile.modifiers.modifiers = ModifierHandler.Instance.MapToDTO();
+                if (audicaFile.modifiers.modifiers.Count > 0)
                 {
-                    File.WriteAllText($"{Application.dataPath}/.cache/modifiers-new.json", ModifiersToJson(audicaFile.modifiers));
+                    //File.WriteAllText($"{Application.dataPath}/.cache/modifiers-new.json", ModifiersToJson(audicaFile.modifiers));
+                    File.WriteAllText($"{Application.dataPath}/.cache/modifiers-new.json", ModifiersToJson2(audicaFile.modifiers));
                     modifiers = true;
                 }
 
@@ -138,6 +140,11 @@ namespace NotReaper.IO {
 		public static string CuesToJson(CueFile cueFile) {
 			return JsonUtility.ToJson(cueFile, true);
 		}
+
+        public static string ModifiersToJson2(ModifierList modifiers)
+        {
+            return JsonUtility.ToJson(modifiers, true);
+        }
 
         public static string ModifiersToJson(ModifierList modifiers)
         {

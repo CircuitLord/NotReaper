@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace NotReaper.Modifier
-{  
+{  /*
     [Serializable]
     public class AimAssistChange : Modifier
     {
@@ -17,7 +17,7 @@ namespace NotReaper.Modifier
             endTick = _endTick;
             amount = _amount;
         }
-    }
+    }*/
 }
 
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace NotReaper.Modifier
 {
+    /*
     [Serializable]
     public class PsychedeliaUpdate : Modifier
     {
@@ -16,5 +17,5 @@ namespace NotReaper.Modifier
             startTick = _startTick;
             amount = _amount;
         }
-    }
+    }*/
 }

@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Collections;
 
 namespace NotReaper.Modifier
-{
+{/*
     [Serializable]
     public class ArenaRotation : Modifier
     {       
@@ -21,5 +21,5 @@ namespace NotReaper.Modifier
             amount = _amount;
             continuous = _continuous;
         }
-    }
+    }*/
 }

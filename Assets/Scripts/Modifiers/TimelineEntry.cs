@@ -7,10 +7,10 @@ namespace NotReaper.Modifier
     public class TimelineEntry : MonoBehaviour
     {
         [SerializeField] private GameObject glow;
-        private ModifierTimeline.ModifierContainer container;
+        //private ModifierTimeline.ModifierContainer container;
         public bool isSelected = false;
         private bool isCreated = false;
-        public void SetContainer(ModifierTimeline.ModifierContainer _container, bool fromLoad)
+        /*public void SetContainer(ModifierTimeline.ModifierContainer _container, bool fromLoad)
         {
             ModifierSelectionHandler.selectables.Add(this);
             container = _container;
@@ -26,7 +26,7 @@ namespace NotReaper.Modifier
                 this.gameObject.SetActive(false);
             }               
         }
-
+        
         public ModifierTimeline.ModifierContainer GetContainer()
         {
             return container;
@@ -51,7 +51,7 @@ namespace NotReaper.Modifier
             {
                 ModifierSelectionHandler.RemoveAllEntries();
                 ModifierSelectionHandler.selectedEntry = this;
-                ModifierHandler.Instance.SelectModifier(container, this);
+                //ModifierHandler.Instance.SelectModifier(container, this);
             }                  
         }
 
@@ -75,22 +75,23 @@ namespace NotReaper.Modifier
         public void DeleteModifier()
         {
             //ModifierDragHandler.RemoveSelectedEntry(this);
-            ModifierTimeline.Instance.SelectModifier(container);
-            ModifierTimeline.Instance.RemoveModifier(container);
-            ModifierHandler.Instance.RemoveModifier(container.data.modifier);
+           // ModifierTimeline.Instance.SelectModifier(container);
+           // ModifierTimeline.Instance.RemoveModifier(container);
+           // ModifierHandler.Instance.RemoveModifier(container.data.modifier);
            
            /* if (container.endMarkBottom != null) GameObject.Destroy(container.endMarkBottom);
             if (container.startMarkBottom != null) GameObject.Destroy(container.startMarkBottom);
             if (container.endMarkTop != null) GameObject.Destroy(container.endMarkTop);
             if (container.connector != null) GameObject.Destroy(container.connector);
             GameObject.Destroy(this.gameObject);
-            */
+            
         }
 
         public void ReportClick()
         {
             OnMouseDown();
         }
+    */
     }
 }
 

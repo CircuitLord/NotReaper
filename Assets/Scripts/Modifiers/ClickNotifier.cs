@@ -6,16 +6,21 @@ namespace NotReaper.Modifier
 {
     public class ClickNotifier : MonoBehaviour
     {
-        private TimelineEntry entry;
+        private Modifier modifier;
 
-        public void SetEntry(GameObject startMark)
+        public void SetModifier(Modifier startMark)
         {
-            entry = startMark.GetComponent<TimelineEntry>();
+            modifier = startMark;
         }
-        private void OnMouseDown()
+
+        public Modifier GetModifier()
         {
-            if (entry is null) return;
-            entry.ReportClick();
+            return modifier;
+        }
+        public void Click(bool singleSelect)
+        {
+            if (modifier is null) return;
+            modifier.ReportClick(singleSelect);
         }
     }
 }

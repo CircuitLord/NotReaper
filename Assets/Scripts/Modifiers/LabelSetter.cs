@@ -53,9 +53,14 @@ namespace NotReaper.Modifier
             toggle.isOn = on;
         }
 
+        public bool GetToggleState()
+        {
+            return toggle.isOn;
+        }
+
         public void SetColorSliderLeft(float[] col)
         {
-            if (col is null) col = new float[] { 0f, 0f, 0f };
+            if (col.Length < 3) col = new float[] { 0f, 0f, 0f };
             Color color = new Color(col[0], col[1], col[2]);
             float h, s;
             Color.RGBToHSV(color, out h, out s, out _);
@@ -65,7 +70,7 @@ namespace NotReaper.Modifier
 
         public void SetColorSliderRight(float[] col)
         {
-            if (col is null) col = new float[] { 0f, 0f, 0f };
+            if (col.Length < 3) col = new float[] { 0f, 0f, 0f };
             Color color = new Color(col[0], col[1], col[2]);
             float h, s;
             Color.RGBToHSV(color, out h, out s, out _);

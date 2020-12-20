@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4310613710281510676}
   - component: {fileID: 7939336707869474618}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: GameObject
-  m_TagString: Untagged
+  m_TagString: Glow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -101,9 +101,9 @@ GameObject:
   - component: {fileID: 305893435466732297}
   - component: {fileID: 9188126776244050634}
   - component: {fileID: 3529406874979906977}
-  - component: {fileID: 5235010984290832564}
   - component: {fileID: 7424116769541277143}
-  m_Layer: 5
+  - component: {fileID: -1720913063980537182}
+  m_Layer: 12
   m_Name: ModifierIconStart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,20 +312,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &5235010984290832564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6350984003558542677}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b12c78c2c4de9744b6bdbe2c893c832, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  glow: {fileID: 2046692837910954558}
-  isSelected: 0
 --- !u!60 &7424116769541277143
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -355,3 +341,15 @@ PolygonCollider2D:
       - {x: 0.0050024427, y: 0.5231335}
       - {x: -0.522727, y: -0.0067529306}
       - {x: 0.005566418, y: -0.52796507}
+--- !u!114 &-1720913063980537182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6350984003558542677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ac5095ec4a65047aac463612c962b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

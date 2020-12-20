@@ -8,9 +8,11 @@ using System.Collections;
 
 namespace NotReaper.Modifier
 {
+    /*
     [Serializable]
     public class ArenaBrightness : Modifier
     {
+        
         public bool continuous;
         public bool strobo;      
 
@@ -25,4 +27,5 @@ namespace NotReaper.Modifier
         }
        
     }
+    */
 }

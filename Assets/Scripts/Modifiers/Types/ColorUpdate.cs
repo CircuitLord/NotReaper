@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace NotReaper.Modifier
-{
+{/*
     [Serializable]
     public class ColorUpdate : Modifier
     {        
@@ -20,5 +20,5 @@ namespace NotReaper.Modifier
             leftHandColor = lhColor;
             rightHandColor = rhColor;
         }
-    }
+    }*/
 }

@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Collections;
 
 namespace NotReaper.Modifier
-{
+{/*
     [Serializable]
     public class ArenaChange : Modifier
     {        
@@ -23,5 +23,5 @@ namespace NotReaper.Modifier
             arena2 = value2;
             preload = _preload;
         }
-    }
+    }*/
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace NotReaper.Modifier
-{
+{/*
     [Serializable]
     public class Particles : Modifier
     {
@@ -17,5 +17,5 @@ namespace NotReaper.Modifier
             endTick = _endTick;
             amount = _amount;
         }
-    }
+    }*/
 }

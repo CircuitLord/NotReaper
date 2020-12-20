@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Collections;
 
 namespace NotReaper.Modifier
-{
+{/*
     [Serializable]
     public class Fader : Modifier
     {
@@ -19,5 +19,5 @@ namespace NotReaper.Modifier
             endTick = _endTick;
             amount = _amount;
         }
-    }
+    }*/
 }

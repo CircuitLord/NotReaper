@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace NotReaper.Modifier
 {
+    /*
     [Serializable]
     public class ZOffset : Modifier
     {
@@ -22,4 +23,5 @@ namespace NotReaper.Modifier
             transitionNumberOfTargets = _transitionNumberOfTargets;
         }
     }
+    */
 }

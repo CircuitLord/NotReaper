@@ -100,11 +100,11 @@ namespace NotReaper.IO {
 			}
             if (modifiers)
             {
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.TypeNameHandling = TypeNameHandling.All;
-                audicaFile.modifiers = JsonConvert.DeserializeObject<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"), settings);
+                //JsonSerializerSettings settings = new JsonSerializerSettings();
+                //settings.TypeNameHandling = TypeNameHandling.All;
+                //audicaFile.modifiers = JsonConvert.DeserializeObject<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"), settings);
 
-                //audicaFile.modifiers = JsonUtility.FromJson<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"));
+                audicaFile.modifiers = JsonUtility.FromJson<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"));
             }
 
 			MemoryStream temp = new MemoryStream();

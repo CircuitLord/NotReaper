@@ -53031,7 +53031,8 @@ MonoBehaviour:
   startTickButton: {fileID: 1684948843}
   endTickButton: {fileID: 134250178}
   createModifierButton: {fileID: 9161362405827831018}
-  modifierData: []
+  modifierPrefab: {fileID: 2692844488994215283, guid: 44d4b74fc04ce7f46ab8f43ab0ea2da0,
+    type: 3}
   modifiers: []
 --- !u!114 &1288364401
 MonoBehaviour:

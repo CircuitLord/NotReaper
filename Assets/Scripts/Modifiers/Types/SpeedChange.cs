@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace NotReaper.Modifier
 {
+    /*
     [Serializable]
     public class SpeedChange : Modifier
     {
@@ -21,4 +22,5 @@ namespace NotReaper.Modifier
             amount = _amount;
         }
     }
+    */
 }

@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - BGCollider
+  - Glow
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Note
   - Ignore main light
   - ChainBuilder
-  - 
+  - Modifier
   - 
   - 
   - 

@@ -14,18 +14,21 @@ namespace NotReaper.Modifier
     public class ModifierTimeline : MonoBehaviour
     {
         public static ModifierTimeline Instance = null;
-        public bool startSet => currentPair.startMarkTop != null;
-        public bool endMarkExists => currentPair.endMarkTop is null;
+        //public bool startSet => currentPair.startMarkTop != null;
+       // public bool endMarkExists => currentPair.endMarkTop is null;
+
+        private Modifier currentModifier;
 
         [Header("References")]
         [SerializeField] private GameObject modifierStartPrefab;
         [SerializeField] private GameObject modifierEndPrefab;
         [SerializeField] private LineRenderer modifierConnectorPrefab;
 
-        public List<ModifierContainer> modifiers = new List<ModifierContainer>();
-        private ModifierContainer currentPair;
+        //public List<ModifierContainer> modifiers = new List<ModifierContainer>();
+        //private ModifierContainer currentPair;
         private Vector3 pStart = new Vector3(0f, 5.1f, -3f);
-        public void UpdateConnectors(float newScale)
+
+        /*public void UpdateConnectors(float newScale)
         {
             foreach (ModifierContainer mc in modifiers)
             {
@@ -35,7 +38,7 @@ namespace NotReaper.Modifier
                 mc.connector.transform.localScale = scale;
 
             }
-        }
+        }*/
 
         public void Start()
         {
@@ -46,7 +49,13 @@ namespace NotReaper.Modifier
                 return;
             }
         }
-
+        /*
+        public void InitializeModifier(ModifierType type, string shorthand)
+        {
+            currentModifier = new Modifier(type.ToString(), shorthand);
+        }
+        */
+        /*
         public void OptimizeModifiers()
         {
 
@@ -70,7 +79,7 @@ namespace NotReaper.Modifier
 
             }
         }
-
+        
         private void ActivateModifierContainer(ModifierContainer container, bool active)
         {
             if (container.startMarkTop != null) container.startMarkTop.SetActive(active);
@@ -80,13 +89,14 @@ namespace NotReaper.Modifier
             if (container.connector != null) container.connector.gameObject.SetActive(active);
 
         }
-
+        */
+        /*
         public void RemoveModifier(ModifierContainer container)
         {
             modifiers.Remove(container);
         }
-
-        public void CreateModifier(ModifierHandler.ModifierData data, bool fromLoad = false)
+        */
+        /*public void CreateModifier(ModifierHandler.ModifierData data, bool fromLoad = false)
         {
             LookForOtherModifiers(data.startTick, data.endTick);
             CreateConnector();
@@ -111,8 +121,8 @@ namespace NotReaper.Modifier
             currentPair = new ModifierContainer();
             // modifiers.Add(currentPair);
 
-        }
-
+        }*/
+        /*
         public void SelectModifier(ModifierContainer container)
         {
             //Debug.Log(container.startMarkTop.transform.name + " " + container.startMarkTop.transform.position);
@@ -138,16 +148,16 @@ namespace NotReaper.Modifier
             //UpdateLinePositions();
             //UpdateLineBoxColliderLoad();
         }
-
-        public float GetStartPosX()
+        */
+        /*public float GetStartPosX()
         {
             return currentPair.startMarkTop.transform.localPosition.x;
         }
         public float GetEndPosX()
         {
             return currentPair.endMarkTop is null ? 0f : currentPair.endMarkTop.transform.localPosition.x;
-        }
-
+        }*/
+        /*
         private void LookForOtherModifiers(QNT_Timestamp startTick, QNT_Timestamp endTick)
         {
             //if (currentPair.raised) return;
@@ -237,8 +247,8 @@ namespace NotReaper.Modifier
                 currentPair.endMarkTop.transform.position = new Vector3(pStart.x, pStart.y - addY, pStart.z);
             }
         }
-
-        public bool CanCreateModifier(ModifierHandler.ModifierType type, QNT_Timestamp tick)
+        */
+        /*public bool CanCreateModifier(ModifierHandler.ModifierType type, QNT_Timestamp tick)
         {
             if (type != ModifierHandler.ModifierType.ColorUpdate && type != ModifierHandler.ModifierType.PsychedeliaUpdate) return true;
 
@@ -261,8 +271,8 @@ namespace NotReaper.Modifier
             }
 
             return false;
-        }
-
+        }*/
+        /*
         public void DropMarksSave()
         {
             CreateModifier(currentPair.data);
@@ -288,7 +298,8 @@ namespace NotReaper.Modifier
 
             currentPair = new ModifierContainer();
         }
-
+        */
+        /*
         public void ShowModifiers(bool show)
         {
             if (modifiers.Count == 0) return;
@@ -312,33 +323,10 @@ namespace NotReaper.Modifier
 
             }
         }
+        */
+        
 
-        public void Scale(float targetScale)
-        {
-            foreach (ModifierContainer mc in modifiers)
-            {
-                float s = .3f;
-                s *= targetScale;
-                Vector3 scale = new Vector3(s, .3f, .3f);
-
-                if (mc.startMarkTop != null)
-                {
-                    mc.startMarkTop.transform.localScale = scale;
-                }
-                if (mc.endMarkTop != null)
-                {
-                    mc.endMarkTop.transform.localScale = scale;
-                }
-                if (mc.connector != null)
-                {
-                    mc.connector.transform.localScale = mc.connector.GetComponent<Connector>().originalScale;
-                    //mc.connector.GetComponent<Connector>().Scale(targetScale);
-                }
-
-            }
-        }
-
-        public void UpdateMark(UpdateType type, ulong tick = 0)
+        /*public void UpdateMark(UpdateType type, ulong tick = 0)
         {
             switch (type)
             {
@@ -488,7 +476,7 @@ namespace NotReaper.Modifier
                 );
             return gradient;
         }
-
+        
         public struct ModifierContainer
         {
             public GameObject startMarkTop;
@@ -517,6 +505,7 @@ namespace NotReaper.Modifier
             MoveStart,
             UpdateEnd
         }
+        */
     }
 
 }

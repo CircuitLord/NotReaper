@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace NotReaper.Modifier
-{
+{/*
     [Serializable]
     public class InvisibleGuns : Modifier
     {
@@ -15,5 +15,5 @@ namespace NotReaper.Modifier
             startTick = _startTick;
             endTick = _endTick;
         }
-    }
+    }*/
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace NotReaper.Modifier
-{
+{/*
     [Serializable]
     public class ColorSwap : Modifier
     {
@@ -18,5 +18,5 @@ namespace NotReaper.Modifier
             endTick = _endTick;
         }
 
-    }
+    }*/
 }
