@@ -6,6 +6,7 @@ using NotReaper.Models;
 using NotReaper.Timing;
 using NotReaper.UserInput;
 using Random = UnityEngine.Random;
+using NotReaper.Modifier;
 
 namespace NotReaper.UI {
 	public class MiniTimeline : MonoBehaviour {
@@ -31,12 +32,14 @@ namespace NotReaper.UI {
 
 		private Camera _mainCamera;
 
+        public BookmarkMenu bookmarkMenu;
+
 
 		[HideInInspector] public bool isMouseOver = false;
 
 		private List<GameObject> repeaterSections = new List<GameObject>();
 
-       
+        public Bookmark selectedBookmark = null;
 
         private void Start() {
 			_mainCamera = Camera.main;
@@ -180,55 +183,82 @@ namespace NotReaper.UI {
         }
 
 
-        public void SetBookmark(float miniXPos, float topXPos,  TargetHandType newType, bool useTopXPos, bool addToAudicaFile = false) {
-			Bookmark bookmarkMini = Instantiate(bookmarkPrefab, new Vector3(0, 0, 0), Quaternion.identity, bookmarksParent).GetComponent<Bookmark>();
-			
+        public Bookmark SetBookmark(float miniXPos, float topXPos,  TargetHandType newType, string text, bool useTopXPos, bool fromLoad = false) {
+			Bookmark bookmarkMini = Instantiate(bookmarkPrefab, new Vector3(0, 0, 0), Quaternion.identity, bookmarksParent).GetComponent<Bookmark>();		
 			Bookmark bookmarkTop = Instantiate(bookmarkPrefab, Timeline.timelineNotesStatic).GetComponent<Bookmark>();
-			
+            bookmarkMini.gameObject.layer = 0;
 			Color background;
 
 			bookmarkMini.transform.localPosition = new Vector3((float) miniXPos, 0, 0);
-			
-			
+            //bookmarkTop.transform.localScale = new Vector3(.05f, .03f, 1f);
 
-			//bookmarkTop.transform.localScale = new Vector3(0.06f, 0.006f, 0.06f);
+            //bookmarkTop.transform.localScale = new Vector3(0.06f, 0.006f, 0.06f);
 
-			if (!useTopXPos) {
+            if (!useTopXPos) {
 				
 				if (newType == TargetHandType.Left) {
-					bookmarkTop.transform.position = new Vector3(0, bookmarkTop.transform.position.y - 0.6f, 0);
+					bookmarkTop.transform.position = new Vector3(0, bookmarkTop.transform.position.y - .85f, 0);
 					background = Color.green;
 				}
 				else {
-					bookmarkTop.transform.position = new Vector3(0, bookmarkTop.transform.position.y - 0.72f, 0);
+					bookmarkTop.transform.position = new Vector3(0, bookmarkTop.transform.position.y - .85f, 0);
 					background = Color.red;
 				}
 			}
 			else {
 				if (newType == TargetHandType.Left) {
-					bookmarkTop.transform.localPosition = new Vector3(topXPos, bookmarkTop.transform.localPosition.y - 0.6f, 0);
+					bookmarkTop.transform.localPosition = new Vector3(topXPos, bookmarkTop.transform.localPosition.y - .85f, 0);
 					background = Color.green;
 				}
 				else {
-					bookmarkTop.transform.localPosition = new Vector3(topXPos, bookmarkTop.transform.localPosition.y - 0.72f, 0);
+					bookmarkTop.transform.localPosition = new Vector3(topXPos, bookmarkTop.transform.localPosition.y - .85f, 0);
 					background = Color.red;
 				}
 			}
-			
+            bookmarkMini.GetComponent<SpriteRenderer>().color = background;
+            bookmarkTop.GetComponent<SpriteRenderer>().color = background;
 
-			bookmarkMini.GetComponent<SpriteRenderer>().color = background;
-			bookmarkTop.GetComponent<SpriteRenderer>().color = background;
-			bookmarkTop.GetComponent<SpriteRenderer>().size = new Vector2(0.07f, 0.1f);
+            bookmarkMini.transform.localScale = new Vector3(1f, 1f, 1f);
+            if(fromLoad) bookmarkTop.FixScaling();
 
+
+            /*bookmarkTop.GetComponent<SpriteRenderer>().size = new Vector2(0.1f, 22f);
+            bookmarkTop.GetComponent<BoxCollider2D>().size = new Vector2(.1f, 22f);
+            bookmarkTop.GetComponentInChildren<TMPro.TextMeshProUGUI>().rectTransform.localPosition = new Vector3(26, -730, 0);
+            bookmarkTop.GetComponentInChildren<TMPro.TextMeshProUGUI>().rectTransform.localScale = new Vector3(1.3f, .1f, 1f);*/
+
+
+
+            //bookmarkTop.transform.localScale = new Vector3(.05f, .03f, 1f);
+
+            //bookmarkTop.glow.transform.localPosition = new Vector3(0f, -.35f, 0f);
+            bookmarkTop.Initialize(bookmarkMini, text, newType, miniXPos);
 			
-			bookmarks.Add(bookmarkMini);
+			//bookmarks.Add(bookmarkMini);
 			bookmarks.Add(bookmarkTop);
-
-
-			if (addToAudicaFile) Timeline.audicaFile.desc.bookmarks.Add(new BookmarkData() {type = newType, xPosMini = miniXPos, xPosTop = bookmarkTop.transform.localPosition.x });
+			
+            return bookmarkTop;
 		}
 
-		private List<Bookmark> bookmarks = new List<Bookmark>();
+        public void SaveSelectedBookmark()
+        {
+            Timeline.audicaFile.desc.bookmarks.Clear();
+            foreach (Bookmark b in bookmarks) SaveBookmark(b);        
+        }
+
+        public void SaveBookmark(Bookmark b)
+        {            
+            Timeline.audicaFile.desc.bookmarks.Add(new BookmarkData() { type = b.handType, xPosMini = b.xPosMini, xPosTop = b.transform.localPosition.x, text = b.GetText() });
+        }
+
+        public void DeleteBookmark()
+        {
+            selectedBookmark.DeleteBookmark();
+            Timeline.audicaFile.desc.bookmarks.Clear();
+            foreach (Bookmark b in bookmarks) SaveBookmark(b);
+        }
+
+		public List<Bookmark> bookmarks = new List<Bookmark>();
 
 		public void ClearBookmarks(bool deleteInAudica = false) {
 			foreach (Bookmark t in bookmarks) {
@@ -256,6 +286,19 @@ namespace NotReaper.UI {
             return x;
         }
 
+        public void OpenBookmarksMenu(string text)
+        {
+            if (BookmarkMenu.isActive)
+            {
+                bookmarkMenu.Activate(false);
+            }
+            else
+            {
+                bookmarkMenu.SetText(selectedBookmark.GetText());
+                bookmarkMenu.Activate(true);
+            }
+        }
+
         private void Update() {
 			bool isCtrlDown = false;
 			bool isShiftDown = false;
@@ -266,8 +309,8 @@ namespace NotReaper.UI {
 				Debug.Log(MinitimelineToSeconds(songPreviewIcon.localPosition.x));
 			}
 
-			if (Input.GetKeyDown(KeyCode.U)) {
-				SetBookmark(GetXForTheBookmarkThingy(), 0f, EditorInput.selectedHand, false, true);
+			if (Input.GetKeyDown(KeyCode.U) && !ModifierHandler.activated && !BookmarkMenu.isActive) {
+                SetBookmark(GetXForTheBookmarkThingy(), 0f, EditorInput.selectedHand, "", false, false).Select();
 			}
 
 			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
@@ -289,8 +332,26 @@ namespace NotReaper.UI {
 				ClearBookmarks(true);
 			}
 
+            if (Input.GetMouseButtonDown(0))
+            {
+                RaycastHit2D hit = Physics2D.Raycast(_mainCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, 1 << LayerMask.NameToLayer("Bookmark"));
 
-		}
+                if (hit.collider != null)
+                {
+                    selectedBookmark = hit.transform.GetComponent<Bookmark>();
+                    selectedBookmark.Select();
+                }
+            }
+            if(selectedBookmark != null)
+            {
+                if (Input.GetKeyDown(KeyCode.Delete))
+                {
+                    DeleteBookmark();
+                }
+            }
+
+
+        }
 	}
 
 	
@@ -300,5 +361,6 @@ namespace NotReaper.UI {
 		public TargetHandType type = TargetHandType.Left;
 		public float xPosMini = 0.0f;
 		public float xPosTop = 0.0f;
+        public string text;
 	}
 }

@@ -9,6 +9,7 @@ using NotReaper.Timing;
 using Sirenix.Utilities;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using NotReaper.UI;
 
 namespace NotReaper.Modifier
 {
@@ -40,6 +41,14 @@ namespace NotReaper.Modifier
             main = Camera.main;
             
         }
+
+        public void CleanUp()
+        {
+            selectedEntries.Clear();
+            copiedEntries.Clear();
+            mode = CopyMode.Copy;
+        }
+
         public void AddEntry(Modifier entry)
         {
             ModifierHandler.Instance.HideWindow(true);
@@ -119,26 +128,27 @@ namespace NotReaper.Modifier
 
         public void PasteCopiedModifiers()
         {
+            if (copiedEntries.Count == 0) return;
             copiedEntries.Sort((mod1, mod2) => mod1.startTick.CompareTo(mod2.startTick));
 
             QNT_Timestamp newStartTick = Timeline.time;
             QNT_Timestamp firstTick = new QNT_Timestamp((ulong)copiedEntries.First().startTick);
-            float tickOffsetForward = newStartTick.tick - copiedEntries.First().startTick;
-            float tickOffsetInversed = copiedEntries.First().startTick - newStartTick.tick;
-            float tickOffset = (newStartTick >= firstTick ? tickOffsetForward : tickOffsetInversed);
+            float tickOffset = newStartTick.tick - copiedEntries.First().startTick;
             posGetter.position = Vector3.zero;
             float positionOffset = posGetter.position.x - copiedEntries.First().startPosX;
+            float miniOffset = MiniTimeline.Instance.GetXForTheBookmarkThingy() - copiedEntries.First().miniStartX;
             if (tickOffset == 0 && mode != CopyMode.Cut) return;
-
             isPasting = true;
             foreach(ModifierDTO dto in copiedEntries)
             {
                 dto.startTick += tickOffset;
                 dto.startPosX += positionOffset;
+                dto.miniStartX += miniOffset;
                 if (dto.endTick != 0)
                 {
                     dto.endTick += tickOffset;
                     dto.endPosX += positionOffset;
+                    dto.miniEndX += miniOffset;
                 }
             }
                
@@ -156,78 +166,7 @@ namespace NotReaper.Modifier
             return (List<ModifierDTO>)formatter.Deserialize(stream);
         }
 
-        private Modifier DeepCopyModifier(Modifier modifier)
-        {
-            return null;
-            /*
-            Modifier m = null;
-            ModifierType _type;
-            Enum.TryParse(modifier.type, true, out _type);
-            float amount = modifier.amount;
-            QNT_Timestamp startTick = new QNT_Timestamp((uint)modifier.startTick);
-            QNT_Timestamp endTick = new QNT_Timestamp((uint)modifier.endTick);
-            ModifierType type = _type;
-            float startPosX = modifier.startPosX;
-            float endPosX = modifier.endPosX;
-            bool option1 = false;
-            bool option2 = false;
-            float[] leftHandColor;
-            float[] rightHandColor;
-            string value1 = "";
-            string value2 = "";
-            switch (type)
-            {
-                case ModifierType.ArenaBrightness:
-                    ArenaBrightness ab = modifier as ArenaBrightness;
-                    option1 = ab.continuous;
-                    option2 = ab.strobo;
-                    break;
-                case ModifierType.ArenaRotation:
-                    ArenaRotation ar = modifier as ArenaRotation;
-                    option1 = ar.continuous;
-                    break;
-                case ModifierType.ColorChange:
-                    ColorChange cc = modifier as ColorChange;
-                    leftHandColor = cc.leftHandColor;
-                    rightHandColor = cc.rightHandColor;
-                    break;
-                case ModifierType.ColorUpdate:
-                    ColorUpdate cu = modifier as ColorUpdate;
-                    leftHandColor = cu.leftHandColor;
-                    rightHandColor = cu.rightHandColor;
-                    break;
-                case ModifierType.zOffset:
-                    ZOffset zo = modifier as ZOffset;
-                    value1 = zo.transitionNumberOfTargets.ToString();
-                    break;
-                case ModifierType.ArenaChange:
-                    ArenaChange ac = modifier as ArenaChange;
-                    value1 = ac.arena1;
-                    value2 = ac.arena2;
-                    option1 = ac.preload;
-                    break;
-                default:
-                    break;
-            }
-            switch (type)
-            {
-                case ModifierType.AimAssist:
-                    return new AimAssistChange(type.ToString(), startTick.tick, endTick.tick, amount);
-                case ModifierType.ArenaBrightness:
-                    return new ArenaBrightness(type.ToString(), startTick.tick, endTick.tick, amount, option1, option2);
-                case ModifierType.ArenaChange:
-                    return new ArenaChange(type.ToString(), startTick.tick, endTick.tick, value1, value2, option1);
-                case ModifierType.ArenaRotation:
-                    return new ArenaRotation(type.ToString(), startTick.tick, endTick.tick, amount, option1);
-                case ModifierType.ColorChange:
-                    return new ColorChange(type.ToString(), startTick.tick, endTick.tick, leftHandColor, rightHandColor);
-                case ModifierType.ColorSwap:
-                    return new 
-
-            }
-            */
-        }
-
+        
         public void DeselectAllModifiers()
         {
             foreach(Modifier m in selectedEntries)
@@ -235,7 +174,7 @@ namespace NotReaper.Modifier
                 m.Select(false);
             }
             selectedEntries.Clear();
-            copiedEntries.Clear();
+            if(mode == CopyMode.Cut) copiedEntries.Clear();
             ModifierHandler.Instance.HideWindow(false);
         }
 
@@ -317,6 +256,20 @@ namespace NotReaper.Modifier
                 if (Input.GetKeyDown(KeyCode.X))
                 {
                     CutSelectedModifiers();
+                }
+                if (Input.GetKeyDown(KeyCode.D))
+                {
+                    if(selectedEntries.Count > 0) SelectModifier(selectedEntries[0], true);
+                }
+                if (Input.GetKeyDown(KeyCode.A))
+                {
+                    if (selectedEntries.Count > 0) SelectModifier(selectedEntries[0], true);
+                    foreach (Modifier m in ModifierHandler.Instance.modifiers)
+                    {
+                        selectedEntries.Add(m);
+                        m.Select(true);
+                    }
+                       
                 }
             }
             if (Input.GetKeyDown(KeyCode.Delete))

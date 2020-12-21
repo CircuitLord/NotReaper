@@ -30,7 +30,9 @@ namespace NotReaper.IO {
 			File.Delete($"{Application.dataPath}/.cache/advanced.cues");
 			File.Delete($"{Application.dataPath}/.cache/moderate.cues");
 			File.Delete($"{Application.dataPath}/.cache/beginner.cues");
-		}
+            if (File.Exists($"{Application.dataPath}/.cache/modifiers.json"))
+                File.Delete($"{Application.dataPath}/.cache/modifiers.json");
+        }
 
 	}
 

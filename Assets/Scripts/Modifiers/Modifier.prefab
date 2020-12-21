@@ -43,9 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad2a3f89b8449dd4a8943774857336eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 
-  startTick: 0
-  endTick: 0
   amount: 0
   startPosX: 0
   endPosX: 0
@@ -70,7 +67,7 @@ MonoBehaviour:
   connector: {fileID: 0}
   startMarkPrefab: {fileID: 6350984003558542677, guid: f323bac9b81273042aced235f7453f6c,
     type: 3}
-  miniStartPrefab: {fileID: 6350984003558542677, guid: 28a9678abe29f124f9f7e79c797f7b0e,
+  miniStartPrefab: {fileID: 6350984003558542677, guid: f323bac9b81273042aced235f7453f6c,
     type: 3}
   endMarkPrefab: {fileID: 6350984003558542677, guid: 28a9678abe29f124f9f7e79c797f7b0e,
     type: 3}
@@ -80,3 +77,4 @@ MonoBehaviour:
     type: 3}
   isCreated: 0
   isSelected: 0
+  glow: {fileID: 0}

@@ -185,7 +185,6 @@ namespace NotReaper {
 	public class Timeline : MonoBehaviour {
 
 		public static Timeline instance;
-		
 		//Hidden public values
 		[HideInInspector] public static AudicaFile audicaFile;
 
@@ -1127,7 +1126,8 @@ namespace NotReaper {
 			Tools.undoRedoManager.ClearActions();
 			tempoChanges.Clear();
 			RemoveAllRepeaters();
-		}
+            ModifierHandler.Instance.CleanUp();
+        }
 
 		public void Export()
 		{
@@ -1240,13 +1240,11 @@ namespace NotReaper {
 		}
 
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
-			readyToRegenerate = false;
-
+            readyToRegenerate = false;
 			inTimingMode = false;
 			SetOffset(new Relative_QNT(0));
-
-			if (audicaLoaded) {
-				miniTimeline.ClearBookmarks(false);
+            if (audicaLoaded) {
+                miniTimeline.ClearBookmarks(false);
 			}
 			
 			if (audicaLoaded && NRSettings.config.saveOnLoadNew) {
@@ -1368,14 +1366,14 @@ namespace NotReaper {
 
 			if (audicaFile.desc.bookmarks != null) {
 				foreach (BookmarkData data in audicaFile.desc.bookmarks) {
-					miniTimeline.SetBookmark(data.xPosMini, data.xPosTop, data.type, true, false);
+					miniTimeline.SetBookmark(data.xPosMini, data.xPosTop, data.type, data.text, true, true);
 				}
-				
-			}
+            }
 
             if(audicaFile.modifiers != null)
             {
-                StartCoroutine(ModifierHandler.Instance.LoadModifiers(audicaFile.modifiers.modifiers));         
+                if(audicaFile.modifiers.modifiers.Count > 0)
+                    StartCoroutine(ModifierHandler.Instance.LoadModifiers(audicaFile.modifiers.modifiers, true));         
             }
 
 			//Loaded successfully
@@ -2031,7 +2029,7 @@ namespace NotReaper {
 				note.localScale = noteScale;
 			}
             ModifierHandler.Instance.Scale((float)newScale / scale);
-
+            BookmarkMenu.Instance.Scale();
 			scale = newScale;
 
 			foreach (Target target in orderedNotes) {
@@ -2177,9 +2175,8 @@ namespace NotReaper {
 			}
 
 
-			if (Input.GetKeyDown(KeyCode.A) && isCtrlDown)
+			if (Input.GetKeyDown(KeyCode.A) && isCtrlDown && !ModifierHandler.activated)
 			{
-
 				Camera.main.farClipPlane = 1000;
 
 				foreach (Target target in orderedNotes)

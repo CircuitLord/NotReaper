@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 2322784639747875722}
   m_Layer: 12
   m_Name: ModifierConnector
-  m_TagString: Untagged
+  m_TagString: Modifier
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

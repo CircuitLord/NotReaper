@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-
+using UnityEngine.Events;
 namespace NotReaper.Modifier
 {
     public class LabelSetter : MonoBehaviour
@@ -12,6 +12,7 @@ namespace NotReaper.Modifier
         [SerializeField] private TMP_InputField inputField;
         [SerializeField] private Slider slider;
         [SerializeField] private Toggle toggle;
+        [SerializeField] private TextMeshProUGUI hint;
         [Header("Color")]
         [SerializeField] private Slider colorSliderHueLeft;
         [SerializeField] private Slider colorSliderHueRight;
@@ -19,6 +20,16 @@ namespace NotReaper.Modifier
         [SerializeField] private Slider colorSliderSaturationRight;
         [SerializeField] private SpriteRenderer colorFieldLeft;
         [SerializeField] private SpriteRenderer colorFieldRight;
+
+        public void Start()
+        {
+            if(inputField != null)
+            {
+                inputField.onSelect.AddListener(ModifierHandler.Instance.OnInputFocusChange);
+                inputField.onDeselect.AddListener(ModifierHandler.Instance.OnInputFocusChange);
+            }
+        }
+
         public void SetLabelText(string text)
         {
             label.text = text;
@@ -58,6 +69,11 @@ namespace NotReaper.Modifier
             return toggle.isOn;
         }
 
+        public void SetHintText(string text)
+        {
+            hint.text = text;
+        }
+
         public void SetColorSliderLeft(float[] col)
         {
             if (col.Length < 3) col = new float[] { 0f, 0f, 0f };
@@ -91,8 +107,7 @@ namespace NotReaper.Modifier
             colorSliderHueRight.maxValue = max;
 
             colorSliderSaturationLeft.maxValue = max;
-            colorSliderSaturationRight.maxValue = max;
-
+            colorSliderSaturationRight.maxValue = max;           
         }
 
         public float[] GetLeftColor()

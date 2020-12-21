@@ -385,7 +385,7 @@ namespace NotReaper.Tools {
 			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) primaryModifierHeld = true;
 			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) secondaryModifierHeld = true;
 
-			if (primaryModifierHeld && !secondaryModifierHeld && !ModifierHandler.activated) {
+			if (primaryModifierHeld && !secondaryModifierHeld && !ModifierHandler.activated && !BookmarkMenu.isActive) {
 				// permits holding primary and secondary down
 				frameIntentFlipTargetsHorizontally = Input.GetKeyDown(KeyCode.F);
 				frameIntentCut = Input.GetKeyDown(KeyCode.X);
@@ -500,7 +500,8 @@ namespace NotReaper.Tools {
 
 		// execute simple actions which don't require any state management'
 		private void UpdateActions() {
-		
+
+            if (ModifierHandler.activated || BookmarkMenu.isActive) return;
 			//if (EditorInput.selectedTool != EditorTool.DragSelect) return;
 			/** Setting hitsounds **/
 			if (frameIntentSetHitSoundStandard) SetHitsoundAction(TargetVelocity.Standard);
@@ -554,7 +555,7 @@ namespace NotReaper.Tools {
 			if (frameIntentScaleDown) timeline.Scale(timeline.selectedNotes, 0.9f);
 
 			/** Note selection and movement **/
-			if (frameIntentDeselectAll) timeline.DeselectAllTargets();
+			if (frameIntentDeselectAll && !ModifierHandler.activated) timeline.DeselectAllTargets();
 		}
 
 		// Update the selection box and individually added / removed targets

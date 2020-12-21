@@ -6,6 +6,7 @@ TagManager:
   tags:
   - BGCollider
   - Glow
+  - Modifier
   layers:
   - Default
   - TransparentFX
@@ -20,7 +21,7 @@ TagManager:
   - Ignore main light
   - ChainBuilder
   - Modifier
-  - 
+  - Bookmark
   - 
   - 
   - 

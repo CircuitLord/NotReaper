@@ -13,6 +13,8 @@ namespace NotReaper.Modifier
         public float amount;
         public float startPosX;
         public float endPosX;
+        public float miniStartX;
+        public float miniEndX;
         public string value1;
         public string value2;
         public bool option1;
@@ -78,12 +80,26 @@ namespace NotReaper.Modifier
             return endMarkExists ? endMark.transform.localPosition.x : 0f;
         }
 
+        private float GetMiniStartX()
+        {
+            if (!miniStartExists) return 0f;
+            return miniStart.transform.localPosition.x;
+        }
+
+        private float GetMiniEndX()
+        {
+            if (!miniEndExists) return 0f;
+            return miniEnd.transform.localPosition.x;
+        }
+
         public ModifierDTO GetDTO()
         {
             ModifierDTO dto = new ModifierDTO();
             dto.amount = amount;
             dto.endPosX = GetEndPosX();
             dto.startPosX = GetStartPosX();
+            dto.miniStartX = GetMiniStartX();
+            dto.miniEndX = GetMiniEndX();
             dto.startTick = startTime.tick;
             dto.endTick = endTime.tick;
             dto.leftHandColor = leftHandColor;
@@ -101,8 +117,10 @@ namespace NotReaper.Modifier
             amount = dto.amount;
             startPosX = dto.startPosX;
             endPosX = dto.endPosX;
-            startTime = new QNT_Timestamp((uint)dto.startTick);
-            endTime = new QNT_Timestamp((uint)dto.endTick);
+            miniStartX = dto.miniStartX;
+            miniEndX = dto.miniEndX;
+            startTime = new QNT_Timestamp((ulong)dto.startTick);
+            endTime = new QNT_Timestamp((ulong)dto.endTick);
             leftHandColor = dto.leftHandColor;
             rightHandColor = dto.rightHandColor;
             option1 = dto.option1;
@@ -133,30 +151,33 @@ namespace NotReaper.Modifier
             }
         }
 
-        public void CreateModifierMark(bool startMarker, bool usePosX = false)
+        public void CreateModifierMark(bool startMarker, QNT_Timestamp miniTime, bool usePosX = false)
         {
             GameObject modifierBottom = Instantiate(startMarker ? miniStartPrefab : miniEndPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, MiniTimeline.Instance.bookmarksParent);
-            GameObject modifierTop = Instantiate(startMarker ? startMarkPrefab : endMarkPrefab, null);//ModifierSelectionHandler.isPasting ? Timeline.timelineNotesStatic : null
+            GameObject modifierTop = Instantiate(startMarker ? startMarkPrefab : endMarkPrefab, usePosX && !ModifierSelectionHandler.isPasting ? Timeline.timelineNotesStatic : null);//ModifierSelectionHandler.isPasting ? Timeline.timelineNotesStatic : null
             if (startMarker) modifierTop.GetComponent<IconTextSetter>().SetText(shorthand);
             Color background = Color.white;
             background.a = .5f;
-            modifierBottom.transform.localPosition = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(startMark ? startTime : endTime), 0f, 0f);
+           
             if (!usePosX)
             {
                 modifierTop.transform.position = startMarker ? new Vector3(0f, modifierTop.transform.position.y, 0f) : new Vector3(0f, startMark.transform.position.y, 0f);
+                modifierBottom.transform.localPosition = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(miniTime), 0f, 0f);
             }
-            /*else if (ModifierSelectionHandler.isPasting)
-            {
-                modifierTop.transform.localPosition = startMarker ? new Vector3(startPosX, modifierTop.transform.localPosition.y, 0f) : new Vector3(endPosX, startMark.transform.localPosition.y, 0f);
-            }*/
-            else
+            else if (ModifierSelectionHandler.isPasting)
             {
                 modifierTop.transform.position = startMarker ? new Vector3(startPosX, modifierTop.transform.position.y, 0f) : new Vector3(endPosX, startMark.transform.position.y, 0f);
+                modifierBottom.transform.localPosition = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(miniTime), 0f, 0f);
+            }
+            else
+            {
+                modifierTop.transform.localPosition = startMarker ? new Vector3(startPosX, modifierTop.transform.localPosition.y, 0f) : new Vector3(endPosX, startMark.transform.localPosition.y, 0f);                
+                modifierBottom.transform.localPosition = new Vector3(startMarker ? miniStartX : miniEndX, 0f, 0f);
             }
 
             modifierTop.transform.SetParent(Timeline.timelineNotesStatic);
             modifierTop.transform.localScale = new Vector3(0.3f, 0.3f);
-            modifierBottom.transform.localScale = new Vector3(10f, 10f);
+            modifierBottom.transform.localScale = new Vector3(7f, 7f);
             modifierBottom.GetComponent<SpriteRenderer>().color = background;
             modifierTop.GetComponent<SpriteRenderer>().color = background;
 
@@ -194,15 +215,15 @@ namespace NotReaper.Modifier
             switch (type)
             {
                 case UpdateType.MoveStart:
-                    startMark.transform.position = new Vector3(0f, startMark.transform.position.y, -3f);
-                    miniStart.transform.position = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(new QNT_Timestamp(tick)), 0f, 0f);
-                    LookForOtherModifiers(startTime, endTime, LookAtType.Start);
+                    startMark.transform.position = new Vector3(0f, startMark.transform.position.y, 0f);
+                    miniStart.transform.localPosition = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(new QNT_Timestamp(tick)), 0f, 0f);
+                    LookForOtherModifiers(startTime, startTime, LookAtType.Start);
                     CreateConnector();
                     UpdateLinePositions();
                     break;
                 case UpdateType.UpdateStart:
-                    startMark.transform.position = new Vector3(0f, startMark.transform.position.y, -3f);
-                    miniStart.transform.position = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(new QNT_Timestamp(tick)), 0f, 0f);
+                    startMark.transform.position = new Vector3(0f, startMark.transform.position.y, 0f);
+                    miniStart.transform.localPosition = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(new QNT_Timestamp(tick)), 0f, 0f);
                     if (connectorExists) GameObject.Destroy(connector);
                     if (endMarkExists) GameObject.Destroy(endMark);
                     if (miniEndExists) GameObject.Destroy(miniEnd);
@@ -222,9 +243,8 @@ namespace NotReaper.Modifier
             }
         }
 
-        public void CreateModifier(bool fromLoad = false)
-        {
-            LookForOtherModifiers(startTime, endTime, LookAtType.Start);
+        public void CreateModifier(bool save = false)
+        {       
             CreateConnector();
             //UpdateLineBoxCollider();
             UpdateLinePositions();
@@ -241,13 +261,17 @@ namespace NotReaper.Modifier
             }
             startPosX = GetStartPosX();
             endPosX = GetEndPosX();
+            miniStartX = GetMiniStartX();
+            miniEndX = GetMiniEndX();
             isCreated = true;
-            Select(false);
+            if(!save) Select(false);
         }
 
         public void Delete()
         {
             if (ModifierHandler.Instance.modifiers.Contains(this)) ModifierHandler.Instance.modifiers.Remove(this);
+            
+            
 
             if (startMarkExists)
             {
@@ -268,6 +292,7 @@ namespace NotReaper.Modifier
 
         public void UpdateLevel()
         {
+            level = 0;
             LookForOtherModifiers(startTime, endTime, LookAtType.Start);
             UpdateLinePositions(true);
         }
@@ -277,10 +302,9 @@ namespace NotReaper.Modifier
             QNT_Timestamp _endTick = endTick;
             if (endTick.tick == 0) _endTick = startTick;
             int lowestLevelFound = 0;
-            for (int i = Enum.GetNames(typeof(ModifierType)).Length; i >= 0; i--)
+            for (int i = 0; i < Enum.GetNames(typeof(ModifierType)).Length; i++)
             {
                 bool skip = false;
-
                 foreach (Modifier mod in ModifierHandler.Instance.modifiers)
                 {
                     if (mod == this) continue;
@@ -301,7 +325,15 @@ namespace NotReaper.Modifier
                             break;
                         }
                     }
-                    else if(startTick == mod.endTime || startTick == mod.startTime)
+                    else if (startTick == mod.endTime || startTick == mod.startTime || endTick == mod.startTime || endTick == mod.endTime)
+                    {
+                        if (mod.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    else if (startTick > mod.startTime && startTick < mod.endTime && _endTick > mod.endTime)
                     {
                         if (mod.level == i)
                         {
@@ -312,8 +344,52 @@ namespace NotReaper.Modifier
                 }
                 if (skip) continue;
                 lowestLevelFound = i;
+                break;
             }
-            if(type == LookAtType.End)
+            /*for (int i = Enum.GetNames(typeof(ModifierType)).Length; i >= 0; i--)
+            {
+                bool skip = false;
+                foreach (Modifier mod in ModifierHandler.Instance.modifiers)
+                {
+                    if (mod == this) continue;
+                    if (mod.startTime <= startTick && mod.endTime >= _endTick)
+                    {
+                        if (mod.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+
+                    }
+                    else if (startTick <= mod.startTime && _endTick >= mod.startTime)
+                    {
+                        if (mod.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    else if (startTick == mod.endTime || startTick == mod.startTime || endTick == mod.startTime || endTick == mod.endTime)
+                    {
+                        if (mod.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    else if(startTick > mod.startTime && startTick < mod.endTime && _endTick > mod.endTime)
+                    {
+                        if (mod.level == i)
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                }
+                if (skip) continue;
+                lowestLevelFound = i;
+            }*/
+            if (type == LookAtType.End)
             {
                 if (lowestLevelFound < level) return;
             }
@@ -392,36 +468,8 @@ namespace NotReaper.Modifier
             return gradient;
         }
 
-
-        private void OnMouseDown()
-        {
-            /*
-            if (!isCreated) return;
-
-            if (Input.GetKey(KeyCode.LeftControl))
-            {
-                if (isSelected)
-                {
-                    ModifierSelectionHandler.RemoveEntry(this);
-                }
-                else
-                {
-                    ModifierSelectionHandler.AddEntry(this);
-                }
-                ModifierHandler.Instance.DeselectModifier();
-            }
-            else
-            {
-                ModifierSelectionHandler.RemoveAllEntries();
-                ModifierSelectionHandler.selectedEntry = this;
-                ModifierHandler.Instance.SelectModifier(container, this);
-            }
-            */
-        }
-
         public void ReportClick(bool singleSelect)
         {
-            //OnMouseDown();
             Select(singleSelect);
         }
 

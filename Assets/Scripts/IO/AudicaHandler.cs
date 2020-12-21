@@ -26,7 +26,6 @@ namespace NotReaper.IO {
 
 			HandleCache.CheckCacheFolderValid();
 			HandleCache.ClearCueCache();
-
 			//Figure out what files we need to extract by getting the song.desc.
 			foreach (ZipEntry entry in audicaZip.Entries) {
 				if (entry.FileName == "song.desc") {
@@ -100,10 +99,6 @@ namespace NotReaper.IO {
 			}
             if (modifiers)
             {
-                //JsonSerializerSettings settings = new JsonSerializerSettings();
-                //settings.TypeNameHandling = TypeNameHandling.All;
-                //audicaFile.modifiers = JsonConvert.DeserializeObject<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"), settings);
-
                 audicaFile.modifiers = JsonUtility.FromJson<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"));
             }
 
@@ -170,9 +165,7 @@ namespace NotReaper.IO {
 
 					//audicaFile.song_png = new ArtFile(artFileName);
 				}
-
-					temp.SetLength(0);
-
+                temp.SetLength(0);
 			}
 
 

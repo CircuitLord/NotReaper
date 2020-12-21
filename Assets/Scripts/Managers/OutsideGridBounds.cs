@@ -41,7 +41,7 @@ namespace NotReaper.Managers
 		{
 
 			if (EditorInput.inUI) return;
-            if (ModifierHandler.activated) return;
+            if (ModifierHandler.activated || BookmarkMenu.isActive) return;
 			if (Input.GetKeyDown(KeyCode.J))
 			{
 				SetGridPosition(-1);

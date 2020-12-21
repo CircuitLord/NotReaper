@@ -13,6 +13,8 @@ namespace NotReaper.Modifier
         public float amount;
         public float startPosX;
         public float endPosX;
+        public float miniStartX;
+        public float miniEndX;
         public string value1;
         public string value2;
         public bool option1;

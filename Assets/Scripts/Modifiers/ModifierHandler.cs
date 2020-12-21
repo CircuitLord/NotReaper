@@ -17,7 +17,7 @@ namespace NotReaper.Modifier
     public class ModifierHandler : MonoBehaviour
     {
         public static ModifierHandler Instance = null;
-
+        public static bool inputFocused = false;
         public static bool activated;
         [HideInInspector] public bool isHovering;
 
@@ -70,6 +70,27 @@ namespace NotReaper.Modifier
             colorPicker.SetActive(false);
             slider = amountSlider.GetComponent<LabelSetter>();
             
+        }
+
+        public void CleanUp()
+        {
+            for(int i = 0; i < modifiers.Count; i++)
+            {
+                modifiers[i].Delete();
+            }
+            modifiers.Clear();
+            currentModifier = null;
+            ModifierSelectionHandler.Instance.CleanUp();
+            GameObject[] stubbornModifiers = GameObject.FindGameObjectsWithTag("Modifier");
+            for(int i = 0; i < stubbornModifiers.Length; i++)
+            {
+                GameObject.Destroy(stubbornModifiers[i]);
+            }
+        }
+
+        public void OnInputFocusChange(string _)
+        {
+            inputFocused = !inputFocused;
         }
 
         public void OnButtonClicked()
@@ -140,24 +161,26 @@ namespace NotReaper.Modifier
                 m.UpdateLevel();
                 yield return new WaitForSeconds(.01f);
             }
+            
                
         }
 
-        public IEnumerator LoadModifiers(List<ModifierDTO> modList)
+        public IEnumerator LoadModifiers(List<ModifierDTO> modList, bool fromLoad = false)
         {
-            if(currentModifier != null)
+            if (currentModifier != null)
             {
-                currentModifier.Select(false);
-                currentModifier = null;
+                CreateModifier();
+                //currentModifier.Select(false);
+                //currentModifier = null;
             }
             //yield return new WaitForSecondsRealtime(.1f);
+            //if (fromLoad) yield return new WaitForSeconds(1f);
             foreach (ModifierDTO dto in modList)
             {
                 Modifier m = Instantiate(modifierPrefab).GetComponent<Modifier>();
                 m.LoadFromDTO(dto);
                 m.shorthand = GetShorthand(m.modifierType);
                 LoadModifier(m);
-
             }
             ModifierSelectionHandler.isPasting = false;
             yield return new WaitForSeconds(.001f);
@@ -172,7 +195,7 @@ namespace NotReaper.Modifier
             SetStartTick(modifier.startTime);
             SetEndTick(modifier.endTime);
             //CreateLoadedModifier();
-            CreateModifier();
+            CreateModifier(false);
             /*
             ModifierType type;
             Enum.TryParse(modifier.type, true, out type);
@@ -249,7 +272,7 @@ namespace NotReaper.Modifier
             return dtoList;
         }
 
-        public void CreateModifier()
+        public void CreateModifier(bool save = false)
         {
             //if (!currentData.startSet) return;
             if (!currentModifier.startSet) return;
@@ -263,7 +286,7 @@ namespace NotReaper.Modifier
             //modifiers.Add(m);
             
             //ModifierTimeline.Instance.CreateModifier(currentData);
-            currentModifier.CreateModifier();
+            currentModifier.CreateModifier(save);
             modifiers.Add(currentModifier);
             //currentData = new ModifierData();
             currentModifier = null;
@@ -290,10 +313,9 @@ namespace NotReaper.Modifier
                     {
                         return true;
                     }
-
                     else if (m.modifierType == ModifierType.Psychedelia && type == ModifierType.PsychedeliaUpdate) return true;
                 }
-                else if (m.endTime.tick == 0 && tick.tick > 0)
+                else if (m.endTime.tick == 0)
                 {
                     if (m.modifierType == ModifierType.ColorChange && type == ModifierType.ColorUpdate) return true;
                     else if (m.modifierType == ModifierType.Psychedelia && type == ModifierType.PsychedeliaUpdate) return true;
@@ -312,7 +334,14 @@ namespace NotReaper.Modifier
         {
              if (!shouldFill || isEmpty)
              {
-                 OnDropdownValueChanged();
+                if (currentModifier != null)
+                {
+                    CreateModifier(true);
+                }
+                else
+                {
+                    OnDropdownValueChanged();
+                }                
                  return;
              }
             //OnDropdownValueChanged();
@@ -435,7 +464,7 @@ namespace NotReaper.Modifier
         private void SetStartTick(QNT_Timestamp tick)
         {
             currentModifier.startSet = true;
-            currentModifier.CreateModifierMark(true, true);
+            currentModifier.CreateModifierMark(true, tick, true);
         }
         private void SetEndTick(QNT_Timestamp tick)
         {
@@ -444,8 +473,8 @@ namespace NotReaper.Modifier
 
         public void SetStartTick()
         {
-            ModifierType t = (ModifierType)dropdown.value;
-            if (currentModifier is null) InitializeModifier(t, GetShorthand(t));
+            
+            InitializeModifier();
             ulong tick = Timeline.time.tick;
             currentModifier.startTime = new QNT_Timestamp(tick);
             if (tick != 0 && tick >= currentModifier.endTime.tick && currentModifier.endTime.tick != 0)
@@ -468,7 +497,7 @@ namespace NotReaper.Modifier
                 else
                 {
                     UpdateEndTick(tick);
-                    currentModifier.CreateModifierMark(true, false);
+                    currentModifier.CreateModifierMark(true, currentModifier.startTime, false);
                 }
 
             }
@@ -504,7 +533,7 @@ namespace NotReaper.Modifier
 
         private void UpdateEndTick(float tick)
         {
-            if (currentModifier is null) return;
+            InitializeModifier();
             if (!currentModifier.startSet) return;
             if (!currentModifier.endMarkExists && currentModifier.endTime.tick != 0)
             {
@@ -515,7 +544,7 @@ namespace NotReaper.Modifier
 
         public void SetEndTick(float loadTick = -1f)
         {
-            if (currentModifier is null) return;
+            InitializeModifier();
             if (!currentModifier.startSet) return;
             ulong tick = Timeline.time.tick;
             if (loadTick != -1f) tick = (ulong)loadTick;
@@ -536,12 +565,13 @@ namespace NotReaper.Modifier
             {
                 currentModifier.endTime = new QNT_Timestamp(tick);
                 endTickButton.GetComponent<LabelSetter>().SetLabelText(tick.ToString());
-                currentModifier.CreateModifierMark(false, loadTick != -1f);
+                currentModifier.CreateModifierMark(false, currentModifier.endTime, loadTick != -1f);
             }
         }
         public void Scale(float targetScale)
         {
             foreach (Modifier m in modifiers) m.Scale(targetScale);
+            if (currentModifier != null) currentModifier.Scale(targetScale);
         }
 
         public void RemoveModifier(Modifier mod)
@@ -553,36 +583,43 @@ namespace NotReaper.Modifier
 
         public void OnValue1Changed()
         {
+            InitializeModifier();
             currentModifier.value1 = value1.GetComponent<LabelSetter>().GetText();
         }
 
         public void OnValue2Changed()
         {
+            InitializeModifier();
             currentModifier.value2 = value2.GetComponent<LabelSetter>().GetText();
         }
 
         public void OnOption1Changed()
         {
+            InitializeModifier();
             currentModifier.option1 = option1.GetComponent<LabelSetter>().GetToggleState();
         }
 
         public void OnOption2Changed()
         {
+            InitializeModifier();
             currentModifier.option2 = option2.GetComponent<LabelSetter>().GetToggleState();
         }
 
         public void OnAmountChanged()
         {
+            InitializeModifier();
             currentModifier.amount = amountSlider.GetComponentInChildren<Slider>().value;
         }
 
         public void OnLeftColorChanged()
         {
+            InitializeModifier();
             currentModifier.leftHandColor = colorPicker.GetComponent<LabelSetter>().GetLeftColor();
         }
 
         public void OnRightColorChanged()
         {
+            InitializeModifier();
             currentModifier.rightHandColor = colorPicker.GetComponent<LabelSetter>().GetRightColor();
         }
 
@@ -591,28 +628,11 @@ namespace NotReaper.Modifier
             //if (selectedModifier is null) OnDropdownValueChanged();
             //else selectedModifier.DeleteModifier();
             ModifierSelectionHandler.Instance.DeleteSelectedModifiers();
-            OnDropdownValueChanged();
+            //OnDropdownValueChanged();
         }
 
         public void OnDropdownValueChanged()
         {
-            /*
-            if (!skipRefresh)
-            {
-                skipRefresh = false;
-                if (selectedModifier is null)
-                {
-                    //ModifierTimeline.Instance.DropMarks();
-                    currentModifier.DropMarks();
-                }
-                else
-                {
-                    Debug.Log("deselecting from dropdown");
-                    DeselectModifier();
-                }
-            }
-            *
-            */
             if (!skipRefresh)
             {
                 ResetCurrentData();
@@ -717,7 +737,19 @@ namespace NotReaper.Modifier
                     option2.SetActive(false);
                     colorPicker.SetActive(false);
                     break;
+                case ModifierType.OverlaySetter:
+                    amountSlider.SetActive(false);
+                    endTickButton.SetActive(false);
+                    value1.GetComponent<LabelSetter>().SetLabelText("Song Info");
+                    value2.GetComponent<LabelSetter>().SetLabelText("Mapper");
+                    value1.SetActive(true);
+                    value2.SetActive(true);
+                    option1.SetActive(false);
+                    option2.SetActive(false);
+                    colorPicker.SetActive(false);
+                    break;
             }
+            SetHintText(type);
             SetMinMax(type);
             if (!skipRefresh)
             {
@@ -727,8 +759,42 @@ namespace NotReaper.Modifier
             skipRefresh = false;
         }
 
-        private void InitializeModifier(ModifierType type, string shorthand)
+        private void SetHintText(ModifierType type)
         {
+            string text;
+            switch (type)
+            {
+                case ModifierType.AimAssist:
+                case ModifierType.Particles:
+                case ModifierType.Speed:
+                    text = "Default: 100";
+                    break;
+                case ModifierType.ArenaBrightness:
+                    text = "Default: 70";
+                    break;
+                case ModifierType.ArenaRotation:
+                case ModifierType.Psychedelia:
+                case ModifierType.PsychedeliaUpdate:
+                case ModifierType.zOffset:
+                    text = "Default: 0";
+                    break;
+                    break;
+                case ModifierType.Fader:
+                    text = "amount = target brightness";
+                    break;
+                default:
+                    text = "";
+                    break;
+            }
+                    
+            amountSlider.GetComponent<LabelSetter>().SetHintText(text);
+        }
+
+        private void InitializeModifier()
+        {
+            if (currentModifier != null) return;
+            ModifierType type = (ModifierType)dropdown.value;
+            string shorthand = GetShorthand(type);
             /*if(currentModifier != null)
             {
                 if (!currentModifier.isCreated)
@@ -792,6 +858,9 @@ namespace NotReaper.Modifier
                 case ModifierType.ArenaChange:
                     sh = "AC";
                     break;
+                case ModifierType.OverlaySetter:
+                    sh = "OS";
+                    break;
                 default:
                     break;
             }
@@ -809,8 +878,8 @@ namespace NotReaper.Modifier
                     slider.SetMaxValue(100f);
                     break;
                 case ModifierType.ArenaRotation:
-                    slider.SetMinValue(0f);
-                    slider.SetMaxValue(1000f);
+                    slider.SetMinValue(-500f);
+                    slider.SetMaxValue(500f);
                     break;
                 case ModifierType.Fader:
                     slider.SetMinValue(0f);
@@ -847,14 +916,23 @@ namespace NotReaper.Modifier
             //currentData = new ModifierData();
             if(currentModifier != null)
             {
+                if (currentModifier.isSelected)
+                {
+                    
+                }
+
                 if (!currentModifier.isCreated)
                 {
                     currentModifier.Delete();
                 }
+                else
+                {
+                    CreateModifier();
+                }
                    
                 currentModifier = null;
             }
-            
+            amountSlider.GetComponent<LabelSetter>().SetSliderValue(0f);
             startTickButton.GetComponent<LabelSetter>().SetLabelText("0");
             endTickButton.GetComponent<LabelSetter>().SetLabelText("0");
             value1.GetComponent<LabelSetter>().SetLabelText("");
@@ -885,7 +963,7 @@ namespace NotReaper.Modifier
              public float[] rightHandColor;
          }*/
 
-        public enum ModifierType { AimAssist = 0, ColorChange = 1, ColorUpdate = 2, ColorSwap = 3, HiddenTelegraphs = 4, InvisibleGuns = 5, Particles = 6, Psychedelia = 7, PsychedeliaUpdate = 8, Speed = 9, zOffset = 10, ArenaRotation = 11, ArenaBrightness = 12, ArenaChange = 13, Fader = 14 }
+        public enum ModifierType { AimAssist = 0, ColorChange = 1, ColorUpdate = 2, ColorSwap = 3, HiddenTelegraphs = 4, InvisibleGuns = 5, Particles = 6, Psychedelia = 7, PsychedeliaUpdate = 8, Speed = 9, zOffset = 10, ArenaRotation = 11, ArenaBrightness = 12, ArenaChange = 13, Fader = 14, OverlaySetter = 15 }
 
     }
 }

@@ -502,6 +502,7 @@ namespace NotReaper.UserInput {
             }
 
             if (Input.GetKeyDown(KeyCode.B)) {
+                if (ModifierHandler.activated || BookmarkMenu.isActive) return;
 				if(isShiftDown) {
 					if(bpmStartTimestamp == null) {
 						bpmStartTimestamp = Timeline.time;
@@ -704,7 +705,7 @@ namespace NotReaper.UserInput {
 
                 }
             }
-            if (Input.GetKeyDown(KeyCode.F8) || Input.GetKeyDown(KeyCode.O))
+            if ((Input.GetKeyDown(KeyCode.F8) || (Input.GetKeyDown(KeyCode.O) && !ModifierHandler.inputFocused)) && !BookmarkMenu.isActive)
             {
                 if (ModifierHandler.activated)
                 {
