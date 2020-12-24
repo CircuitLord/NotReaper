@@ -370,12 +370,14 @@ namespace NotReaper.Modifier
         {
             InitializeModifier();
             currentModifier.option1 = option1.GetComponent<LabelSetter>().GetToggleState();
+            SetHintText(currentModifier.modifierType);
         }
 
         public void OnOption2Changed()
         {
             InitializeModifier();
             currentModifier.option2 = option2.GetComponent<LabelSetter>().GetToggleState();
+            SetHintText(currentModifier.modifierType);
         }
 
         public void OnAmountChanged()
@@ -425,7 +427,7 @@ namespace NotReaper.Modifier
                     break;
                 case ModifierType.ArenaBrightness:
                     amountSlider.SetActive(true);
-                    endTickButton.SetActive(true);
+                    endTickButton.SetActive(false);
                     value1.SetActive(false);
                     value2.SetActive(false);
                     colorPicker.SetActive(false);
@@ -436,7 +438,7 @@ namespace NotReaper.Modifier
                     break;
                 case ModifierType.ArenaRotation:
                     amountSlider.SetActive(true);
-                    endTickButton.SetActive(true);
+                    endTickButton.SetActive(false);
                     value1.SetActive(false);
                     value2.SetActive(false);
                     option2.SetActive(false);
@@ -558,16 +560,46 @@ namespace NotReaper.Modifier
                     text = "Default: 100";
                     break;
                 case ModifierType.ArenaBrightness:
-                    text = "Default: 70";
+                    if(currentModifier != null)
+                    {
+                        if (currentModifier.option2)
+                        {
+                            text = "Amount represents flashes per second";
+                            endTickButton.SetActive(true);
+                            break;
+                        }
+                        if (currentModifier.option1)
+                        {
+                            text = "Amount represents speed";
+                            endTickButton.SetActive(true);
+                            break;
+                        }
+                    }
+                    endTickButton.SetActive(false);
+                    text = "Default: 100";
                     break;
                 case ModifierType.ArenaRotation:
+                    if(currentModifier != null)
+                    {
+                        if (currentModifier.option1)
+                        {
+                            text = "Amount represents rotation speed";
+                            endTickButton.SetActive(true);
+                            break;
+                        }
+                    }
+                    endTickButton.SetActive(false);
+                    text = "Default: 0";
+                    break;
                 case ModifierType.Psychedelia:
                 case ModifierType.PsychedeliaUpdate:
+                    text = "Amount represents cycle speed";
+                    break;
                 case ModifierType.zOffset:
                     text = "Default: 0";
                     break;
                 case ModifierType.Fader:
-                    text = "amount = target brightness";
+                    text = "Fades from current brightness to amount";
                     break;
                 default:
                     text = "";
