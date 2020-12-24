@@ -20,6 +20,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_EFB53AD2:
+        m_Texture: {fileID: 2800000, guid: 0d7b9c541121112428966a21e570eae8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -60,7 +64,7 @@ Material:
     - Scale: 39
     - Strength: 0.5
     - Vector1_24D4E1D8: 2.5
-    - Vector1_6D268C6B: 2.12
+    - Vector1_6D268C6B: 2.63
     - Vector1_9F865091: 2
     - Vector1_AF95E7A8: 100
     - Vector1_C89AA531: 700
