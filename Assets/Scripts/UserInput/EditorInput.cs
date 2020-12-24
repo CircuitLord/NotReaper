@@ -656,7 +656,7 @@ namespace NotReaper.UserInput {
 			}
 
 
-			if (Input.GetKeyDown(InputManager.timelineTogglePlay)) {
+			if (Input.GetKeyDown(InputManager.timelineTogglePlay) && !ModifierHandler.inputFocused && !BookmarkMenu.inputFocused) {
 				timeline.TogglePlayback();
 			}
 
@@ -730,7 +730,7 @@ namespace NotReaper.UserInput {
 			if (Input.GetKeyDown(KeyCode.N)) {
 				SelectSnappingMode(SnappingMode.None);
 			}
-			if (Input.GetKeyDown(KeyCode.M)) {
+			if (Input.GetKeyDown(KeyCode.M) && !ModifierHandler.activated && !BookmarkMenu.isActive) {
 				SelectSnappingMode(SnappingMode.Melee);
 			}
 

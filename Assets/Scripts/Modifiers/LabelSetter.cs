@@ -78,16 +78,19 @@ namespace NotReaper.Modifier
         {
             if (col.Length < 3) col = new float[] { 0f, 0f, 0f };
             Color color = new Color(col[0], col[1], col[2]);
+            colorFieldLeft.color = color;
             float h, s;
             Color.RGBToHSV(color, out h, out s, out _);
             colorSliderHueLeft.value = h;
             colorSliderSaturationLeft.value = s;
+            
         }
 
         public void SetColorSliderRight(float[] col)
         {
             if (col.Length < 3) col = new float[] { 0f, 0f, 0f };
             Color color = new Color(col[0], col[1], col[2]);
+            colorFieldRight.color = color;
             float h, s;
             Color.RGBToHSV(color, out h, out s, out _);
             colorSliderHueRight.value = h;

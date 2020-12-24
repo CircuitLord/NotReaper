@@ -16,13 +16,12 @@ namespace NotReaper.Modifier
     public class ModifierSelectionHandler : MonoBehaviour
     {
         public static ModifierSelectionHandler Instance = null;
-        private List<Modifier> selectedEntries = new List<Modifier>();
-
-        private List<ModifierDTO> copiedEntries = new List<ModifierDTO>();
-
+        public Transform posGetter = null;
         public static bool isPasting = false;
 
-        public Transform posGetter = null;
+
+        private List<Modifier> selectedEntries = new List<Modifier>();
+        private List<ModifierDTO> copiedEntries = new List<ModifierDTO>();
 
         private Camera main;
         private CopyMode mode = CopyMode.Copy;
@@ -49,40 +48,6 @@ namespace NotReaper.Modifier
             mode = CopyMode.Copy;
         }
 
-        public void AddEntry(Modifier entry)
-        {
-            ModifierHandler.Instance.HideWindow(true);
-            if (selectedEntries.Contains(entry))
-            {
-                RemoveEntry(entry);
-                return;
-            }
-            //entry.Select(true);
-            selectedEntries.Add(entry);
-            
-        }
-
-        public void RemoveEntry(Modifier entry)
-        {
-            if (!selectedEntries.Contains(entry)) return;
-            //entry.Select(false);
-            selectedEntries.Remove(entry);
-
-            if(selectedEntries.Count == 0) ModifierHandler.Instance.HideWindow(false);
-        }
-
-        public void RemoveSelectedEntry(TimelineEntry entry)
-        {
-            //if (entry == selectedEntry) selectedEntry = null;
-        }
-
-        public void RemoveAllEntries()
-        {
-            //foreach (TimelineEntry entry in selectedEntries) entry.Select(false);
-            selectedEntries.Clear();
-            ModifierHandler.Instance.HideWindow(false);
-        }
-
         public void DeleteSelectedModifiers()
         {
             for(int i = 0; i < selectedEntries.Count; i++)
@@ -98,7 +63,6 @@ namespace NotReaper.Modifier
         {
             mode = CopyMode.Copy;
             copiedEntries.Clear();
-            //copiedEntries = selectedEntries.ToList();
             copiedEntries = GetDTOList();
         }
 
@@ -123,7 +87,7 @@ namespace NotReaper.Modifier
             {
                list.Add(m.GetDTO());
             }
-            return list;//CloneList(list);
+            return list;
         }
 
         public void PasteCopiedModifiers()
@@ -156,31 +120,22 @@ namespace NotReaper.Modifier
             isPasting = false;
             DeselectAllModifiers();
         }
-
-        private List<ModifierDTO> CloneList<ModifierDTO>(List<ModifierDTO> oldList)
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-            MemoryStream stream = new MemoryStream();
-            formatter.Serialize(stream, oldList);
-            stream.Position = 0;
-            return (List<ModifierDTO>)formatter.Deserialize(stream);
-        }
-
         
         public void DeselectAllModifiers()
         {
-            foreach(Modifier m in selectedEntries)
+            ModifierHandler.Instance.DropCurrentModifier();
+            foreach (Modifier m in selectedEntries)
             {
                 m.Select(false);
             }
             selectedEntries.Clear();
             if(mode == CopyMode.Cut) copiedEntries.Clear();
-            ModifierHandler.Instance.HideWindow(false);
+            ModifierHandler.Instance.HideWindow(false);            
         }
 
         public void SelectModifier(Modifier m, bool singleSelect)
         {
-          
+            ModifierHandler.Instance.DropCurrentModifier();
             if (selectedEntries.Contains(m))
             {
                 if (singleSelect)
@@ -194,7 +149,7 @@ namespace NotReaper.Modifier
                     }
                 }
                 else
-                {
+                {                  
                     selectedEntries.Remove(m);
                     m.Select(false);
                 }                
@@ -215,8 +170,23 @@ namespace NotReaper.Modifier
                 }                
             }
             bool singleActive = selectedEntries.Count < 2;
-            ModifierHandler.Instance.HideWindow(!singleActive);
-            ModifierHandler.Instance.FillData(m, singleActive, selectedEntries.Count == 0);
+            ModifierHandler.Instance.HideWindow(!singleActive || !singleSelect);
+            ModifierHandler.Instance.FillData(m, singleActive && singleSelect, selectedEntries.Count == 0);
+        }
+
+        private void SelectAll()
+        {
+            if (selectedEntries.Count > 0)
+            {
+                ModifierHandler.Instance.DropCurrentModifier();
+                foreach (Modifier m in selectedEntries) m.Select(false);
+            }
+            foreach (Modifier m in ModifierHandler.Instance.modifiers)
+            {
+                selectedEntries.Add(m);
+                m.Select(true);
+            }
+            ModifierHandler.Instance.HideWindow(true);
         }
 
         private void Update()
@@ -237,10 +207,7 @@ namespace NotReaper.Modifier
                     else
                     {
                         SelectModifier(m, true);
-                    }
-                    
-                    
-                   
+                    }                                                           
                 }
             }            
             if (Input.GetKey(KeyCode.LeftControl))
@@ -259,17 +226,11 @@ namespace NotReaper.Modifier
                 }
                 if (Input.GetKeyDown(KeyCode.D))
                 {
-                    if(selectedEntries.Count > 0) SelectModifier(selectedEntries[0], true);
+                    DeselectAllModifiers();
                 }
                 if (Input.GetKeyDown(KeyCode.A))
                 {
-                    if (selectedEntries.Count > 0) SelectModifier(selectedEntries[0], true);
-                    foreach (Modifier m in ModifierHandler.Instance.modifiers)
-                    {
-                        selectedEntries.Add(m);
-                        m.Select(true);
-                    }
-                       
+                    SelectAll();
                 }
             }
             if (Input.GetKeyDown(KeyCode.Delete))

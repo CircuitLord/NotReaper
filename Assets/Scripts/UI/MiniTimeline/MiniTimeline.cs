@@ -183,11 +183,11 @@ namespace NotReaper.UI {
         }
 
 
-        public Bookmark SetBookmark(float miniXPos, float topXPos,  TargetHandType newType, string text, bool useTopXPos, bool fromLoad = false) {
+        public Bookmark SetBookmark(float miniXPos, float topXPos,  TargetHandType newType, string text, Color myColor, BookmarkUIColor uiCol, bool useTopXPos, bool fromLoad = false) {
 			Bookmark bookmarkMini = Instantiate(bookmarkPrefab, new Vector3(0, 0, 0), Quaternion.identity, bookmarksParent).GetComponent<Bookmark>();		
 			Bookmark bookmarkTop = Instantiate(bookmarkPrefab, Timeline.timelineNotesStatic).GetComponent<Bookmark>();
             bookmarkMini.gameObject.layer = 0;
-			Color background;
+			Color background = fromLoad ? myColor : BookmarkColorPicker.selectedColor;
 
 			bookmarkMini.transform.localPosition = new Vector3((float) miniXPos, 0, 0);
             //bookmarkTop.transform.localScale = new Vector3(.05f, .03f, 1f);
@@ -198,26 +198,26 @@ namespace NotReaper.UI {
 				
 				if (newType == TargetHandType.Left) {
 					bookmarkTop.transform.position = new Vector3(0, bookmarkTop.transform.position.y - .85f, 0);
-					background = Color.green;
+					//background = Color.green;
 				}
 				else {
 					bookmarkTop.transform.position = new Vector3(0, bookmarkTop.transform.position.y - .85f, 0);
-					background = Color.red;
+					//background = Color.red;
 				}
 			}
 			else {
 				if (newType == TargetHandType.Left) {
 					bookmarkTop.transform.localPosition = new Vector3(topXPos, bookmarkTop.transform.localPosition.y - .85f, 0);
-					background = Color.green;
+					//background = Color.green;
 				}
 				else {
 					bookmarkTop.transform.localPosition = new Vector3(topXPos, bookmarkTop.transform.localPosition.y - .85f, 0);
-					background = Color.red;
+					//background = Color.red;
 				}
 			}
-            bookmarkMini.GetComponent<SpriteRenderer>().color = background;
-            bookmarkTop.GetComponent<SpriteRenderer>().color = background;
-
+            //bookmarkMini.GetComponent<SpriteRenderer>().color = background;
+            //bookmarkTop.GetComponent<SpriteRenderer>().color = background;
+            
             bookmarkMini.transform.localScale = new Vector3(1f, 1f, 1f);
             if(fromLoad) bookmarkTop.FixScaling();
 
@@ -233,9 +233,9 @@ namespace NotReaper.UI {
 
             //bookmarkTop.glow.transform.localPosition = new Vector3(0f, -.35f, 0f);
             bookmarkTop.Initialize(bookmarkMini, text, newType, miniXPos);
-			
-			//bookmarks.Add(bookmarkMini);
-			bookmarks.Add(bookmarkTop);
+            bookmarkTop.SetColor(background, fromLoad ? uiCol : BookmarkColorPicker.selectedUIColor);
+            //bookmarks.Add(bookmarkMini);
+            bookmarks.Add(bookmarkTop);
 			
             return bookmarkTop;
 		}
@@ -248,7 +248,7 @@ namespace NotReaper.UI {
 
         public void SaveBookmark(Bookmark b)
         {            
-            Timeline.audicaFile.desc.bookmarks.Add(new BookmarkData() { type = b.handType, xPosMini = b.xPosMini, xPosTop = b.transform.localPosition.x, text = b.GetText() });
+            Timeline.audicaFile.desc.bookmarks.Add(new BookmarkData() { type = b.handType, xPosMini = b.xPosMini, xPosTop = b.transform.localPosition.x, text = b.GetText(), color = b.GetColor(), uiColor = (int)b.GetUIColor()});
         }
 
         public void DeleteBookmark()
@@ -304,13 +304,13 @@ namespace NotReaper.UI {
 			bool isShiftDown = false;
 
 
-			if (Input.GetKeyDown(KeyCode.P)) {
+			if (Input.GetKeyDown(KeyCode.P) && !ModifierHandler.inputFocused && !BookmarkMenu.inputFocused) {
 				SetPreviewStartPoint(Timeline.time);
 				Debug.Log(MinitimelineToSeconds(songPreviewIcon.localPosition.x));
 			}
 
 			if (Input.GetKeyDown(KeyCode.U) && !ModifierHandler.activated && !BookmarkMenu.isActive) {
-                SetBookmark(GetXForTheBookmarkThingy(), 0f, EditorInput.selectedHand, "", false, false).Select();
+                SetBookmark(GetXForTheBookmarkThingy(), 0f, EditorInput.selectedHand, "", BookmarkColorPicker.selectedColor, BookmarkColorPicker.selectedUIColor, false, false).Select();
 			}
 
 			if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
@@ -362,5 +362,7 @@ namespace NotReaper.UI {
 		public float xPosMini = 0.0f;
 		public float xPosTop = 0.0f;
         public string text;
+        public Color color;
+        public int uiColor;
 	}
 }

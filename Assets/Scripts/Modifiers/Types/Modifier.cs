@@ -5,11 +5,13 @@ using Newtonsoft.Json;
 using NotReaper.Timing;
 using NotReaper.UI;
 using UnityEngine.UI;
+using static NotReaper.Modifier.ModifierHandler;
+
 namespace NotReaper.Modifier
 {
     public class Modifier : MonoBehaviour
     {
-        [Header("DTO")]
+        [Header("DTO Data")]
         public float amount;
         public float startPosX;
         public float endPosX;
@@ -22,6 +24,7 @@ namespace NotReaper.Modifier
         public float[] leftHandColor;
         public float[] rightHandColor;
 
+        [Header("Data")]
         public ModifierHandler.ModifierType modifierType;
         public string shorthand;
         public QNT_Timestamp startTime;
@@ -34,7 +37,6 @@ namespace NotReaper.Modifier
         public GameObject miniStart;
         public GameObject miniEnd;
         public LineRenderer connector;
-        //private Transform pStart;
 
         [Header("Prefabs")]
         public GameObject startMarkPrefab;
@@ -42,11 +44,11 @@ namespace NotReaper.Modifier
         public GameObject endMarkPrefab;
         public GameObject miniEndPrefab;
         public GameObject connectorPrefab;
-
-        public bool isCreated;
-        public bool isSelected;
         public GameObject glow;
 
+        [Header("Trackers")]
+        public bool isCreated;
+        public bool isSelected;
         public bool startMarkExists => startMark != null;
         public bool endMarkExists => endMark != null;
         public bool miniStartExists => miniStart != null;
@@ -54,14 +56,6 @@ namespace NotReaper.Modifier
         public bool connectorExists => connector != null;
 
         private Vector3 pStartPos = new Vector3(0f, 0.4f, 0f);
-
-        private void Start()
-        {
-            //pStart = new GameObject("Leveler").transform;
-            //pStart.transform.SetParent(Timeline.timelineNotesStatic);
-            //pStart = ModifierSelectionHandler.Instance.posGetter;
-             //5.1f
-        }
 
         public void Show(bool show)
         {
@@ -73,7 +67,7 @@ namespace NotReaper.Modifier
         }
         private float GetStartPosX()
         {
-            return  startMark.transform.localPosition.x;
+            return startMark.transform.localPosition.x;
         }
         private float GetEndPosX()
         {
@@ -147,17 +141,22 @@ namespace NotReaper.Modifier
             if (connectorExists)
             {
                 connector.transform.localScale = connector.GetComponent<Connector>().originalScale;
-                //mc.connector.GetComponent<Connector>().Scale(targetScale);
             }
         }
 
         public void CreateModifierMark(bool startMarker, QNT_Timestamp miniTime, bool usePosX = false)
         {
             GameObject modifierBottom = Instantiate(startMarker ? miniStartPrefab : miniEndPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, MiniTimeline.Instance.bookmarksParent);
-            GameObject modifierTop = Instantiate(startMarker ? startMarkPrefab : endMarkPrefab, usePosX && !ModifierSelectionHandler.isPasting ? Timeline.timelineNotesStatic : null);//ModifierSelectionHandler.isPasting ? Timeline.timelineNotesStatic : null
-            if (startMarker) modifierTop.GetComponent<IconTextSetter>().SetText(shorthand);
+            GameObject modifierTop = Instantiate(startMarker ? startMarkPrefab : endMarkPrefab, usePosX && !ModifierSelectionHandler.isPasting ? Timeline.timelineNotesStatic : null);
+            if (startMarker)
+            {
+                modifierTop.GetComponent<IconTextSetter>().SetText(shorthand);
+            }
+               
             Color background = Color.white;
             background.a = .5f;
+            modifierBottom.layer = 0;
+            Destroy(modifierBottom.GetComponent<Collider2D>());
            
             if (!usePosX)
             {
@@ -198,9 +197,7 @@ namespace NotReaper.Modifier
                 endMark.GetComponent<ClickNotifier>().SetModifier(this);
                 CreateConnector();
                 LookForOtherModifiers(startTime, endTime, LookAtType.End);
-                //UpdateLineBoxCollider();
                 UpdateLinePositions();
-                //currentPair.endMarkTop.transform.SetParent(currentPair.startMarkTop.transform);
             }
         }
 
@@ -246,9 +243,7 @@ namespace NotReaper.Modifier
         public void CreateModifier(bool save = false)
         {       
             CreateConnector();
-            //UpdateLineBoxCollider();
             UpdateLinePositions();
-            //startMark.transform.position = new Vector3(startMark.transform.position.x, startMark.transform.position.y, 0f);
             startMark.GetComponent<SpriteRenderer>().color = Color.white;
             miniStart.GetComponent<SpriteRenderer>().color = Color.white;
 
@@ -270,9 +265,7 @@ namespace NotReaper.Modifier
         public void Delete()
         {
             if (ModifierHandler.Instance.modifiers.Contains(this)) ModifierHandler.Instance.modifiers.Remove(this);
-            
-            
-
+                     
             if (startMarkExists)
             {
                 GameObject.Destroy(startMark.gameObject);
@@ -285,9 +278,7 @@ namespace NotReaper.Modifier
                 GameObject.Destroy(miniEnd.gameObject);
                 GameObject.Destroy(connector.gameObject);
             }
-
-            Destroy(this.gameObject);
-                
+            Destroy(this.gameObject);                
         }
 
         public void UpdateLevel()
@@ -299,8 +290,10 @@ namespace NotReaper.Modifier
 
         private void LookForOtherModifiers(QNT_Timestamp startTick, QNT_Timestamp endTick, LookAtType type)
         {
+            startTick.tick -= 120;
             QNT_Timestamp _endTick = endTick;
             if (endTick.tick == 0) _endTick = startTick;
+            _endTick.tick += 120;
             int lowestLevelFound = 0;
             for (int i = 0; i < Enum.GetNames(typeof(ModifierType)).Length; i++)
             {
@@ -315,7 +308,6 @@ namespace NotReaper.Modifier
                             skip = true;
                             break;
                         }
-
                     }
                     else if (startTick <= mod.startTime && _endTick >= mod.startTime)
                     {
@@ -325,7 +317,7 @@ namespace NotReaper.Modifier
                             break;
                         }
                     }
-                    else if (startTick == mod.endTime || startTick == mod.startTime || endTick == mod.startTime || endTick == mod.endTime)
+                    else if(startTick == mod.endTime && startTick.tick != 0)
                     {
                         if (mod.level == i)
                         {
@@ -345,59 +337,18 @@ namespace NotReaper.Modifier
                 if (skip) continue;
                 lowestLevelFound = i;
                 break;
-            }
-            /*for (int i = Enum.GetNames(typeof(ModifierType)).Length; i >= 0; i--)
-            {
-                bool skip = false;
-                foreach (Modifier mod in ModifierHandler.Instance.modifiers)
-                {
-                    if (mod == this) continue;
-                    if (mod.startTime <= startTick && mod.endTime >= _endTick)
-                    {
-                        if (mod.level == i)
-                        {
-                            skip = true;
-                            break;
-                        }
-
-                    }
-                    else if (startTick <= mod.startTime && _endTick >= mod.startTime)
-                    {
-                        if (mod.level == i)
-                        {
-                            skip = true;
-                            break;
-                        }
-                    }
-                    else if (startTick == mod.endTime || startTick == mod.startTime || endTick == mod.startTime || endTick == mod.endTime)
-                    {
-                        if (mod.level == i)
-                        {
-                            skip = true;
-                            break;
-                        }
-                    }
-                    else if(startTick > mod.startTime && startTick < mod.endTime && _endTick > mod.endTime)
-                    {
-                        if (mod.level == i)
-                        {
-                            skip = true;
-                            break;
-                        }
-                    }
-                }
-                if (skip) continue;
-                lowestLevelFound = i;
-            }*/
+            }           
             if (type == LookAtType.End)
             {
                 if (lowestLevelFound < level) return;
             }
+
             level = lowestLevelFound;
             float addY = level * .3f;
             ModifierSelectionHandler.Instance.posGetter.localPosition = pStartPos;
             Vector3 newPos = ModifierSelectionHandler.Instance.posGetter.localPosition;
             newPos.y -= addY;
+
             if (startMarkExists)
             {                
                 newPos.x = startMark.transform.localPosition.x;              
@@ -433,21 +384,6 @@ namespace NotReaper.Modifier
             }
         }
 
-        /*
-        private void UpdateLineBoxCollider()
-        {
-            UpdateLinePositions();
-            if (connectorExists)
-            {
-
-                BoxCollider boxCollider = connector.GetComponent<BoxCollider>();
-
-                boxCollider.center = new Vector3((connector.GetPosition(1).x + connector.GetPosition(0).x) / 2, connector.GetPosition(0).y, 0f);
-                boxCollider.size = new Vector3(connector.GetPosition(1).x - connector.GetPosition(0).x - .33f, boxCollider.size.y, 0f);
-                boxCollider.enabled = false;
-            }
-        }
-        */
         private void UpdateLinePositions(bool useLocal = false)
         {
             if (!connectorExists) return;
@@ -458,6 +394,7 @@ namespace NotReaper.Modifier
             if (useLocal) newPos.x = connector.GetPosition(1).x;
             connector.SetPosition(1, newPos);
         }
+
         private Gradient GetGradient(float alpha)
         {
             Gradient gradient = new Gradient();

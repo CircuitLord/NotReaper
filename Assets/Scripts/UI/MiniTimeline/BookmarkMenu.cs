@@ -43,6 +43,7 @@ public class BookmarkMenu : MonoBehaviour
     public void Save()
     {
         MiniTimeline.Instance.selectedBookmark.SetText(inputField.text);
+        MiniTimeline.Instance.selectedBookmark.SetColor(BookmarkColorPicker.selectedColor, BookmarkColorPicker.selectedUIColor);
         MiniTimeline.Instance.SaveSelectedBookmark();
         MiniTimeline.Instance.selectedBookmark.Deselect();
         MiniTimeline.Instance.OpenBookmarksMenu("");
@@ -57,4 +58,29 @@ public class BookmarkMenu : MonoBehaviour
     {
         foreach (Bookmark b in MiniTimeline.Instance.bookmarks) b.Scale();
     }
+
+    public void SetColor(BookmarkUIColor uiColor)
+    {
+        switch (uiColor)
+        {
+            case BookmarkUIColor.Blue:
+                BookmarkColorPicker.Instance.SetColorBlue();
+                break;
+            case BookmarkUIColor.Green:
+                BookmarkColorPicker.Instance.SetColorGreen();
+                break;
+            case BookmarkUIColor.Icy:
+                BookmarkColorPicker.Instance.SetColorIcy();
+                break;
+            case BookmarkUIColor.Purple:
+                BookmarkColorPicker.Instance.SetColorPurple();
+                break;
+            case BookmarkUIColor.Red:
+                BookmarkColorPicker.Instance.SetColorRed();
+                break;
+            case BookmarkUIColor.Yellow:
+                BookmarkColorPicker.Instance.SetColorYellow();
+                break;
+        }
+    }  
 }

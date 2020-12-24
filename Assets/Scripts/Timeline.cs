@@ -1366,7 +1366,7 @@ namespace NotReaper {
 
 			if (audicaFile.desc.bookmarks != null) {
 				foreach (BookmarkData data in audicaFile.desc.bookmarks) {
-					miniTimeline.SetBookmark(data.xPosMini, data.xPosTop, data.type, data.text, true, true);
+					miniTimeline.SetBookmark(data.xPosMini, data.xPosTop, data.type, data.text, data.color, (BookmarkUIColor)data.uiColor, true, true);
 				}
             }
 

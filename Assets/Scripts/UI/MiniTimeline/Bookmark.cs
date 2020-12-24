@@ -19,6 +19,7 @@ namespace NotReaper.UI {
         public TargetHandType handType;
         public float xPosMini;
         public double percentBookmark = 0;
+        private BookmarkUIColor myUIColor;
 
         private Vector3 originalScale = new Vector3(0.05f, 0.03f, 1f);
         private bool needsScaling = true;
@@ -35,13 +36,22 @@ namespace NotReaper.UI {
         public void SetText(string _text)
         {
             text.text = _text;
+            UpdateColor();
+        }
+
+        public void UpdateColor()
+        {
+            rend.color = BookmarkColorPicker.selectedColor;
         }
 
         public void Select()
         {
             MiniTimeline.Instance.selectedBookmark = this;
-            isSelected = !isSelected;                     
-
+            isSelected = !isSelected;
+            if (isSelected)
+            {
+                BookmarkMenu.Instance.SetColor(myUIColor);
+            }
             MiniTimeline.Instance.OpenBookmarksMenu(text.text);
         }
 
@@ -92,6 +102,22 @@ namespace NotReaper.UI {
             }
         }
 
+        public Color GetColor()
+        {
+            return rend.color;
+        }
+
+        public BookmarkUIColor GetUIColor()
+        {
+            return myUIColor;
+        }
+
+        public void SetColor(Color col, BookmarkUIColor uiCol)
+        {
+            rend.color = col;
+            mini.GetComponent<SpriteRenderer>().color = col;
+            myUIColor = uiCol;
+        }
     }
 
 }

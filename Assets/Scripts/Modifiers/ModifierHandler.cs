@@ -35,14 +35,11 @@ namespace NotReaper.Modifier
         [SerializeField] private GameObject createModifierButton;
         [SerializeField] private GameObject modifierPrefab;
 
-        //public List<ModifierData> modifierData = new List<ModifierData>();
         public List<Modifier> modifiers = new List<Modifier>();
         private Modifier currentModifier;
-       // private ModifierData currentData;
 
 
         private LabelSetter slider;
-        private TimelineEntry selectedModifier;
         private Vector3 activatePosition = new Vector3(290.6859f, -36.6f, 0f);
         private bool init = false;
         private bool skipRefresh = false;
@@ -59,10 +56,6 @@ namespace NotReaper.Modifier
                 Debug.LogError("Trying to create another Modifier instance.");
                 return;
             }
-
-            //currentModifier = new Modifier();
-            //currentData.type = ModifierType.AimAssist;
-            //currentData.shorthand = "AA";
             value1.SetActive(false);
             value2.SetActive(false);
             option1.SetActive(false);
@@ -70,6 +63,16 @@ namespace NotReaper.Modifier
             colorPicker.SetActive(false);
             slider = amountSlider.GetComponent<LabelSetter>();
             
+        }
+
+        public void DropCurrentModifier()
+        {
+            if (currentModifier is null) return;
+            if (!currentModifier.isCreated) return;
+
+
+            modifiers.Add(currentModifier);
+            currentModifier = null;
         }
 
         public void CleanUp()
@@ -112,7 +115,6 @@ namespace NotReaper.Modifier
             {
                 if (MiniTimeline.Instance != null)
                 {
-                    //ModifierTimeline.Instance.ShowModifiers(true);
                     ShowModifiers(true);
                     Timeline.OptimizeInvisibleTargets();
                 }
@@ -129,7 +131,6 @@ namespace NotReaper.Modifier
             {
                 if (MiniTimeline.Instance != null)
                 {
-                    //ModifierTimeline.Instance.ShowModifiers(false);
                     ShowModifiers(false);
                     Timeline.OptimizeInvisibleTargets();
                 }
@@ -143,8 +144,6 @@ namespace NotReaper.Modifier
                 {
                     activatePosition = modifierWindow.transform.localPosition;
                 }
-
-                //modifierWindow.transform.localPosition = new Vector3(-2700, 0f, 0f);
                 modifierWindow.SetActive(false);
             }
         }
@@ -156,13 +155,12 @@ namespace NotReaper.Modifier
 
         public IEnumerator IUpdateLevels()
         {
+            modifiers.Sort((mod1, mod2) => mod1.startTime.tick.CompareTo(mod2.startTime.tick));
             foreach (Modifier m in modifiers)
             {
                 m.UpdateLevel();
                 yield return new WaitForSeconds(.01f);
-            }
-            
-               
+            }                          
         }
 
         public IEnumerator LoadModifiers(List<ModifierDTO> modList, bool fromLoad = false)
@@ -170,11 +168,7 @@ namespace NotReaper.Modifier
             if (currentModifier != null)
             {
                 CreateModifier();
-                //currentModifier.Select(false);
-                //currentModifier = null;
             }
-            //yield return new WaitForSecondsRealtime(.1f);
-            //if (fromLoad) yield return new WaitForSeconds(1f);
             foreach (ModifierDTO dto in modList)
             {
                 Modifier m = Instantiate(modifierPrefab).GetComponent<Modifier>();
@@ -185,82 +179,16 @@ namespace NotReaper.Modifier
             ModifierSelectionHandler.isPasting = false;
             yield return new WaitForSeconds(.001f);
             ShowModifiers(activated);
-            //yield return null;
         }
 
         public void LoadModifier(Modifier modifier)
         {
-
             currentModifier = modifier;
             SetStartTick(modifier.startTime);
             SetEndTick(modifier.endTime);
-            //CreateLoadedModifier();
             CreateModifier(false);
-            /*
-            ModifierType type;
-            Enum.TryParse(modifier.type, true, out type);
-
-            currentData.amount = modifier.amount;
-            currentData.startTick = new QNT_Timestamp((uint)modifier.startTick);
-            currentData.endTick = new QNT_Timestamp((uint)modifier.endTick);
-            currentData.type = type;
-            currentData.startPosX = modifier.startPosX;
-            currentData.endPosX = modifier.endPosX;
-            SetShorthand(currentData.type);
-
-            switch (type)
-            {
-                case ModifierType.ArenaBrightness:
-                    ArenaBrightness ab = modifier as ArenaBrightness;
-                    currentData.option1 = ab.continuous;
-                    currentData.option2 = ab.strobo;
-                    break;
-                case ModifierType.ArenaRotation:
-                    ArenaRotation ar = modifier as ArenaRotation;
-                    currentData.option1 = ar.continuous;
-                    break;
-                case ModifierType.ColorChange:
-                    ColorChange cc = modifier as ColorChange;
-                    currentData.leftHandColor = cc.leftHandColor;
-                    currentData.rightHandColor = cc.rightHandColor;
-                    break;
-                case ModifierType.ColorUpdate:
-                    ColorUpdate cu = modifier as ColorUpdate;
-                    currentData.leftHandColor = cu.leftHandColor;
-                    currentData.rightHandColor = cu.rightHandColor;
-                    break;
-                case ModifierType.zOffset:
-                    ZOffset zo = modifier as ZOffset;
-                    currentData.value1 = zo.transitionNumberOfTargets.ToString();
-                    break;
-                case ModifierType.ArenaChange:
-                    ArenaChange ac = modifier as ArenaChange;
-                    currentData.value1 = ac.arena1;
-                    currentData.value2 = ac.arena2;
-                    currentData.option1 = ac.preload;
-                    break;
-                default:
-                    break;
-            }
-            SetStartTick(new QNT_Timestamp((ulong)modifier.startTick));
-            SetEndTick(new QNT_Timestamp((ulong)modifier.endTick));
-            CreateLoadedModifier();*/
         }
 
-        private void CreateLoadedModifier()
-        {/*
-            Modifier m = CreateModifierType();
-            m.startPosX = currentData.startPosX;
-            m.endPosX = currentData.endPosX;
-            currentData.modifier = m;
-            modifiers.Add(m);
-            modifierData.Add(currentData);
-            ModifierTimeline.Instance.CreateModifier(currentData, true);
-            Timeline.audicaFile.modifiers.modifiers = modifiers;
-            currentData = new ModifierData();
-            OnDropdownValueChanged();
-            */
-        }
 
         public List<ModifierDTO> MapToDTO()
         {
@@ -274,37 +202,18 @@ namespace NotReaper.Modifier
 
         public void CreateModifier(bool save = false)
         {
-            //if (!currentData.startSet) return;
+            if (currentModifier is null) return;
             if (!currentModifier.startSet) return;
-            //if (!ModifierTimeline.Instance.CanCreateModifier(currentData.type, currentData.startTick)) return;
             if (!CanCreateModifier(currentModifier.modifierType, currentModifier.startTime)) return;
-            //modifierData.Add(currentData);           
-            //Modifier m = CreateModifierType();
-            //m.startPosX = ModifierTimeline.Instance.GetStartPosX();
-            //m.endPosX = ModifierTimeline.Instance.GetEndPosX();
-            //currentData.modifier = m;
-            //modifiers.Add(m);
-            
-            //ModifierTimeline.Instance.CreateModifier(currentData);
             currentModifier.CreateModifier(save);
             modifiers.Add(currentModifier);
-            //currentData = new ModifierData();
             currentModifier = null;
-            OnDropdownValueChanged();
-            /*if (selectedModifier is null)
-            {
-                OnDropdownValueChanged();
-            }
-            else
-            {
-                DeselectModifier(false, true);
-            }*/
-           
+            OnDropdownValueChanged();           
         }
+
         public bool CanCreateModifier(ModifierType type, QNT_Timestamp tick)
         {
             if (type != ModifierType.ColorUpdate && type != ModifierType.PsychedeliaUpdate) return true;
-
             foreach (Modifier m in modifiers)
             {
                 if (m.startTime < tick && m.endTime > tick)
@@ -321,7 +230,6 @@ namespace NotReaper.Modifier
                     else if (m.modifierType == ModifierType.Psychedelia && type == ModifierType.PsychedeliaUpdate) return true;
                 }
             }
-
             return false;
         }
 
@@ -330,7 +238,7 @@ namespace NotReaper.Modifier
             return dropdown.IsExpanded;
         }
         
-        public void FillData(Modifier modifier, bool shouldFill, bool isEmpty) //was called SelectModifier
+        public void FillData(Modifier modifier, bool shouldFill, bool isEmpty)
         {
              if (!shouldFill || isEmpty)
              {
@@ -344,32 +252,13 @@ namespace NotReaper.Modifier
                 }                
                  return;
              }
-            //OnDropdownValueChanged();
-            /*if (entry == selectedModifier)
-            {
-                DeselectModifier();
-                return;
-            }*/
-            /*
-            else if (selectedModifier != null)
-            {
-                DeselectModifier(true);
-            }*/
-            /*
-            modifiers.Remove(container.data.modifier);
-            Timeline.audicaFile.modifiers.modifiers = modifiers;
-            ModifierTimeline.Instance.SelectModifier(container);
-            selectedModifier = entry;
-            skipRefresh = true;
-            dropdown.value = (int)container.data.type;
-            */
+
             int modType = (int)modifier.modifierType;
             skipRefresh = dropdown.value != modType;
             currentModifier = modifier;
             modifiers.Remove(modifier);
             dropdown.value = modType;
-            //OnDropdownValueChanged();
-            //entry.Select(true);
+
             amountSlider.GetComponent<LabelSetter>().SetSliderValue(currentModifier.amount);
             value1.GetComponent<LabelSetter>().SetInputText(currentModifier.value1);
             value2.GetComponent<LabelSetter>().SetInputText(currentModifier.value2);
@@ -380,86 +269,7 @@ namespace NotReaper.Modifier
             createModifierButton.GetComponent<LabelSetter>().SetLabelText("Update Modifier");
             colorPicker.GetComponent<LabelSetter>().SetColorSliderLeft(currentModifier.leftHandColor);
             colorPicker.GetComponent<LabelSetter>().SetColorSliderRight(currentModifier.rightHandColor);
-            //currentData = container.data;
         }
-    
-        public void DeselectModifier(bool swap = false, bool fromCreate = false)
-        {
-           /* if (selectedModifier is null) return;
-            selectedModifier.Select(false);
-            selectedModifier = null;
-            currentData = new ModifierData();
-            if (!fromCreate) ModifierTimeline.Instance.DropMarksSave();
-            if (swap) return;
-            OnDropdownValueChanged();*/
-        }
-
-        /*private Modifier CreateModifierType()
-        {
-            Modifier m = null;
-            float st = currentData.startTick.tick;
-            float et = currentData.endTick.tick;
-            float amount = currentData.amount;
-            string type = currentData.type.ToString();
-            string val1 = currentData.value1;
-            string val2 = currentData.value2;
-            bool opt1 = currentData.option1;
-            bool opt2 = currentData.option2;
-            float[] colLeft = currentData.leftHandColor;
-            float[] colRight = currentData.rightHandColor;
-
-            switch (currentData.type)
-            {
-                case ModifierType.AimAssist:
-                    m = new AimAssistChange(type, st, et, amount);
-                    break;
-                case ModifierType.ArenaBrightness:
-                    m = new ArenaBrightness(type, st, et, amount, opt1, opt2);
-                    break;
-                case ModifierType.ArenaRotation:
-                    m = new ArenaRotation(type, st, et, amount, opt1);
-                    break;
-                case ModifierType.ColorChange:
-                    m = new ColorChange(type, st, et, colLeft, colRight);
-                    break;
-                case ModifierType.ColorSwap:
-                    m = new ColorSwap(type, st, et);
-                    break;
-                case ModifierType.ColorUpdate:
-                    m = new ColorUpdate(type, st, colLeft, colRight);
-                    break;
-                case ModifierType.Fader:
-                    m = new Fader(type, st, et, amount);
-                    break;
-                case ModifierType.HiddenTelegraphs:
-                    m = new HiddenTelegraphs(type, st, et);
-                    break;
-                case ModifierType.InvisibleGuns:
-                    m = new InvisibleGuns(type, st, et);
-                    break;
-                case ModifierType.Particles:
-                    m = new Particles(type, st, et, amount);
-                    break;
-                case ModifierType.Psychedelia:
-                    m = new Psychedelia(type, st, et, amount);
-                    break;
-                case ModifierType.PsychedeliaUpdate:
-                    m = new PsychedeliaUpdate(type, st, amount);
-                    break;
-                case ModifierType.Speed:
-                    m = new SpeedChange(type, st, et, amount);
-                    break;
-                case ModifierType.zOffset:
-                    float f = 0f;
-                    float.TryParse(val1, out f);
-                    m = new ZOffset(type, st, et, amount, f);
-                    break;
-                case ModifierType.ArenaChange:
-                    m = new ArenaChange(type, st, et, val1, val2, opt1);
-                    break;
-            }
-            return m;
-        }*/
 
         private void SetStartTick(QNT_Timestamp tick)
         {
@@ -479,17 +289,14 @@ namespace NotReaper.Modifier
             currentModifier.startTime = new QNT_Timestamp(tick);
             if (tick != 0 && tick >= currentModifier.endTime.tick && currentModifier.endTime.tick != 0)
             {
-
-                //currentModifier.startTime = new QNT_Timestamp(tick);
                 UpdateEndTick(tick);
                 startTickButton.GetComponent<LabelSetter>().SetLabelText(tick.ToString());
                 currentModifier.UpdateMark(Modifier.UpdateType.UpdateStart, tick);
             }
             else
             {
-                //currentModifier.startTime = new QNT_Timestamp(tick);
                 startTickButton.GetComponent<LabelSetter>().SetLabelText(tick.ToString());
-                if (currentModifier.startSet && currentModifier.endTime != currentModifier.startTime)
+                if (currentModifier.startSet)
                 {
                     UpdateEndTick(tick);
                     currentModifier.UpdateMark(Modifier.UpdateType.MoveStart, tick);
@@ -502,33 +309,6 @@ namespace NotReaper.Modifier
 
             }
             currentModifier.startSet = true;           
-
-            /*
-            if (tick != 0 && tick >= currentModifier.endTime.tick && currentModifier.endTime.tick != 0)
-            {
-
-                currentModifier.startTime = new QNT_Timestamp(tick);
-                UpdateEndTick(tick);
-                startTickButton.GetComponent<LabelSetter>().SetLabelText(tick.ToString());
-                ModifierTimeline.Instance.UpdateMark(ModifierTimeline.UpdateType.UpdateStart, tick);
-            }
-            else
-            {
-                currentData.startTick = new QNT_Timestamp(tick);
-                startTickButton.GetComponent<LabelSetter>().SetLabelText(tick.ToString());
-                if (currentData.startSet && currentData.endTick != currentData.startTick)
-                {
-                    ModifierTimeline.Instance.UpdateMark(ModifierTimeline.UpdateType.MoveStart, tick);
-                }
-                else
-                {
-                    UpdateEndTick(tick);
-                    ModifierTimeline.Instance.SetModifierMark(currentData.type, currentData.startTick, currentData.shorthand, true, currentData.startPosX, false);
-                }
-
-            }
-            currentData.startSet = true;
-            */
         }
 
         private void UpdateEndTick(float tick)
@@ -572,13 +352,6 @@ namespace NotReaper.Modifier
         {
             foreach (Modifier m in modifiers) m.Scale(targetScale);
             if (currentModifier != null) currentModifier.Scale(targetScale);
-        }
-
-        public void RemoveModifier(Modifier mod)
-        {
-            modifiers.Remove(mod);
-            selectedModifier = null;
-            OnDropdownValueChanged();
         }
 
         public void OnValue1Changed()
@@ -625,21 +398,15 @@ namespace NotReaper.Modifier
 
         public void DeleteModifier()
         {
-            //if (selectedModifier is null) OnDropdownValueChanged();
-            //else selectedModifier.DeleteModifier();
             ModifierSelectionHandler.Instance.DeleteSelectedModifiers();
-            //OnDropdownValueChanged();
+            currentModifier = null;
+            OnDropdownValueChanged();
         }
 
         public void OnDropdownValueChanged()
         {
-            if (!skipRefresh)
-            {
-                ResetCurrentData();
-            }
+            if (!skipRefresh) ResetCurrentData();
            
-
-            //currentData.type = (ModifierType)dropdown.value;
             ModifierType type = (ModifierType)dropdown.value;
             switch (type)
             {
@@ -751,12 +518,33 @@ namespace NotReaper.Modifier
             }
             SetHintText(type);
             SetMinMax(type);
-            if (!skipRefresh)
-            {
-                createModifierButton.GetComponent<LabelSetter>().SetLabelText("Create Modifier");
-                //InitializeModifier(type, GetShorthand(type));
-            }
+            if (!skipRefresh) createModifierButton.GetComponent<LabelSetter>().SetLabelText("Create Modifier");
+           
             skipRefresh = false;
+        }
+
+        private void PickLastUsedColor()
+        {
+            if (currentModifier.modifierType != ModifierType.ColorChange && currentModifier.modifierType != ModifierType.ColorUpdate) return;
+            Modifier closestColorModifier = null;
+            foreach(Modifier m in modifiers)
+            {
+                if (m.modifierType != ModifierType.ColorChange && m.modifierType != ModifierType.ColorUpdate) continue;
+                if (m.startTime >= Timeline.time) continue;
+                if(closestColorModifier is null)
+                {
+                    closestColorModifier = m;
+                    continue;
+                }
+                if (closestColorModifier.startTime < m.startTime) closestColorModifier = m;
+            }
+            if(closestColorModifier != null)
+            {
+                currentModifier.leftHandColor = closestColorModifier.leftHandColor;
+                currentModifier.rightHandColor = closestColorModifier.rightHandColor;
+                colorPicker.GetComponent<LabelSetter>().SetColorSliderLeft(currentModifier.leftHandColor);
+                colorPicker.GetComponent<LabelSetter>().SetColorSliderRight(currentModifier.rightHandColor);
+            }
         }
 
         private void SetHintText(ModifierType type)
@@ -778,34 +566,26 @@ namespace NotReaper.Modifier
                 case ModifierType.zOffset:
                     text = "Default: 0";
                     break;
-                    break;
                 case ModifierType.Fader:
                     text = "amount = target brightness";
                     break;
                 default:
                     text = "";
                     break;
-            }
-                    
+            }                   
             amountSlider.GetComponent<LabelSetter>().SetHintText(text);
         }
 
         private void InitializeModifier()
-        {
+        {            
             if (currentModifier != null) return;
+                
             ModifierType type = (ModifierType)dropdown.value;
             string shorthand = GetShorthand(type);
-            /*if(currentModifier != null)
-            {
-                if (!currentModifier.isCreated)
-                {
-                    currentModifier.Delete();
-                    currentModifier = null;
-                }
-            }*/
             currentModifier = Instantiate(modifierPrefab).GetComponent<Modifier>();
             currentModifier.modifierType = type;
             currentModifier.shorthand = shorthand;
+            PickLastUsedColor();
         }
 
         private string GetShorthand(ModifierType type)
@@ -864,7 +644,6 @@ namespace NotReaper.Modifier
                 default:
                     break;
             }
-            //currentData.shorthand = sh;
             return sh;
         }
 
@@ -913,14 +692,8 @@ namespace NotReaper.Modifier
 
         private void ResetCurrentData()
         {
-            //currentData = new ModifierData();
             if(currentModifier != null)
             {
-                if (currentModifier.isSelected)
-                {
-                    
-                }
-
                 if (!currentModifier.isCreated)
                 {
                     currentModifier.Delete();
@@ -935,33 +708,11 @@ namespace NotReaper.Modifier
             amountSlider.GetComponent<LabelSetter>().SetSliderValue(0f);
             startTickButton.GetComponent<LabelSetter>().SetLabelText("0");
             endTickButton.GetComponent<LabelSetter>().SetLabelText("0");
-            value1.GetComponent<LabelSetter>().SetLabelText("");
-            value2.GetComponent<LabelSetter>().SetLabelText("");
+            value1.GetComponent<LabelSetter>().SetInputText("");
+            value2.GetComponent<LabelSetter>().SetInputText("");
             option1.GetComponent<LabelSetter>().SetToggleState(false);
             option2.GetComponent<LabelSetter>().SetToggleState(false);
-            colorPicker.GetComponent<LabelSetter>().SetColorSliderLeft(new float[] { 0f, 0f, 0f });
-            colorPicker.GetComponent<LabelSetter>().SetColorSliderRight(new float[] { 0f, 0f, 0f });
         }
-
-        /* [Serializable]
-         public struct ModifierData
-         {
-             public ModifierType type;
-             public string shorthand;
-             public QNT_Timestamp startTick;
-             public QNT_Timestamp endTick;
-             public float amount;
-             public string value1;
-             public string value2;
-             public bool option1;
-             public bool option2;
-             public bool startSet;
-             public Modifier modifier;
-             public float startPosX;
-             public float endPosX;
-             public float[] leftHandColor;
-             public float[] rightHandColor;
-         }*/
 
         public enum ModifierType { AimAssist = 0, ColorChange = 1, ColorUpdate = 2, ColorSwap = 3, HiddenTelegraphs = 4, InvisibleGuns = 5, Particles = 6, Psychedelia = 7, PsychedeliaUpdate = 8, Speed = 9, zOffset = 10, ArenaRotation = 11, ArenaBrightness = 12, ArenaChange = 13, Fader = 14, OverlaySetter = 15 }
 
