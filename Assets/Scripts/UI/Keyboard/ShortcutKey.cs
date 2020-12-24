@@ -12,6 +12,8 @@ namespace NotReaper.Keyboard
         public bool selectableNormal = true;
         public bool selectableCtrl = false;
         public bool selectableShift = false;
+        public bool isCtrlKey = false;
+        public bool isShiftKey = false;
         [HideInInspector] public bool selectable = true;
         private GameObject textBox;
 

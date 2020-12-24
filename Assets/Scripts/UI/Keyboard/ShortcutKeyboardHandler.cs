@@ -6,31 +6,50 @@ namespace NotReaper.Keyboard
 {
     public class ShortcutKeyboardHandler : MonoBehaviour
     {
+        public static ShortcutKeyboardHandler Instance = null;
         public ShortcutInfo shortcutMenu;
         private ShortcutKey[] keys;
         private bool showCtrl = false;
         private bool showShift = false;
+        private Camera main;
         private void Start()
         {
+            if (Instance is null) Instance = this;
+            else
+            {
+                Debug.LogWarning("Trying to create second ShortcutKeyboardHandler instance.");
+                return;
+            }
+            main = Camera.main;
             keys = GetComponentsInChildren<ShortcutKey>();
         }
 
         private void Update()
         {
             if (!shortcutMenu.isOpened) return;
-
+            
             if (Input.GetKeyDown(KeyCode.LeftControl))
             {
-                showCtrl = !showCtrl;
-                showShift = false;
-                EnableKeys(showCtrl, OfType.Ctrl);
+                SelectCtrlKey();
             }
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
-                showShift = !showShift;
-                showCtrl = false;
-                EnableKeys(showShift, OfType.Shift);
+                SelectShiftKey();
             }
+        }
+
+        public void SelectCtrlKey()
+        {
+            showCtrl = !showCtrl;
+            showShift = false;
+            EnableKeys(showCtrl, OfType.Ctrl);
+        }
+
+        public void SelectShiftKey()
+        {
+            showShift = !showShift;
+            showCtrl = false;
+            EnableKeys(showShift, OfType.Shift);
         }
 
         private void EnableKeys(bool enable, OfType type)
