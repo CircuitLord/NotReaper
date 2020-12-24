@@ -404,6 +404,12 @@ namespace NotReaper.UserInput {
 				return;
 			}
 
+            if (ModifierInfo.isOpened)
+            {
+                inUI = true;
+                return;
+            }
+
 			switch (selectedMode) {
 				case EditorMode.Compose:
 					inUI = false;
@@ -549,6 +555,11 @@ namespace NotReaper.UserInput {
 				}
 			}
 
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                if (ModifierInfo.isOpened) ModifierInfo.Instance.hide();
+            }
+
 
 			bool wasInUI = inUI;
 			FigureOutIsInUI();
@@ -566,6 +577,11 @@ namespace NotReaper.UserInput {
 					shortcutMenu.show();
 				}
 			}
+
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                if (!ModifierInfo.isOpened) ModifierInfo.Instance.show();
+            }
 
 			if(Input.GetKeyDown(KeyCode.F5)) {
 				if(!addOrTrimAudioWindow.gameObject.activeSelf) {
@@ -705,7 +721,7 @@ namespace NotReaper.UserInput {
 
                 }
             }
-            if ((Input.GetKeyDown(KeyCode.F8) || (Input.GetKeyDown(KeyCode.O) && !ModifierHandler.inputFocused)) && !BookmarkMenu.isActive)
+            if ((Input.GetKeyDown(KeyCode.O) && !ModifierHandler.inputFocused) && !BookmarkMenu.isActive)
             {
                 if (ModifierHandler.activated)
                 {

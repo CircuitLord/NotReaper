@@ -213,6 +213,10 @@ namespace NotReaper.Modifier
 
         public bool CanCreateModifier(ModifierType type, QNT_Timestamp tick)
         {
+            if(type == ModifierType.Speed || type == ModifierType.zOffset || type == ModifierType.Fader)
+            {
+                if (currentModifier.endTime.tick == 0) return false;
+            }
             if (type != ModifierType.ColorUpdate && type != ModifierType.PsychedeliaUpdate) return true;
             foreach (Modifier m in modifiers)
             {
