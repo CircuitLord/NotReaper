@@ -237,7 +237,7 @@ namespace NotReaper.Modifier
 
         public bool CanCreateModifier(ModifierType type, QNT_Timestamp tick)
         {
-            if(type == ModifierType.Speed || type == ModifierType.zOffset || type == ModifierType.Fader)
+            if(type == ModifierType.Speed || type == ModifierType.Fader)
             {
                 if (currentModifier.endTime.tick == 0) return false;
             }
@@ -743,7 +743,7 @@ namespace NotReaper.Modifier
                     break;
                 case ModifierType.zOffset:
                     slider.SetMinValue(-100f);
-                    slider.SetMaxValue(300f);
+                    slider.SetMaxValue(500f);
                     break;
                 case ModifierType.ColorChange:
                 case ModifierType.ColorUpdate:

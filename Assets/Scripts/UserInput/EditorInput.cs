@@ -557,7 +557,7 @@ namespace NotReaper.UserInput {
 
             if (Input.GetKeyDown(KeyCode.F8))
             {
-                if (ModifierInfo.isOpened) ModifierInfo.Instance.hide();
+                if (ModifierInfo.isOpened) ModifierInfo.Instance.Hide();
             }
 
 
@@ -580,7 +580,7 @@ namespace NotReaper.UserInput {
 
             if (Input.GetKeyDown(KeyCode.F8))
             {
-                if (!ModifierInfo.isOpened) ModifierInfo.Instance.show();
+                if (!ModifierInfo.isOpened) ModifierInfo.Instance.Show();
             }
 
 			if(Input.GetKeyDown(KeyCode.F5)) {
