@@ -63,8 +63,8 @@ namespace NotReaper.UI {
             if (Timeline.desc.title != null) titleField.text = Timeline.desc.title;
             if (Timeline.desc.artist != null) artistField.text = Timeline.desc.artist;
             if (Timeline.desc.author != null) mapperField.text = Timeline.desc.author;
-
             if (Timeline.desc.moggSong != null) moggSongVolume.value = Timeline.audicaFile.mainMoggSong.volume.l;
+
 
             diffDropdown.value = difficultyManager.loadedIndex;
             ChangeSelectedDifficulty(difficultyManager.loadedIndex);

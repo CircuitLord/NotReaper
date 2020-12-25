@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,7 +34,7 @@ namespace NotReaper.Models
                 else if (split[2].Contains("   ")) values = split[2].Split(new string[] { "   " }, StringSplitOptions.None);
                 else if (split[2].Contains("  ")) values = split[2].Split(new string[] { "  " }, StringSplitOptions.None);
                 else values = split[2].Split(new string[] { " " }, StringSplitOptions.None);
-                return new MoggVol(float.Parse(values[0]), float.Parse(values[1]));
+                return new MoggVol(float.Parse(values[0], new CultureInfo("en-US")), float.Parse(values[1], new CultureInfo("en-US")));
             }
             catch (Exception)
             {
@@ -54,8 +55,8 @@ namespace NotReaper.Models
                 if (exportString[i].Contains("(vols")) volIndex = i;
                 if (exportString[i].Contains("(pan")) panIndex = i;
             }
-            exportString[volIndex] = $"(vols ({volume.l.ToString("n2")}   {volume.r.ToString("n2")}))";
-            exportString[panIndex] = $"(pans ({pan.l.ToString("n2")}   {pan.r.ToString("n2")}))";
+            exportString[volIndex] = $"(vols ({volume.l.ToString("n2", new CultureInfo("en-US"))}   {volume.r.ToString("n2", new CultureInfo("en-US"))}))";
+            exportString[panIndex] = $"(pans ({pan.l.ToString("n2", new CultureInfo("en-US"))}   {pan.r.ToString("n2", new CultureInfo("en-US"))}))";
             return string.Join(Environment.NewLine, exportString);
         }
 
