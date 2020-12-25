@@ -551,7 +551,7 @@ namespace NotReaper.UserInput {
 
 			if(Input.GetKeyDown(KeyCode.F1)) {
 				if(shortcutMenu.isOpened) {
-					shortcutMenu.hide();
+					shortcutMenu.Hide();
 				}
 			}
 
@@ -574,7 +574,7 @@ namespace NotReaper.UserInput {
 
 			if(Input.GetKeyDown(KeyCode.F1)) {
 				if(!shortcutMenu.isOpened) {
-					shortcutMenu.show();
+					shortcutMenu.Show();
 				}
 			}
 

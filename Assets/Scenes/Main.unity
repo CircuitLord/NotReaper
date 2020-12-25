@@ -23299,6 +23299,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4854768570276366757, guid: e64fc2121988d744fa1bc26855185884,
+        type: 3}
+      propertyPath: m_text
+      value: <b>Play</b> the Song with Metronome
+      objectReference: {fileID: 0}
     - target: {fileID: 4854768570317619254, guid: e64fc2121988d744fa1bc26855185884,
         type: 3}
       propertyPath: m_RootOrder
@@ -23538,6 +23543,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9048688953993024966, guid: e64fc2121988d744fa1bc26855185884,
+        type: 3}
+      propertyPath: selectableCtrl
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9063702628039265728, guid: e64fc2121988d744fa1bc26855185884,
         type: 3}
@@ -108169,7 +108179,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1426037692}
         m_TargetAssemblyTypeName: ShortcutInfo, Assembly-CSharp
-        m_MethodName: show
+        m_MethodName: Show
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -120489,6 +120499,11 @@ PrefabInstance:
     - target: {fileID: -4698102262073806807, guid: bd44e65c21f799d43a24365a5a6fb901,
         type: 3}
       propertyPath: selectable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4698102262073806807, guid: bd44e65c21f799d43a24365a5a6fb901,
+        type: 3}
+      propertyPath: selectableNormal
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 215174466, guid: bd44e65c21f799d43a24365a5a6fb901, type: 3}
