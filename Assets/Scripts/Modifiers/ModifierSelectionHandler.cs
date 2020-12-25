@@ -141,12 +141,14 @@ namespace NotReaper.Modifier
         public void SelectModifier(Modifier m, bool singleSelect)
         {
             ModifierHandler.Instance.DropCurrentModifier();
+            if (selectedEntries.Count == 0) singleSelect = true;
             if (selectedEntries.Contains(m))
             {
                 if (singleSelect)
                 {
-                    DeselectAllModifiers();
                     bool reselect = selectedEntries.Count > 1;
+                    DeselectAllModifiers();
+                   
                     if (reselect)
                     {
                         selectedEntries.Add(m);
@@ -176,6 +178,7 @@ namespace NotReaper.Modifier
             }
             bool singleActive = selectedEntries.Count < 2;
             ModifierHandler.Instance.HideWindow(!singleActive || !singleSelect);
+            if (selectedEntries.Count == 0) ModifierHandler.Instance.HideWindow(false);
             ModifierHandler.Instance.FillData(m, singleActive && singleSelect, selectedEntries.Count == 0);
         }
 
@@ -214,6 +217,10 @@ namespace NotReaper.Modifier
                         SelectModifier(m, true);
                     }                                                           
                 }
+                else if (Input.GetKey(KeyCode.LeftControl))
+                {
+                    DeselectAllModifiers();
+                }
             }            
             if (Input.GetKey(KeyCode.LeftControl))
             {
@@ -244,14 +251,12 @@ namespace NotReaper.Modifier
                     selectionBox.transform.SetParent(Timeline.timelineNotesStatic);
                     Vector3 newPos = selectionBox.transform.localPosition;
                     newPos.x = dragStartPos.x;
-                    selectionBox.transform.localPosition = newPos;
-                    
-                    
-                   
+                    selectionBox.transform.localPosition = newPos;                                                          
                 }
                 if (Input.GetMouseButton(0))
                 {
                     float sizeX = dragStartPos.x - Timeline.timelineNotesStatic.InverseTransformPoint(main.ScreenToWorldPoint(Input.mousePosition)).x;
+                    
                     if (Mathf.Abs(sizeX) > .2f)
                     {
                         if(!selectionBox.activeInHierarchy) selectionBox.SetActive(true);
@@ -261,10 +266,10 @@ namespace NotReaper.Modifier
                         selectionBox.transform.localScale = new Vector2(sizeX, selectionBox.transform.localScale.y);
                         newPos.x = dragStartPos.x + (sizeX / 2);
                         selectionBox.transform.localPosition = new Vector2(newPos.x, selectionBox.transform.localPosition.y);
-
-                        foreach(Modifier m in ModifierHandler.Instance.modifiers)
+                        
+                        foreach (Modifier m in ModifierHandler.Instance.modifiers)
                         {
-                            if(m.transform.localPosition.x > rend.bounds.min.x && m.transform.localPosition.x < rend.bounds.max.x)
+                            if(m.startMark.transform.position.x > rend.bounds.min.x && m.startMark.transform.position.x < rend.bounds.max.x)
                             {
                                 if (!selectedEntries.Contains(m))
                                 {
@@ -279,8 +284,6 @@ namespace NotReaper.Modifier
                                 }
                             }
                         }
-
-
                     }
                 }
                 if (Input.GetMouseButtonUp(0))

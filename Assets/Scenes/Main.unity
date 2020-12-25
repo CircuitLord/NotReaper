@@ -107087,6 +107087,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2495659640164554793, guid: 8256b527a95885e43b25e656bdba305d,
         type: 3}
+      propertyPath: ButtonTooltip
+      value: Modifier panel [O]
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495659640164554793, guid: 8256b527a95885e43b25e656bdba305d,
+        type: 3}
       propertyPath: NROnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1288364400}
@@ -108967,7 +108972,7 @@ MonoBehaviour:
         m_CallState: 2
   buttonBackground: {fileID: 0}
   destroyOnClick: 0
-  ButtonTooltip: Timing panel [F6]
+  ButtonTooltip: Help panel [F1]
   onHoverValue: 0.7
   parentWindow: {fileID: 0}
 --- !u!1 &181536232878604831
