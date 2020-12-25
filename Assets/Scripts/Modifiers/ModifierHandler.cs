@@ -34,6 +34,8 @@ namespace NotReaper.Modifier
         [SerializeField] private GameObject endTickButton;
         [SerializeField] private GameObject createModifierButton;
         [SerializeField] private GameObject modifierPrefab;
+        [SerializeField] private Transform leftMax;
+        [SerializeField] private Transform rightMax;
 
         public List<Modifier> modifiers = new List<Modifier>();
         private Modifier currentModifier;
@@ -44,6 +46,7 @@ namespace NotReaper.Modifier
         private bool init = false;
         private bool skipRefresh = false;
         private bool isHidden = false;
+        private bool parentSet = false;
 
         public void Start()
         {
@@ -63,6 +66,27 @@ namespace NotReaper.Modifier
             colorPicker.SetActive(false);
             slider = amountSlider.GetComponent<LabelSetter>();
             
+        }
+
+        public void OptimizeModifiers()
+        {
+            foreach(Modifier m in modifiers)
+            {
+                m.Optimize(false);
+                if (m.endMarkExists)
+                {
+                    if (m.endMark.transform.position.x > leftMax.position.x && m.startMark.transform.position.x < rightMax.position.x)
+                    {
+                        m.Optimize(true);
+                    }
+                       
+                }
+                else if (m.startMark.transform.position.x > leftMax.position.x && m.startMark.transform.position.x < rightMax.position.x)
+                {
+                    m.Optimize(true);
+                }
+                   
+            }
         }
 
         public void DropCurrentModifier()

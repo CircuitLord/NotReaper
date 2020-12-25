@@ -17,6 +17,7 @@ namespace NotReaper.Modifier
     {
         public static ModifierSelectionHandler Instance = null;
         public Transform posGetter = null;
+        public GameObject selectionBox;
         public static bool isPasting = false;
 
 
@@ -25,6 +26,8 @@ namespace NotReaper.Modifier
 
         private Camera main;
         private CopyMode mode = CopyMode.Copy;
+        private Vector3 dragStartPos;
+        private Renderer rend;
 
         private void Start()
         {
@@ -38,7 +41,9 @@ namespace NotReaper.Modifier
             posGetter = GameObject.Instantiate(new GameObject("PosGetter").transform);
             posGetter.SetParent(Timeline.timelineNotesStatic);
             main = Camera.main;
-            
+            rend = selectionBox.GetComponent<Renderer>();
+            selectionBox.SetActive(false);
+           
         }
 
         public void CleanUp()
@@ -232,6 +237,61 @@ namespace NotReaper.Modifier
                 {
                     SelectAll();
                 }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    
+                    dragStartPos = Timeline.timelineNotesStatic.InverseTransformPoint(main.ScreenToWorldPoint(Input.mousePosition));
+                    selectionBox.transform.SetParent(Timeline.timelineNotesStatic);
+                    Vector3 newPos = selectionBox.transform.localPosition;
+                    newPos.x = dragStartPos.x;
+                    selectionBox.transform.localPosition = newPos;
+                    
+                    
+                   
+                }
+                if (Input.GetMouseButton(0))
+                {
+                    float sizeX = dragStartPos.x - Timeline.timelineNotesStatic.InverseTransformPoint(main.ScreenToWorldPoint(Input.mousePosition)).x;
+                    if (Mathf.Abs(sizeX) > .2f)
+                    {
+                        if(!selectionBox.activeInHierarchy) selectionBox.SetActive(true);
+                        Vector3 newPos = selectionBox.transform.localPosition;
+                        
+                        sizeX *= -1f;
+                        selectionBox.transform.localScale = new Vector2(sizeX, selectionBox.transform.localScale.y);
+                        newPos.x = dragStartPos.x + (sizeX / 2);
+                        selectionBox.transform.localPosition = new Vector2(newPos.x, selectionBox.transform.localPosition.y);
+
+                        foreach(Modifier m in ModifierHandler.Instance.modifiers)
+                        {
+                            if(m.transform.localPosition.x > rend.bounds.min.x && m.transform.localPosition.x < rend.bounds.max.x)
+                            {
+                                if (!selectedEntries.Contains(m))
+                                {
+                                    SelectModifier(m, false);
+                                }
+                            }
+                            else
+                            {
+                                if (selectedEntries.Contains(m))
+                                {
+                                    SelectModifier(m, false);
+                                }
+                            }
+                        }
+
+
+                    }
+                }
+                if (Input.GetMouseButtonUp(0))
+                {
+                    dragStartPos = Vector3.zero;
+                    selectionBox.SetActive(false);
+                }
+            }
+            if (Input.GetKeyUp(KeyCode.LeftControl) && selectionBox.activeInHierarchy)
+            {
+                selectionBox.SetActive(false);
             }
             if (Input.GetKeyDown(KeyCode.Delete))
             {
