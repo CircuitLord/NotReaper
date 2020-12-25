@@ -568,17 +568,21 @@ namespace NotReaper.Modifier
                     {
                         if (currentModifier.option2)
                         {
-                            text = "Amount represents flashes per second";
+                            text = "Amount represents flashes per beat (1/4 note)";
+                            slider.SetMinValue(1f);
+                            slider.SetMaxValue(128f);
                             endTickButton.SetActive(true);
                             break;
                         }
                         if (currentModifier.option1)
                         {
+                            SetMinMax(type);
                             text = "Amount represents speed";
                             endTickButton.SetActive(true);
                             break;
                         }
                     }
+                    SetMinMax(type);
                     endTickButton.SetActive(false);
                     text = "Default: 100";
                     break;
