@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2692844488994215283
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2692844488994215281}
+  - component: {fileID: 2692844488994215280}
+  m_Layer: 0
+  m_Name: Modifier
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2692844488994215281
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2692844488994215283}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.0440788, y: 7.128885, z: -6.070406}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2692844488994215280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2692844488994215283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad2a3f89b8449dd4a8943774857336eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  amount: 0
+  startPosX: 0
+  endPosX: 0
+  value1: 
+  value2: 
+  option1: 0
+  option2: 0
+  leftHandColor: []
+  rightHandColor: []
+  modifierType: 0
+  shorthand: 
+  startTime:
+    tick: 0
+  endTime:
+    tick: 0
+  startSet: 0
+  level: 0
+  startMark: {fileID: 0}
+  endMark: {fileID: 0}
+  miniStart: {fileID: 0}
+  miniEnd: {fileID: 0}
+  connector: {fileID: 0}
+  startMarkPrefab: {fileID: 6350984003558542677, guid: f323bac9b81273042aced235f7453f6c,
+    type: 3}
+  miniStartPrefab: {fileID: 6350984003558542677, guid: f323bac9b81273042aced235f7453f6c,
+    type: 3}
+  endMarkPrefab: {fileID: 6350984003558542677, guid: 28a9678abe29f124f9f7e79c797f7b0e,
+    type: 3}
+  miniEndPrefab: {fileID: 6350984003558542677, guid: 28a9678abe29f124f9f7e79c797f7b0e,
+    type: 3}
+  connectorPrefab: {fileID: 6350984003558542677, guid: 65ec6d2edb74c6043a6be4c6d3990862,
+    type: 3}
+  isCreated: 0
+  isSelected: 0
+  glow: {fileID: 0}

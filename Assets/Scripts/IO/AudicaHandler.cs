@@ -4,9 +4,11 @@ using System.IO;
 using System.Text;
 using Ionic.Zip;
 using NAudio.Midi;
+using Newtonsoft.Json;
 using NotReaper.Models;
 using UnityEngine;
 using UnityEngine.Networking;
+using NotReaper.Modifier;
 
 namespace NotReaper.IO {
 
@@ -19,12 +21,11 @@ namespace NotReaper.IO {
 			
 
 			string appPath = Application.dataPath;
-			bool easy = false, standard = false, advanced = false, expert = false;
+			bool easy = false, standard = false, advanced = false, expert = false, modifiers = false;
 
 
 			HandleCache.CheckCacheFolderValid();
 			HandleCache.ClearCueCache();
-
 			//Figure out what files we need to extract by getting the song.desc.
 			foreach (ZipEntry entry in audicaZip.Entries) {
 				if (entry.FileName == "song.desc") {
@@ -60,6 +61,11 @@ namespace NotReaper.IO {
 					entry.Extract($"{appPath}/.cache");
 					easy = true;
 				} 
+                else if(entry.FileName == "modifiers.json")
+                {
+                    entry.Extract($"{appPath}/.cache");
+                    modifiers = true;
+                }
 			}
 
 			//Load moggsongg, has to be done after desc is loaded
@@ -91,6 +97,10 @@ namespace NotReaper.IO {
 			if (easy) {
 				audicaFile.diffs.beginner = JsonUtility.FromJson<CueFile>(File.ReadAllText($"{appPath}/.cache/beginner.cues"));
 			}
+            if (modifiers)
+            {
+                audicaFile.modifiers = JsonUtility.FromJson<ModifierList>(File.ReadAllText($"{appPath}/.cache/modifiers.json"));
+            }
 
 			MemoryStream temp = new MemoryStream();
 
@@ -155,9 +165,7 @@ namespace NotReaper.IO {
 
 					//audicaFile.song_png = new ArtFile(artFileName);
 				}
-
-					temp.SetLength(0);
-
+                temp.SetLength(0);
 			}
 
 

@@ -23,10 +23,9 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using Application = UnityEngine.Application;
 using NotReaper.Timing;
-
+using NotReaper.Modifier;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
-using Sirenix.Utilities;
 
 namespace NotReaper {
 
@@ -186,7 +185,6 @@ namespace NotReaper {
 	public class Timeline : MonoBehaviour {
 
 		public static Timeline instance;
-		
 		//Hidden public values
 		[HideInInspector] public static AudicaFile audicaFile;
 
@@ -347,7 +345,6 @@ namespace NotReaper {
 			NRSettings.PostLoad.Invoke();
 			beatSnapWarningText.DOFade(0f, 0f);
 		}
-
 
 		private void HandleAutoupdater() {
 
@@ -1129,7 +1126,8 @@ namespace NotReaper {
 			Tools.undoRedoManager.ClearActions();
 			tempoChanges.Clear();
 			RemoveAllRepeaters();
-		}
+            ModifierHandler.Instance.CleanUp();
+        }
 
 		public void Export()
 		{
@@ -1189,7 +1187,7 @@ namespace NotReaper {
 					audicaFile.diffs.beginner = export;
 					break;
 			}
-
+            
 			audicaFile.desc = desc;
 
 			desc.tempoList = tempoChanges;
@@ -1242,13 +1240,11 @@ namespace NotReaper {
 		}
 
 		public bool LoadAudicaFile(bool loadRecent = false, string filePath = null) {
-			readyToRegenerate = false;
-
+            readyToRegenerate = false;
 			inTimingMode = false;
 			SetOffset(new Relative_QNT(0));
-
-			if (audicaLoaded) {
-				miniTimeline.ClearBookmarks(false);
+            if (audicaLoaded) {
+                miniTimeline.ClearBookmarks(false);
 			}
 			
 			if (audicaLoaded && NRSettings.config.saveOnLoadNew) {
@@ -1370,10 +1366,15 @@ namespace NotReaper {
 
 			if (audicaFile.desc.bookmarks != null) {
 				foreach (BookmarkData data in audicaFile.desc.bookmarks) {
-					miniTimeline.SetBookmark(data.xPosMini, data.xPosTop, data.type, true, false);
+					miniTimeline.SetBookmark(data.xPosMini, data.xPosTop, data.type, data.text, data.color, (BookmarkUIColor)data.uiColor, true, true);
 				}
-				
-			}
+            }
+
+            if(audicaFile.modifiers != null)
+            {
+                if(audicaFile.modifiers.modifiers.Count > 0)
+                    StartCoroutine(ModifierHandler.Instance.LoadModifiers(audicaFile.modifiers.modifiers, true));         
+            }
 
 			//Loaded successfully
 
@@ -2005,6 +2006,7 @@ namespace NotReaper {
 		}
 
 		public void SetScale(int newScale) {
+
 			if (newScale < 5 || newScale > 100) return;
 			timelineBG.material.SetTextureScale("_MainTex", new Vector2(newScale / 4f, 1));
 			scaleOffset = -newScale % 8 / 8f;
@@ -2026,8 +2028,8 @@ namespace NotReaper {
 				
 				note.localScale = noteScale;
 			}
-
-
+            ModifierHandler.Instance.Scale((float)newScale / scale);
+            BookmarkMenu.Instance.Scale();
 			scale = newScale;
 
 			foreach (Target target in orderedNotes) {
@@ -2118,7 +2120,7 @@ namespace NotReaper {
 
 			bool dragging = Input.GetMouseButton(0) && hover;
 
-			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f)
+			if (!isShiftDown && !isScrollingBeatSnap && Math.Abs(Input.mouseScrollDelta.y) > 0.1f && !ModifierHandler.Instance.IsDropdownExpanded())
 			{
 				if (!audioLoaded) return;
 				if (EditorInput.inUI && EditorInput.enableScrolling == false) return;
@@ -2173,9 +2175,8 @@ namespace NotReaper {
 			}
 
 
-			if (Input.GetKeyDown(KeyCode.A) && isCtrlDown)
+			if (Input.GetKeyDown(KeyCode.A) && isCtrlDown && !ModifierHandler.activated)
 			{
-
 				Camera.main.farClipPlane = 1000;
 
 				foreach (Target target in orderedNotes)
@@ -2301,7 +2302,7 @@ namespace NotReaper {
 			}
 		}
 
-		private static void OptimizeInvisibleTargets()
+		public static void OptimizeInvisibleTargets()
 		{
 			if (NRSettings.config.optimizeInvisibleTargets)
 			{
@@ -2311,11 +2312,19 @@ namespace NotReaper {
 					orderedNotes[i].gridTargetIcon.gameObject.SetActive(false);
 					orderedNotes[i].timelineTargetIcon.gameObject.SetActive(false);
 				}
-				foreach (Target target in targetsToShow)
-				{
-					target.gridTargetIcon.gameObject.SetActive(true);
-					target.timelineTargetIcon.gameObject.SetActive(true);
-				}
+                if (!ModifierHandler.activated)
+                {
+                    foreach (Target target in targetsToShow)
+                    {
+                        target.gridTargetIcon.gameObject.SetActive(true);
+                        target.timelineTargetIcon.gameObject.SetActive(true);
+                    }
+                }
+                else
+                {
+                    //ModifierTimeline.Instance.OptimizeModifiers();
+                }
+                
 			}
 		}
 
@@ -2427,6 +2436,7 @@ namespace NotReaper {
 		}
 
 		public void JumpToX(float x) {
+            if (ModifierHandler.activated) return;
 			StopCoroutine(AnimateSetTime(new QNT_Timestamp(0)));
 
 			float posX = Math.Abs(timelineTransformParent.position.x) + x;
@@ -2555,6 +2565,15 @@ namespace NotReaper {
 			else
 				return 0;
 		}
+
+        public float GetPercentagePlayed(QNT_Timestamp tick)
+        {
+            if (songPlayback.song != null)
+                return (TimestampToSeconds(tick) / songPlayback.song.length);
+
+            else
+                return 0;
+        }
 
 		//Shifts `startTime` by `duration` seconds, respecting bpm changes in between
 		public QNT_Timestamp ShiftTick(QNT_Timestamp startTime, float duration, bool useBinarySearch = true) {

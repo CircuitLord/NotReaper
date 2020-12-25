@@ -77,6 +77,11 @@ namespace NotReaper.IO {
 			songDesc.offset = offset;
 			File.WriteAllText(Path.Combine(workFolder, "song.desc"), JsonUtility.ToJson(songDesc, true));
 
+            /*File.Delete(Path.Combine(workFolder, "modifiers.json"));
+            ModifierList modifierList = new ModifierList();
+            modifierList.modifiers = ModifierHandler.instance.modifiers;
+            File.WriteAllText(Path.Combine(workFolder, "modifiers.json"), JsonUtility.ToJson(modifierList, true));
+            */
 			
 			//Create the actual audica file and save it to the /saves/ folder
 			using(ZipArchive archive = ZipArchive.Create()) {
@@ -86,7 +91,7 @@ namespace NotReaper.IO {
 				archive.AddEntry("song.png", Path.Combine(workFolder, "song.png"));
 				archive.AddEntry("song.mogg", Path.Combine(workFolder, "song.mogg"));
 				archive.AddEntry("song.moggsong", Path.Combine(workFolder, "song.moggsong"));
-
+                archive.AddEntry("modifiers.json", Path.Combine(workFolder, "modifiers.json"));
 
 				archive.SaveTo(Path.Combine(Application.dataPath, @"../", "saves", songID + ".audica"), SharpCompress.Common.CompressionType.None);
 			}

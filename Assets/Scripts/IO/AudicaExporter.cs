@@ -13,6 +13,7 @@ using SharpCompress.Common;
 using SharpCompress.Writers;
 using UnityEngine;
 using NotReaper.Timing;
+using NotReaper.Modifier;
 
 namespace NotReaper.IO {
 
@@ -34,7 +35,7 @@ namespace NotReaper.IO {
 				HandleCache.CheckCacheFolderValid();
 				HandleCache.CheckSaveFolderValid();
 
-				bool expert = false, advanced = false, standard = false, easy = false;
+                bool expert = false, advanced = false, standard = false, easy = false, modifiers = false;
 				//Write the cues files to disk so we can add them to the audica file.
 				if (audicaFile.diffs.expert.cues != null) {
 					File.WriteAllText($"{Application.dataPath}/.cache/expert-new.cues", CuesToJson(audicaFile.diffs.expert));
@@ -52,6 +53,12 @@ namespace NotReaper.IO {
 					File.WriteAllText($"{Application.dataPath}/.cache/beginner-new.cues", CuesToJson(audicaFile.diffs.beginner));
 					easy = true;
 				}
+                audicaFile.modifiers.modifiers = ModifierHandler.Instance.MapToDTO();
+                if (audicaFile.modifiers.modifiers.Count > 0)
+                {
+                    File.WriteAllText($"{Application.dataPath}/.cache/modifiers.json", ModifiersToJson2(audicaFile.modifiers));
+                    modifiers = true;
+                }
 
 				File.WriteAllText($"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}", audicaFile.mainMoggSong.ExportToText());
 				File.WriteAllText($"{Application.dataPath}/.cache/song-new.desc", JsonUtility.ToJson(audicaFile.desc));
@@ -73,9 +80,6 @@ namespace NotReaper.IO {
 
 					if (entry.ToString() == "expert.cues") {
 						archive.RemoveEntry(entry);
-						
-
-
 					} else if (entry.ToString() == "song.desc") {
 						archive.RemoveEntry(entry);
 					}
@@ -91,7 +95,10 @@ namespace NotReaper.IO {
 						archive.RemoveEntry(entry);
 					} else if (entry.ToString() == "beginner.cues") {
 						archive.RemoveEntry(entry);
-					}
+					} else if(entry.ToString() == "modifiers.json")
+                    {
+                        archive.RemoveEntry(entry);
+                    }
 					
 
 				}
@@ -99,10 +106,11 @@ namespace NotReaper.IO {
 				if (advanced) archive.AddEntry("advanced.cues", $"{Application.dataPath}/.cache/advanced-new.cues");
 				if (standard) archive.AddEntry("moderate.cues", $"{Application.dataPath}/.cache/moderate-new.cues");
 				if (easy) archive.AddEntry("beginner.cues", $"{Application.dataPath}/.cache/beginner-new.cues");
-
+                if (modifiers) archive.AddEntry("modifiers.json", $"{Application.dataPath}/.cache/modifiers.json");
+                    
 
 				archive.AddEntry($"{audicaFile.desc.moggSong}", $"{Application.dataPath}/.cache/{audicaFile.desc.moggSong}");
-				archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/song-new.desc");
+                archive.AddEntry("song.desc", $"{Application.dataPath}/.cache/song-new.desc");
 				archive.AddEntry("song.mid", $"{Application.dataPath}/.cache/song.mid");
 				if (File.Exists($"{Application.dataPath}/.cache/song.png"))
 					{
@@ -130,6 +138,17 @@ namespace NotReaper.IO {
 			return JsonUtility.ToJson(cueFile, true);
 		}
 
+        public static string ModifiersToJson2(ModifierList modifiers)
+        {
+            return JsonUtility.ToJson(modifiers, true);
+        }
+
+        public static string ModifiersToJson(ModifierList modifiers)
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.All;
+            return JsonConvert.SerializeObject(modifiers, Formatting.Indented, settings);
+        }
 
 	}
 

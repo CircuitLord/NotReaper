@@ -30,7 +30,6 @@ namespace NotReaper.UI {
 
 
 
-
         [Header("Extras")]
         [SerializeField] private GameObject selectedSlider;
         [SerializeField] private RectTransform sliderRTrans;

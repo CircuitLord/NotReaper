@@ -32,10 +32,10 @@ public class ShortcutInfo : MonoBehaviour {
         readmeButton.onClick.AddListener(() => {
             Application.OpenURL("https://github.com/CircuitLord/NotReaper/blob/master/README.md");
         });
-        hide();
+        Hide();
     }
 
-    public void show() {
+    public void Show() {
         gameObject.SetActive(true);
         gameObject.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
         
@@ -49,7 +49,7 @@ public class ShortcutInfo : MonoBehaviour {
 
 
 
-    public void hide() {
+    public void Hide() {
 
         gameObject.SetActive(false);
 

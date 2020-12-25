@@ -5,6 +5,7 @@ using NAudio.Midi;
 using NotReaper.Targets;
 using NotReaper.Timing;
 using NotReaper.UI;
+using NotReaper.Modifier;
 
 namespace NotReaper.Models {
 	public struct TempoChange {
@@ -118,6 +119,7 @@ namespace NotReaper.Models {
 		public List<Cue> pathBuilderNoteCues = new List<Cue>();
 		public List<PathBuilderData> pathBuilderNoteData = new List<PathBuilderData>();
         public List<RepeaterSection> repeaterSections = new List<RepeaterSection>();
+        public List<ModifierHandler> modifiers = new List<ModifierHandler>(); //TODO: is this needed?
 	}
 
 	[Serializable]
@@ -146,6 +148,7 @@ namespace NotReaper.Models {
 		public SafeDesc safeDesc = new SafeDesc();
 		public AudioClip song;
 		public DiffsList diffs = new DiffsList();
+        public ModifierList modifiers = new ModifierList();
 		public AudioClip song_extras;
 		public AudioClip song_sustain_l;
 		public AudioClip song_sustain_r;
@@ -156,6 +159,12 @@ namespace NotReaper.Models {
 		public bool usesRightSustain = false;
 
 	}
+
+    [Serializable]
+    public class ModifierList
+    {
+        public List<Modifier.ModifierDTO> modifiers = new List<Modifier.ModifierDTO>();
+    }
 
 	public static class CuesDifficulty {
 		public static string expert = "expert";
