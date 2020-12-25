@@ -2322,7 +2322,7 @@ namespace NotReaper {
                 }
                 else
                 {
-                    //ModifierTimeline.Instance.OptimizeModifiers();
+                    ModifierHandler.Instance.OptimizeModifiers();
                 }
                 
 			}

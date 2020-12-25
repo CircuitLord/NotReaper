@@ -410,6 +410,15 @@ namespace NotReaper.Modifier
             Select(singleSelect);
         }
 
+        public void Optimize(bool enable)
+        {
+            if (startMarkExists) startMark.SetActive(enable);
+            if (endMarkExists) endMark.SetActive(enable);
+            if (connectorExists) connector.gameObject.SetActive(enable);
+            if (miniStartExists) miniStart.SetActive(enable);
+            if (miniEndExists) miniEnd.SetActive(enable);
+        }
+
         public enum UpdateType
         {
             UpdateStart,
