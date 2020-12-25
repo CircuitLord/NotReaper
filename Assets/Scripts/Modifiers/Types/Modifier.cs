@@ -165,7 +165,7 @@ namespace NotReaper.Modifier
             }
             else if (ModifierSelectionHandler.isPasting)
             {
-                modifierTop.transform.position = startMarker ? new Vector3(startPosX, modifierTop.transform.position.y, 0f) : new Vector3(endPosX * Timeline.scaleTransform, startMark.transform.position.y, 0f);
+                modifierTop.transform.position = startMarker ? new Vector3(startPosX * Timeline.scaleTransform, modifierTop.transform.position.y, 0f) : new Vector3(endPosX * Timeline.scaleTransform, startMark.transform.position.y, 0f);
                 modifierBottom.transform.position = new Vector3((float)MiniTimeline.Instance.GetXForTheModifierThingy(miniTime), 0f, 0f);
             }
             else

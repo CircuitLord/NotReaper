@@ -97,7 +97,7 @@ namespace NotReaper.Modifier
 
             QNT_Timestamp newStartTick = Timeline.time;
             QNT_Timestamp firstTick = new QNT_Timestamp((ulong)copiedEntries.First().startTick);
-            float tickOffset = newStartTick.tick - copiedEntries.First().startTick;
+            float tickOffset = (newStartTick.tick - copiedEntries.First().startTick);
             posGetter.position = Vector3.zero;
             float positionOffset = posGetter.position.x - copiedEntries.First().startPosX;
             float miniOffset = MiniTimeline.Instance.GetXForTheBookmarkThingy() - copiedEntries.First().miniStartX;
