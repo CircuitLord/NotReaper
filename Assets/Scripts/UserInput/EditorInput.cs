@@ -770,12 +770,12 @@ namespace NotReaper.UserInput {
 			}
 
 
-			if (!isShiftDown && isCTRLDown && Input.GetKeyDown(InputManager.undo)) {
+			if (!isShiftDown && isCTRLDown && Input.GetKeyDown(InputManager.undo) && !ModifierHandler.activated) {
 				Tools.undoRedoManager.Undo();
 				Debug.Log("Undoing...");
 			}
 
-			if (isShiftDown && isCTRLDown && Input.GetKeyDown(InputManager.redo)) {
+			if (isShiftDown && isCTRLDown && Input.GetKeyDown(InputManager.redo) && !ModifierHandler.activated) {
 				Tools.undoRedoManager.Redo();
 				Debug.Log("Redoing...");
 			}

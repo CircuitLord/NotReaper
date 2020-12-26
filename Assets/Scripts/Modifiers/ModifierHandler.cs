@@ -19,6 +19,7 @@ namespace NotReaper.Modifier
         public static ModifierHandler Instance = null;
         public static bool inputFocused = false;
         public static bool activated;
+        public static bool isLoading = false;
         [HideInInspector] public bool isHovering;
 
         [Header("References")]
@@ -185,7 +186,7 @@ namespace NotReaper.Modifier
             }                          
         }
 
-        public IEnumerator LoadModifiers(List<ModifierDTO> modList, bool fromLoad = false)
+        public IEnumerator LoadModifiers(List<ModifierDTO> modList, bool fromLoad = false, bool fromAction = false)
         {
             if (currentModifier != null)
             {
@@ -201,6 +202,7 @@ namespace NotReaper.Modifier
             ModifierSelectionHandler.isPasting = false;
             yield return new WaitForSeconds(.001f);
             ShowModifiers(activated);
+            isLoading = false;
         }
 
         public void LoadModifier(Modifier modifier)
@@ -235,6 +237,9 @@ namespace NotReaper.Modifier
             if (!CanCreateModifier(currentModifier.modifierType, currentModifier.startTime)) return;
             currentModifier.CreateModifier(save);
             modifiers.Add(currentModifier);
+            List<Modifier> lmo = new List<Modifier>();
+            lmo.Add(currentModifier);
+            if (!save && !isLoading) ModifierUndoRedo.Instance.AddAction(lmo, Action.Create);
             currentModifier = null;
             OnDropdownValueChanged();           
         }

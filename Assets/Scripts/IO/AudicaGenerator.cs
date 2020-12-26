@@ -82,7 +82,7 @@ namespace NotReaper.IO {
             modifierList.modifiers = ModifierHandler.instance.modifiers;
             File.WriteAllText(Path.Combine(workFolder, "modifiers.json"), JsonUtility.ToJson(modifierList, true));
             */
-			
+            File.Create(Path.Combine(workFolder, "modifiers.json"));
 			//Create the actual audica file and save it to the /saves/ folder
 			using(ZipArchive archive = ZipArchive.Create()) {
 				archive.AddAllFromDirectory(audicaTemplate);

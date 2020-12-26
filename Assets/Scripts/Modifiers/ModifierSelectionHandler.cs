@@ -10,6 +10,7 @@ using Sirenix.Utilities;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using NotReaper.UI;
+using NotReaper.UserInput;
 
 namespace NotReaper.Modifier
 {
@@ -55,13 +56,22 @@ namespace NotReaper.Modifier
 
         public void DeleteSelectedModifiers()
         {
-            for(int i = 0; i < selectedEntries.Count; i++)
+            bool couldAdd = ModifierUndoRedo.Instance.AddAction(selectedEntries, Action.Delete);
+            for (int i = 0; i < selectedEntries.Count; i++)
             {
                 selectedEntries[i].Delete();
             }
             selectedEntries.Clear();
             ModifierHandler.Instance.HideWindow(false);
             StartCoroutine(ModifierHandler.Instance.IUpdateLevels());
+        }
+
+        public void Restore(List<ModifierDTO> dtoList)
+        {
+            mode = CopyMode.Restore;
+            copiedEntries.Clear();
+            copiedEntries = dtoList;
+            PasteCopiedModifiers();
         }
 
         public void CopySelectedModifiers()
@@ -107,21 +117,23 @@ namespace NotReaper.Modifier
             float positionOffset = posGetter.position.x - copiedEntries.First().startPosX;
             float miniOffset = MiniTimeline.Instance.GetXForTheBookmarkThingy() - copiedEntries.First().miniStartX;
             if (tickOffset == 0 && mode != CopyMode.Cut) return;
-            isPasting = true;
-            foreach(ModifierDTO dto in copiedEntries)
+            isPasting = mode != CopyMode.Restore;
+            if(mode != CopyMode.Restore)
             {
-                dto.startTick += tickOffset;
-                dto.startPosX += positionOffset;
-                dto.miniStartX += miniOffset;
-                if (dto.endTick != 0)
+                foreach (ModifierDTO dto in copiedEntries)
                 {
-                    dto.endTick += tickOffset;
-                    dto.endPosX += positionOffset;
-                    dto.miniEndX += miniOffset;
+                    dto.startTick += tickOffset;
+                    dto.startPosX += positionOffset;
+                    dto.miniStartX += miniOffset;
+                    if (dto.endTick != 0)
+                    {
+                        dto.endTick += tickOffset;
+                        dto.endPosX += positionOffset;
+                        dto.miniEndX += miniOffset;
+                    }
                 }
             }
-               
-            StartCoroutine(ModifierHandler.Instance.LoadModifiers(copiedEntries));
+            StartCoroutine(ModifierHandler.Instance.LoadModifiers(copiedEntries, false, true));
             isPasting = false;
             DeselectAllModifiers();
         }
@@ -271,6 +283,14 @@ namespace NotReaper.Modifier
                 {
                     SelectAll();
                 }
+                if (Input.GetKeyDown(InputManager.undo) && !Input.GetKey(KeyCode.LeftShift))
+                {
+                    ModifierUndoRedo.Instance.Undo();
+                }
+                if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(InputManager.redo))
+                {
+                    ModifierUndoRedo.Instance.Redo();
+                }
                 if (Input.GetMouseButtonDown(0))
                 {
                     dragStartPos = Timeline.timelineNotesStatic.InverseTransformPoint(main.ScreenToWorldPoint(Input.mousePosition));
@@ -332,7 +352,8 @@ namespace NotReaper.Modifier
         private enum CopyMode
         {
             Copy,
-            Cut
+            Cut,
+            Restore
         }
     }
 }

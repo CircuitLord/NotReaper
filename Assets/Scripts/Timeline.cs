@@ -1373,7 +1373,11 @@ namespace NotReaper {
             if(audicaFile.modifiers != null)
             {
                 if(audicaFile.modifiers.modifiers.Count > 0)
-                    StartCoroutine(ModifierHandler.Instance.LoadModifiers(audicaFile.modifiers.modifiers, true));         
+                {
+                    ModifierHandler.isLoading = true;
+                    StartCoroutine(ModifierHandler.Instance.LoadModifiers(audicaFile.modifiers.modifiers, true));
+                }
+                        
             }
 
 			//Loaded successfully

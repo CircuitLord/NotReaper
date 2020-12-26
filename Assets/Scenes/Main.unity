@@ -65540,6 +65540,7 @@ GameObject:
   - component: {fileID: 1288364398}
   - component: {fileID: 1288364400}
   - component: {fileID: 1288364401}
+  - component: {fileID: 1288364399}
   m_Layer: 0
   m_Name: ModifierCreator
   m_TagString: Untagged
@@ -65561,6 +65562,21 @@ Transform:
   m_Father: {fileID: 869528922}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1288364399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288364397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec8e2bd1a6d00404b8a95ca8732a39d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionHistory: []
+  recreatedModifiers: []
+  actionIndex: 0
 --- !u!114 &1288364400
 MonoBehaviour:
   m_ObjectHideFlags: 0
