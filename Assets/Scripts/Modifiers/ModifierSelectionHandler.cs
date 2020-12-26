@@ -204,8 +204,8 @@ namespace NotReaper.Modifier
             if (!ModifierHandler.activated) return;
             if (Input.GetMouseButtonDown(0))
             {
-                RaycastHit2D hit = Physics2D.Raycast(main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, 1 << LayerMask.NameToLayer("Modifier"));
-
+                int layerMask = LayerMask.GetMask("Modifier");
+                RaycastHit2D hit = Physics2D.Raycast(main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, layerMask);
                 if (hit.collider != null)
                 {
                     Modifier m = hit.transform.GetComponent<ClickNotifier>().GetModifier();
@@ -217,13 +217,38 @@ namespace NotReaper.Modifier
                     else
                     {
                         SelectModifier(m, true);
-                    }                                                           
+                    }
+                                                                                            
                 }
                 else if (Input.GetKey(KeyCode.LeftControl))
                 {
                     DeselectAllModifiers();
                 }
-            }            
+                else
+                {
+                    layerMask = LayerMask.GetMask("Timeline");
+                    hit = Physics2D.Raycast(main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, layerMask);
+                    if(hit.collider != null)
+                    {
+                        if (hit.transform.gameObject.layer == 14)
+                        {
+                            DeselectAllModifiers();
+                        }
+                    }
+                }
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                int layerMask = LayerMask.GetMask("Modifier");
+                RaycastHit2D hit = Physics2D.Raycast(main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, layerMask);
+                if (hit.collider != null)
+                {
+                    Modifier m = hit.transform.GetComponent<ClickNotifier>().GetModifier();
+                    DeselectAllModifiers();
+                    selectedEntries.Add(m);
+                    DeleteSelectedModifiers();
+                }
+            }
             if (Input.GetKey(KeyCode.LeftControl))
             {
                 if (Input.GetKeyDown(KeyCode.C))
@@ -248,12 +273,11 @@ namespace NotReaper.Modifier
                 }
                 if (Input.GetMouseButtonDown(0))
                 {
-                    
                     dragStartPos = Timeline.timelineNotesStatic.InverseTransformPoint(main.ScreenToWorldPoint(Input.mousePosition));
                     selectionBox.transform.SetParent(Timeline.timelineNotesStatic);
                     Vector3 newPos = selectionBox.transform.localPosition;
                     newPos.x = dragStartPos.x;
-                    selectionBox.transform.localPosition = newPos;                                                          
+                    selectionBox.transform.localPosition = newPos;
                 }
                 if (Input.GetMouseButton(0))
                 {
@@ -269,20 +293,20 @@ namespace NotReaper.Modifier
                         newPos.x = dragStartPos.x + (sizeX / 2);
                         selectionBox.transform.localPosition = new Vector2(newPos.x, selectionBox.transform.localPosition.y);
                         
-                        foreach (Modifier m in ModifierHandler.Instance.modifiers)
+                        for (int i = 0; i < ModifierHandler.Instance.modifiers.Count; i++)
                         {
-                            if(m.startMark.transform.position.x > rend.bounds.min.x && m.startMark.transform.position.x < rend.bounds.max.x)
+                            if(ModifierHandler.Instance.modifiers[i].startMark.transform.position.x > rend.bounds.min.x && ModifierHandler.Instance.modifiers[i].startMark.transform.position.x < rend.bounds.max.x)
                             {
-                                if (!selectedEntries.Contains(m))
+                                if (!selectedEntries.Contains(ModifierHandler.Instance.modifiers[i]))
                                 {
-                                    SelectModifier(m, false);
+                                    SelectModifier(ModifierHandler.Instance.modifiers[i], false);
                                 }
                             }
                             else
                             {
-                                if (selectedEntries.Contains(m))
+                                if (selectedEntries.Contains(ModifierHandler.Instance.modifiers[i]))
                                 {
-                                    SelectModifier(m, false);
+                                    SelectModifier(ModifierHandler.Instance.modifiers[i], false);
                                 }
                             }
                         }

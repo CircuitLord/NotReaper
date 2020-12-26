@@ -437,8 +437,17 @@ namespace NotReaper.Modifier
         {
             if (currentModifier != null)
             {
-                currentModifier.Delete();
-                currentModifier = null;
+                if (currentModifier.isCreated)
+                {
+                    DeleteModifier();
+                }
+                else
+                {
+                    currentModifier.Delete();
+                    currentModifier = null;
+                    OnDropdownValueChanged();
+                }
+               
             }
         }
 

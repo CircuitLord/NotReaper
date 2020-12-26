@@ -10202,7 +10202,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 168590452}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: LeftMax
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10655,7 +10655,7 @@ GameObject:
   m_Component:
   - component: {fileID: 182098224}
   - component: {fileID: 182098225}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Spectrogram
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13237,7 +13237,7 @@ PrefabInstance:
     - target: {fileID: -8794629182415543781, guid: c9c08db71d576c245ba39e46283f2499,
         type: 3}
       propertyPath: m_Layer
-      value: 1
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: -6387200925977116845, guid: c9c08db71d576c245ba39e46283f2499,
         type: 3}
@@ -14046,7 +14046,7 @@ GameObject:
   - component: {fileID: 249710224}
   - component: {fileID: 249710226}
   - component: {fileID: 249710225}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: TimelineNotes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21040,7 +21040,7 @@ GameObject:
   m_Component:
   - component: {fileID: 368367548}
   - component: {fileID: 368367549}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Container
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25885,7 +25885,7 @@ GameObject:
   - component: {fileID: 483826303}
   - component: {fileID: 483826306}
   - component: {fileID: 483826305}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: zero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26336,7 +26336,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 497996737}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: mask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26948,7 +26948,7 @@ GameObject:
   m_Component:
   - component: {fileID: 512593569}
   - component: {fileID: 512593570}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: CanvasThingy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27627,7 +27627,7 @@ GameObject:
   m_Component:
   - component: {fileID: 526556409}
   - component: {fileID: 526556410}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: RightSustainAudio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28016,7 +28016,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.01307678, y: 48.92}
+  m_AnchoredPosition: {x: 0.01307678, y: 20.92}
   m_SizeDelta: {x: 324.6, y: 76.42613}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &527566606
@@ -28381,7 +28381,7 @@ GameObject:
   - component: {fileID: 540021630}
   - component: {fileID: 540021632}
   - component: {fileID: 540021631}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: RectThingy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31311,7 +31311,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.013076782, y: 104.8}
+  m_AnchoredPosition: {x: 0.013076782, y: 83.6}
   m_SizeDelta: {x: 324.6, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &614981457
@@ -31334,7 +31334,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Use the Arena Filename without ending  (e.g. cloudy)
+  m_text: 'Use the Arena Filename without ending  (e.g. cloudy)
+
+    Default arenas
+    are called environment1-5, (e.g. environment2)'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8d6ffc87ae696bb49b961911c4703d7d, type: 2}
   m_sharedMaterial: {fileID: 2143181537736950723, guid: 8d6ffc87ae696bb49b961911c4703d7d,
@@ -47855,7 +47858,7 @@ GameObject:
   - component: {fileID: 971804791}
   - component: {fileID: 971804790}
   - component: {fileID: 971804789}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: SelectionBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51912,7 +51915,7 @@ GameObject:
   - component: {fileID: 1052582750}
   - component: {fileID: 1052582751}
   - component: {fileID: 1052582752}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Timelinebg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71535,7 +71538,7 @@ GameObject:
   - component: {fileID: 1395334178}
   - component: {fileID: 1395334180}
   - component: {fileID: 1395334181}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Timeline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83809,7 +83812,7 @@ GameObject:
   - component: {fileID: 1617452613}
   - component: {fileID: 1617452615}
   - component: {fileID: 1617452614}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: mask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87243,7 +87246,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1680971285}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: RightMax
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92666,7 +92669,7 @@ GameObject:
   - component: {fileID: 1808405451}
   - component: {fileID: 1808405454}
   - component: {fileID: 1808405453}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Playhead
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94588,7 +94591,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1852465331}
   - component: {fileID: 1852465332}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: LeftSustainAudio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
