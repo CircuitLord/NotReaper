@@ -93,8 +93,6 @@ namespace NotReaper.Modifier
         {
             if (currentModifier is null) return;
             if (!currentModifier.isCreated) return;
-
-
             modifiers.Add(currentModifier);
             currentModifier = null;
         }
@@ -216,12 +214,18 @@ namespace NotReaper.Modifier
 
         public List<ModifierDTO> MapToDTO()
         {
+            Modifier current = null;
+            if (currentModifier != null && currentModifier.isSelected) current = currentModifier;
+            ModifierSelectionHandler.Instance.DeselectAllModifiers();
+            DropCurrentModifier();
             List<ModifierDTO> dtoList = new List<ModifierDTO>();
             foreach(Modifier m in modifiers)
             {
                 dtoList.Add(m.GetDTO());
             }
+            if (current != null) ModifierSelectionHandler.Instance.SelectModifier(current, true);
             return dtoList;
+            
         }
 
         public void CreateModifier(bool save = false)
