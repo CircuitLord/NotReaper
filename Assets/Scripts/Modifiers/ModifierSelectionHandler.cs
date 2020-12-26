@@ -135,7 +135,8 @@ namespace NotReaper.Modifier
             }
             selectedEntries.Clear();
             if(mode == CopyMode.Cut) copiedEntries.Clear();
-            ModifierHandler.Instance.HideWindow(false);            
+            ModifierHandler.Instance.HideWindow(false);
+            ModifierHandler.Instance.FillData(null, false, true);
         }
 
         public void SelectModifier(Modifier m, bool singleSelect)
@@ -159,6 +160,7 @@ namespace NotReaper.Modifier
                 {                  
                     selectedEntries.Remove(m);
                     m.Select(false);
+
                 }                
             }
             else
