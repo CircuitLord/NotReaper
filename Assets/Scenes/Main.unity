@@ -74839,12 +74839,12 @@ PrefabInstance:
     - target: {fileID: 3436151485532106856, guid: 9ebc8165bf56d7a4c8be3d01391466f7,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: DeleteModifier
+      value: OnDeleteButtonClicked
       objectReference: {fileID: 0}
     - target: {fileID: 3436151485532106856, guid: 9ebc8165bf56d7a4c8be3d01391466f7,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ModifierHandler, Assembly-CSharp
+      value: NotReaper.Modifier.ModifierHandler, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3436151485532106858, guid: 9ebc8165bf56d7a4c8be3d01391466f7,
         type: 3}

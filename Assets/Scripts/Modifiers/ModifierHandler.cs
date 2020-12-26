@@ -433,6 +433,15 @@ namespace NotReaper.Modifier
             OnDropdownValueChanged();
         }
 
+        public void OnDeleteButtonClicked()
+        {
+            if (currentModifier != null)
+            {
+                currentModifier.Delete();
+                currentModifier = null;
+            }
+        }
+
         public void OnDropdownValueChanged()
         {
             if (!skipRefresh) ResetCurrentData();
