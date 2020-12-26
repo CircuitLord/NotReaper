@@ -305,6 +305,7 @@ namespace NotReaper.Targets {
             {
                 line.SetActive(data.supportsBeatLength);
                 transform.localScale = Vector3.one * timelineTargetSize * 0.4f;
+                collisionRadius = 0.50f;
             }
             else
             {

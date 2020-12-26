@@ -93,8 +93,6 @@ namespace NotReaper.Modifier
         {
             if (currentModifier is null) return;
             if (!currentModifier.isCreated) return;
-
-
             modifiers.Add(currentModifier);
             currentModifier = null;
         }
@@ -216,12 +214,18 @@ namespace NotReaper.Modifier
 
         public List<ModifierDTO> MapToDTO()
         {
+            Modifier current = null;
+            if (currentModifier != null && currentModifier.isSelected) current = currentModifier;
+            ModifierSelectionHandler.Instance.DeselectAllModifiers();
+            DropCurrentModifier();
             List<ModifierDTO> dtoList = new List<ModifierDTO>();
             foreach(Modifier m in modifiers)
             {
                 dtoList.Add(m.GetDTO());
             }
+            if (current != null) ModifierSelectionHandler.Instance.SelectModifier(current, true);
             return dtoList;
+            
         }
 
         public void CreateModifier(bool save = false)
@@ -237,7 +241,7 @@ namespace NotReaper.Modifier
 
         public bool CanCreateModifier(ModifierType type, QNT_Timestamp tick)
         {
-            if(type == ModifierType.Speed || type == ModifierType.zOffset || type == ModifierType.Fader)
+            if(type == ModifierType.Speed || type == ModifierType.Fader)
             {
                 if (currentModifier.endTime.tick == 0) return false;
             }
@@ -431,6 +435,24 @@ namespace NotReaper.Modifier
             ModifierSelectionHandler.Instance.DeleteSelectedModifiers();
             currentModifier = null;
             OnDropdownValueChanged();
+        }
+
+        public void OnDeleteButtonClicked()
+        {
+            if (currentModifier != null)
+            {
+                if (currentModifier.isCreated)
+                {
+                    DeleteModifier();
+                }
+                else
+                {
+                    currentModifier.Delete();
+                    currentModifier = null;
+                    OnDropdownValueChanged();
+                }
+               
+            }
         }
 
         public void OnDropdownValueChanged()
@@ -743,7 +765,7 @@ namespace NotReaper.Modifier
                     break;
                 case ModifierType.zOffset:
                     slider.SetMinValue(-100f);
-                    slider.SetMaxValue(300f);
+                    slider.SetMaxValue(500f);
                     break;
                 case ModifierType.ColorChange:
                 case ModifierType.ColorUpdate:

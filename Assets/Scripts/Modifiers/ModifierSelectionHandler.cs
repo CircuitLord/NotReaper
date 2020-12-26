@@ -135,18 +135,21 @@ namespace NotReaper.Modifier
             }
             selectedEntries.Clear();
             if(mode == CopyMode.Cut) copiedEntries.Clear();
-            ModifierHandler.Instance.HideWindow(false);            
+            ModifierHandler.Instance.HideWindow(false);
+            ModifierHandler.Instance.FillData(null, false, true);
         }
 
         public void SelectModifier(Modifier m, bool singleSelect)
         {
             ModifierHandler.Instance.DropCurrentModifier();
+            if (selectedEntries.Count == 0) singleSelect = true;
             if (selectedEntries.Contains(m))
             {
                 if (singleSelect)
                 {
-                    DeselectAllModifiers();
                     bool reselect = selectedEntries.Count > 1;
+                    DeselectAllModifiers();
+                   
                     if (reselect)
                     {
                         selectedEntries.Add(m);
@@ -157,6 +160,7 @@ namespace NotReaper.Modifier
                 {                  
                     selectedEntries.Remove(m);
                     m.Select(false);
+
                 }                
             }
             else
@@ -176,6 +180,7 @@ namespace NotReaper.Modifier
             }
             bool singleActive = selectedEntries.Count < 2;
             ModifierHandler.Instance.HideWindow(!singleActive || !singleSelect);
+            if (selectedEntries.Count == 0) ModifierHandler.Instance.HideWindow(false);
             ModifierHandler.Instance.FillData(m, singleActive && singleSelect, selectedEntries.Count == 0);
         }
 
@@ -199,8 +204,8 @@ namespace NotReaper.Modifier
             if (!ModifierHandler.activated) return;
             if (Input.GetMouseButtonDown(0))
             {
-                RaycastHit2D hit = Physics2D.Raycast(main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, 1 << LayerMask.NameToLayer("Modifier"));
-
+                int layerMask = LayerMask.GetMask("Modifier");
+                RaycastHit2D hit = Physics2D.Raycast(main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, layerMask);
                 if (hit.collider != null)
                 {
                     Modifier m = hit.transform.GetComponent<ClickNotifier>().GetModifier();
@@ -212,9 +217,38 @@ namespace NotReaper.Modifier
                     else
                     {
                         SelectModifier(m, true);
-                    }                                                           
+                    }
+                                                                                            
                 }
-            }            
+                else if (Input.GetKey(KeyCode.LeftControl))
+                {
+                    DeselectAllModifiers();
+                }
+                else
+                {
+                    layerMask = LayerMask.GetMask("Timeline");
+                    hit = Physics2D.Raycast(main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, layerMask);
+                    if(hit.collider != null)
+                    {
+                        if (hit.transform.gameObject.layer == 14)
+                        {
+                            DeselectAllModifiers();
+                        }
+                    }
+                }
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                int layerMask = LayerMask.GetMask("Modifier");
+                RaycastHit2D hit = Physics2D.Raycast(main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1000000f, layerMask);
+                if (hit.collider != null)
+                {
+                    Modifier m = hit.transform.GetComponent<ClickNotifier>().GetModifier();
+                    DeselectAllModifiers();
+                    selectedEntries.Add(m);
+                    DeleteSelectedModifiers();
+                }
+            }
             if (Input.GetKey(KeyCode.LeftControl))
             {
                 if (Input.GetKeyDown(KeyCode.C))
@@ -239,19 +273,16 @@ namespace NotReaper.Modifier
                 }
                 if (Input.GetMouseButtonDown(0))
                 {
-                    
                     dragStartPos = Timeline.timelineNotesStatic.InverseTransformPoint(main.ScreenToWorldPoint(Input.mousePosition));
                     selectionBox.transform.SetParent(Timeline.timelineNotesStatic);
                     Vector3 newPos = selectionBox.transform.localPosition;
                     newPos.x = dragStartPos.x;
                     selectionBox.transform.localPosition = newPos;
-                    
-                    
-                   
                 }
                 if (Input.GetMouseButton(0))
                 {
                     float sizeX = dragStartPos.x - Timeline.timelineNotesStatic.InverseTransformPoint(main.ScreenToWorldPoint(Input.mousePosition)).x;
+                    
                     if (Mathf.Abs(sizeX) > .2f)
                     {
                         if(!selectionBox.activeInHierarchy) selectionBox.SetActive(true);
@@ -261,26 +292,24 @@ namespace NotReaper.Modifier
                         selectionBox.transform.localScale = new Vector2(sizeX, selectionBox.transform.localScale.y);
                         newPos.x = dragStartPos.x + (sizeX / 2);
                         selectionBox.transform.localPosition = new Vector2(newPos.x, selectionBox.transform.localPosition.y);
-
-                        foreach(Modifier m in ModifierHandler.Instance.modifiers)
+                        
+                        for (int i = 0; i < ModifierHandler.Instance.modifiers.Count; i++)
                         {
-                            if(m.transform.localPosition.x > rend.bounds.min.x && m.transform.localPosition.x < rend.bounds.max.x)
+                            if(ModifierHandler.Instance.modifiers[i].startMark.transform.position.x > rend.bounds.min.x && ModifierHandler.Instance.modifiers[i].startMark.transform.position.x < rend.bounds.max.x)
                             {
-                                if (!selectedEntries.Contains(m))
+                                if (!selectedEntries.Contains(ModifierHandler.Instance.modifiers[i]))
                                 {
-                                    SelectModifier(m, false);
+                                    SelectModifier(ModifierHandler.Instance.modifiers[i], false);
                                 }
                             }
                             else
                             {
-                                if (selectedEntries.Contains(m))
+                                if (selectedEntries.Contains(ModifierHandler.Instance.modifiers[i]))
                                 {
-                                    SelectModifier(m, false);
+                                    SelectModifier(ModifierHandler.Instance.modifiers[i], false);
                                 }
                             }
                         }
-
-
                     }
                 }
                 if (Input.GetMouseButtonUp(0))
