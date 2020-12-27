@@ -20,7 +20,7 @@ namespace NotReaper.Modifier
         public Transform posGetter = null;
         public GameObject selectionBox;
         public static bool isPasting = false;
-
+        public List<Modifier> tempCopiedModifiers = new List<Modifier>();
 
         private List<Modifier> selectedEntries = new List<Modifier>();
         private List<ModifierDTO> copiedEntries = new List<ModifierDTO>();
@@ -56,7 +56,7 @@ namespace NotReaper.Modifier
 
         public void DeleteSelectedModifiers()
         {
-            bool couldAdd = ModifierUndoRedo.Instance.AddAction(selectedEntries, Action.Delete);
+            bool couldAdd = ModifierUndoRedo.Instance.AddAction(selectedEntries.ToList(), Action.Delete);
             for (int i = 0; i < selectedEntries.Count; i++)
             {
                 selectedEntries[i].Delete();
@@ -70,7 +70,7 @@ namespace NotReaper.Modifier
         {
             mode = CopyMode.Restore;
             copiedEntries.Clear();
-            copiedEntries = dtoList;
+            copiedEntries = dtoList.ToList();
             PasteCopiedModifiers();
         }
 
@@ -83,9 +83,11 @@ namespace NotReaper.Modifier
 
         public void CutSelectedModifiers()
         {
+            if (selectedEntries.Count == 0) return;
             mode = CopyMode.Cut;
             copiedEntries.Clear();
             copiedEntries = GetDTOList();
+            ModifierUndoRedo.Instance.AddAction(selectedEntries.ToList(), Action.Delete);
             for (int i = 0; i < selectedEntries.Count; i++)
             {
                 selectedEntries[i].Delete();
@@ -116,7 +118,7 @@ namespace NotReaper.Modifier
             posGetter.position = Vector3.zero;
             float positionOffset = posGetter.position.x - copiedEntries.First().startPosX;
             float miniOffset = MiniTimeline.Instance.GetXForTheBookmarkThingy() - copiedEntries.First().miniStartX;
-            if (tickOffset == 0 && mode != CopyMode.Cut) return;
+            if (tickOffset == 0 && mode == CopyMode.Copy) return;
             isPasting = mode != CopyMode.Restore;
             if(mode != CopyMode.Restore)
             {
@@ -136,6 +138,18 @@ namespace NotReaper.Modifier
             StartCoroutine(ModifierHandler.Instance.LoadModifiers(copiedEntries, false, true));
             isPasting = false;
             DeselectAllModifiers();
+            if (mode == CopyMode.Restore)
+            {
+                copiedEntries.Clear();
+                mode = CopyMode.Copy;
+            }
+            else
+            {
+                ModifierUndoRedo.Instance.AddAction(tempCopiedModifiers.ToList(), Action.Create);
+                tempCopiedModifiers.Clear();
+            }
+           
+           
         }
         
         public void DeselectAllModifiers()

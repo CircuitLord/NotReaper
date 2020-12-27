@@ -178,6 +178,7 @@ namespace NotReaper.Modifier
 
         public IEnumerator IUpdateLevels()
         {
+            if (ModifierUndoRedo.undoRedoActive) yield break;
             modifiers.Sort((mod1, mod2) => mod1.startTime.tick.CompareTo(mod2.startTime.tick));
             foreach (Modifier m in modifiers)
             {
@@ -239,7 +240,9 @@ namespace NotReaper.Modifier
             modifiers.Add(currentModifier);
             List<Modifier> lmo = new List<Modifier>();
             lmo.Add(currentModifier);
-            if (!save && !isLoading) ModifierUndoRedo.Instance.AddAction(lmo, Action.Create);
+            if (!save && !isLoading && !ModifierSelectionHandler.isPasting) ModifierUndoRedo.Instance.AddAction(lmo, Action.Create);
+            if(ModifierUndoRedo.recreating) ModifierUndoRedo.Instance.recreatedModifiers.Add(currentModifier);
+            if (ModifierSelectionHandler.isPasting) ModifierSelectionHandler.Instance.tempCopiedModifiers.Add(currentModifier);
             currentModifier = null;
             OnDropdownValueChanged();           
         }
