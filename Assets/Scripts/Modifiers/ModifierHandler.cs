@@ -509,7 +509,9 @@ namespace NotReaper.Modifier
                     option2.SetActive(false);
                     colorPicker.SetActive(false);
                     option1.GetComponentInChildren<LabelSetter>().SetLabelText("Continuous");
+                    option2.GetComponentInChildren<LabelSetter>().SetLabelText("Incremental");
                     option1.SetActive(true);
+                    option2.SetActive(true);
                     break;
                 case ModifierType.ColorChange:
                     amountSlider.SetActive(false);
@@ -659,20 +661,15 @@ namespace NotReaper.Modifier
                         {
                             text = "Amount represents speed at end tick";
                             endTickButton.SetActive(true);
-                            option2.GetComponent<LabelSetter>().SetLabelText("Incremental");
-                            option2.SetActive(true);
                             break;
                         }
                         if (currentModifier.option1)
                         {
                             text = "Amount represents rotation speed";
                             endTickButton.SetActive(true);
-                            option2.GetComponent<LabelSetter>().SetLabelText("Continuous");
-                            option2.SetActive(true);
                             break;
                         }
                     }
-                    option2.SetActive(false);
                     endTickButton.SetActive(false);
                     text = "Default: 0";
                     break;
