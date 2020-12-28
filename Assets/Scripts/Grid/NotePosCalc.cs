@@ -3,7 +3,6 @@ using NotReaper.Models;
 using NotReaper.Targets;
 using UnityEngine;
 using NotReaper.Timing;
-
 namespace NotReaper.Grid {
 
 
@@ -89,7 +88,7 @@ namespace NotReaper.Grid {
 			};
 
 			if (NRSettings.config.useAutoZOffsetWith360) {
-				cue.zOffset = GetZOffsetForX(target.data.x);
+                cue.zOffset = GetZOffsetForX(target.data.x);
 			}
 
 

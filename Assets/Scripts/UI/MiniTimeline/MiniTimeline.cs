@@ -262,7 +262,8 @@ namespace NotReaper.UI {
 
 		public void ClearBookmarks(bool deleteInAudica = false) {
 			foreach (Bookmark t in bookmarks) {
-				Destroy(t.gameObject);
+
+                t.Destroy();
 			}
 			
 			bookmarks.Clear();

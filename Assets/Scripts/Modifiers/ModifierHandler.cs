@@ -69,6 +69,13 @@ namespace NotReaper.Modifier
             
         }
 
+        public List<Modifier> GetZOffsetModifiers()
+        {
+            List<Modifier> list = new List<Modifier>();
+            foreach (Modifier m in modifiers) if (m.modifierType == ModifierType.zOffset) list.Add(m);
+            return list;
+        }
+
         public void OptimizeModifiers()
         {
             foreach(Modifier m in modifiers)

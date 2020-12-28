@@ -77,6 +77,7 @@ namespace NotReaper.Models {
 		public double previewStartSeconds = 0.0d;
 		public List<TempoChange> tempoList;
 		public List<BookmarkData> bookmarks = new List<BookmarkData>();
+        public bool bakedzOffset = false;
 	}
 
 	public class SafeDesc {

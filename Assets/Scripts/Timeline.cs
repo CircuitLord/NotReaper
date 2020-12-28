@@ -1153,15 +1153,14 @@ namespace NotReaper {
 			CueFile export = new CueFile();
 			export.cues = new List<Cue>();
 			export.NRCueData = new NRCueData();
-
-			foreach (Target target in orderedNotes) {
+         
+            foreach (Target target in orderedNotes) {
 
 				if (target.data.beatLength == 0) target.data.beatLength = Constants.SixteenthNoteDuration;
 				
 				if (target.data.behavior == TargetBehavior.Metronome) continue;
 				
 				var cue = NotePosCalc.ToCue(target, offset);
-
 				if(target.data.behavior == TargetBehavior.NR_Pathbuilder) {
 					export.NRCueData.pathBuilderNoteCues.Add(cue);
 					export.NRCueData.pathBuilderNoteData.Add(target.data.pathBuilderData);
@@ -1170,8 +1169,12 @@ namespace NotReaper {
 
 				export.cues.Add(cue);
 			}
-
-			export.NRCueData.repeaterSections = repeaterSections.GetRange(0, repeaterSections.Count);
+            if (audicaFile.desc.bakedzOffset)
+            {              
+                export.cues = ZOffsetBaker.Instance.Bake(export.cues.ToList());
+            }
+               
+            export.NRCueData.repeaterSections = repeaterSections.GetRange(0, repeaterSections.Count);
 
 			switch (difficultyManager.loadedIndex) {
 				case 0:

@@ -118,6 +118,12 @@ namespace NotReaper.UI {
             mini.GetComponent<SpriteRenderer>().color = col;
             myUIColor = uiCol;
         }
+
+        public void Destroy()
+        {
+            Destroy(mini.gameObject);
+            Destroy(this.gameObject);
+        }
     }
 
 }
