@@ -612,6 +612,11 @@ namespace NotReaper.Modifier
                 colorPicker.GetComponent<LabelSetter>().SetColorSliderLeft(currentModifier.leftHandColor);
                 colorPicker.GetComponent<LabelSetter>().SetColorSliderRight(currentModifier.rightHandColor);
             }
+            else
+            {
+                currentModifier.leftHandColor = colorPicker.GetComponent<LabelSetter>().GetLeftColor();
+                currentModifier.rightHandColor = colorPicker.GetComponent<LabelSetter>().GetRightColor();
+            }
         }
 
         private void SetHintText(ModifierType type)
@@ -650,13 +655,24 @@ namespace NotReaper.Modifier
                 case ModifierType.ArenaRotation:
                     if(currentModifier != null)
                     {
+                        if (currentModifier.option2)
+                        {
+                            text = "Amount represents speed at end tick";
+                            endTickButton.SetActive(true);
+                            option2.GetComponent<LabelSetter>().SetLabelText("Incremental");
+                            option2.SetActive(true);
+                            break;
+                        }
                         if (currentModifier.option1)
                         {
                             text = "Amount represents rotation speed";
                             endTickButton.SetActive(true);
+                            option2.GetComponent<LabelSetter>().SetLabelText("Continuous");
+                            option2.SetActive(true);
                             break;
                         }
                     }
+                    option2.SetActive(false);
                     endTickButton.SetActive(false);
                     text = "Default: 0";
                     break;
