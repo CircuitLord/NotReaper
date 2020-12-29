@@ -105,7 +105,6 @@ namespace NotReaper.Modifier
                 currentModifier.Delete();
                 return;
             }
-               
             modifiers.Add(currentModifier);
             currentModifier = null;
         }

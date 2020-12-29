@@ -89,12 +89,13 @@ namespace NotReaper.Modifier
             copiedEntries.Clear();
             copiedEntries = GetDTOList();
             ModifierUndoRedo.Instance.AddAction(selectedEntries.ToList(), Action.Delete);
-            for (int i = 0; i < selectedEntries.Count; i++)
+            /*for (int i = 0; i < selectedEntries.Count; i++)
             {
+                ModifierHandler.Instance.DeleteModifier();
                 selectedEntries[i].Delete();
-            }
+            }*/
+            ModifierHandler.Instance.DeleteModifier();
             selectedEntries.Clear();
-
             StartCoroutine(ModifierHandler.Instance.IUpdateLevels());
         }
 
