@@ -100,7 +100,12 @@ namespace NotReaper.Modifier
         public void DropCurrentModifier()
         {
             if (currentModifier is null) return;
-            if (!currentModifier.isCreated) return;
+            if (!currentModifier.isCreated)
+            {
+                currentModifier.Delete();
+                return;
+            }
+               
             modifiers.Add(currentModifier);
             currentModifier = null;
         }

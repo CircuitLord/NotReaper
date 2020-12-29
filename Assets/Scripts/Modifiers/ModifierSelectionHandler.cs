@@ -112,7 +112,7 @@ namespace NotReaper.Modifier
         {
             if (copiedEntries.Count == 0) return;
             copiedEntries.Sort((mod1, mod2) => mod1.startTick.CompareTo(mod2.startTick));
-
+            ModifierHandler.Instance.DropCurrentModifier();
             QNT_Timestamp newStartTick = Timeline.time;
             QNT_Timestamp firstTick = new QNT_Timestamp((ulong)copiedEntries.First().startTick);
             float tickOffset = newStartTick.tick - copiedEntries.First().startTick;
