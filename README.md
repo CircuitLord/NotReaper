@@ -176,10 +176,6 @@ COLOR represents an rgba value as { "r": 0-1, "g": 0-1, "b": 0-1, "a": 0-1 }.
     "bgImagePath": "Path\\To\\Image.png"    // image file to use as a background, default %appdata%\..\locallow\CircuitCubed\NotReaper\BG1.png
 }
 ```
-# Donating
 
-Finding NotReaper useful? I'm glad! :) If you really want to, you can donate here:
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VEEKJW2CSJVZG&currency_code=USD&source=url)
 
 
